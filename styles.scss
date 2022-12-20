@@ -1,0 +1,15 @@
+---
+---
+@import "{{ site.theme }}";
+
+.current {
+  color: green;
+}
+
+.navlink {
+  padding: 0 1em;
+}
+
+.navlink:first-of-type {
+  padding: 0 1em 0 0;
+}
