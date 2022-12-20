@@ -14,15 +14,19 @@ To begin this project, I set out to answer the following questions:
 
 ## Why is managing my Ruby version even important?  Why should people care?
 
-I'd
+We could flip this question around, and ask "What are the alternatives to using a version manager?"  Well, the answer to that is obviously "NOT using a version manager", or just doing what your machine does by default.  That default behavior is to use the system version of Ruby, which comes pre-installed when you buy your laptop.
 
-Because different codebases on your machine will run on different versions of the same languages.  One Rails app might use Ruby v2.7.5, while another has already upgraded to v3.0.0.  If you don’t use a Ruby version manager, then the only alternative is to use the version of Ruby which shipped with your laptop.
+So what's wrong with that?
 
-If you insist on not using a version manager, then every time you want to switch from working on one app to working on the other, you have to upgrade / downgrade your system Ruby version.  That is, shall we say, impractical.  Using a version manager makes this switching process as easy as a few keystrokes.
+Well, if you download different Ruby codebases on your machine, they will likely run on different versions of Ruby.  One Rails app might use Ruby v2.7.5, while another has already upgraded to v3.0.0.
+
+Whether you use a version manager or not, you still need to switch your Ruby version from 2.7.5 to 3.0.0 and back, every time you switch back and forth from developing one of these projects to developing on the other.  If you don't use a version manager, then to perform this switch, you'd have to manually upgrade / downgrade your system Ruby version.
+
+Using a version manager makes this switching process as easy as a few keystrokes.  Each version manager accomplishes this in a different way so we won't go into specifics here.  But what they have in common is that they save you from the slow, error-prone process of the manual version upgrade/downgrade dance with your system version.
 
 [This article](https://web.archive.org/web/20220809210326/https://launchschool.com/books/core_ruby_tools/read/ruby_version_managers) sums it up nicely:
 
-![image tooltip here](/assets/images/why_use_a_version_manager.png)
+![screenshot describing the benefits of using a Ruby version manager](/assets/images/why_use_a_version_manager.png)
 
 In my experience, version managers are one of the more widely-used tools in my toolbelt.  If I want to understand my tools at a deep level, there are certainly much worse places to start.
 

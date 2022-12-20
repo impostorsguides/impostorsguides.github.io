@@ -85,7 +85,7 @@ I started coding in late 2012 - early 2013, at Dev Bootcamp in Chicago.  So many
 
 ## To Make The Learning Resource I Wish I’d Had
 
-There are some learning resources that speak my language, like the Michael Hartl tutorial (“build an X from scratch” is very much my speed).  But I find other docs and resources to be maddeningly abstract.  They’re often written by people suffering from the Curse of Knowledge, people who have long since forgotten what it’s like to be a beginner.  I don’t think it’s productive to tell newbies to “read the fucking manual” when the manual often isn’t written with newbies in mind, i.e. without examples, with jargon that goes undefined, etc.
+There are some learning resources that speak my language, like the Michael Hartl tutorial (“build an X from scratch” is very much my speed).  But I find other docs and resources to be maddeningly abstract.  They’re often written by people suffering from the [Curse of Knowledge](https://en.wikipedia.org/wiki/Curse_of_knowledge), people who have long since forgotten what it’s like to be a beginner.  I don’t think it’s productive to tell newbies to “read the fucking manual” when the manual often isn’t written with newbies in mind, i.e. without examples, with jargon that goes undefined, etc.
 
 I love newbies and I never want to lose touch with what it was like to be one.  This is my attempt to offer today’s noobs a learning resource that speaks to them at their level.
 
@@ -122,9 +122,7 @@ If I took the above attitude to heart, I’d refrain from publishing anything un
 
 That’s what would make the internet a worse place.
 
-Or, and here me out: if we see something online that we think is incorrect, we can let the author know.  Even crazier, maybe we could even be kind when we do it.
-
-I know some stuff that you don’t, and you know some stuff that I don’t.  Let’s fill in the blanks for each other, and let’s do it kindly and cooperatively.  That is how the internet gets better.
+The fact that I'm not an expert means I'm able to put myself in the shoes of a beginning programmer, to a greater extent than someone who has been doing this for 20 years and has forgotten what it was like to be a newbie.
 
 # Why do so many links on your posts point to Archive.org and Archive.ph?
 
