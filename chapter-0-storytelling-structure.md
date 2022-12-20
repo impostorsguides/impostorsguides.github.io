@@ -14,6 +14,8 @@ To begin this project, I set out to answer the following questions:
 
 ## Why is managing my Ruby version even important?  Why should people care?
 
+I'd
+
 Because different codebases on your machine will run on different versions of the same languages.  One Rails app might use Ruby v2.7.5, while another has already upgraded to v3.0.0.  If you don’t use a Ruby version manager, then the only alternative is to use the version of Ruby which shipped with your laptop.
 
 If you insist on not using a version manager, then every time you want to switch from working on one app to working on the other, you have to upgrade / downgrade your system Ruby version.  That is, shall we say, impractical.  Using a version manager makes this switching process as easy as a few keystrokes.
