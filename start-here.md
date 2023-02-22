@@ -85,7 +85,7 @@ I started coding in late 2012 - early 2013, at Dev Bootcamp in Chicago.  So many
 
 ## To Make The Learning Resource I Wish I’d Had
 
-There are some learning resources that speak my language, like the Michael Hartl tutorial (“build an X from scratch” is very much my speed).  But I find other docs and resources to be maddeningly abstract.  They’re often written by people suffering from the [Curse of Knowledge](https://en.wikipedia.org/wiki/Curse_of_knowledge), people who have long since forgotten what it’s like to be a beginner.  I don’t think it’s productive to tell newbies to “read the fucking manual” when the manual often isn’t written with newbies in mind, i.e. without examples, with jargon that goes undefined, etc.
+There are some learning resources that speak my language, like the Michael Hartl tutorial (“build an X from scratch” is very much my speed).  But I find other docs and resources to be maddeningly abstract.  They’re often written by people suffering from the Curse of Knowledge, people who have long since forgotten what it’s like to be a beginner.  I don’t think it’s productive to tell newbies to “read the fucking manual” when the manual often isn’t written with newbies in mind, i.e. without examples, with jargon that goes undefined, etc.
 
 I love newbies and I never want to lose touch with what it was like to be one.  This is my attempt to offer today’s noobs a learning resource that speaks to them at their level.
 
@@ -95,7 +95,8 @@ At Dev Bootcamp, I was surrounded by peers of varying skill levels.  In some cas
 
 Dev Bootcamp closed down in 2017.  I think that’s a shame, and I consider myself lucky to have participated in it while it was around.  The more beginner-friendly communities we can build in tech, the more diverse viewpoints we’ll attract to tech, and the more well-rounded our industry will become.
 
-# What’s Your Teaching Writing Style?
+# What’s Your Teaching / Writing Style?
+
 I want these code walk-throughs to be fun, or at the very least interesting.  At its best, walking through a codebase and figuring out what it does should be like a Sherlock Holmes mystery!
 
 I find I learn best from people who talk through their thought process, so I try to do likewise.  I verbalize:
@@ -122,10 +123,16 @@ If I took the above attitude to heart, I’d refrain from publishing anything un
 
 That’s what would make the internet a worse place.
 
-The fact that I'm not an expert means I'm able to put myself in the shoes of a beginning programmer, to a greater extent than someone who has been doing this for 20 years and has forgotten what it was like to be a newbie.
+Or, and here me out: if we see something online that we think is incorrect, we can let the author know.  Even crazier, maybe we could even be kind when we do it.
+
+I know some stuff that you don’t, and you know some stuff that I don’t.  Let’s fill in the blanks for each other, and let’s do it kindly and cooperatively.  That is how the internet gets better.
 
 # Why do so many links on your posts point to Archive.org and Archive.ph?
 
 This project represents many months of research and effort for me.  Over that period of time, I’ve done countless Google searches and found countless links that have helped me.  Over time, the content of those links is bound to change.  It would add to the confusion of a newbie if I told them I read something on a linked resource, only for them to find that the resource now contains completely different information when they click the link.  Even worse would be if the link were broken, leaving nothing on that page at all!
 
 I wanted to preserve how those pages looked at the time I encountered them.  If you can see what I saw when I was thinking through these problems, you’ll be better able to follow my train of thought.  It’s the same reason I often post screenshots of those same pages.  If you see what I saw, it’s easier for me to communicate my train of thought to you.
+
+# Summary
+
+If you've ever borne the brunt of someone else's exasparation because you ask "Why is this the way that it is?" too many times, you're in the right place.
