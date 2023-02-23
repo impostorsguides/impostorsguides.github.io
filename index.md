@@ -17,3 +17,7 @@ I'm currently interested in making the programming community a more welcoming pl
 My current attempt at doing so is tentatively titled "The Impostor's Guide To Programming".  I'm fresh off of finishing [Chip and Dan Heath's amazing book "Made To Stick"](https://www.amazon.com/Made-Stick-Ideas-Survive-Others-ebook/dp/B000N2HCKQ/), and I want to take the principles I learned from this book and apply them toward teaching beginners how to code.
 
 If you're curious about this project and want to read more, [start here](/start-here).
+
+<!-- Begin ConvertKit Homepage -->
+  {% include convert_kit_1.html %}
+<!-- End ConvertKit Homepage -->
