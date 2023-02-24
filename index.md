@@ -18,6 +18,3 @@ My current attempt at doing so is tentatively titled "The Impostor's Guide To Pr
 
 If you're curious about this project and want to read more, [start here](/start-here).
 
-<!-- Begin ConvertKit Homepage -->
-  {% include convert_kit_1.html %}
-<!-- End ConvertKit Homepage -->
