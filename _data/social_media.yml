@@ -1,0 +1,6 @@
+- name: Twitter
+  link: https://www.twitter.com/impostorsguides
+  external: 'true'
+- name: LinkedIn
+  link: https://www.linkedin.com/in/heyrichie/
+  external: 'true'
