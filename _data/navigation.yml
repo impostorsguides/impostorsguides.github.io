@@ -1,7 +1,5 @@
 - name: Home
   link: /
-- name: Start Here
-  link: /start-here/
 - name: RBENV
   link: /rbenv/index
 - name: Twitter
