@@ -1,8 +1,12 @@
 - name: Home
   link: /
+  external: 'false'
 - name: RBENV
   link: /rbenv/index
+  external: 'false'
 - name: Twitter
   link: https://www.twitter.com/impostorsguides
+  external: 'true'
 - name: LinkedIn
   link: https://www.linkedin.com/in/heyrichie/
+  external: 'true'
