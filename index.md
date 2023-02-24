@@ -19,3 +19,7 @@ I'm a journeyman engineer myself, and I may have gotten some things wrong in the
  - Teaching someone to fish is better than giving them a fish.
  - Experiments help you verify something works on your own machine.
  - They're also great hands-on activities.
+
+## If you like what you read
+
+Please consider sharing it on [Hacker News](https://news.ycombinator.com/) or your social media.  It helps me reach more newbie developers.
