@@ -4,12 +4,18 @@ title: Home
 permalink: /
 ---
 
-# Me In 10 Seconds
+# What This Site Is About
 
-I'm currently an [improviser](https://wgimprovschool.com/), a [world traveler](https://nomadlist.com/@toomanyrichies), and a software engineer.  I'm a pretty big introvert and value my privacy, so I'm not planning on publishing much on who I am here.
+The programming community could stand to be a more welcoming place for beginners.  Greybeards always tell newbies to "read the fucking manual", but "the manual" is quite often written for people who were already experts, or at least appears that way to those same newbies.
 
-# What I'm Doing Now
+"The Impostor's Guide To Programming" is an attempt to fix that.  [Chip and Dan Heath's amazing book "Made To Stick"](https://www.amazon.com/Made-Stick-Ideas-Survive-Others-ebook/dp/B000N2HCKQ/) talks about "The Curse of Knowledge" and how experts often don't realize that they're talking over the heads of more novice practicioners.  This site attempts to swing the pendulum in the opposite direction, erring on the side of too much hand-holding.  It makes the assumption that, when faced between the dual risks of annoying a more seasoned engineer vs. mystifying a more novice one, the latter is the greater sin.
 
-I'm currently interested in making the programming community a more welcoming place for beginners.  When I was learning to code, people always told me to "read the fucking manual", but the manual was more often than not a document written for people who were already experts.  That's a problem that I want to address.
+I'm a journeyman engineer myself, and I may have gotten some things wrong in these posts.  If you spot an error and want to help fix it, feel free to reach out [here](https://twitter.com/impostorsguides) (for now).  You can also use the same link to reach out with general questions or comments.
 
-My current attempt at doing so is tentatively titled "The Impostor's Guide To Programming".  I'm fresh off of finishing [Chip and Dan Heath's amazing book "Made To Stick"](https://www.amazon.com/Made-Stick-Ideas-Survive-Others-ebook/dp/B000N2HCKQ/), and I want to take the principles I learned from this book and apply them toward teaching beginners how to code.
+## This Site's Principles
+
+ - The best way to learn something is to teach it.
+ - If you can't explain something in simple terms, you don't understand it well enough.
+ - Teaching someone to fish is better than giving them a fish.
+ - Experiments help you verify something works on your own machine.
+ - They're also great hands-on activities.
