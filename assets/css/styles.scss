@@ -13,3 +13,8 @@
 .navlink:first-of-type {
   padding: 0 1em 0 0;
 }
+
+nav {
+  display: flex;
+  justify-content: space-between;
+}

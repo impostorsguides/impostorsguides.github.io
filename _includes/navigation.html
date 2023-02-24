@@ -1,12 +1,23 @@
 <nav>
-  {% for item in site.data.navigation %}
+  <div class="internal-links">
+    {% for item in site.data.navigation %}
       <a
         class="navlink"
         href="{{ item.link }}"
-        {% if item.external == 'true' %}
-          target="_blank"
-        {% endif %}>
+      >
         {{ item.name }}
       </a>
-  {% endfor %}
+    {% endfor %}
+  </div>
+  <div class="external-links">
+    {% for item in site.data.social_media %}
+      <a
+      class="navlink"
+        href="{{ item.link }}"
+          target="_blank"
+        >
+        {{ item.name }}
+      </a>
+    {% endfor %}
+  </div>
 </nav>
