@@ -28,6 +28,11 @@ The programming community could stand to be a more welcoming place for beginners
 
 I'm a journeyman engineer myself, and I may have gotten some things wrong in these posts.  If you spot an error and want to help fix it, feel free to reach out [here](https://twitter.com/impostorsguides) (for now).  You can also use the same link to reach out with general questions or comments.
 
+# What prior knowledge do you need to follow this?
+
+ - You need to know how to use `git`.  If you don't yet know this crucial tool, a good free resource is [the "Pro Git" book](https://git-scm.com/book/en/v2), a free, comprehensive book available entirely online.
+ - You need some basic programming knowledge, such as familiarity with if-blocks, case statements, what variables are, etc.
+
 # This Site's Principles
 
  - The best way to learn something is to teach it.
