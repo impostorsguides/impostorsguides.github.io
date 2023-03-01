@@ -31,6 +31,7 @@ I'm a journeyman engineer myself, and I may have gotten some things wrong in the
 # What prior knowledge do you need to follow this?
 
  - You need to know how to use `git`.  If you don't yet know this crucial tool, a good free resource is [the "Pro Git" book](https://git-scm.com/book/en/v2), a free, comprehensive book available entirely online.
+ - You need very basic knowledge of how to navigate in a terminal.  You should be familiar with `cd`, `ls`, `pwd`, and similarly elementary commands.
  - You need some basic programming knowledge, such as familiarity with if-blocks, case statements, what variables are, etc.
 
 # This Site's Principles
