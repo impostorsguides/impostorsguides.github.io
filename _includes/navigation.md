@@ -1,4 +1,4 @@
-<nav>
+<nav style="border-bottom: 1px solid grey; padding-bottom: 1em">
   <div class="internal-links">
     {% for item in site.data.navigation %}
       <a
@@ -21,3 +21,4 @@
     {% endfor %}
   </div>
 </nav>
+
