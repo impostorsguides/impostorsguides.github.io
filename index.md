@@ -41,6 +41,7 @@ I'm a journeyman engineer myself, and I may have gotten some things wrong in the
  - Teaching someone to fish is better than giving them a fish.
  - Experiments help you verify something works on your own machine.
  - They're also great hands-on activities.
+ - Whenever possible, use resources that are free (as in beer).  This guide is for everyone, and everyone can afford "free".
 
 # If you like what you read
 
