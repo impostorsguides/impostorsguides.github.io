@@ -378,5 +378,3 @@ There, I find [these](https://stackoverflow.com/questions/13468481/when-to-use-s
 </p>
 
 Therefore, the reason `set -e` is not the default is *probably* because the UNIX authors wanted to give developers more fine-grained control over whether and how to handle different kinds of exceptions.  `set -e` halts your program immediately whenever any kind of error is triggered, so you don't have to explicitly catch each kind of error separately.  Depending on the program you're writing, this might be considered a feature or a bug; it appears to be a matter of preference.
-
-Moving on to line 3 of the code.
