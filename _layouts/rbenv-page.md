@@ -4,8 +4,9 @@ category: rbenv-piecemeal
 ---
 
 {% if page.previous-permalink %}
-  <div style="margin-top: 2em" />
+  <div style="margin-bottom: 2em" />
   Previous: <a href={{ page.previous-permalink }}>{{ page.previous-title }}</a>
+  </div>
 {% endif %}
 
 <h2>{{ page.title }}</h2>
@@ -17,7 +18,9 @@ category: rbenv-piecemeal
 {{ content }}
 
 {% if page.next-permalink %}
+<div style="margin-top: 2em" />
   Next: <a href={{ page.next-permalink }}>{{ page.next-title }}</a>
+</div>
 {% endif %}
 
 

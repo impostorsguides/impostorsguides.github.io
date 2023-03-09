@@ -1,2 +1,7 @@
+---
+layout: null
+---
 User-agent: *
-Disallow: /richiethomas.github.io/
+Disallow:
+
+Sitemap: {{ "/sitemap.xml" | prepend: site.baseurl | prepend: site.url }}
