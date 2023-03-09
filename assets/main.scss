@@ -12,6 +12,7 @@ $small-font-size:  $base-font-size * 0.875;
 $base-line-height: 1.5;
 
 $spacing-unit:     30px;
+$half-spacing-unit:     15px;
 
 $text-color:       #111;
 $background-color: #fdfdfd;
@@ -33,8 +34,8 @@ $on-laptop:        800px;
 // Use media queries like this:
 // @include media-query($on-palm) {
 //     .wrapper {
-//         padding-right: calc($spacing-unit / 2);
-//         padding-left: calc($spacing-unit / 2);
+//         padding-right: $half-spacing-unit;
+//         padding-left: $half-spacing-unit;
 //     }
 // }
 @mixin media-query($device) {
@@ -43,10 +44,8 @@ $on-laptop:        800px;
   }
 }
 
-$foobar: 100%;
-
 nav {
-  width: $foobar;
+  width: 100%;
   display: flex;
   justify-content: space-between;
 }
