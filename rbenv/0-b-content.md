@@ -1,4 +1,4 @@
-### The shebang line
+## The shebang line
 
 ```
 #!/usr/bin/env bash
@@ -8,7 +8,7 @@ From a Google search for the string `"#!/usr/bin/env bash"`, I learned that this
 
 In UNIX, a shebang is a special line of code at the top of a script file which tells UNIX which program to use in order to execute the code which comes after it.  In this case, since the shebang ends in "bash", we're telling UNIX to use `bash` to evaluate the code.
 
-#### `#!/usr/bin/env bash` vs. `#!/usr/bin/bash`
+### Different types of shebangs
 
 Note that you might sometimes see `#!/usr/bin/bash` instead of as a shebang, instead of `#!/usr/bin/env bash`.  The difference between the two is illustrated in further detail [here](https://archive.ph/ouudu) and [here](https://archive.ph/4jEZL).  But the gist of it is that `/usr/bin/env` checks your terminal environment for variables, sets them, and then runs your command.  If we type just `env` into our terminals, we can see a list of the environment variables that `env` will set:
 
@@ -41,7 +41,7 @@ Using a shebang not only saves us a few keystrokes, but it's also one less thing
 
 As I mentioned before, the string "bash" at the end of the shebang tells UNIX to use `bash` when interpreting the code which follows.  But `bash` is not the only interpreter we can tell UNIX to use for a script that we write.  The only reason the code author used it here is because they wrote the subsequent code in bash.  If they had written it in Ruby, they could have written `#!/usr/bin/env ruby` instead (i.e. replace `bash` with `ruby` in the shebang).  In fact, let's try doing exactly that, as an experiment.
 
-#### Experiment- writing a script with a Ruby shebang
+### Experiment- writing a script with a Ruby shebang
 
 We start by writing a regular Ruby script with a `.rb` file extension.  We'll call it "hello.rb":
 
@@ -101,7 +101,7 @@ Hello world
 
 Success!  We've told bash which interpreter we want to use, meaning that we no longer need to use the `ruby` command at the terminal prompt.
 
-#### Experiment- does the shebang have to be on the first line?
+### Experiment- does the shebang have to be on the first line?
 
 I update my script so that the shebang is on line 2 instead of line 1:
 
@@ -122,7 +122,7 @@ $ ./foo
 
 So as it turns out, the shebang line *must* be on the very first line of the file.  Good to know.
 
-#### Can the computer use the file extension instead of the shebang?
+### Can the computer use the file extension instead of the shebang?
 
 We have a `.rb` file extension at the end, but the terminal doesn't use the extension when deciding how to interpret the file.  I came across [this StackOverflow post](https://archive.ph/YpR6y) while looking for documentation on this:
 
@@ -140,7 +140,7 @@ This got me wondering *why* a terminal doesn't use file extensions.  So [I poste
 
 Oh well, onward!
 
-#### Why aren't new files executable by default?
+### Why aren't new files executable by default?
 
 Why is it necessary to run `chmod +x` on our file, before we can execute it?  Why can't a user execute their own file by default?  I asked myself this same question, and since I couldn't find an answer online already, [I asked StackOverflow](https://archive.ph/G8Ine).
 
@@ -152,11 +152,11 @@ The question I asked involves a command called `umask` which isn't super-importa
 
 Because [UNIX is multi-user in nature](https://archive.ph/EVocS), it needs to account for the scenario where a user gains access to a system that they shouldn't have access to, and writes a malicious script that they then try to execute.  Because they don't have permission to execute the script without authorization from the system's administrator, they are prevented from doing so.  This, in a nutshell, is why we have to `chmod` our scripts every time.
 
-### File Permissions
+## File Permissions
 
 File permissions are divided into 3 different categories- one for the file's owner, one for the group that the user belongs to, and one for everybody else.  The `+x` flag for `chmod` actually updates the "executable" permissions for *all 3* of those groups, *not* just for me, the file's creator.  We can see this in action by running an experiment.
 
-#### Experiment- analyzing a file's permissions
+### Experiment- analyzing a file's permissions
 
 We delete our old `foo` file and creating a new one, then looking at its permissions:
 
@@ -184,7 +184,7 @@ $ ls -l foo
 
 As we can see, now each permissions category has `x` set.
 
-### The `PATH` variable
+## The `PATH` variable
 
 Let's go back to the `/usr/bin/env` command in our shebang, and specifically to the environment variables which are loaded by that command.  An important example of these is the `PATH` variable.  It's important because it contains a list of directories that UNIX will search through, when it looks for the command we ask `env` to run (as well as the order in which the search will happen).  So if my shebang is `#!/usr/bin/env ruby`, and my `PATH` variable looks like the following:
 ```
@@ -207,7 +207,7 @@ UNIX splits the `PATH` string using `IFS` as that delimiter when you type a comm
 
 The `IFS` link above contains an experiment, which I've modified slightly below so we can see an example of this env var and its usage.
 
-#### Experiment- IFS and delimiters
+### Experiment- IFS and delimiters
 
 The script below iterates over a string which is delimited with spaces, using a for-loop.  We haven't encountered a `bash`-flavored for-loop yet, but we will later on in the code.
 

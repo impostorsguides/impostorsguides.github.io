@@ -1,5 +1,3 @@
-### for-loops in bash
-
 Moving onto the next line of code.
 
 ```
@@ -9,6 +7,9 @@ Moving onto the next line of code.
 
   done
 ```
+
+## for-loops in bash
+
 We saw a regular `bash` for-loop earlier, in our experiment with delimiters.  This loop is a bit weird, though, because we haven't yet seen an `arg` variable explicitly defined by the code.  Yet here it is, being referenced in our loop.
 
 If we haven't seen this variable defined yet, does that mean it’s defined or built-in by the language?  As usual, Googling turns up [a StackOverflow post](https://archive.ph/p4Cjp):
@@ -25,7 +26,7 @@ Scrolling down in the answer a bit, we see:
 
 The above statement implies that `$@` expands to the list of arguments provided to the script.  Let’s see if that’s true with another experiment.
 
-#### Experiment- what does `$@` evaluate to?
+### Experiment- what does `$@` evaluate to?
 
 I write a new script (again named simply "foo"):
 
@@ -86,7 +87,7 @@ Awesome!  So we learned:
  - `$@` stands for the arguments that you pass to the script
  - If you write a `for` loop but leave off the `in ___` part, bash defaults to using `$@`
 
-### Case statements
+## Case statements
 
 Moving on to the next line:
 
@@ -124,7 +125,7 @@ I find [this link](https://web.archive.org/web/20220820011836/https://linuxize.c
 
 None of this is terribly surprising, since these rules all appear to match how case statements work in Ruby and other languages I've worked with.
 
-#### Experiment- building a simple `case` statement
+### Experiment- building a simple `case` statement
 
 In case this is your first time encountering case statements, let's build a simple one here.  I start by updating my `foo` script to look like the following:
 
@@ -205,7 +206,7 @@ $ ./foo 4
 
 Interestingly, when I remove the quotes from around the numbers in the case statements, the script continues to function as normal.
 
-#### Pattern-matching in case statements
+### Pattern-matching in case statements
 
 The earlier bullet points also explain the syntax of the subsequent line, which is a condition that the case statement will match against:
 
@@ -218,7 +219,7 @@ We see two patterns (`-e` and `--`), separated by the `|` character, then termin
 
 Because of point #7 above, I suspect that any text starting with `-e` would fit the `-e*` pattern.  To prove it, I perform an experiment.
 
-#### Experiment- the `-e*` flag in a case statement
+### Experiment- the `-e*` flag in a case statement
 
 I write the following script:
 
@@ -278,7 +279,7 @@ Hmmm OK, but you still need to be able to process the subsequent arguments in th
 
 Not quite.  We'll see shortly that the last line of the shim file makes use of `"$@"` again, specifically to pass those args to `$program`.  The value of `$@` is not modified at all by anything in the `for` loop, so all the args which get passed to the shim file are *also* passed in their original form to `$program`.  By `break`ing here, the only thing we're doing here is preventing those positional arguments from affecting the value of `RBENV_DIR`, which (as we'll see shortly) is the real purpose of the `for`-loop.
 
-#### More pattern-matching with case statements
+### More pattern-matching with case statements
 
 Next line of code:
 
@@ -293,7 +294,7 @@ Judging by the `)` terminator character and the `;;` a few lines down, we can se
 
 The pattern searches for a forward-slash, with zero or more arbitrary characters before and/or after it.  To me, that looks like it's trying to match against a file path.  Let’s check that with an experiment.
 
-#### Experiment: how to check for a filepath in a case statement
+### Experiment: how to check for a filepath in a case statement
 
 I make a `bash` script which looks like so
 

@@ -9,11 +9,7 @@ category: rbenv-piecemeal
   </div>
 {% endif %}
 
-<h2>{{ page.title }}</h2>
-
-{% if page.subtitle %}
-  <h3>{{ page.subtitle }}</h3>
-{% endif %}
+<h1>{{ page.title }}</h1>
 
 {{ content }}
 

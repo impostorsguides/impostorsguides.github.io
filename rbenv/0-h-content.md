@@ -1,10 +1,10 @@
-### The `exec` Command
-
 At last, we come to the final line of code in the shim:
 
 ```
 exec "/usr/local/bin/rbenv" exec "$program" "$@"
 ```
+
+## The `exec` Command
 
 What does the `exec` command at the start of the line do?  I first try `man exec` but I get the "General Commands Manual", indicating that this is a builtin command.  I then try `help exec` and see:
 
@@ -28,7 +28,7 @@ To be honest, that explanation creates more questions for me than it answers, in
  - What's the difference between forking a process and replacing the current process with the new one (i.e. what `exec` does)?
  - Why use `exec` over forking, or vice-versa?
 
-### What is a process?
+## What is a process?
 
 I Google "what is a process in unix" and find a few answers.  The first one is from [TechTarget.com](https://archive.ph/1gKHE):
 
@@ -66,7 +66,7 @@ It appears that, if you know the parent process will be done after running the c
 
 One use case they give for `fork`ing (rather than `exec`ing) is a web server that needs one process to spin off and handle a request that the server receives, while the parent thread continues to listen for new requests in a separate process.
 
-#### Experiment- messing around with `exec`
+### Experiment- messing around with `exec`
 
 Directly in my terminal, I run:
 
@@ -129,7 +129,7 @@ PID of bar: 58695
 
 Now the PIDs are the same!  This tells me that the `foo` process did indeed get **replaced** by the `bar` process.
 
-### Back to the line of code
+## Back to the line of code
 
 So that’s what the shell builtin `exec` command does.  But the line of code we're looking at is:
 

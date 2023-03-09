@@ -29,13 +29,13 @@ $ which bundle
 
 Here we see that file containing the `bundle` command's logic lives in a subdirectory of a directory called `.rbenv`.
 
-### Dotfiles and dot directories
+## Dotfiles and dot directories
 
 The directory's name begins with a `.` because it's meant to be hidden from the `ls` command (unless you run `ls -a` instead of just `ls`).  In UNIX, there's [a convention](https://archive.ph/9l8sE) whereby the names of files and directories which are meant to be hidden from view by default are prefixed with a dot.  [Techopedia says that](https://archive.ph/msXQy) "They are created frequently by various system or application utilities. Hidden files are helpful in preventing accidental deletion of important data."
 
 That last sentence catches my attention- "Hidden files are helpful in preventing accidental deletion of important data."  I've actually never explicitly tested that statement before.  Let's do so now.
 
-#### Experiment- do hidden files get deleted when running `rm`?
+### Experiment- do hidden files get deleted when running `rm`?
 
 I create a temporary directory named `foo/`, and create two files inside of it- a hidden one named `.bar` and a regular one named `baz`:
 
@@ -80,13 +80,13 @@ Back to  `.rbenv/`.  This hidden directory houses the logic for my Ruby version 
 
 RBENV lets me switch between Ruby versions without too much hassle.  This is a useful ability, because I have multiple Ruby codebases installed on my machine right now, and they all depend on different versions of Ruby.
 
-#### Experiments
+### Experiments
 
 We just did our first of many experiments.  Sometimes these experiments will help us construct hypotheses of how we think code might work, and then test whether those hypotheses are correct.  Other times, they're just ways that we can prove to ourselves that what we read on StackOverflow or some random person's blog post is actually correct.
 
 Either way, I've found them to be a good habit to develop as I write this post.
 
-### The pain that version managers solve
+## The pain that version managers solve
 
 If we have multiple versions of Ruby installed, that means there are multiple programs installed on our machine which respond to the `ruby` command in our terminal.  Without a Ruby version manager to help us switch between versions, our OS will just pick the first of these programs that it finds.
 
@@ -94,7 +94,7 @@ If we're lucky, the "first version it finds" will be the Ruby version that our p
 
 A Ruby version manager like RBENV ensures that every time we run a Ruby file, we're using the version that this file depends on.
 
-### So what's the difference between Bundler and RBENV?
+## So what's the difference between Bundler and RBENV?
 
 But wait.  A minute ago, we said:
 
@@ -106,7 +106,7 @@ This... sounds a lot like what I just said RBENV does.  So what's the difference
 
 More info can be found [here](https://archive.ph/pmhuY), in this excellent summary from Honeybadger.io.
 
-### Shims
+## Shims
 
 Earlier, I made the claim that:
 
@@ -122,7 +122,7 @@ To quote [RBENV's README file](https://archive.ph/VGriC#how-it-works):
 
 The file whose path we discovered earlier (`~/.rbenv/shims/bundle`) is the shim file for the Bundler gem's `bundle` command.
 
-### The code for the shim file
+## The code for the shim file
 
 Let's take a look at the shim's code.  I type the following into my terminal:
 

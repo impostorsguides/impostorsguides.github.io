@@ -1,12 +1,14 @@
 Moving on to line 3 of the code.
 
-### Tests and conditions
-
 ```
 [ -n "$RBENV_DEBUG" ] && set -x
 ```
 
-What do those brackets mean?  [This answer](https://stackoverflow.com/a/2188369/2143275) from StackOverflow says:
+What do those brackets mean?
+
+## Tests and conditions
+
+[This answer](https://stackoverflow.com/a/2188369/2143275) from StackOverflow says:
 
 <p style="text-align: center">
   <img src="/assets/images/what-are-brackets.png" width="85%" alt="What are brackets in bash?" style="border: 1px solid black; padding: 0.5em">
@@ -20,7 +22,7 @@ OK, so `[` and `test` are synonyms as far as `bash` is concerned.  I run `man te
 
 Here we have a formal definition of `[` (aka `test`).  It's a "condition evaluation utility", which I interpret to mean that it's similar to an if-clause in Ruby.  Let's test whether that's true with an experiment:
 
-#### Experiment- `[` vs `test`
+### Experiment- `[` vs `test`
 
 I create a file named `./foo`:
 
@@ -101,7 +103,7 @@ At least in this case, `test` and `[ ... ]` appear to produce the same results.
 
 Now what about that -n flag?
 
-### Passing flags to `[`
+## Passing flags to `[`
 
 If we’re looking for docs on a flag that we’re supposed to pass to a certain command, we can usually find those docs inside the docs for the command itself. In this case, I search for `-n` in the `man` page for `test`:
 
@@ -113,7 +115,7 @@ It looks like `[ -n "$RBENV_DEBUG" ]` returns a zero exit code (or in the parlan
 
 Let's see if `-n` behaves the way we expect.
 
-#### Experiment- the `-n` flag
+### Experiment- the `-n` flag
 
 First I run the following directly in my terminal tab:
 
@@ -166,7 +168,7 @@ OK great.  So when I don't use double-quotes, the script thinks I'm just running
 
 Another question about the bracket syntax: what would happen if I used single-quotes instead of double-quotes?  Does that matter?  Time for another simple experiment.
 
-#### Experiment- single- vs. double-quotes
+### Experiment- single- vs. double-quotes
 
 Since I've already defined my FOO variable in my terminal tab, I type the following in the same tab:
 
@@ -196,7 +198,7 @@ OK, so when using single-quotes instead of double-quotes, the shell doesn't expa
 
 So if the `[ -n "$RBENV_DEBUG" ]` condition returns true, the `&&` syntax ensures that we then execute the 2nd half of this line of code: `set -x`.  If that condition returns false, we exit early and don't evaluate `set -x`.
 
-### Verbose Mode
+## Verbose Mode
 
 We know about `set` already, but what does the `-x` flag do?
 
@@ -218,7 +220,7 @@ The `man` entry tells us that the `-x` flag causes `bash` to "(p)rint commands a
 
 Let's see if that's what happens.
 
-#### Experiment- the `set -x` command
+### Experiment- the `set -x` command
 
 I write a new script, run `chmod +x` on it, and add the following code:
 
@@ -248,7 +250,7 @@ From this, I think we can conclude that `set -x` prints each line of code that i
 
 So to summarize, `[ -n "$RBENV_DEBUG" ] && set -x` tells us that we will print each command as it is executed, but **only if** we set the `$RBENV_DEBUG` environment variable to equal  any non-empty string value.
 
-### Is it dangerous to rely on builtin commands?
+## Is it dangerous to rely on builtin commands?
 
 Relatedly, while researching the `set` command, it dawned on me that if `man set` pulls up the "General Commands Manual", that must mean it's a builtin command (i.e. its implemented by a specific shell).  This is confirmed by a browse of [the GNU `bash` docs on `set`](https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html), titled "The Set Builtin".
 

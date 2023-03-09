@@ -1,14 +1,14 @@
-### Parameter Expansion
-
 Moving on to the next line of code:
 
 ```
 program="${0##*/}"
 ```
 
+## Parameter Expansion
+
 Judging by the variable name, it looks like we're trying to store the name of the program.  Let's see whether we're right with an experiment.
 
-#### Experiment- are we storing the string we think we're storing?
+### Experiment- are we storing the string we think we're storing?
 
 I edit the shim file (`~/.rbenv/shims/bundle`) to echo the value of `program` after the above line of code:
 
@@ -54,7 +54,7 @@ We actually saw `$0` before, when we were testing out the name of our shell.  Th
 
 Let's test out what happens when that file is *not* a shell program.
 
-#### Experiment- messing around with parameter expansion
+### Experiment- messing around with parameter expansion
 
 I create a directory named "foo".  Inside of that a subdirectory named "bar", and inside of that I create a file named "baz".  Inside of "baz" I type the following:
 
@@ -131,7 +131,7 @@ Lastly, going back to the concept that the StackOverflow answer mentioned, i.e. 
 
 I feel like my understanding of the topic is good enough for now.  Next line of code.
 
-### Conditional statements
+## Conditional statements
 
 ```
 if [ "$program" = "ruby" ]; then
@@ -147,7 +147,7 @@ The one thing that trips me up is the single equals sign.  In Ruby, we use singl
 
 Let's see whether this is true.
 
-#### Experiment- double- vs. single-equals comparison
+### Experiment- double- vs. single-equals comparison
 
 I run the following experiment, in a new script file:
 
@@ -187,7 +187,7 @@ I know that `==` is an example of a "logical operator", so the above implies tha
 
 So what’s the difference between single- and double-`[`?
 
-#### Double- vs. single-`[`
+### Double- vs. single-`[`
 
 [This StackOverflow page](https://web.archive.org/web/20220602085208/https://serverfault.com/questions/52034/what-is-the-difference-between-double-and-single-square-brackets-in-bash) provides some help:
 

@@ -1,18 +1,20 @@
-### The `set` command
+The next line of code is:
 
 ```
 set -e
 ```
 
+## The `set` command
+
 This is the first time I've encountered the `set` command, so I'll have to do some research here.
 
-#### How to look up a command we don't recognize
+### How to look up a command we don't recognize
 
 When looking for the answer to a programming question, I want to avoid wild goose chases and time-wasting rabbit holes.  Usually, that means looking for the most authoritative, original source of truth that I can find.  And it doesn't get any more "authoritative" than reading the manual.
 
 In many cases, we can find the manual for various terminal commands using the `man` command.  If we fail to find what we're looking for using `man`, we can try checking StackOverflow or another source.  But the quality of those sources can vary widely, so a useful habit is to stick to official docs when we can.
 
-#### Experiment- looking up a `man` page
+### Experiment- looking up a `man` page
 
 One terminal command that most of us are familiar with by now is `ls`, which prints out the contents of a directory.  Let's use that command as a springboard to help us learn about `man` pages.
 
@@ -37,7 +39,7 @@ If we keep scrolling down the `man` page, we'll also see:
 
 If you're not familiar with `man` pages, I recommend at least skimming the page for `ls`.
 
-#### Looking up the `man` page for `set`
+### Looking up the `man` page for `set`
 
 Let's try looking up the above `set` command in its `man` page.  I type `man set` into my terminal and I see the following:
 
@@ -53,7 +55,7 @@ So when does it give you one result, vs. the other?
 
 I found an answer [here](https://unix.stackexchange.com/questions/167004/why-dont-shell-builtins-have-proper-man-pages).  The gist of it is that `man` pages are provided only for commands which come from UNIX.  But `bash` is not UNIX.  UNIX is the operating system, and `bash` is the application we're using to interact with the operating system (aka [the "shell"](https://web.archive.org/web/20220601094544/https://www.pcmag.com/encyclopedia/term/shell) which surrounds the operating system).
 
-### What are shells?
+## What are shells?
 
 Here's [an article from PCMag](https://web.archive.org/web/20220601094544/https://www.pcmag.com/encyclopedia/term/shell), which describes a shell as "The outer layer of an operating system, otherwise known as the user interface."  I like that definition because it clarifies why the term "shell" was chosen (a shell is "the outer layer" of an egg).
 
@@ -65,7 +67,7 @@ Here's [an article from PCMag](https://web.archive.org/web/20220601094544/https:
 
 There are many such applications- other examples include "zsh", "fish", etc.  Later on, we'll actually encounter these two shells again, when we dive into specific `rbenv` commands.
 
-#### What is POSIX?
+### What is POSIX?
 
 Further down in the PCMag article, we read:
 
@@ -87,7 +89,7 @@ The phrase "mostly compliant with the POSIX-1003.2 standard" catches my eye.  Th
 
 Looks like we were correct!
 
-#### More about shells
+### More about shells
 
 Each shell has its own set of commands, its own syntax, etc.  Some shells (such as `bash` and `zsh`) are quite similar to each other (in terms of the commands they offer).  Others (such as `bash` vs. `fish`) are *very* different from each other.  Therefore, it's important to distinguish which commands are available in all shells from those which are only available in certain shells.
 
@@ -97,7 +99,7 @@ It would be misleading to include manual files for each shell's commands in the 
 
 Moral of the story- if you ever see the  "General Commands Manual" thing when looking up a `man` page, the command you're looking up is probably a *shell builtin*, not a UNIX command.
 
-#### Experiment- which shell are you using?
+### Experiment- which shell are you using?
 
 I'm typing this on a 2019 Macbook Pro, [which ships with `zsh` as its default shell](https://archive.ph/QGwEP).  Your default shell might be the same as mine, or it might `bash` or another shell.
 
@@ -162,7 +164,7 @@ bash-3.2$ echo "$SHELL"
 
 That's because [`$SHELL` returns the current user's login shell](https://unix.stackexchange.com/a/669344/142469), **not** the shell that the user is currently using.  But if you are currently inside your default shell anyway (which you likely will be in most cases), using `$SHELL` should be fine.
 
-### Making `help` easier to work with in `zsh`
+## Making `help` easier to work with in `zsh`
 
 I try to pull up the `help` docs for `set` to find out more about this command.
 
@@ -209,13 +211,13 @@ This all sounds fine, so I add the code from StackOverflow into my `~/.zshrc` fi
 
 I then run `source ~/.zshrc` to reload the file into memory.
 
-#### What is a `.zshrc` file?
+### What is a `.zshrc` file?
 
 When you open a new terminal tab or window in `zsh`, one of the first things that happens is that `zsh` runs [a few setup scripts](https://archive.ph/KlEQ0).  One of these setup scripts is called `.zshrc`.  This file is where you'd put configuration options that you'd want to run on every new terminal tab or window.  This includes our `help` configuration, so that's why we add that code in `.zshrc`.
 
 There are other files as well, such as `.zshenv`, but `.zshrc` is the one I interact with most.  Other shells have similar `rc` files (ex.- `bash` has `.bashrc`).  The `rc` in `.zshrc` stands for "run commands" or "run control", depending on [who you ask](https://archive.ph/r0z0j).
 
-### Finally getting some answers on `set`
+## Finally getting some answers on `set`
 
 Back to the `set` command.
 
@@ -233,7 +235,7 @@ From the first paragraph, I see an explanation of the `-s` flag, and then I see:
 For the meaning of the other flags, see zshoptions(1).
 ```
 
-#### `zshoptions`
+### `zshoptions`
 
 It's telling me that I need to use another command in order to read about the flags for zsh.  But what's with that `(1)` syntax at the end of the command?  Is that part of what I'm supposed to type?
 
@@ -257,7 +259,7 @@ I try Googling "command not found: zshoptions".  One of the first results I see 
 
 OK, so I'm supposed to type `man zshoptions` in the terminal?  Then I guess I'm confused what the `(1)` at the end of `zshoptions(1)` means.
 
-#### Section headers in `man` output
+### Section headers in `man` output
 
 I Google "what is the parentheses number in man bash" and find [this link](https://web.archive.org/web/20230209205725/https://stackoverflow.com/questions/62936/what-does-the-number-in-parentheses-shown-after-unix-command-names-in-manpages-m) with the following answer...
 
@@ -281,7 +283,7 @@ Continuing onward... typing `man zshoptions` has a ton of output to parse.  Luck
 
 Just based on my own instinct, the important text seems to be "If a command has a non-zero exit status,... exit."
 
-### Exit Codes
+## Exit Codes
 
 We'll dive more deeply into exit statuses and their meaning with an experiment below, but if you want answers now, check out [this link](https://archive.ph/nCzoq) from The Linux Documentation Project:
 
@@ -297,7 +299,7 @@ Back to the first sentence, I interpret it to mean that, if you add `set -e` to 
 
 Let's try an experiment to figure out whether that's the case.
 
-#### Experiment- will `set -e` cause a script to stop when an error is raised?
+### Experiment- will `set -e` cause a script to stop when an error is raised?
 
 I make 2 bash scripts, one called `foo` and one called `bar`:
 
@@ -367,7 +369,7 @@ This time, I **do** see the summary logline from `foo`.  This tells me that the 
 
 Based on this experiment, I think we can conclude that `set -e` does, in fact, prevent execution from continuing when the script encounters an error.
 
-#### Why isn't `set -e` the default?
+### Why isn't `set -e` the default?
 
 But my earlier question remains- why must a developer explicitly include `set -e` in their bash script?  Why is this not the default?  This question feels like it has a subjective answer, meaning that I doubt the answer will be found in the `man` or `help` pages, so I decide to use StackOverflow.
 

@@ -39,7 +39,7 @@
  p, blockquote, pre,
  ul, ol, dl, figure,
  %vertical-rhythm {
-   margin-bottom: $half-spacing-unit;
+   margin-bottom: $spacing-unit;
  }
 
 
@@ -86,12 +86,16 @@
  /**
   * Headings
   */
- h1, h2, h3, h4, h5, h6 {
+ h1, h2 {
    font-weight: $base-font-weight;
 
    code {
      font-size: inherit;
    }
+ }
+
+ h3, h4, h5, h6 {
+  font-weight: $base-font-weight + 200;
  }
 
  h1, h2, h3 {

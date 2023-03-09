@@ -1,5 +1,3 @@
-### Detecting whether a string is a filepath
-
 The next line of code tells us:
 
 ```
@@ -7,6 +5,8 @@ if [ -f "$arg" ]; then
 ...
 fi
 ```
+
+## Detecting whether a string is a filepath
 
 Running `man test` and searching for the `-f` string reveals the following:
 
@@ -78,7 +78,7 @@ But wait, the last argument (`foo`) *also* matches a filepath, i.e. the `./foo` 
 
 Let's try an experiment which should tell us whether this is in fact happening with the shim for the `ruby` command.
 
-#### Experiment- are we skipping potentially valid filepaths?
+### Experiment- are we skipping potentially valid filepaths?
 
 I update the shim for my `ruby` command to look like the following.  Newly-added lines are indicated with comments in blue at the right of the screenshot:
 
@@ -130,7 +130,7 @@ break
 
 Here we see that the purpose of our case statement is to set the `RBENV_DIR` environment variable.
 
-#### What does the `RBENV_DIR` env var do?
+### What does the `RBENV_DIR` env var do?
 
 To answer this question, I search for it in the `rbenv` codebase on my local machine (which I've downloaded from [the Github repo](https://github.com/rbenv/rbenv/tree/c4395e58201966d9f90c12bd6b7342e389e7a4cb)).
 
@@ -154,7 +154,7 @@ So the intention is for `RBENV_DIR` to control where `rbenv` looks for your `.ru
 
 But what is the `export` keyword at the start of `export RBENV_DIR="${arg%/*}"`?
 
-### `export` statements
+## `export` statements
 
 The assignment statement `export FOO=’bar’` creates a variable named `FOO` and sets its value to `bar`, **but** it does something else as well.  We’ve already seen variables declared earlier, i.e. `program="${0##*/}"`.  What does the use of `export` buy us?
 
@@ -162,7 +162,7 @@ The assignment statement `export FOO=’bar’` creates a variable named `FOO` a
 
 The blog post link above gives two examples, one demonstrating access of an environment variable from a child shell, and the other of accessing a shell variable from a child shell.  We can do an experiment in our terminal to see for ourselves.
 
-#### Experiment- environment vs shell variables
+### Experiment- environment vs shell variables
 
 We can type the following directly in our terminal:
 
@@ -207,7 +207,7 @@ In the meantime, what do the contents of the `RBENV_DIR` variable look like?  To
 
 Let’s try an experiment.
 
-#### Experiment- more fun with parameter expansion
+### Experiment- more fun with parameter expansion
 
 I type the following directly in my terminal:
 
@@ -262,7 +262,7 @@ Summing up what all this does:
  - If the arg is `--` or if it starts with `-e`, it will immediately stop checking the remaining args, and proceed to running the code outside the case statement (what that code does is TBD).
  - if the argument contains a `/` character, RBENV will check to see if that argument corresponds to a valid filepath.  If it does, it will grab the file’s parent directory and use that to (later on) check which Ruby version to use.
 
-### Setting `RBENV_ROOT`
+## Setting `RBENV_ROOT`
 
 The next line of code is pretty straight-forward:
 

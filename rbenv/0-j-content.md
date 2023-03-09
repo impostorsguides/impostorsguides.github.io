@@ -1,4 +1,4 @@
-### What We Learned
+## What We Learned
 
 We covered a lot in this series, including:
 
@@ -36,7 +36,7 @@ We covered a lot in this series, including:
 
 And possibly more, as well.  I lost count lol.
 
-### I still have more questions!
+## I still have more questions!
 
 Such as:
 
