@@ -8,7 +8,7 @@ permalink: /resources/
 <ol type="I">
   <h2><li>bash for Rubyists</li></h2>
   <ol >
-    <li>Part 1: The RBENV Shim</li>
+    <h3><li>Part 1: The RBENV Shim</li></h3>
     <ol type="i">
     {% assign sorted_pages = site.pages | sort:"id" %}
 
@@ -18,7 +18,7 @@ permalink: /resources/
       {% endif %}
     {% endfor %}
     </ol>
-    <li>Part 2: Walking Through The Project</li>
+    <h3><li>Part 2: Walking Through The Project</li></h3>
     <ol type="i">
       {% for page in sorted_pages %}
         {% if page.category == 'rbenv-pt-2' %}

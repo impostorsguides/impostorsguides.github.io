@@ -25,6 +25,14 @@ PWD=/Users/myusername/Workspace/OpenSource
 ...
 ```
 
+The benefit of using the `/usr/bin/env bash` shebang instead of `/usr/bin/bash` is that the former will likely work on more peoples' machines than the latter.  This is because one of the environment variables that `/usr/bin/env` loads is the `$PATH` env var (as we can see above in the output of the `env` command).
+
+If we use the `/usr/bin/bash` shebang, then whoever runs our script **must** have `bash` installed in their `/usr/bin/` directory.  Not everyone fits this description.  If we use the `/usr/bin/env bash` shebang (and therefore if we load `PATH` into our environment), then UNIX will search through all the directories in `PATH` until it finds `bash`.
+
+By relying on `/usr/bin/env bash`, we're no longer dependent on `bash` being located in a specific directory on our user's machine.
+
+### Why use a shebang?
+
 We *could* (hypothetically) leave the shebang out from this file.  But **somehow** we have to tell UNIX  how to run the file (i.e. which program to use).  If we don't do so in the file itself (i.e. by using a shebang), we'd have to do so when we type the command into the terminal.  So instead of typing `bundle install` in the command line, we'd have to type the following every time:
 
 ```
