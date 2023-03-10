@@ -3,8 +3,8 @@
 main:
   - title: Home
     url: /
-  - title: bash for Rubyists
-    url: /rbenv/
+  - title: Resources
+    url: /resources/
 social_media:
   - title: Twitter
     url: https://www.twitter.com/impostorsguides
