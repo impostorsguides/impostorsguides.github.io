@@ -7,7 +7,7 @@ I decide to peruse [RBENV’s Github page](https://github.com/rbenv/rbenv/tree/c
 Richie says: This brings up a good question- we’ve already looked at the shim file itself, but where did that shim file come from?  It sounds like that’s part of the “rehashing” process described here, but how does that process work?
 
 <p style="text-align: center">
-  <img src="/assets/images/rbenv-how-it-works-readme.png" width="70%" alt="'How It Works' section from RBENV's README file"  style="border: 1px solid black; padding: 0.5em">
+  <img src="/assets/images/choosing-the-ruby-version.png" width="70%" alt="README section on 'Choosing the Ruby Version'"  style="border: 1px solid black; padding: 0.5em">
 </p>
 
 Richie says: The process in which RBNV checks which Ruby version to use is something I *thought* I understood from my last write-up.  But it turns out there’s additional logic to do this which doesn’t live in the shim file itself.  Maybe I should try to find where that extra logic lives?

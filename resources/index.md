@@ -6,7 +6,7 @@ permalink: /resources/
 
 
 <ol type="I">
-  <li><a href="/rbenv/ch-0">bash for Rubyists</a></li>
+  <h2><li>bash for Rubyists</li></h2>
   <ol >
     <li>Part 1: The RBENV Shim</li>
     <ol type="i">
