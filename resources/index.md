@@ -6,17 +6,25 @@ permalink: /resources/
 
 
 <ol type="I">
-  <li><a href="/rbenv/ch-0">The Impostor's Guide to RBENV</a></li>
+  <li><a href="/rbenv/ch-0">bash for Rubyists</a></li>
   <ol >
-    <li>Part 1: The Shim</li>
+    <li>Part 1: The RBENV Shim</li>
     <ol type="i">
     {% assign sorted_pages = site.pages | sort:"id" %}
 
     {% for page in sorted_pages %}
-      {% if page.category == 'rbenv-piecemeal' %}
+      {% if page.category == 'rbenv-pt-1' %}
         <li><a href="{{ page.url }}">{{ page.title }}</a></li>
       {% endif %}
     {% endfor %}
+    </ol>
+    <li>Part 2: Walking Through The Project</li>
+    <ol type="i">
+      {% for page in sorted_pages %}
+        {% if page.category == 'rbenv-pt-2' %}
+          <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+        {% endif %}
+      {% endfor %}
     </ol>
   </ol>
 </ol>

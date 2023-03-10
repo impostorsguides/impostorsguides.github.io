@@ -1,5 +1,5 @@
 
-> (Note: this walk-through is based on `rbenv` version `1.2.0-46-g52acbdf`.  You'll likely need to install that version and run `rbenv rehash` if you want to follow along on your own machine.  The git SHA for the code I'm analyzing is `c4395e58201966d9f90c12bd6b7342e389e7a4cb`, and you can find the Github repo for this version [here](c4395e58201966d9f90c12bd6b7342e389e7a4cb).)
+> (Note: this walk-through is based on `rbenv` version `1.2.0-46-g52acbdf`.  You'll likely need to install that version and run `rbenv rehash` if you want to follow along on your own machine.  The git SHA for the code I'm analyzing is `c4395e58201966d9f90c12bd6b7342e389e7a4cb`, and you can find the Github repo for this version [here](https://github.com/rbenv/rbenv/tree/c4395e58201966d9f90c12bd6b7342e389e7a4cb).)
 
 What's the first thing that happens when you type `bundle install` into the terminal and hit "Enter"?
 
