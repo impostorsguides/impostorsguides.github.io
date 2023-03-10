@@ -46,3 +46,7 @@ I'm a journeyman engineer myself, and I may have gotten some things wrong in the
 # If you like what you read
 
 Please consider sharing it on [Hacker News](https://news.ycombinator.com/) or your social media.  It helps me reach more newbie developers.
+
+And / or sign up below to hear when I post something new:
+
+{% include convert_kit_2.html %}
