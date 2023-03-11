@@ -1,4 +1,5 @@
 _site
+.byebug_history
 .sass-cache
 .jekyll-metadata
 .vscode/
