@@ -59,7 +59,7 @@ OK, so the name `/libexec` communicates that the files in the directory are mean
 Just for the sake of thoroughness, I [search](https://github.com/rbenv/rbenv/search?o=asc&q=libexec&s=created&type=issues) for `libexec` in the `rbenv` Github repo, to see if there are any other issues which reference it.  There are... quite a few:
 
 <p style="text-align: center">
-  <img src="/assets/images/search-results-for-libexec.png" width="70%" alt="Searching for 'libexec' in the Github repo"  style="border: 1px solid black; padding: 0.5em">
+  <img src="/assets/images/search-results-for-libexec.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="Searching for 'libexec' in the Github repo">
 </p>
 
 171, to be exact.  I notice that the one I found is the oldest one; this might not be relevant, just something I noticed.
