@@ -65,3 +65,10 @@ nav {
 // Import partials from the `whiteglass` theme.
 @import "whiteglass";
 
+.current {
+  color: green;
+}
+
+ul.resources-titles > li {
+  list-style-type: none;
+}
