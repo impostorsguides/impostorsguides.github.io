@@ -43,6 +43,16 @@ I'm a journeyman engineer myself, and I may have gotten some things wrong in the
  - They're also great hands-on activities.
  - Whenever possible, use resources that are free (as in beer).  This guide is for everyone, and everyone can afford "free".
 
+# A Note About Links
+
+I use internet-archived links so you can see what I saw at the time I encountered the pages I references.  Whenever possible, I tried to use Archive.org, since they don't obfuscate the links and you can see what link you'll be visiting.  Occasionally, that wasn't possible:
+
+<center style="margin-bottom: 3em">
+  <img src="/assets/images/screenshot-19mar2023-1134am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
+</center>
+
+In these cases, I use Archive.ph instead.  I'm looking for a back-up archiver which doesn't obfuscate links, and would appreciate any suggestions.
+
 # If you like what you read
 
 Please consider sharing it on [Hacker News](https://news.ycombinator.com/) or your social media.  It helps me reach more newbie developers.
