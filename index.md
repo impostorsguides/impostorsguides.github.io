@@ -28,6 +28,12 @@ The programming community could stand to be a more welcoming place for beginners
 
 I'm a journeyman engineer myself, and I may have gotten some things wrong in these posts.  If you spot an error and want to help fix it, feel free to reach out [here](https://twitter.com/impostorsguides) (for now).  You can also use the same link to reach out with general questions or comments.
 
+# Why the focus on Ruby and Rubyists?  Are you saying Rubyists are impostors?
+
+*Absolutely not*.  I mostly work with Ruby in my day job.  I got my start in Ruby, at a bootcamp (RIP Dev Bootcamp <3).  I love the Ruby community and its MINASWAN ethos.  I'm not implying anything about Rubyists or their skill level.
+
+Simply put, Ruby is the language I love and choose to work in.
+
 # What prior knowledge do you need to follow this?
 
  - You need to know how to use `git`.  If you don't yet know this crucial tool, a good free resource is [the "Pro Git" book](https://git-scm.com/book/en/v2), a free, comprehensive book available entirely online.
@@ -45,7 +51,9 @@ I'm a journeyman engineer myself, and I may have gotten some things wrong in the
 
 # A Note About Links
 
-I use internet-archived links so you can see what I saw at the time I encountered the pages I references.  Whenever possible, I tried to use Archive.org, since they don't obfuscate the links and you can see what link you'll be visiting.  Occasionally, that wasn't possible:
+I use internet-archived links whenever possible, so you can see what I saw at the time I encountered the pages that I reference.
+
+My first choice for these archived links is usually [The Wayback Machine](https://www.archive.org/), since they don't obfuscate the links and you can see what link you'll be visiting.  Occasionally, that wasn't possible:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1134am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
