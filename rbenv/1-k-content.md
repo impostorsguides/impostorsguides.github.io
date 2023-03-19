@@ -294,7 +294,7 @@ We set the Ruby version equal to "2.0".
 
 ```
 create_executable "ruby" <<SH
-…
+...
 SH
 ```
 
@@ -308,7 +308,7 @@ A simple shebang pointing to the `bash` executable.
 
 ```
 if [[ \$1 == "-S"* ]]; then
-…
+...
 else
   echo 'ruby 2.0 (rbenv test)'
 fi
@@ -334,7 +334,7 @@ What do we do if the "-S" flag is passed?
 found="\$(PATH="\${RUBYPATH:-\$PATH}" which \$2)"
 ```
 
-First we create a variable named "found" and store… something in it?  Not sure.  I add some `echo` statements to find out:
+First we create a variable named "found" and store... something in it?  Not sure.  I add some `echo` statements to find out:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-340am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -365,7 +365,7 @@ The `which` command resolves to `which rake`.  So that's how we get the value fo
 PATH=/var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/rbenv/root/versions/2.0/bin:/Users/myusername/Workspace/OpenSource/rbenv/libexec:/var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/rbenv/root/shims:/Users/myusername/Workspace/OpenSource/rbenv/test/libexec:/Users/myusername/Workspace/OpenSource/rbenv/test/../libexec:/var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/rbenv/bin:/usr/bin:/bin:/usr/sbin:/sbin which rake
 ```
 
-So that's the answer to "How did ‘found' get constructed?"  Now, what is it used for?
+So that's the answer to "How did 'found' get constructed?"  Now, what is it used for?
 
 ```
   if head -n1 "\$found" | grep ruby >/dev/null; then
@@ -409,7 +409,7 @@ The above is what `\$BASH "\$found"` [here](https://github.com/rbenv/rbenv/blob/
 /var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/rbenv/root/versions/2.0/bin/rake
 ```
 
-…using the `bash` program:
+...using the `bash` program:
 
 ```
 `/bin/bash`
@@ -527,7 +527,7 @@ I also add the following to the test itself:
   <img src="/assets/images/screenshot-15mar2023-352am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-If `rbenv` is being invoked, I expect both the output of `which ruby` from the test file and the output of `echo ‘inside rbenv-exec'` from the command file to appear in a new file named "result.txt".  I run the test and `cat` that file:
+If `rbenv` is being invoked, I expect both the output of `which ruby` from the test file and the output of `echo 'inside rbenv-exec'` from the command file to appear in a new file named "result.txt".  I run the test and `cat` that file:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-353am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -539,7 +539,7 @@ So it *is* being invoked.  That must mean that the `ruby` command being called f
   <img src="/assets/images/screenshot-15mar2023-355am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-At the bottom, we see `exec "/usr/local/bin/rbenv" exec …`.  That's us calling the shell's `exec` program, and telling it to run the equivalent of "rbenv exec".
+At the bottom, we see `exec "/usr/local/bin/rbenv" exec ...`.  That's us calling the shell's `exec` program, and telling it to run the equivalent of "rbenv exec".
 
 OK, *now* I see why this test is needed, *and* I see that it is in fact calling `rbenv exec` after all.  It's just doing it indirectly.  This is also why `rbenv-rehash` is needed- otherwise, the shim that we're calling here wouldn't exist!
 
@@ -691,7 +691,7 @@ I also notice that message at the very bottom:
 HEAD is now at b7a755c83f No more Bundler.
 ```
 
-I happened to do a `git log` when I first navigated into this repo, and I noticed that "No more Bundler." was the commit message of the HEAD commit.  So it looks like this command didn't send me back to the commit on Aug 12, 2011.  I'm guessing that's because of what the warning tells us, i.e. that the log for master only goes back to… today (at the time I'm writing this, it's 10 Nov 2022).
+I happened to do a `git log` when I first navigated into this repo, and I noticed that "No more Bundler." was the commit message of the HEAD commit.  So it looks like this command didn't send me back to the commit on Aug 12, 2011.  I'm guessing that's because of what the warning tells us, i.e. that the log for master only goes back to... today (at the time I'm writing this, it's 10 Nov 2022).
 
 OK, fine, I'll go back and read the SO post more closely.  I then see the following:
 
@@ -824,9 +824,9 @@ $ /usr/bin/env ruby --version
 ruby 2.6.8p205 (2021-07-07 revision 67951) [universal.x86-darwin21]
 ```
 
-When we call `ruby --version` or the 3rd command above (`ruby -e 'system…`), we get the correct version.  But when we call the 2nd command above (`perl -e 'system…`), we get the non-RBENV version.
+When we call `ruby --version` or the 3rd command above (`ruby -e 'system...`), we get the correct version.  But when we call the 2nd command above (`perl -e 'system...`), we get the non-RBENV version.
 
-That's because… why again?
+That's because... why again?
 
 Each time we run `puts "$RUBY_VERSION"`, we've just finished running `RBENV_VERSION=system`.  So what I'm wondering now is:
 
@@ -920,7 +920,7 @@ When running the `perl -e` version:
  - We don't reach the "first line of rbenv exec" logline until we're executing the command which is run by the `system` call.
  - At this point, we're passing `RBENV_VERSION=system` to `ruby -e`.
  - This explains why we see `RBENV_VERSION inside rbenv-exec: system` as the 2nd logline.
- - Because this value is defined, we don't enter the `if` block, and therefore we *don't* see the "inside ‘if' block" logline.
+ - Because this value is defined, we don't enter the `if` block, and therefore we *don't* see the "inside 'if' block" logline.
  - Because of this, in turn, we don't set `RBENV_VERSION` equal to the output of `rbenv-version-file-read`, which would have set `RBENV_VERSION` equal to 2.7.5.  Instead, we leave its value as "system".
  - Because its value is still "system" by the time it reaches [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L44), we never prepend `PATH` with `RBENV_BIN_PATH` (i.e. the RBENV-specific path to the user's requested command).  In our case, remember, that requested command is "ruby".
  - Because `PATH` never gets prepended with the RBENV-specific path to the user's command, we use the default system path to that command.  In our case, that default system path to "ruby" is `/usr/bin/ruby`.
@@ -1213,7 +1213,7 @@ To see what this command resolves to, I put the following `echo` statement just 
   <img src="/assets/images/screenshot-15mar2023-504am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-When I ran `rbenv exec ruby -e ‘puts 1+1', I saw the following:
+When I ran `rbenv exec ruby -e 'puts 1+1', I saw the following:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-505am.png" width="100%" style="border: 1px solid black; padding: 0.5em">

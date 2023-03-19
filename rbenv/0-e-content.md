@@ -175,7 +175,7 @@ Interestingly, I also try running the following directly in my terminal, without
 zsh: = not found
 ```
 
-So does that mean we can’t use double-equals in zsh?
+So does that mean we can/t use double-equals in zsh?
 
 To answer this, I Google around a bit and find [this link](https://archive.ph/2iSkK) for a StackOverflow question.  Apparently in `zsh`,...
 
@@ -185,7 +185,7 @@ a == is a logical operator only inside [[ ... ]] constructs.
 
 I know that `==` is an example of a "logical operator", so the above implies that I need to use double-brackets in my command.
 
-So what’s the difference between single- and double-`[`?
+So what/s the difference between single- and double-`[`?
 
 ### Double- vs. single-`[`
 
@@ -195,7 +195,7 @@ So what’s the difference between single- and double-`[`?
   <img src="/assets/images/brackets.png" width="70%" alt="bracket syntax in bash" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-OK, so `[` is more POSIX-compliant than `[[`, therefore it’s more portable across a wider array of machines.  `[[` is more modern and comes with some helpful extras (like easier compatibility with `==`, as we saw earlier), so it can sometimes be easier to use.  But if you’re writing a script that will be used by many people and you can’t predict which shell they’ll run it on (or which version of a shell), you’re probably safer using `[`.
+OK, so `[` is more POSIX-compliant than `[[`, therefore it/s more portable across a wider array of machines.  `[[` is more modern and comes with some helpful extras (like easier compatibility with `==`, as we saw earlier), so it can sometimes be easier to use.  But if you/re writing a script that will be used by many people and you can/t predict which shell they/ll run it on (or which version of a shell), you/re probably safer using `[`.
 
 Lastly, I discovered further down in that StackOverflow link that I *can* use single-brackets with `==`, but I have to wrap the double-equals sign in quotes, like this:
 

@@ -131,7 +131,7 @@ Now the PIDs are the same!  This tells me that the `foo` process did indeed get 
 
 ## Back to the line of code
 
-So that’s what the shell builtin `exec` command does.  But the line of code we're looking at is:
+So that's what the shell builtin `exec` command does.  But the line of code we're looking at is:
 
 ```
 exec "/usr/local/bin/rbenv" exec ...

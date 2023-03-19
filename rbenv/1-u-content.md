@@ -1,4 +1,4 @@
-There’s just one more file we have to examine before we can call it a day on the "libexec/" folder.  I see the "test/" directory has its own folder named "libexec", containing a command named `rbenv-echo`.  I `grep` for the usage of this command, and I only see one case, inside [the `rbenv.bats` spec file](https://github.com/rbenv/rbenv/blob/ed1a3a554585799cd0537c6a5678f6c793145b8e/test/rbenv.bats).  Let’s look at the `rbenv-echo` command now.
+There's just one more file we have to examine before we can call it a day on the "libexec/" folder.  I see the "test/" directory has its own folder named "libexec", containing a command named `rbenv-echo`.  I `grep` for the usage of this command, and I only see one case, inside [the `rbenv.bats` spec file](https://github.com/rbenv/rbenv/blob/ed1a3a554585799cd0537c6a5678f6c793145b8e/test/rbenv.bats).  Let's look at the `rbenv-echo` command now.
 
 ## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/libexec/rbenv-echo)
 
@@ -16,7 +16,7 @@ fi
 
 We have the `bash` shebang and "Usage" comments.
 
-Then we have an `if` conditional, which checks whether the command’s first argument starts with "-F".  If it does, then we create a variable named "sep".  Not sure what "sep" refers to; the command we’re currently examining appears to be strictly utilitarian in nature (it’s only called from within one specific test file), so it’s not meant for public consumption and therefore the core team probably felt like they could skimp on readability a bit, since it’s just for their own use.  I’ve done that before as well; they probably didn’t expect someone to read every last file the way I’m doing.
+Then we have an `if` conditional, which checks whether the command's first argument starts with "-F".  If it does, then we create a variable named "sep".  Not sure what "sep" refers to; the command we're currently examining appears to be strictly utilitarian in nature (it's only called from within one specific test file), so it's not meant for public consumption and therefore the core team probably felt like they could skimp on readability a bit, since it's just for their own use.  I've done that before as well; they probably didn't expect someone to read every last file the way I'm doing.
 
 At any rate, what are we storing in "sep"?  The `bash` syntax is:
 
@@ -45,7 +45,7 @@ echo ${1:7}
 
 ...treats the number `1` in this case as the value of argument "$1", and prints everything starting from the 7th character onward (characters are 0-based here).
 
-This also appears to be what’s happening in the case of our code.  We’re setting the "sep" variable equal to the value of `rbenv echo`’s first argument.  But not the whole argument- only the section of the argument from character 2 to the end (shaving off the first 2 chars, i.e. the "-F" chars).
+This also appears to be what's happening in the case of our code.  We're setting the "sep" variable equal to the value of `rbenv echo`'s first argument.  But not the whole argument- only the section of the argument from character 2 to the end (shaving off the first 2 chars, i.e. the "-F" chars).
 
 We can verify this with an experiment.  I paste the following function in my `bash` terminal:
 
@@ -76,7 +76,7 @@ The first part of this, `echo "${!2}"`, looks strange to me.  I search the GNU P
   <img src="/assets/images/screenshot-17mar23-950am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-I don’t know what a "nameref" is, and therefore I don’t know which of the "if" branches in this definition is relevant to our code.  This is a great example of the issue I take with the GNU docs- they’re written for people who are already familiar with `bash`.  There is no example code, no links to definitions for jargon (like "nameref"), and no plain-English wording.  It seems to me that, if we want to tell noobies to "read the fucking manual", then we need to write the manual with those noobies in mind.
+I don't know what a "nameref" is, and therefore I don't know which of the "if" branches in this definition is relevant to our code.  This is a great example of the issue I take with the GNU docs- they're written for people who are already familiar with `bash`.  There is no example code, no links to definitions for jargon (like "nameref"), and no plain-English wording.  It seems to me that, if we want to tell noobies to "read the fucking manual", then we need to write the manual with those noobies in mind.
 
 OK, rant over.
 
@@ -86,13 +86,13 @@ I Google "bash parameter expansion exclamation mark", and I find [another StackO
   <img src="/assets/images/screenshot-17mar23-952am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-This time we have actual example code.  It looks like the "!" syntax is known as ‘indirect expansion", which means you can pass the name of a variable as a stringified argument, and the consumer of the argument will look for a variable with that stringified name, and expand *that variable* instead of the string itself.  That makes sense, given how I saw the `rbenv echo` command being used inside the `rbenv.bats` file:
+This time we have actual example code.  It looks like the "!" syntax is known as 'indirect expansion", which means you can pass the name of a variable as a stringified argument, and the consumer of the argument will look for a variable with that stringified name, and expand *that variable* instead of the string itself.  That makes sense, given how I saw the `rbenv echo` command being used inside the `rbenv.bats` file:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-17mar23-953am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-OK, so we `echo` the value of the variable whose name we’re passing to `rbenv echo` via the 2nd argument (that’s what the "2" in `"${!2}"` means)/  Then we pipe that `echo`’ed value to a command named `tr`.  Specifically, the full command is `tr "${sep:-:}" $'\n'`.  What does this command do?  I type `man tr` in my terminal and get:
+OK, so we `echo` the value of the variable whose name we're passing to `rbenv echo` via the 2nd argument (that's what the "2" in `"${!2}"` means)/  Then we pipe that `echo`'ed value to a command named `tr`.  Specifically, the full command is `tr "${sep:-:}" $'\n'`.  What does this command do?  I type `man tr` in my terminal and get:
 
 NAME
      tr – translate characters
@@ -112,7 +112,7 @@ Hoping for some example code, I Google "bash tr command" and find [this link](ht
   <img src="/assets/images/screenshot-17mar23-954am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-OK, so we’re replacing the value:
+OK, so we're replacing the value:
 
 ```
 "${sep:-:}"
@@ -140,9 +140,9 @@ bash-3.2$ echo "${sep:-:}"
 :
 ```
 
-I think we can conclude that, yes, that is what’s happening here.
+I think we can conclude that, yes, that is what's happening here.
 
-The string that we replace it with looks to be a simple newline.  I’m a bit confused why we need the leading "$" character, so I try `echo`’ing the newline with and without the dollar sign:
+The string that we replace it with looks to be a simple newline.  I'm a bit confused why we need the leading "$" character, so I try `echo`'ing the newline with and without the dollar sign:
 
 ```
 bash-3.2$ echo $'\n'
@@ -161,9 +161,9 @@ So in summary: the code...
 echo "${!2}" | tr "${sep:-:}" $'\n'
 ```
 
-...appears to mean that we `echo` the value of the variable whose name is passed in as the 2nd argument, and we replace any occurrences of the value of "sep" (or ":" if "sep" doesn’t exist) with a newline.  With that knowledge, it seems like "sep" most likely stands for "separator".
+...appears to mean that we `echo` the value of the variable whose name is passed in as the 2nd argument, and we replace any occurrences of the value of "sep" (or ":" if "sep" doesn't exist) with a newline.  With that knowledge, it seems like "sep" most likely stands for "separator".
 
-Let’s test this hypothesis.  I make the following function and paste it into my terminal:
+Let's test this hypothesis.  I make the following function and paste it into my terminal:
 
 ```
 foo() {
@@ -194,7 +194,7 @@ bash-3.2$ foo xy bar
 foo5bar5baz
 ```
 
-This time, since we didn’t specify "5" as a separator, we just get our original string back, without any newline separation.  Lastly, I change the definition of "bar" to use the ":" character instead of "5", and run the last command again:
+This time, since we didn't specify "5" as a separator, we just get our original string back, without any newline separation.  Lastly, I change the definition of "bar" to use the ":" character instead of "5", and run the last command again:
 
 ```
 bash-3.2$ bar="foo:bar:baz"
@@ -212,7 +212,7 @@ bash-3.2$
 
 We once again see our original string, this time split into 3 separate lines according to the default ":" separator.
 
-What happens if we *don’t* pass the "-F" flag?  That’s handled in the `else` condition:
+What happens if we *don't* pass the "-F" flag?  That's handled in the `else` condition:
 
 ```
 else
@@ -220,8 +220,8 @@ else
 fi
 ```
 
-Here we’re still using indirect expansion, except this time we perform it on the first argument, not the 2nd one.  But we’re still `echo`ing that variable’s value to STDOUT.
+Here we're still using indirect expansion, except this time we perform it on the first argument, not the 2nd one.  But we're still `echo`ing that variable's value to STDOUT.
 
-That’s it!  That’s the definition of `rbenv echo`.
+That's it!  That's the definition of `rbenv echo`.
 
 

@@ -422,7 +422,7 @@ Not super-clear on what those do.  This may be a case where I `echo`'ed the wron
 
 Let me take a different tack, and search what `PS4` is.  The only line of code in this codebase containing the string `PS4` is the `export` line we're currently reading, so I know `PS4` isn't *directly* referenced anywhere else in the codebase.  That sort of implies to me that `PS4` must be used by something else, probably the system itself, in which case the name `PS4` has a special meaning in bash.
 
-I Google "PS4" and find that I'm right about this.  [This article](https://web.archive.org/web/20220517005905/https://www.thegeekstuff.com/2008/09/bash-shell-take-control-of-ps1-ps2-ps3-ps4-and-prompt_command/) says that "The PS4 shell variable defines the prompt that gets displayed, when you execute a shell script in debug mode...  It also says that "PS4 (is used) by ‘set -x' to prefix tracing output", which relates to the line of code after the `export` line we're currently on.
+I Google "PS4" and find that I'm right about this.  [This article](https://web.archive.org/web/20220517005905/https://www.thegeekstuff.com/2008/09/bash-shell-take-control-of-ps1-ps2-ps3-ps4-and-prompt_command/) says that "The PS4 shell variable defines the prompt that gets displayed, when you execute a shell script in debug mode...  It also says that "PS4 (is used) by 'set -x' to prefix tracing output", which relates to the line of code after the `export` line we're currently on.
 
 So when I see lines like the following in the output of `rbenv –debug commands`:
 
@@ -569,7 +569,7 @@ Now my question is: why would you need to call `eval` and pass it a command?  Wh
 It seems like that could be tricky to accomplish, for example if part of the command that `exec` would run is the first command in the string.  Ex.:
 
 ```
-command="echo ‘Hello world'"
+command="echo 'Hello world'"
 eval $command
 ```
 
@@ -686,7 +686,7 @@ Second, What is `cat -`?
 
 I type `help cat` in my terminal, and get the following:
 
-> The `cat` utility reads files sequentially, writing them to the standard output.  The file operands are processed in command-line order.  If file is a single dash (‘-') or absent, `cat` reads from the standard input.
+> The `cat` utility reads files sequentially, writing them to the standard output.  The file operands are processed in command-line order.  If file is a single dash ('-') or absent, `cat` reads from the standard input.
 
 OK, so if there are no args passed to `abort`, then we read from standard input.  Not sure why, though.  Maybe it'll become clearer if we continue reading the code.
 
@@ -1953,7 +1953,7 @@ drwxr-xr-x  4 myusername  staff   128 Sep  4 10:13 ..
 
 (stopping here for the day; 18534 words)
 
-I've seen things ending in ".d" before, but I don't know what I'm supposed to infer from that ending.  I guess I thought it was a file extension of some sort, but here ".d" has been added to the name of a directory, not a file.  I Google ‘what does ".d" stand for bash', and the first two results I see ([this](https://web.archive.org/web/20220619172419/https://unix.stackexchange.com/questions/4029/what-does-the-d-stand-for-in-directory-names) and [this](https://web.archive.org/web/20201130081947/https://serverfault.com/questions/240181/what-does-the-suffix-d-mean-in-linux)) are both from StackExchange.  Some excerpts from these pages:
+I've seen things ending in ".d" before, but I don't know what I'm supposed to infer from that ending.  I guess I thought it was a file extension of some sort, but here ".d" has been added to the name of a directory, not a file.  I Google 'what does ".d" stand for bash', and the first two results I see ([this](https://web.archive.org/web/20220619172419/https://unix.stackexchange.com/questions/4029/what-does-the-d-stand-for-in-directory-names) and [this](https://web.archive.org/web/20201130081947/https://serverfault.com/questions/240181/what-does-the-suffix-d-mean-in-linux)) are both from StackExchange.  Some excerpts from these pages:
 
 > "d" stands for directory and such a directory is a collection of configuration files which are often fragments that are included in the main configuration file. The point is to compartmentalize configuration concerns to increase maintainability.
 >

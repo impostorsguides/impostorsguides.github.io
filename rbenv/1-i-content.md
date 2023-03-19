@@ -115,7 +115,7 @@ And as I suspected, the `!` means we negate the result of the `[ -t 0]` test:
 
 So the `0` in `! -t 0` represents a file descriptor.  And this condition says "execute the code inside this conditional check, *if* file descriptor # 0 is *not* open or is *not* associated with a terminal".
 
-That… sounds strange to me.  What kind of logic would we want to execute only if file descriptor 0 is *not* open?  And what are file descriptors again?  I've heard the term before, but I forget what they are.
+That... sounds strange to me.  What kind of logic would we want to execute only if file descriptor 0 is *not* open?  And what are file descriptors again?  I've heard the term before, but I forget what they are.
 
 According to [RedHat](https://web.archive.org/web/20220405071108/https://www.redhat.com/sysadmin/more-stupid-bash-tricks):
 
@@ -450,7 +450,7 @@ Next block of code:
 
 ```
 if ! enable -f "${BASH_SOURCE%/*}"/rbenv-realpath.dylib realpath 2>/dev/null; then
-…
+...
 fi
 ```
 
@@ -608,9 +608,9 @@ All of this is just to say, I will try not to get my hopes up.  If I fail to fin
 
 But no one said this would be easy.  The key will be doing this in a methodical, systematic way.  The goal is to prevent myself from either a) missing some issues because I accidentally skipped over them, or b) re-reading issues that I've already eliminated.
 
-Reading through past Github issues is a difficult process to derive learnings and new knowledge from.  When reading code, if you don't understand a certain piece of syntax, you can always post a question on StackOverflow.  But there's no StackOverflow, Q&A site for questions like "Hey, what did you mean in your Github issue when [you said](https://github.com/rbenv/rbenv/issues/38) `...we will be supporting system wide installs via homebrew…`?"
+Reading through past Github issues is a difficult process to derive learnings and new knowledge from.  When reading code, if you don't understand a certain piece of syntax, you can always post a question on StackOverflow.  But there's no StackOverflow, Q&A site for questions like "Hey, what did you mean in your Github issue when [you said](https://github.com/rbenv/rbenv/issues/38) `...we will be supporting system wide installs via homebrew...`?"
 
-I mean, to a certain extent, that Q&A site *is* Github itself, but that's not Github's primary intent.  I get the sense that the questions and answers posted on StackOverflow are meant to be just as relevant 10 years from now as they are today.  Also, SO is meant more for discrete questions with discrete answers.  In contrast, the discussions on Github are just that- discussions.  There's much more back-and-forth between contributors… (NOTE- how to finish this train of thought?)
+I mean, to a certain extent, that Q&A site *is* Github itself, but that's not Github's primary intent.  I get the sense that the questions and answers posted on StackOverflow are meant to be just as relevant 10 years from now as they are today.  Also, SO is meant more for discrete questions with discrete answers.  In contrast, the discussions on Github are just that- discussions.  There's much more back-and-forth between contributors... (NOTE- how to finish this train of thought?)
 
 At any rate, it's highly unlikely that anyone would reply to a question I posted on a 10-year-old Github issue, much less the original author.
 
@@ -687,9 +687,9 @@ OK, I don't want to get too bogged down here for now.  I think this new working 
 
 While thinking about `rbenv hooks` I realized there's a common stumbling block which often not only blocks me from making forward progress, but also sometimes saps my motivation to push through and persist.  My working name for this is "2nd-order confusion".
 
-Think about some of the basic questions I've encountered and answered so far, over the course of this project.  For example: "I don't know what the syntax `[ … ]` is in `bash`."  That's a question I had at the beginning of this project.  And it was relatively straightforward to answer, just by Googling "square brackets bash".  I get my answer from StackOverflow, I know a little bit more about bash than I did a minute ago, and it's now relatively easier to read the script in front of me.
+Think about some of the basic questions I've encountered and answered so far, over the course of this project.  For example: "I don't know what the syntax `[ ... ]` is in `bash`."  That's a question I had at the beginning of this project.  And it was relatively straightforward to answer, just by Googling "square brackets bash".  I get my answer from StackOverflow, I know a little bit more about bash than I did a minute ago, and it's now relatively easier to read the script in front of me.
 
-But what about when the question is not so straightforward?  What about when I have multiple questions, and they're all unrelated to each other?  What about when I have one question which depends on the answer to another question, for example the questions I had about the commands passed to `awk` when I was examining the `rbenv-help` command?  In that case, I wanted to know a) was I right in thinking that these are 3 separate commands being passed to `awk`, b) if so, what each of those commands were doing?  In that case, I was also confused about c) what the `END` syntax meant, and d) where the values for local variables like `usage` and `summary` were being initialized (i.e. what is going on [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L66) with the `usage = usage…` syntax?).
+But what about when the question is not so straightforward?  What about when I have multiple questions, and they're all unrelated to each other?  What about when I have one question which depends on the answer to another question, for example the questions I had about the commands passed to `awk` when I was examining the `rbenv-help` command?  In that case, I wanted to know a) was I right in thinking that these are 3 separate commands being passed to `awk`, b) if so, what each of those commands were doing?  In that case, I was also confused about c) what the `END` syntax meant, and d) where the values for local variables like `usage` and `summary` were being initialized (i.e. what is going on [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L66) with the `usage = usage...` syntax?).
 
 In a way, it's similar to how cryptography works.  Stay with me, here.  It's relatively easy, given two prime numbers, to multiply them together and get a result.  But if all you have is the result, and you want the two prime numbers, that's a much more difficult problem (intentionally so, in the case of crypto).  2nd-order confusion is like that.  If you're looking at a non-trivial piece of code and don't know where to begin understanding it, one reason might be because you have multiple 1st-order questions and the confusion around each of them is compounding exponentially, leaving you with no idea where to start Googling.
 

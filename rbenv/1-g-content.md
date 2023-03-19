@@ -1,6 +1,6 @@
 This is the file that gets called by [this line of the `rbenv` file](https://github.com/rbenv/rbenv/blob/0767d64344d0c52282125e2e25aa03f4d7a80698/libexec/rbenv#L103) when the user types either `rbenv -v` or `rbenv --version` in their terminal.
 
-As usual, let’s look at the tests first:
+As usual, let's look at the tests first:
 
 ## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/--version.bats)
 
@@ -10,13 +10,13 @@ After the `bats` shebang and the loading of `test_helper`, the first line of cod
 export GIT_DIR="${RBENV_TEST_DIR}/.git"
 ```
 
-Here we set an environment variable named `GIT_DIR` to equal a “.git” hidden directory inside our test dir.  I don’t see any other references to `GIT_DIR` in the RBENV codebase, so I Google it and find that it’s mentioned [here](https://git-scm.com/book/en/v2/Git-Internals-Environment-Variables) in the Git docs:
+Here we set an environment variable named `GIT_DIR` to equal a “.git” hidden directory inside our test dir.  I don't see any other references to `GIT_DIR` in the RBENV codebase, so I Google it and find that it's mentioned [here](https://git-scm.com/book/en/v2/Git-Internals-Environment-Variables) in the Git docs:
 
 > ### Repository Locations
 >
 > Git uses several environment variables to determine how it interfaces with the current repository.
 >
-> GIT_DIR is the location of the .git folder. If this isn’t specified, Git walks up the directory tree until it gets to ~ or /, looking for a .git directory at every step.
+> GIT_DIR is the location of the .git folder. If this isn't specified, Git walks up the directory tree until it gets to ~ or /, looking for a .git directory at every step.
 
 It appears that we use `git` commands several times throughout the tests for `rbenv --version`, so setting this env var is part of the overall setup we need for our tests to pass.
 
@@ -31,7 +31,7 @@ setup() {
 }
 ```
 
-This is our `setup` hook function which gets called before the tests are run.  We first create the `$HOME` directory; [according to test_helper.bash](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L19), this env var resolves to `"${RBENV_TEST_DIR}/home"`.  Next we set two of git’s config values- the git user’s name and email address.  Lastly, we navigate into our `RBENV_TEST_DIR` as we normally would in the `setup` function.
+This is our `setup` hook function which gets called before the tests are run.  We first create the `$HOME` directory; [according to test_helper.bash](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L19), this env var resolves to `"${RBENV_TEST_DIR}/home"`.  Next we set two of git's config values- the git user's name and email address.  Lastly, we navigate into our `RBENV_TEST_DIR` as we normally would in the `setup` function.
 
 (stopping here for the day; 93767 words)
 
@@ -43,7 +43,7 @@ git_commit() {
 }
 ```
 
-This is a helper function to make an empty git commit.  Skipping ahead to the command file itself, part of its code uses git commands to pull RBENV’s version number using metadata from git, and we’ll need this `git_commit` helper function to generate a new git SHA as part of the test setup process.
+This is a helper function to make an empty git commit.  Skipping ahead to the command file itself, part of its code uses git commands to pull RBENV's version number using metadata from git, and we'll need this `git_commit` helper function to generate a new git SHA as part of the test setup process.
 
 First test:
 
@@ -56,9 +56,9 @@ First test:
 }
 ```
 
-We start by asserting that `$RBENV_ROOT` does not exist on our machine.  I’m actually not sure why this check is necessary, since `RBENV_ROOT` does not appear [in the command file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version).  At first I thought it was a copy/paste mistake, but that seems unlikely because there are no other instances of `assert [ ! -e "$RBENV_ROOT" ]` in this test file, which is where I would expect the copy/paste job to have been taken from.  There’s no explanation in [the PR which introduced this test](https://github.com/rbenv/rbenv/commit/ab9ebb9d0ddb440e5546e2eb1d1bf3e483f8b017), either.  I hate that I have to leave this as an open question, but the only other way I can think of to answer it is by filing an issue on the RBENV repo, and I don’t want to waste the core team’s time with such a trivial question.
+We start by asserting that `$RBENV_ROOT` does not exist on our machine.  I'm actually not sure why this check is necessary, since `RBENV_ROOT` does not appear [in the command file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version).  At first I thought it was a copy/paste mistake, but that seems unlikely because there are no other instances of `assert [ ! -e "$RBENV_ROOT" ]` in this test file, which is where I would expect the copy/paste job to have been taken from.  There's no explanation in [the PR which introduced this test](https://github.com/rbenv/rbenv/commit/ab9ebb9d0ddb440e5546e2eb1d1bf3e483f8b017), either.  I hate that I have to leave this as an open question, but the only other way I can think of to answer it is by filing an issue on the RBENV repo, and I don't want to waste the core team's time with such a trivial question.
 
-The rest of the test is pretty straight-forward.  We run the `--version` command, assert that it completed successfully, and assert that the value stored in the `$output` variable from `bats` matches the pattern “rbenv ?.?.?”.  Each question mark corresponds to a single character, so we’re checking that the printed output starts with “rbenv “ followed by a single character, a period, a single character, another period, and a final single character.  For example, “1.2.0”.  In other words, the typical format of a version number (major, minor, and patch numbers).
+The rest of the test is pretty straight-forward.  We run the `--version` command, assert that it completed successfully, and assert that the value stored in the `$output` variable from `bats` matches the pattern “rbenv ?.?.?”.  Each question mark corresponds to a single character, so we're checking that the printed output starts with “rbenv “ followed by a single character, a period, a single character, another period, and a final single character.  For example, “1.2.0”.  In other words, the typical format of a version number (major, minor, and patch numbers).
 
 Next test:
 
@@ -112,7 +112,7 @@ When I run the current test and `cat` the “result.txt” file, I get:
   <img src="/assets/images/screenshot-14mar2023-811am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-We can see the loglines from inside the first `if` block (loglines 1 and 2) as well as the 2nd `if` block (loglines 3 through 5), but not those from the 3rd `if` block (loglines 6 and 7).  This proves that it is indeed the `| grep -q rbenv;` clause which this test is designed to cover.  Since this clause is falsy, we never reach inside the overall `if` block, we never set the `git_revision` variable, and [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version#L23) causes the `echo`’ed value to default to the value of the `version` variable, since the `git_revision` variable is empty.  This explains why we match on the pattern `?.?.?`, since that pattern fits the value of `version`.
+We can see the loglines from inside the first `if` block (loglines 1 and 2) as well as the 2nd `if` block (loglines 3 through 5), but not those from the 3rd `if` block (loglines 6 and 7).  This proves that it is indeed the `| grep -q rbenv;` clause which this test is designed to cover.  Since this clause is falsy, we never reach inside the overall `if` block, we never set the `git_revision` variable, and [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version#L23) causes the `echo`'ed value to default to the value of the `version` variable, since the `git_revision` variable is empty.  This explains why we match on the pattern `?.?.?`, since that pattern fits the value of `version`.
 
 Next test:
 
@@ -152,15 +152,15 @@ Last test:
 }
 ```
 
-This test is similar to the previous test, except this time we don’t tag the repo with a version number.  We’ll still reach the inside of [this `if` statement](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version#L18), but because there are no tags, the command `git describe --tags HEAD` will be empty, so the `git_revision` variable will be empty as well.  Because of this, the `:-$version` syntax on [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version#L23) causes the parameter expansion to default to the value of the `version` variable, meaning `version`’s value is what gets printed by the `echo` command.  This is why the value of `$output` is expected to match the “?.?.?” pattern.
+This test is similar to the previous test, except this time we don't tag the repo with a version number.  We'll still reach the inside of [this `if` statement](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version#L18), but because there are no tags, the command `git describe --tags HEAD` will be empty, so the `git_revision` variable will be empty as well.  Because of this, the `:-$version` syntax on [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version#L23) causes the parameter expansion to default to the value of the `version` variable, meaning `version`'s value is what gets printed by the `echo` command.  This is why the value of `$output` is expected to match the “?.?.?” pattern.
 
 (stopping here for the day; 94773 words)
 
-With the tests wrapped up, let’s look at the code next:
+With the tests wrapped up, let's look at the code next:
 
 ## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version)
 
-The first block of “code” is just the shebang (which we’ve already seen by now) followed by some comments:
+The first block of “code” is just the shebang (which we've already seen by now) followed by some comments:
 
 ```
 #!/usr/bin/env bash
@@ -184,7 +184,7 @@ set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 ```
 
-Again, this is code that we’ve seen elsewhere.  The first line tells bash to exit immediately if an error occurs, and the 2nd line tells bash to read the `$RBENV_DEBUG` environment variable, and to output verbose debugging information if that env var has been set previously.
+Again, this is code that we've seen elsewhere.  The first line tells bash to exit immediately if an error occurs, and the 2nd line tells bash to read the `$RBENV_DEBUG` environment variable, and to output verbose debugging information if that env var has been set previously.
 
 Next few lines of code:
 
@@ -199,14 +199,14 @@ Next few lines of code:
 
 ```
 if cd "${BASH_SOURCE%/*}" 2>/dev/null && git remote -v 2>/dev/null | grep -q rbenv; then
-  …
+  ...
 fi
 ```
 Here we attempt to cd into a directory specified by the value of the `$BASH_SOURCE` env var (piping any errors to `/dev/null`), then we try to run `git remote -v` inside that directory (again, piping any errors to `/dev/null`), and then piping the results of the previous `git remote` command to the `grep` command and `grep`ping for the string “rbenv”.  We run “grep” in “quiet” mode for performance reasons (hence the `-q` flag).  After Googling “grep quiet mode”, [the first result I see](https://archive.ph/VceeV) says that the purpose of quiet mode is:
 
 > Sometimes, instead of examining at the matched strings, we are only interested in whether there was a match or not. The quiet option (-q), causes grep to run silently and not generate any output. Instead, it runs the command and returns an exit status based on success or failure. The return status is 0 for success and nonzero for failure.
 
-So this implies that we don’t actually care *what* the match for `grep rbenv` is, only whether there *was* a match.  If there wasn’t, then the `if` condition returns false, so we don’t execute the code inside said condition.
+So this implies that we don't actually care *what* the match for `grep rbenv` is, only whether there *was* a match.  If there wasn't, then the `if` condition returns false, so we don't execute the code inside said condition.
 
 Speaking of which, that code is:
 
@@ -215,11 +215,11 @@ Speaking of which, that code is:
   git_revision="${git_revision#v}"
 ```
 
-Here we re-initialize the `git_revision` string to the result of either `git describe --tags HEAD 2>/dev/null` as the happy path.  If this happy path has no result, we set “git_revision” equal to the boolean `true`.  We’ve seen this trick before, and last time we did, the trick was used to ensure that any subsequent length checks return `0` if the happy path code returned empty.
+Here we re-initialize the `git_revision` string to the result of either `git describe --tags HEAD 2>/dev/null` as the happy path.  If this happy path has no result, we set “git_revision” equal to the boolean `true`.  We've seen this trick before, and last time we did, the trick was used to ensure that any subsequent length checks return `0` if the happy path code returned empty.
 
 The 2nd line checks whether `git_revision` starts with the letter “v”, and if it does, deletes that “v”.  For example, if the previous command set `git_revision` equal to `v1.2.0`, then this 2nd line of code just trims the `v` off the front, leaving us with `1.2.0`.
 
-I’ve never used the command `git describe --tags HEAD` before, but I suspect that its job is to pull a tag name (for example, “v1.2.0” from [here](https://github.com/rbenv/rbenv/releases/tag/v1.2.0)), so that on the next line we can trim the “v” from it and be left with “1.2.0” to store in the “git_revision” variable.  I tried to verify that this is what happens by running `git describe –tags HEAD` on the master branch, but that failed:
+I've never used the command `git describe --tags HEAD` before, but I suspect that its job is to pull a tag name (for example, “v1.2.0” from [here](https://github.com/rbenv/rbenv/releases/tag/v1.2.0)), so that on the next line we can trim the “v” from it and be left with “1.2.0” to store in the “git_revision” variable.  I tried to verify that this is what happens by running `git describe –tags HEAD` on the master branch, but that failed:
 
 ```
 $ git describe --tags HEAD
@@ -236,7 +236,7 @@ I thought maybe I am supposed to checkout a specific tag, so I looked up how to 
 > `$ git checkout tags/<tag> -b <branch>`
 >
 
-I tried just `git checkout tags/v1.2.0` by itself, without the branch name, but that didn’t work:
+I tried just `git checkout tags/v1.2.0` by itself, without the branch name, but that didn't work:
 
 ```
 $ git checkout tags/v1.2.0
@@ -244,21 +244,21 @@ $ git checkout tags/v1.2.0
 error: pathspec 'tags/v1.2.0' did not match any file(s) known to git
 ```
 
-Looks like I’ll probably need the branch name.  Or, maybe I can just put some tracer statements inside my `rbenv---version` file and see what the branch name is.
+Looks like I'll probably need the branch name.  Or, maybe I can just put some tracer statements inside my `rbenv---version` file and see what the branch name is.
 
-Here’s how I update that file on my local machine:
+Here's how I update that file on my local machine:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-14mar2023-814am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-I’ve added the tracers on lines 18 and 20.  When I `eval` and run `rbenv -v`, I see the following:
+I've added the tracers on lines 18 and 20.  When I `eval` and run `rbenv -v`, I see the following:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-14mar2023-815am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-I see my first tracer’s output, but not my 2nd.  Which means the `if` condition isn’t returning true.  I wonder which of the inner conditions is causing the overall `if` condition to be falsy.  I try commenting out the 2nd condition and just checking the first:
+I see my first tracer's output, but not my 2nd.  Which means the `if` condition isn't returning true.  I wonder which of the inner conditions is causing the overall `if` condition to be falsy.  I try commenting out the 2nd condition and just checking the first:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-14mar2023-816am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -272,7 +272,7 @@ No change in the tracer output, unfortunately:
 
 I try adding another tracer to just `echo` the value of `$BASH_SOURCE`, and I get `BASH_SOURCE: /usr/local/Cellar/rbenv/1.2.0/libexec/rbenv---version`.
 
-So the `git remote -v | grep -q rbenv` line must be returning zero results, which is why we don’t enter the `if` block.  And the purpose of `git remote -v` is to show what the remote git server’s address is, this line would only return zero results if there was no remote git server, meaning the directory we’re in when we run this code is not a git repository.  So then how do we fetch a specific rbenv version to show the user?
+So the `git remote -v | grep -q rbenv` line must be returning zero results, which is why we don't enter the `if` block.  And the purpose of `git remote -v` is to show what the remote git server's address is, this line would only return zero results if there was no remote git server, meaning the directory we're in when we run this code is not a git repository.  So then how do we fetch a specific rbenv version to show the user?
 
 The answer is given in the very last line of code in this file:
 
@@ -282,4 +282,4 @@ echo "rbenv ${git_revision:-$version}"
 
 Here is that `:-` syntax again.  We `echo` the value of `git_revision` if it was populated from the insides of that `if` block we just looked at.  If we never reached the insides of that block, then our value of `git_revision` should still be the empty string that it was initialized to, in which case we use the value of our other variable, `version`, which was initialized to `1.2.0`.
 
-And that’s what our `rbenv---version` file does!
+And that's what our `rbenv---version` file does!

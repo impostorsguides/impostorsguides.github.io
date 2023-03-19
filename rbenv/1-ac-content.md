@@ -182,7 +182,7 @@ OUT
 }
 ```
 
-Here we create 3 executables, one in each of Ruby versions 1.8, 1.9, and 2.0.  We set our current Ruby version to 1.8 via an environment variable and run the `which` command, passing as an argument the name of the executable that is *not* installed in Ruby 1.8.  We assert that the command fails because the executable was not found in our current Ruby version, and we also assert that the printed error includes not only the ‘command not found' message, but also a message stating which Ruby versions *do* contain the requested executable.
+Here we create 3 executables, one in each of Ruby versions 1.8, 1.9, and 2.0.  We set our current Ruby version to 1.8 via an environment variable and run the `which` command, passing as an argument the name of the executable that is *not* installed in Ruby 1.8.  We assert that the command fails because the executable was not found in our current Ruby version, and we also assert that the printed error includes not only the 'command not found' message, but also a message stating which Ruby versions *do* contain the requested executable.
 
 Next test:
 

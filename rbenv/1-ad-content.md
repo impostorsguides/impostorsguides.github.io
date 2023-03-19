@@ -18,7 +18,7 @@ I decide to open that up.  Inside I look for where "gem-rehash.bash" is referenc
   <img src="/assets/images/screenshot-19mar2023-924am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
-I scan this a bit more closely, and I see "Auditing installed plugins" in the logs that the question references.  This reminds me that we're currently in a directory named "rbenv.d/exec/gem-rehash/", and that "rbenv.d" is one of the directories that is checked for plugins by… which file was it again?
+I scan this a bit more closely, and I see "Auditing installed plugins" in the logs that the question references.  This reminds me that we're currently in a directory named "rbenv.d/exec/gem-rehash/", and that "rbenv.d" is one of the directories that is checked for plugins by... which file was it again?
 
 I search for "rbenv.d" in the code, and I find:
 

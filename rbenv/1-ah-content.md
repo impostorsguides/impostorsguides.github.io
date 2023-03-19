@@ -501,7 +501,7 @@ However, I do find [this StackOverflow post](https://web.archive.org/web/2023031
 
 ```
 EXAMPLES
-     Replace ‘bar’ with ‘baz’ when piped from another command:
+     Replace 'bar' with 'baz' when piped from another command:
 
            echo "An alternate word, like bar, is sometimes used in examples." | sed 's/bar/baz/'
 
@@ -513,7 +513,7 @@ EXAMPLES
 
            echo "/home/example" | sed 's#/home/example#/usr/local/example#'
 
-     Replace all occurances of ‘foo’ with ‘bar’ in the file test.txt, without creating a backup of the file:
+     Replace all occurances of 'foo' with 'bar' in the file test.txt, without creating a backup of the file:
 
            sed -i '' -e 's/foo/bar/g' test.txt
 ```

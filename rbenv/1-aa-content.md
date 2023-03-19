@@ -637,7 +637,7 @@ OK, for each line that `sed` encounters, it first puts that line in the "hold sp
 
 The next `sed` command is `s/[+-]/./g;`.  I think I recognize the square brackets from Ruby regexes, but there's always the chance that `sed` regexes work differently.  In [the GNU `sed` manual](https://www.gnu.org/software/sed/manual/sed.html), I search for the string "bracket" and find the section ["5.5 Character Classes and Bracket Expressions"](https://www.gnu.org/software/sed/manual/sed.html#Character-Classes-and-Bracket-Expressions):
 
-> A bracket expression is a list of characters enclosed by ‘[' and ‘]'. It matches any single character in that list; if the first character of the list is the caret ‘^', then it matches any character not in the list. For example, the following command replaces the words ‘gray' or ‘grey' with ‘blue':
+> A bracket expression is a list of characters enclosed by '[' and ']'. It matches any single character in that list; if the first character of the list is the caret '^', then it matches any character not in the list. For example, the following command replaces the words 'gray' or 'grey' with 'blue':
 >
 > `sed  's/gr[ae]y/blue/'`
 
@@ -677,13 +677,13 @@ This is another search-and-replace command.  The first "." after the "/" charact
 
 Next is the `\(...\)` syntax.  The slashes simply escape the opening and closing parentheses.  The parentheses themselves are meant to create a sub-expression, as mentioned [here](https://web.archive.org/web/20221016162544/https://www.gnu.org/software/sed/manual/sed.html#Back_002dreferences-and-Subexpressions).  The concept of sub-expressions is actually related to the `\1` syntax that we also see in the current `sed` command.  From the docs:
 
-> back-references are regular expression commands which refer to a previous part of the matched regular expression. Back-references are specified with backslash and a single digit (e.g. ‘\1'). The part of the regular expression they refer to is called a subexpression, and is designated with parentheses.
+> back-references are regular expression commands which refer to a previous part of the matched regular expression. Back-references are specified with backslash and a single digit (e.g. '\1'). The part of the regular expression they refer to is called a subexpression, and is designated with parentheses.
 >
 > Back-references and subexpressions are used in two cases: in the regular expression search pattern, and in the replacement part of the s command...
 >
-> In a regular expression pattern, back-references are used to match the same content as a previously matched subexpression. In the following example, the subexpression is ‘.' - any single character (being surrounded by parentheses makes it a subexpression). The back-reference ‘\1' asks to match the same content (same character) as the sub-expression.
+> In a regular expression pattern, back-references are used to match the same content as a previously matched subexpression. In the following example, the subexpression is '.' - any single character (being surrounded by parentheses makes it a subexpression). The back-reference '\1' asks to match the same content (same character) as the sub-expression.
 >
-> The command below matches words starting with any character, followed by the letter ‘o', followed by the same character as the first.
+> The command below matches words starting with any character, followed by the letter 'o', followed by the same character as the first.
 >
 > ```
 > $ sed -E -n '/^(.)o\1$/p' /usr/share/dict/words
@@ -718,7 +718,7 @@ Next are the double-brackets followed by `:digit:` followed by the double-closin
 > X
 > ```
 >
-> ‘[:digit:]'
+> '[:digit:]'
 > Digits: 0 1 2 3 4 5 6 7 8 9.
 
 So to summarize the line `s/.p\([[:digit:]]\)/.z.\1/;`:
@@ -795,7 +795,7 @@ I find [more GNU docs](https://web.archive.org/web/20220707190251/https://www.gn
 >
 > ...
 >
-> For example, assume you are a Swedish user in Spain, and you want your programs to handle numbers and dates according to Spanish conventions, and only the messages should be in Swedish. Then you could create a locale named ‘sv_ES' or ‘sv_ES.UTF-8' by use of the localedef program. But it is simpler, and achieves the same effect, to set the LANG variable to es_ES.UTF-8 and the LC_MESSAGES variable to sv_SE.UTF-8; these two locales come already preinstalled with the operating system.
+> For example, assume you are a Swedish user in Spain, and you want your programs to handle numbers and dates according to Spanish conventions, and only the messages should be in Swedish. Then you could create a locale named 'sv_ES' or 'sv_ES.UTF-8' by use of the localedef program. But it is simpler, and achieves the same effect, to set the LANG variable to es_ES.UTF-8 and the LC_MESSAGES variable to sv_SE.UTF-8; these two locales come already preinstalled with the operating system.
 >
 > LC_ALL is an environment variable that overrides all of these. It is typically used in scripts that run particular programs. For example, configure scripts generated by GNU autoconf use LC_ALL to make sure that the configuration tests don't operate in locale dependent ways.
 

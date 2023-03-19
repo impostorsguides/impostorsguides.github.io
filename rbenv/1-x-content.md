@@ -245,7 +245,7 @@ Now I think I see what's happening here.  The line of code...
 IFS="${IFS}"$'\r'
 ```
 
-...means that we're concatenating the ‘carriage return' character to the end of the original set of `IFS` characters.  Much clearer.
+...means that we're concatenating the 'carriage return' character to the end of the original set of `IFS` characters.  Much clearer.
 
 Next:
 

@@ -100,7 +100,7 @@ echo hello
 SH
 ```
 
-Here we make a directory especially for this test that we're running, and then create a new executable command called `rbenv-hello`.  We add a fake shebang and some usage comments to the file, followed by a command to just echo ‘hello'.  Basically just enough fake file content to mimic a real rbenv command file.
+Here we make a directory especially for this test that we're running, and then create a new executable command called `rbenv-hello`.  We add a fake shebang and some usage comments to the file, followed by a command to just echo 'hello'.  Basically just enough fake file content to mimic a real rbenv command file.
 
 Next half of the test is:
 
@@ -352,7 +352,7 @@ The phrase "modifying the input as specified by a list of commands" is too abstr
 
 ```
 EXAMPLES
-     Replace ‘bar' with ‘baz' when piped from another command:
+     Replace 'bar' with 'baz' when piped from another command:
 
            echo "An alternate word, like bar, is sometimes used in examples." | sed 's/bar/baz/'
 
@@ -364,7 +364,7 @@ EXAMPLES
 
            echo "/home/example" | sed 's#/home/example#/usr/local/example#'
 
-     Replace all occurances of ‘foo' with ‘bar' in the file test.txt, without creating a backup of the file:
+     Replace all occurances of 'foo' with 'bar' in the file test.txt, without creating a backup of the file:
 
            sed -i '' -e 's/foo/bar/g' test.txt
 ```
@@ -405,7 +405,7 @@ ComputerHope, which I've often found to be another good resource during this pro
 
 > The sed stream editor performs basic text transformations on an input stream (a file, or input from a pipeline). While in some ways similar to an editor which permits scripted edits (such as ed), sed works by making only one pass over the input(s), and is consequently more efficient. But it is sed's ability to filter text in a pipeline which particularly distinguishes it from other types of editors.
 
-I'm still a bit unclear on the `-e` flag, however.  When I Google ‘what does the "-e" flag do sed', the first result I see is [a StackExchange post](https://unix.stackexchange.com/questions/33157/what-is-the-purpose-of-e-in-sed-command) which proves helpful:
+I'm still a bit unclear on the `-e` flag, however.  When I Google 'what does the "-e" flag do sed', the first result I see is [a StackExchange post](https://unix.stackexchange.com/questions/33157/what-is-the-purpose-of-e-in-sed-command) which proves helpful:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-123pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
@@ -863,17 +863,17 @@ Here we declare a helper function which will be used further down in the `awk` c
 
 The & character has a special meaning here, according to [the GNU docs](https://web.archive.org/web/20220608181534/https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html) for the "sub()" function:
 
-> If the special character ‘&' appears in replacement, it stands for the precise substring that was matched by regexp. (If the regexp can match more than one string, then this precise substring may vary.) For example:
+> If the special character '&' appears in replacement, it stands for the precise substring that was matched by regexp. (If the regexp can match more than one string, then this precise substring may vary.) For example:
 >
 > ```
 > { sub(/candidate/, "& and his wife"); print }
 > ```
 >
-> changes the first occurrence of ‘candidate' to ‘candidate and his wife' on each input line.
+> changes the first occurrence of 'candidate' to 'candidate and his wife' on each input line.
 
 In this case, the docs say that the function "changes the first occurrence", but that's just because the function that the doc is discussing here is the "sub" function.  Under the docs for "gsub", we see:
 
-> As in sub(), the characters ‘&' and ‘\' are special...
+> As in sub(), the characters '&' and '\' are special...
 
 Next block of code:
 

@@ -150,15 +150,15 @@ Sure enough, I find that it contains the following table:
   <img src="/assets/images/rbenv-env-vars.png" width="70%" alt="Environment variables in RBENV" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-So the intention is for `RBENV_DIR` to control where `rbenv` looks for your `.ruby-version` file.  I happen to know from being a long-time RBENV user that the `.ruby-version` file is one way that RBENV uses to detect which Ruby version you want to use.  It’s quite common, when running a Ruby file that depends on a specific Ruby version, to include a `.ruby-version` file in the same directory as the executed file.  This file contains the hard-coded version number that you want to use when running your Ruby script, and is one method you can use to tell RBENV to pin your project to a specific Ruby version.
+So the intention is for `RBENV_DIR` to control where `rbenv` looks for your `.ruby-version` file.  I happen to know from being a long-time RBENV user that the `.ruby-version` file is one way that RBENV uses to detect which Ruby version you want to use.  It's quite common, when running a Ruby file that depends on a specific Ruby version, to include a `.ruby-version` file in the same directory as the executed file.  This file contains the hard-coded version number that you want to use when running your Ruby script, and is one method you can use to tell RBENV to pin your project to a specific Ruby version.
 
 But what is the `export` keyword at the start of `export RBENV_DIR="${arg%/*}"`?
 
 ## `export` statements
 
-The assignment statement `export FOO=’bar’` creates a variable named `FOO` and sets its value to `bar`, **but** it does something else as well.  We’ve already seen variables declared earlier, i.e. `program="${0##*/}"`.  What does the use of `export` buy us?
+The assignment statement `export FOO='bar'` creates a variable named `FOO` and sets its value to `bar`, **but** it does something else as well.  We've already seen variables declared earlier, i.e. `program="${0##*/}"`.  What does the use of `export` buy us?
 
-[It turns out](https://web.archive.org/web/20220713174024/https://www.baeldung.com/linux/bash-variables-export) there are two kinds of variables in a bash script: a shell variable and an environment variable.  When we created the `program` variable, that was an example of creating a **shell** variable.  Shell variables are only accessible from within the shell they’re created in.  Environment variables, on the other hand, are accessible from within child shells created by the parent shell.
+[It turns out](https://web.archive.org/web/20220713174024/https://www.baeldung.com/linux/bash-variables-export) there are two kinds of variables in a bash script: a shell variable and an environment variable.  When we created the `program` variable, that was an example of creating a **shell** variable.  Shell variables are only accessible from within the shell they're created in.  Environment variables, on the other hand, are accessible from within child shells created by the parent shell.
 
 The blog post link above gives two examples, one demonstrating access of an environment variable from a child shell, and the other of accessing a shell variable from a child shell.  We can do an experiment in our terminal to see for ourselves.
 
@@ -205,7 +205,7 @@ In the meantime, what do the contents of the `RBENV_DIR` variable look like?  To
 "${arg%/*}"
 ```
 
-Let’s try an experiment.
+Let's try an experiment.
 
 ### Experiment- more fun with parameter expansion
 
@@ -257,10 +257,10 @@ fi
 
 Summing up what all this does:
 
- - If the command you’re running is the `ruby` command:
+ - If the command you're running is the `ruby` command:
  - RBENV will iterate over each of the arguments you passed to `ruby`
  - If the arg is `--` or if it starts with `-e`, it will immediately stop checking the remaining args, and proceed to running the code outside the case statement (what that code does is TBD).
- - if the argument contains a `/` character, RBENV will check to see if that argument corresponds to a valid filepath.  If it does, it will grab the file’s parent directory and use that to (later on) check which Ruby version to use.
+ - if the argument contains a `/` character, RBENV will check to see if that argument corresponds to a valid filepath.  If it does, it will grab the file's parent directory and use that to (later on) check which Ruby version to use.
 
 ## Setting `RBENV_ROOT`
 

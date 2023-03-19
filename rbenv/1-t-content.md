@@ -1,4 +1,4 @@
-As usual, let’s look at the test file first!
+As usual, let's look at the test file first!
 
 ## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/shims.bats)
 
@@ -44,7 +44,7 @@ Next and last spec:
 }
 ```
 
-Here we do the same setup as in the last spec, but when we run the command, we pass the `--short` argument.  We then assert that, instead of getting the full filepaths, we just get the shims’ names.
+Here we do the same setup as in the last spec, but when we run the command, we pass the `--short` argument.  We then assert that, instead of getting the full filepaths, we just get the shims' names.
 
 On to the file itself.
 
@@ -81,7 +81,7 @@ Next block of code:
 shopt -s nullglob
 ```
 
-Here we set the `nullglob` shell option, so that any filepath patterns which don’t expand into actual files to instead expand into the null string, so that an attempt to iterate over the list of filepaths will instead iterate zero times.
+Here we set the `nullglob` shell option, so that any filepath patterns which don't expand into actual files to instead expand into the null string, so that an attempt to iterate over the list of filepaths will instead iterate zero times.
 
 Last block of code:
 
@@ -99,6 +99,6 @@ For each item in the "${RBENV_ROOT}/shims/" directory (which contains our list o
 
 As a last step, we take the series of printed shim names (or filepaths) and sort them alphabetically.
 
-That’s it for this file!  It was a short one, for sure.
+That's it for this file!  It was a short one, for sure.
 
 Next file.

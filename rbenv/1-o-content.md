@@ -1,11 +1,11 @@
-I’m not yet familiar with the `rbenv-prefix` command, so I sneak a peak at the “Usage” and “Summary” comments in the file itself, before switching to the test file:
+I'm not yet familiar with the `rbenv-prefix` command, so I sneak a peak at the “Usage” and “Summary” comments in the file itself, before switching to the test file:
 
 ```
 # Displays the directory where a Ruby version is installed. If no
 # version is given, `rbenv prefix' displays the location of the
 # currently selected version.
 ```
-In the happy-path, this command prints out the RBENV directory where a given Ruby version is installed.  Simple enough.  Let’s look at the specs now.
+In the happy-path, this command prints out the RBENV directory where a given Ruby version is installed.  Simple enough.  Let's look at the specs now.
 
 ## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/prefix.bats)
 
@@ -35,7 +35,7 @@ Next spec:
 }
 ```
 
-Here we don’t do any of the setup we did for the last test, we simply run the command with the `RBENV_VERSION` env var set.  Because we didn’t do any of the setup (such as creating the fake directory under RBENV’s `/versions` directory), we assert that the test should fail, and that a specific error should be printed.
+Here we don't do any of the setup we did for the last test, we simply run the command with the `RBENV_VERSION` env var set.  Because we didn't do any of the setup (such as creating the fake directory under RBENV's `/versions` directory), we assert that the test should fail, and that a specific error should be printed.
 
 Next test:
 
@@ -71,11 +71,11 @@ Here, the setup includes:
 making a sub-directory within the `BATS_TEST_DIRNAME` directory,
 adding a command within that sub-directory named `rbenv-which` (this is a stubbed-out version of a real RBENV command by the same name),
 setting its contents equal to a shell script with a single command (`echo /bin/ruby`), and
-updating the new command’s permissions so that it’s executable.
+updating the new command's permissions so that it's executable.
 
 Once we have our fake `rbenv-which` command ready, we run the command with the `RBENV_VERSION` env var set to `system`, and we verify that the `prefix` command successfully exited with `/` (i.e. the home directory) as its output.
 
-I’m actually not sure what this tells us about the `prefix` command, other than it seems to depend internally on the `rbenv-which` command.  We’ll probably learn more when we examine the `prefix` command’s contents.
+I'm actually not sure what this tells us about the `prefix` command, other than it seems to depend internally on the `rbenv-which` command.  We'll probably learn more when we examine the `prefix` command's contents.
 
 Last spec file is:
 
@@ -89,7 +89,7 @@ EOF
 }
 ```
 
-Here we run the `rbenv prefix system` command, having ensured that the executable for system Ruby will not be found in the value of `$PATH` because we’ve removed it with the call to `path_without ruby` (described below).  We then assert that the `prefix` command failed and that a specific error message was output to STDERR.
+Here we run the `rbenv prefix system` command, having ensured that the executable for system Ruby will not be found in the value of `$PATH` because we've removed it with the call to `path_without ruby` (described below).  We then assert that the `prefix` command failed and that a specific error message was output to STDERR.
 
 ### Tangent- the `path_without` helper function
 
@@ -120,9 +120,9 @@ path_without() {
 }
 ```
 
-Let’s break down what’s happening here:
+Let's break down what's happening here:
 We create a local variable named `exe`, and set it equal to the first argument which is passed to `path_without` (in the case of our last spec for `rbenv-prefix`, this was the string “ruby”).
-We create another local variable called `path`, and set it equal to the current value of our shell’s `$PATH` variable, prefixed and suffixed with the “:” character.
+We create another local variable called `path`, and set it equal to the current value of our shell's `$PATH` variable, prefixed and suffixed with the “:” character.
 We then create 3 more (uninitialized) local variables, named `found`, `alt`, and `util`.
 We then run the command `type -aP “$exe”` (which in the case of our spec, resolves to `type -aP ruby`):
 
@@ -133,7 +133,7 @@ If you remember from earlier in this project, we discovered that the `type` comm
 According to [GNU.org](https://web.archive.org/web/20220926111408/https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html), the `-a` flag tells `type` to return any and all such files, whereas leaving `-a` off returns a max of one result.
 
 
-According to the same link, “The -P option forces a path search for each name, even if -t would not return ‘file’.”  This appears to mean that passing `-P` allows `type` to resolve any symlinks to their corresponding files, instead of just returning the path to the symlink itself.
+According to the same link, “The -P option forces a path search for each name, even if -t would not return 'file'.”  This appears to mean that passing `-P` allows `type` to resolve any symlinks to their corresponding files, instead of just returning the path to the symlink itself.
 
 
 Next we iterate over each of the results from `type` via a `for` loop.  For example, on my machine, when I open a `bash` shell and enter `type -aP ruby`, I get:
@@ -158,19 +158,19 @@ bash-3.2$ type -aP ruby
       - We set the `alt` local variable equal to `"${RBENV_TEST_DIR}/$(echo "${found#/}" | tr '/' '-')"`.  This consists of two strings, concatenated together with a `/`:
         - ${RBENV_TEST_DIR}, which in my case resolves to `/var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/rbenv.eke`.  I know this because I added [a logging statement](/assets/images/screenshot-16mar2023-838am.png){:target="_blank" rel="noopener"} to the `path_without` function.
         - On my machine, `$(echo "${found#/}" | tr '/' '-')`, resolves to `usr-bin`.  Again, I learned this because by adding [a logging statement](/assets/images/screenshot-16mar2023-844am.png){:target="_blank" rel="noopener"} which stored the contents of this command in a variable, and then `echo`ed the variable.
-        - We can further tell what’s going on here by looking up the `man` page for `tr`:
+        - We can further tell what's going on here by looking up the `man` page for `tr`:
         - If we look up the `man` page for `tr`, we see that `tr` reads from STDIN, and replaces each instance of `string1` with `string2`.
-        - In our case, we’re replacing each instance of “/” with “-” (except for the last “/” in “$found”, which was shaved off by the parameter expansion "${found#/}".
+        - In our case, we're replacing each instance of “/” with “-” (except for the last “/” in “$found”, which was shaved off by the parameter expansion "${found#/}".
         - We therefore conclude that the value of the local variable `alt` is “/var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/rbenv.zgI/usr-bin”.
-      - We then take the above new value for `alt`, and make a directory out of it, creating any sub-directories as well if they don’t already exist.
+      - We then take the above new value for `alt`, and make a directory out of it, creating any sub-directories as well if they don't already exist.
       - Then we iterate over a list of system utils (`bash head cut readlink greadlink sed sort awk`).  For each of these util programs:
-        - We check if “${found}/$util” exists as an executable file.  For example, if my value of “$found” is “/Users/myusername/.rbenv/shims” and the current `util` I’m iterating on is `head`, we check if “/Users/myusername/.rbenv/shims/head” exists as a file and is executable.
+        - We check if “${found}/$util” exists as an executable file.  For example, if my value of “$found” is “/Users/myusername/.rbenv/shims” and the current `util` I'm iterating on is `head`, we check if “/Users/myusername/.rbenv/shims/head” exists as a file and is executable.
         - If that executable file exists, we create a symlink to it and place the symlink in our `alt` directory.
-        - This has the effect of ensuring that we still have access to these system utils, even though we’ve removed
+        - This has the effect of ensuring that we still have access to these system utils, even though we've removed
       - Lastly, we concatenate `found` and `alt` to the end of the current value of the lower-case `path` variable.
     - We then trim the trailing “:” character off the beginning and end of `path`, and echo it to STDOUT, so that the caller of `path_without` can store the `echo`d value in a variable.
 
-One thing I don’t understand- according to the comments above the `path_without` function, its stated goal is:
+One thing I don't understand- according to the comments above the `path_without` function, its stated goal is:
 
 ```
 # Output a modified PATH that ensures that the given executable is not present,
@@ -179,7 +179,7 @@ One thing I don’t understand- according to the comments above the `path_withou
 
 But the local variable `path` is initialized as `local path=":${PATH}:"`.  It then gets appended with more directories, but at no point does `path` appear to have the anything *removed* from it.  So how do we guarantee that “the given executable is not present”?
 
-I decide to do an experiment to see what exact value `path` is initialized to, and how it’s modified over the course of the function.
+I decide to do an experiment to see what exact value `path` is initialized to, and how it's modified over the course of the function.
 
 (stopping here for the day; 52905 words)
 
@@ -197,14 +197,14 @@ TODO- replace this image with actual code snippet, for readability
   </a>
 </p>
 
-One of the first things I notice is that the value of `path` at the beginning and the end are the same, *up to the point* where the original path contains `/usr/bin`.  At that point, instead of `/usr/bin`, the initial `path` contains `:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:` (which begins with the same value as `found`), while the final version of `path` contains `:/var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/rbenv.hAE/usr-bin:/bin:/usr/sbin:/sbin:/usr/local/bin:` (which begins with the same value as `alt`).  It seems like we can conclude that the job of the `path="${path/:${found}:/:${alt}:}"` operation is *not* to concatenate both `found` and `alt` to the initial value of `path` (as I thought at first), but to *replace* `found` with `alt`.  This appears to be the mechanism by which the code “ensures that the given executable is not present”, as described in the function’s comments.
+One of the first things I notice is that the value of `path` at the beginning and the end are the same, *up to the point* where the original path contains `/usr/bin`.  At that point, instead of `/usr/bin`, the initial `path` contains `:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:` (which begins with the same value as `found`), while the final version of `path` contains `:/var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/rbenv.hAE/usr-bin:/bin:/usr/sbin:/sbin:/usr/local/bin:` (which begins with the same value as `alt`).  It seems like we can conclude that the job of the `path="${path/:${found}:/:${alt}:}"` operation is *not* to concatenate both `found` and `alt` to the initial value of `path` (as I thought at first), but to *replace* `found` with `alt`.  This appears to be the mechanism by which the code “ensures that the given executable is not present”, as described in the function's comments.
 
 Before moving on, I remember to remove the logging lines that I added to `path_without` above, and to delete the `testdoc` logfile.
 
 
 ### Rant- Including examples in your documentation
 
-I find it incredibly frustrating that so much documentation in programming neglects to include examples of how that code is used in the wild.  So many of the explanations are vague and/or assume prior knowledge that the reader may or may not have.  If the documentation isn’t written with a novice in mind, then there is no point in telling that novice to “go read the fucking manual”, is there?
+I find it incredibly frustrating that so much documentation in programming neglects to include examples of how that code is used in the wild.  So many of the explanations are vague and/or assume prior knowledge that the reader may or may not have.  If the documentation isn't written with a novice in mind, then there is no point in telling that novice to “go read the fucking manual”, is there?
 
 For example, the following page in the GNU bash manual describes several different types of parameter expansion:
 
@@ -214,11 +214,11 @@ For example, the following page in the GNU bash manual describes several differe
 
 Not one of these includes examples of what the expected result would be when (for example) `parameter` is set to “foo/bar/baz” and “word” is set to “/”.  Of course, “foo/bar/baz” and “/” might not be the right example cases for all types of parameter expansion, but there will be *some* values for “parameter” and “word” that would clarify the (rather abstract) descriptions above.
 
-It may not be the author’s intention, but the effect on newbies is that it reduces their confidence in their ability to learn how to code, and therefore in their ability to participate in this community.  It makes them more likely to consider quitting.  And *we* as a community are worse off if they decide to quit.  Our pool of ideas is then smaller and more shallow.
+It may not be the author's intention, but the effect on newbies is that it reduces their confidence in their ability to learn how to code, and therefore in their ability to participate in this community.  It makes them more likely to consider quitting.  And *we* as a community are worse off if they decide to quit.  Our pool of ideas is then smaller and more shallow.
 
 <div style="border-bottom: 1px solid grey; margin: 3em"></div>
 
-Having read through the spec file for the `prefix` command, let’s turn to the command file itself.
+Having read through the spec file for the `prefix` command, let's turn to the command file itself.
 
 ## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-prefix)
 
@@ -246,11 +246,11 @@ fi
 
 If the user specified a first argument, then we assume it is the version number that the user wants to see the prefix for, so we set `RBENV_VERSION` equal to that first argument and export it as an environment variable, so that this process and any child processes can use it.
 
-If the user did *not* specify a first argument, *and* if `RBENV_VERSION` is currently blank, we set `RBENV_VERSION` equal to the return value of the `rbenv version-name` command.  Based on a cursory run of `rbenv version-name` in my `bash` terminal, this appears to be quite similar to running `rbenv version`, but only including the number itself (not including the path to the `.ruby-version` file that sets the version number, as does the `rbenv version` command).  Note that we don’t export the environment variable in this case.
+If the user did *not* specify a first argument, *and* if `RBENV_VERSION` is currently blank, we set `RBENV_VERSION` equal to the return value of the `rbenv version-name` command.  Based on a cursory run of `rbenv version-name` in my `bash` terminal, this appears to be quite similar to running `rbenv version`, but only including the number itself (not including the path to the `.ruby-version` file that sets the version number, as does the `rbenv version` command).  Note that we don't export the environment variable in this case.
 
 If neither the above `if` or `elif` conditions are met, that means that:
 
- - The user didn’t specify a first argument, AND
+ - The user didn't specify a first argument, AND
  - The user has previously set a value for `RBENV_VERSION.
 
 This could happen if, for instance, the user runs the command as such:
@@ -278,7 +278,7 @@ fi
 ```
 If the current version of Ruby is set to `system`, then we execute the code below:
 
- - If the command `rbenv which ruby` returns a result, and if we’re successful in storing that result in a variable named `RUBY_PATH`, then:
+ - If the command `rbenv which ruby` returns a result, and if we're successful in storing that result in a variable named `RUBY_PATH`, then:
     - We trim everything including and after the last `/` character from the new `RUBY_PATH` value.
     - We create a new variable named `RBENV_PREFIX_PATH`, and set it equal to the value of `RUBY_PATH` *plus* a `/bin` at the end.
     - We echo either the value of `RBENV_PREFIX_PATH` if it has been set, or a `/` character as a backup / default.
@@ -297,9 +297,9 @@ if [ ! -d "$RBENV_PREFIX_PATH" ]; then
 fi
 ```
 
-If we’ve reached this block of code, that means the `if` check in the previous block (i.e.`if [ "$RBENV_VERSION" = "system" ]; then`) was false.  We know this because all the conditional branches inside that last check contain calls to `exit`.
+If we've reached this block of code, that means the `if` check in the previous block (i.e.`if [ "$RBENV_VERSION" = "system" ]; then`) was false.  We know this because all the conditional branches inside that last check contain calls to `exit`.
 
-Here we attempt to store a value in the `RBENV_PREFIX_PATH` variable, which should correspond to a valid directory on the user’s machine.  If that variable does *not* correspond to a valid directory, we echo an error message explaining that the Ruby version that the user attempted to get a prefix for was not found on their machine, and we exit with a non-success return code.
+Here we attempt to store a value in the `RBENV_PREFIX_PATH` variable, which should correspond to a valid directory on the user's machine.  If that variable does *not* correspond to a valid directory, we echo an error message explaining that the Ruby version that the user attempted to get a prefix for was not found on their machine, and we exit with a non-success return code.
 
 Last line of code:
 
@@ -307,6 +307,6 @@ Last line of code:
 echo "$RBENV_PREFIX_PATH"
 ```
 
-If we’ve reached this line of code, that means a) we were successful in setting a value for `RBENV_PREFIX_PATH`, and b) it does correspond to a directory containing a Ruby version which was installed via RBENV.  If this is the case, we simply `echo` the directory for that Ruby version, and exit the script.
+If we've reached this line of code, that means a) we were successful in setting a value for `RBENV_PREFIX_PATH`, and b) it does correspond to a directory containing a Ruby version which was installed via RBENV.  If this is the case, we simply `echo` the directory for that Ruby version, and exit the script.
 
 On to the next file.

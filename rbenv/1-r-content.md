@@ -343,13 +343,13 @@ Here we're setting (but not exporting) `RBENV_VERSION_OLD` to be equal to `RBENV
     echo 'set -gu RBENV_VERSION_OLD "$RBENV_VERSION"'
 ```
 
-…is probably the fish way of doing:
+...is probably the fish way of doing:
 
 ```
     echo 'RBENV_VERSION_OLD="${RBENV_VERSION-}"'
 ```
 
-…in bash.
+...in bash.
 
 As a side note, the `case` statement which switches on the value of `$shell` is (I'm guessing) the reason this file has `-sh-` in it.  As we discussed before, any command containing shell-specific logic seems to use this naming convention.
 
@@ -358,7 +358,7 @@ Next block of code:
 ```
 if [ "$version" = "-" ]; then
   case "$shell" in
-  …
+  ...
   esac
   exit
 fi

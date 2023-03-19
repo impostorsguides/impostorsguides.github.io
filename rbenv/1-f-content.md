@@ -411,7 +411,7 @@ Opening a new tab results in:
   <img src="/assets/images/screenshot-13mar2023-747am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-So we get all the way up to "just before execution of…" in the "rbenv" file, but no further.
+So we get all the way up to "just before execution of..." in the "rbenv" file, but no further.
 
 Oh, I think I know what's going on.  The line after line 131 in "rbenv" is an "exec" command.  "exec" will exit after it finishes executing the given command.  I think we actually encountered this before.  See the following terminal experiment:
 
@@ -435,7 +435,7 @@ I see that line 126 only "echo"s, it doesn't "exec".  The conditional seems to b
 
 Success- we see the "end of rbenv file" tracer!
 
-I also notice that we seem to go from the "rbenv-init" file, *back to* the "rbenv" file.  I see this because the 2nd tracer statement above is "inside rbenv-init, just before ‘command rbenv'", then the 3rd tracer is "start of rbenv file".  I actually know why this is, because I read [a post on StackExchange](https://web.archive.org/web/20220203113040/https://askubuntu.com/questions/512770/what-is-use-of-command-command) earlier today which explains what the `command` command does:
+I also notice that we seem to go from the "rbenv-init" file, *back to* the "rbenv" file.  I see this because the 2nd tracer statement above is "inside rbenv-init, just before 'command rbenv'", then the 3rd tracer is "start of rbenv file".  I actually know why this is, because I read [a post on StackExchange](https://web.archive.org/web/20220203113040/https://askubuntu.com/questions/512770/what-is-use-of-command-command) earlier today which explains what the `command` command does:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-13mar2023-751am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -478,7 +478,7 @@ print=""
 no_rehash=""
 for args in "$@"
 do
-…
+...
 done
 ```
 Pretty straightforward.  We're declaring two variables (`print` and `no_rehash`), setting them to empty strings, then iterating over each arg in the list of args sent to `rbenv init`.
@@ -550,9 +550,9 @@ Next few lines of code:
 ```
 if [ -z "$print" ]; then
   case "$shell" in
-  …
+  ...
   esac
-…
+...
 fi
 ```
 
@@ -663,7 +663,7 @@ Next line of code:
 
 ```
 case "$shell" in
- …
+ ...
 esac
 ```
 
@@ -743,7 +743,7 @@ Next line of code:
 
 ```
 case "$shell" in
-…
+...
 esac
 ```
 Here we're just branching via case statement based on the different values of our `$shell` var.
@@ -756,7 +756,7 @@ fish )
 function rbenv
   set command \$argv[1]
   set -e argv[1]
-…
+...
 EOS
   ;;
 ```
@@ -928,7 +928,7 @@ cat << EOS
 EOS
 ```
 
-There's no dynamic string interpolation or parameter expansion here.  Just a simple ‘Hello world' function.  I run `chmod +x baz` so that I can execute it.  I run "baz" by itself to make sure it works:
+There's no dynamic string interpolation or parameter expansion here.  Just a simple 'Hello world' function.  I run `chmod +x baz` so that I can execute it.  I run "baz" by itself to make sure it works:
 
 ```
 $ vim foo
@@ -1074,7 +1074,7 @@ I still get the same error:
   <img src="/assets/images/screenshot-13mar2023-839am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-I try adding another ‘end' before line 13:
+I try adding another 'end' before line 13:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-13mar2023-840am.png" width="50%" style="border: 1px solid black; padding: 0.5em">
@@ -1187,7 +1187,7 @@ Next lines of code:
 
 ```
 if [ "$shell" != "fish" ]; then
-…
+...
 fi
 ```
 
@@ -1198,11 +1198,11 @@ Next lines of code:
 ```
 IFS="|"
 cat <<EOS
-…
+...
 EOS
 ```
 
-Here we set the `IFS` variable (which stands for "internal field separator") to the pipe symbol "\|".  [We've covered this before](https://web.archive.org/web/20220715010436/https://www.baeldung.com/linux/ifs-shell-variable), but `IFS` is a special shell variable that determines how bash separates a string of characters into multiple strings.  For example, let's say we have a string `a|b|c|d|e`.  If `IFS` is set to the pipe character (as above), and if we pass our single string to a `for` loop, then bash will internally split our string into 5 strings (‘a', ‘b', ‘c', ‘d', and ‘e') and iterate over each of them.
+Here we set the `IFS` variable (which stands for "internal field separator") to the pipe symbol "\|".  [We've covered this before](https://web.archive.org/web/20220715010436/https://www.baeldung.com/linux/ifs-shell-variable), but `IFS` is a special shell variable that determines how bash separates a string of characters into multiple strings.  For example, let's say we have a string `a|b|c|d|e`.  If `IFS` is set to the pipe character (as above), and if we pass our single string to a `for` loop, then bash will internally split our string into 5 strings ('a', 'b', 'c', 'd', and 'e') and iterate over each of them.
 
 The `cat << EOS` line of code starts a new heredoc, so that we can finish implementing our `rbenv` function.
 

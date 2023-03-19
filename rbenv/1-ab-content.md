@@ -13,7 +13,7 @@ create_executable() {
 }
 ```
 
-We create a helper function named `create_executable`.  It creates a sub-directory of RBENV’s “versions/” directory, with a name that corresponds to a Ruby version that we specify in the first argument to the helper function.  We then create an executable file within our new sub-directory, with a filename corresponding to the 2nd argument we send to the helper function.
+We create a helper function named `create_executable`.  It creates a sub-directory of RBENV's “versions/” directory, with a name that corresponds to a Ruby version that we specify in the first argument to the helper function.  We then create an executable file within our new sub-directory, with a filename corresponding to the 2nd argument we send to the helper function.
 
 The next block of code is our first (and only) test for this file:
 
@@ -51,7 +51,7 @@ On to the code itself.
 
 ## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-whence)
 
-The first block of code is one we’re familiar with already:
+The first block of code is one we're familiar with already:
 
 ```
 #!/usr/bin/env bash
@@ -90,7 +90,7 @@ else
 fi
 ```
 
-Here we see that we have the option of specifying a flag named `--path`.  If we do this, we set a variable named `print_paths` equal to “1” and shift it off of our argument stack.  Otherwise, we set it equal to the empty string.  We’ll use `print_paths` later on in the code.
+Here we see that we have the option of specifying a flag named `--path`.  If we do this, we set a variable named `print_paths` equal to “1” and shift it off of our argument stack.  Otherwise, we set it equal to the empty string.  We'll use `print_paths` later on in the code.
 
 Next block of code:
 
@@ -106,7 +106,7 @@ whence() {
 }
 ```
 
-Here we create a helper function named `whence`.  It looks like we take the first argument provided to this helper, and store it in a local variable named “command”, so it’s probably the name of the command that we passed to `rbenv whence`.  We then run the `rbenv-versions --bare` command, which returns a list of Ruby versions, minus all the extraneous info (filepaths, asterisks next to the currently-selected version, etc.).  This list then gets piped to the `read -r` command, storing each line in a local variable named `version`.  For each line of code in `rbenv-versions` (i.e for each version of Ruby installed), we then construct a possible filepath to the command within the Ruby version’s directory.  If that filepath corresponds to a file which is executable, we then either echo the path if the user passed the `--path` flag, or just the Ruby version itself.  When the `read` command is done reading lines of input from `rbenv-versions`, the `whence` helper function terminates.
+Here we create a helper function named `whence`.  It looks like we take the first argument provided to this helper, and store it in a local variable named “command”, so it's probably the name of the command that we passed to `rbenv whence`.  We then run the `rbenv-versions --bare` command, which returns a list of Ruby versions, minus all the extraneous info (filepaths, asterisks next to the currently-selected version, etc.).  This list then gets piped to the `read -r` command, storing each line in a local variable named `version`.  For each line of code in `rbenv-versions` (i.e for each version of Ruby installed), we then construct a possible filepath to the command within the Ruby version's directory.  If that filepath corresponds to a file which is executable, we then either echo the path if the user passed the `--path` flag, or just the Ruby version itself.  When the `read` command is done reading lines of input from `rbenv-versions`, the `whence` helper function terminates.
 
 Next block of code:
 
@@ -129,6 +129,6 @@ result="$(whence "$RBENV_COMMAND")"
 
 Here we call our `whence` helper function, and store the results as an array of strings inside a variable named `result`.  If `result` is non-empty, we print its contents to the screen.
 
-That’s the end of this file!  Next one:
+That's the end of this file!  Next one:
 
 (stopping here for the day; 85130 words)

@@ -227,7 +227,7 @@ After reading the above, I've learned a lot.  One last thing I want to learn is 
   <img src="/assets/images/screenshot-19mar2023-1056am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
-My first thought was that this rule creates a hidden dotfile named "c.o".  But when I ran `make` and did an `ls -la` search for any dotfiles, I didn't find any, so I concluded that this is not correct.  I then Googled ‘makefile ".c.o:"', and found [a useful result](https://archive.ph/K1xVd) right away:
+My first thought was that this rule creates a hidden dotfile named "c.o".  But when I ran `make` and did an `ls -la` search for any dotfiles, I didn't find any, so I concluded that this is not correct.  I then Googled 'makefile ".c.o:"', and found [a useful result](https://archive.ph/K1xVd) right away:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1057am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
@@ -241,7 +241,7 @@ I see the link to the documentation on [old-fashioned suffix rules](https://www.
 
 From this page, I learn that ".c.o" is actually a common (and obsolete) example of a "double-suffix rule".  In particular, this passage stands out:
 
-> A double-suffix rule is defined by a pair of suffixes: the target suffix and the source suffix. It matches any file whose name ends with the target suffix. The corresponding implicit prerequisite is made by replacing the target suffix with the source suffix in the file name. A two-suffix rule ‘.c.o' (whose target and source suffixes are ‘.o' and ‘.c') is equivalent to the pattern rule ‘%.o : %.c'.
+> A double-suffix rule is defined by a pair of suffixes: the target suffix and the source suffix. It matches any file whose name ends with the target suffix. The corresponding implicit prerequisite is made by replacing the target suffix with the source suffix in the file name. A two-suffix rule '.c.o' (whose target and source suffixes are '.o' and '.c') is equivalent to the pattern rule '%.o : %.c'.
 
 I take this to mean that the rule will look for each file with a suffix of ".c", and use the command(s) to produce a file with the same filename as the target, but with ".o" instead of a ".c" as the file extension.
 

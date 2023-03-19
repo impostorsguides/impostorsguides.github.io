@@ -105,7 +105,7 @@ Now what about that -n flag?
 
 ## Passing flags to `[`
 
-If we’re looking for docs on a flag that we’re supposed to pass to a certain command, we can usually find those docs inside the docs for the command itself. In this case, I search for `-n` in the `man` page for `test`:
+If we're looking for docs on a flag that we're supposed to pass to a certain command, we can usually find those docs inside the docs for the command itself. In this case, I search for `-n` in the `man` page for `test`:
 
 <p style="text-align: center">
   <img src="/assets/images/man-test-n.png" width="70%" alt="Documentation for the `test` command's `-n` flag">
