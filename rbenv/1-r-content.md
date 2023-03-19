@@ -531,7 +531,7 @@ else
 fi
 ```
 
-We run `rbenv prefix` on the version param passed to `rbenv shell`.  For example, if we type `rbenv shell 2.7.5`, then we run `rbenv prefix 2.7.5`.  On my machine, that returns the filepath to the directory for version 2.7.5 (`/Users/richiethomas/.rbenv/versions/2.7.5`).  If I pass `rbenv prefix` and invalid version, I get an error:
+We run `rbenv prefix` on the version param passed to `rbenv shell`.  For example, if we type `rbenv shell 2.7.5`, then we run `rbenv prefix 2.7.5`.  On my machine, that returns the filepath to the directory for version 2.7.5 (`/Users/myusername/.rbenv/versions/2.7.5`).  If I pass `rbenv prefix` and invalid version, I get an error:
 
 ```
 $ rbenv prefix foo

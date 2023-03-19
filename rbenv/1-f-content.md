@@ -1108,8 +1108,8 @@ I post [a StackExchange question](https://unix.stackexchange.com/questions/71695
 Running this version of the `baz` file via `./baz | source` fixes the glitch!
 
 ```
-richiethomas@richie ~/foo (master)> ./baz | source
-richiethomas@richie ~/foo (master)> bar
+myusername@me ~/foo (master)> ./baz | source
+myusername@me ~/foo (master)> bar
 5
 5
 ```

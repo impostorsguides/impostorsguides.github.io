@@ -276,7 +276,7 @@ What I want now is a way to run all the spec files at once, without having to ca
 ```
 $ ./run
 
-bats: /Users/richiethomas/Workspace/OpenSource/rbenv/test/test does not exist
+bats: /Users/myusername/Workspace/OpenSource/rbenv/test/test does not exist
 ```
 
 I notice the `/rbenv/test/test` filepath, which I’m not surprised doesn’t exist.  I wonder if it’s assuming that I’m running the `run` file from the root directory, and is therefore looking for the `/test` subdirectory in whichever directory it’s currently in.  I `cd..` and re-run `./test/run`, and this works:

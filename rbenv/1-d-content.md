@@ -302,10 +302,10 @@ $ which talk
 I then had the thought that maybe `compctl -K whoson talk` tells zsh to call `whoson` for a list of the auto-complete commands whenever `talk` is called and the user then hits the tab key.  This appears to be what happens:
 
 ```
-$ talk richiethomas richiethomas richiethomas
+$ talk myusername myusername myusername
 ```
 
-My username appeared everytime I hit the `tab` key.  For the record, the `users` command simply returns `richiethomas` on my machine, since I’m the only user.
+My username appeared everytime I hit the `tab` key.  For the record, the `users` command simply returns `myusername` on my machine, since I’m the only user.
 
 OK, that cleared things up substantially.
 
@@ -361,10 +361,10 @@ When I try tab-complete with `grep`, I don’t see my `foo bar baz` options eith
 I remember that, in addition to $fpath, there’s $FPATH.  I try updating $FPATH instead:
 
 ```
-$ FPATH="Users/richiethomas/Workspace/mavenlink/completions:$FPATH"
+$ FPATH="Users/myusername/Workspace/mavenlink/completions:$FPATH"
 $ echo $FPATH
 
-Users/richiethomas/Workspace/mavenlink/completions:Users/richiethomas/Workspace/mavenlink/completions:/usr/local/share/zsh/site-functions:/usr/share/zsh/site-functions:/usr/share/zsh/5.8.1/functions
+Users/myusername/Workspace/mavenlink/completions:Users/myusername/Workspace/mavenlink/completions:/usr/local/share/zsh/site-functions:/usr/share/zsh/site-functions:/usr/share/zsh/5.8.1/functions
 
 $ grep
 $ talk

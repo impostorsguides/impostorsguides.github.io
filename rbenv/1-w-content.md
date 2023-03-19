@@ -268,11 +268,11 @@ bash-3.2$ cd foo/bar/baz
 
 bash-3.2$ find_local_version_file $(pwd)
 
-root: /Users/richiethomas/Workspace/OpenSource/impostorsguides.github.io/foo/bar/baz
-root: /Users/richiethomas/Workspace/OpenSource/impostorsguides.github.io/foo/bar
-root: /Users/richiethomas/Workspace/OpenSource/impostorsguides.github.io/foo
-root: /Users/richiethomas/Workspace/OpenSource/impostorsguides.github.io
-/Users/richiethomas/Workspace/OpenSource/impostorsguides.github.io/.ruby-version
+root: /Users/myusername/Workspace/OpenSource/impostorsguides.github.io/foo/bar/baz
+root: /Users/myusername/Workspace/OpenSource/impostorsguides.github.io/foo/bar
+root: /Users/myusername/Workspace/OpenSource/impostorsguides.github.io/foo
+root: /Users/myusername/Workspace/OpenSource/impostorsguides.github.io
+/Users/myusername/Workspace/OpenSource/impostorsguides.github.io/.ruby-version
 
 bash-3.2$
 ```
@@ -284,9 +284,9 @@ So again, that’s the happy-path.  I then navigate to `~/Workspace/OpenSource`,
 ```
 bash-3.2$ find_local_version_file $(pwd)
 
-root: /Users/richiethomas/Workspace/OpenSource
-root: /Users/richiethomas/Workspace
-root: /Users/richiethomas
+root: /Users/myusername/Workspace/OpenSource
+root: /Users/myusername/Workspace
+root: /Users/myusername
 root: /Users
 root:
 final root:

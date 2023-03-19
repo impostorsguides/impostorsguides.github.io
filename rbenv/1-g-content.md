@@ -80,8 +80,8 @@ This test appears to cover [this line of code](https://github.com/rbenv/rbenv/bl
 From reading this test, the intent seems to be that we want to run `git remote -v` and expect something like the following to show up:
 
 ```
-origin	git@github.com:richiethomas/homebrew.git (fetch)
-origin	git@github.com:richiethomas/homebrew.git (push)
+origin	git@github.com:myusername/homebrew.git (fetch)
+origin	git@github.com:myusername/homebrew.git (push)
 ```
 
 Then we want to filter out these two lines, since they show `homebrew.git` as the remote, *not* `rbenv.git`.

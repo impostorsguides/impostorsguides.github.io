@@ -141,8 +141,8 @@ Next we iterate over each of the results from `type` via a `for` loop.  For exam
 ```
 bash-3.2$ type -aP ruby
 
-/Users/richiethomas/.rbenv/shims/ruby
-/Users/richiethomas/.rbenv/shims/ruby
+/Users/myusername/.rbenv/shims/ruby
+/Users/myusername/.rbenv/shims/ruby
 /usr/bin/ruby
 ```
 
@@ -150,8 +150,8 @@ bash-3.2$ type -aP ruby
     - Each result is referred to as `found`.
     - First we remove everything including and after the last `/` character.
       - This leaves us with just the directory containing the “found” executable file.
-      - For example, if `type -aP ruby` includes the result “/Users/richiethomas/.rbenv/shims/ruby” on my machine, then the updated value of “found” changes from “/Users/richiethomas/.rbenv/shims/ruby” to “/Users/richiethomas/.rbenv/shims”.
-    - We then compare the new value of found to see if it is equal to `"${RBENV_ROOT}/shims"`.  For example, on my machine, this resolves to `/Users/richiethomas/.rbenv/shims`.
+      - For example, if `type -aP ruby` includes the result “/Users/myusername/.rbenv/shims/ruby” on my machine, then the updated value of “found” changes from “/Users/myusername/.rbenv/shims/ruby” to “/Users/myusername/.rbenv/shims”.
+    - We then compare the new value of found to see if it is equal to `"${RBENV_ROOT}/shims"`.  For example, on my machine, this resolves to `/Users/myusername/.rbenv/shims`.
       - We take *only* the results which are *not* equal.
       - For example, on the output above, we eliminate the first 2 results, and keep only `/usr/bin/ruby`.
     - For the results that we keep, we do the following:
@@ -164,7 +164,7 @@ bash-3.2$ type -aP ruby
         - We therefore conclude that the value of the local variable `alt` is “/var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/rbenv.zgI/usr-bin”.
       - We then take the above new value for `alt`, and make a directory out of it, creating any sub-directories as well if they don’t already exist.
       - Then we iterate over a list of system utils (`bash head cut readlink greadlink sed sort awk`).  For each of these util programs:
-        - We check if “${found}/$util” exists as an executable file.  For example, if my value of “$found” is “/Users/richiethomas/.rbenv/shims” and the current `util` I’m iterating on is `head`, we check if “/Users/richiethomas/.rbenv/shims/head” exists as a file and is executable.
+        - We check if “${found}/$util” exists as an executable file.  For example, if my value of “$found” is “/Users/myusername/.rbenv/shims” and the current `util` I’m iterating on is `head`, we check if “/Users/myusername/.rbenv/shims/head” exists as a file and is executable.
         - If that executable file exists, we create a symlink to it and place the symlink in our `alt` directory.
         - This has the effect of ensuring that we still have access to these system utils, even though we’ve removed
       - Lastly, we concatenate `found` and `alt` to the end of the current value of the lower-case `path` variable.
@@ -258,7 +258,7 @@ This could happen if, for instance, the user runs the command as such:
 ```
 $ RBENV_VERSION=3.0.0 rbenv prefix
 
-/Users/richiethomas/.rbenv/versions/3.0.0
+/Users/myusername/.rbenv/versions/3.0.0
 ```
 
 Next block of code:

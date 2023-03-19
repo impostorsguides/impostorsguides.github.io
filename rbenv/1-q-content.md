@@ -8,6 +8,6 @@ This one is just 3 lines of code with no test file.  I'm mostly including this p
 echo "$RBENV_ROOT"
 ```
 
-The shebang and summary are unsurprising.  The only actual line of code just `echo`s the value of an environment variable.  When I run `rbenv root` on my terminal to see what this value is, I get `/Users/richiethomas/.rbenv`.  Easy-peasy, no need to complicate things.
+The shebang and summary are unsurprising.  The only actual line of code just `echo`s the value of an environment variable.  When I run `rbenv root` on my terminal to see what this value is, I get `/Users/myusername/.rbenv`.  Easy-peasy, no need to complicate things.
 
 Next file.

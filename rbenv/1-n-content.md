@@ -213,7 +213,7 @@ $ rbenv local 2.7.5
 
 $ ls -la .ruby-version
 
--rw-r--r--  1 richiethomas  staff  6 Mar 16 08:26 .ruby-version
+-rw-r--r--  1 myusername  staff  6 Mar 16 08:26 .ruby-version
 
 $ cat .ruby-version
 

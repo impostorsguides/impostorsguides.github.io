@@ -25,7 +25,7 @@ Here we define a helper function named `create_executable`.  This function gets 
 create_executable "1.8" "ruby"
 ```
 
-This function creates a local variable named `bin`, and sets it equal to a directory path constructed with the value of `RBENV_ROOT` plus the first argument.  For example, if the value of this env var on my machine is `/Users/richiethomas/.rbenv` and the first argument I supply to the function is `1.8` (as it is above), then `bin` resolves to `/Users/richiethomas/.rbenv/versions/1.8/bin`.  We then make a directory with this name, and make any sub-directories too if they don't already exist.  We then create an empty file in this directory using the 2nd argument to the function (in the case above, the file is named `/Users/richiethomas/.rbenv/versions/1.8/bin/ruby`).  We then modify this new file to make it executable, hence the function name `create_executable`.
+This function creates a local variable named `bin`, and sets it equal to a directory path constructed with the value of `RBENV_ROOT` plus the first argument.  For example, if the value of this env var on my machine is `/Users/myusername/.rbenv` and the first argument I supply to the function is `1.8` (as it is above), then `bin` resolves to `/Users/myusername/.rbenv/versions/1.8/bin`.  We then make a directory with this name, and make any sub-directories too if they don't already exist.  We then create an empty file in this directory using the 2nd argument to the function (in the case above, the file is named `/Users/myusername/.rbenv/versions/1.8/bin/ruby`).  We then modify this new file to make it executable, hence the function name `create_executable`.
 
 (stopping here for the day; 54037 words)
 
@@ -552,7 +552,7 @@ First off, the curly brace groups (i.e. `{ ....} ... { ... }`.  This is apparent
 
 So we're just grouping the output of the commands inside the curly braces, and redirecting *all* their output to the destination immediately following the closing curly braces (i.e. `2>| /dev/null` and `>&2` respectively; more on that later).
 
-Inside the first set of braces, we create a new file with the name "$PROTOTYPE_SHIM_PATH", which on my machine resolves to `/Users/richiethomas/.rbenv/shims/.rbenv-shim`.  If that command produces any error output, we redirect it to `/dev/null`.  And if that command fails, we use the `||` syntax to do what follows on the subsequent lines of code (see below).
+Inside the first set of braces, we create a new file with the name "$PROTOTYPE_SHIM_PATH", which on my machine resolves to `/Users/myusername/.rbenv/shims/.rbenv-shim`.  If that command produces any error output, we redirect it to `/dev/null`.  And if that command fails, we use the `||` syntax to do what follows on the subsequent lines of code (see below).
 
 I noticed the use of `echo > <filename>` here, rather than `touch <filename>`, which I thought was the canonical command that is used to create a new, empty file.
 
