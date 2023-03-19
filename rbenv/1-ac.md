@@ -4,8 +4,8 @@ title: "rbenv-which"
 permalink: /rbenv/1-ac
 category: rbenv-pt-2
 id: 39
-next-title: "gem-rehash.bash"
-next-permalink: /rbenv/1-ad
+next-title: "Part 3- Introduction"
+next-permalink: /rbenv/2-a
 previous-title: "rbenv-whence"
 previous-permalink: /rbenv/1-ab
 ---

@@ -1,13 +1,13 @@
 ---
 layout: rbenv-page
-title: "bash.h"
-permalink: /rbenv/1-ag
 category: rbenv-pt-3
-id: 43
-next-title: "src/configure"
-next-permalink: /rbenv/1-ah
+id: 47
 previous-title: "Makefile.in"
 previous-permalink: /rbenv/1-af
+title: "bash.h"
+permalink: /rbenv/1-ag
+next-title: "src/configure"
+next-permalink: /rbenv/1-ah
 ---
 
 {% include_relative 1-ag-content.md %}

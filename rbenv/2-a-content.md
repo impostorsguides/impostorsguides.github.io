@@ -1,0 +1,1 @@
+We've finished reading the code for the various commands that `rbenv` exposes.  But in order to do this, we skipped over other files which, at the time, were less of a priority.  Now that we've gotten the most important stuff out of the way, let's circle back and finish reading the rest of the code in the codebase.

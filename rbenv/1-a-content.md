@@ -32,10 +32,12 @@ Richie says: How does it do this?  The delegation process seems important since 
 
 The above questions are all perfectly valid starting points for diving into the code.  However, I'm thinking I want to take a more methodical approach.  I see the following directories, and I don't know what they mean:
 
-
+<center style="margin-bottom: 3em">
+  <img src="/assets/images/screenshot-19mar2023-237pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
+</center>
 
 My curiosity might be satisfied if I just start at the top and work my way down through the directories and files.  This seems like the best way to get a “lay of the land”, or a broad overview, as far as RBENV's codebase goes.
 
 Let's do that.
 
-
+EDIT: after walking through the directories and their files from top to bottom, I realized the files could be divided into two categories: files related to specific `rbenv` commands (i.e. `rbenv versions`, `rbenv rehash`, etc.) and files related to the infrastructure of the codebase itself (i.e. code for github workflows, code for compiling a faster implementation of `realpath`, the `Makefile`, etc).  So this section will cover those command files (all of which are located in the `libexec/` directory), and the next section will cover those infrastructure files (which are located in various other directories).
