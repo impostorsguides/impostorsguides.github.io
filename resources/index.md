@@ -18,10 +18,18 @@ permalink: /resources/
       {% endif %}
     {% endfor %}
     </ol>
-    <h3><li>Part 2: Walking Through The Project</li></h3>
+    <h3><li>Part 2: RBENV Commands</li></h3>
     <ol>
       {% for page in sorted_pages %}
         {% if page.category == 'rbenv-pt-2' %}
+          <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+        {% endif %}
+      {% endfor %}
+    </ol>
+    <h3><li>Part 3: Infrastructure Files</li></h3>
+    <ol>
+      {% for page in sorted_pages %}
+        {% if page.category == 'rbenv-pt-3' %}
           <li><a href="{{ page.url }}">{{ page.title }}</a></li>
         {% endif %}
       {% endfor %}
