@@ -2,7 +2,7 @@ Where do we go from here?  A couple options:
 
 ## `ruby-build`
 
-Back in the introduction to Part 2, we mentioned how you could install new versions of Ruby in an RBENV-friendly manner by using the `ruby-build` plugin.  But we didn't actually cover that plugin, because it was part of a separate codebase.  However, `rbenv install` is a not-uncommon command, and it might pay to dive into that codebase like we did here.
+Back in the introduction to Part 2, we mentioned how you could install new versions of Ruby in an RBENV-friendly manner by using the `ruby-build` plugin.  But we didn't actually cover that plugin, because it was part of a separate codebase.  However, `rbenv install` is a not-uncommon command, and it might pay to dive into that codebase like we did here.  It could also help solidify our understanding of RBENV plugins.
 
 ## Other Ruby version managers
 
