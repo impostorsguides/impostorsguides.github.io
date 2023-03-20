@@ -1,5 +1,9 @@
 Where do we go from here?  A couple options:
 
+## More about the RBENV git history
+
+We could pivot from reading the code to reading the Github history.  This would give us more context on *why* certain decisions were made, which would certainly help us feel like even less of an impostor.
+
 ## `ruby-build`
 
 Back in the introduction to Part 2, we mentioned how you could install new versions of Ruby in an RBENV-friendly manner by using the `ruby-build` plugin.  But we didn't actually cover that plugin, because it was part of a separate codebase.  However, `rbenv install` is a not-uncommon command, and it might pay to dive into that codebase like we did here.  It could also help solidify our understanding of RBENV plugins.
@@ -16,6 +20,14 @@ I'm feeling more confident about grokking codebases, now that I've finished read
 
 Is there something you'd like me to cover?  Reach out to me on [Twitter](https://www.twitter.com/impostorsguides) or email me at [impostorsguides] at {gmail} dot [com].
 
+## It's Your Call
+
+The term `grok` is wanting, because there's always more to understand about any given codebase.  Each reader must decide for themselves whether they've learned enough to move on to other challenges.  I *think* I'm ready, but I reserve the right to come back later, and dive into some of the above. ;-)
+
 ## Some resources to keep reading
 
-[The Missing Semester of Your CS Education (MIT Course)](https://missing.csail.mit.edu/)
+<ol>
+  <li><h3><a href="https://missing.csail.mit.edu/">The Missing Semester of Your CS Education (MIT Course)</a></h3>
+  <p>Talks a lot about many of the same tools we've encountered here.  And surprisingly beginner-friendly, considering it's from MIT.</p>
+  </li>
+</ol>
