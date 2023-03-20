@@ -1,8 +1,12 @@
 The term "grok" means `understand (something) thoroughly and intuitively`.  But it's deceptive, because there's always more to understand about any given codebase.  Each reader must decide for themselves whether they've learned enough to move on to other challenges.
 
-And that's kind of the point of this guide- if people have an idea in their head that "I'll be a ninja/rockstar/whatever once I understand codebase X", this guide will hopefully burst that bubble.  Hopefully you've learned something from reading this, but now you also understand how much more there is to learn.
+And that's kind of the point of this guide- if people have an idea in their head that "I'll be a 10x / ninja / rockstar / whatever once I understand codebase X", this guide is intended to burst that bubble.  Hopefully you've learned something from reading this, but now you also understand how much more there is to learn.
 
-With that said, where do we go from here?  A couple options:
+To put it in terms of the [Dunning-Kruger effect](https://web.archive.org/web/20221129140620/https://slidemodel.com/templates/dunning-kruger-effect-curve-for-powerpoint/), hopefully I've been able to nudge you a bit out of the "Valley of Despair" and toward the "Slope of Enlightenment".
+
+Speaking of which, just like my goal was to make this codebase less mysterious, I also want to make the idea of being a 10x / ninja / rockstar / whatever less magical.  These are just people who consistently put one foot in front of the other, day after day, until one day they woke up and they were on the core team of one of the most widely-used Ruby version managers around.  That could be you!
+
+With all that word salad out of the way, where do we go from here?  A couple options:
 
 ## More about the RBENV git history
 
