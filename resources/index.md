@@ -34,7 +34,7 @@ permalink: /resources/
         {% endif %}
       {% endfor %}
     </ol>
-    <h3><li><a href="/rbenv/conclusion">Conclusion</a></li></h3>
+    <h3><a href="/rbenv/conclusion">Conclusion</a></h3>
 
   </ol>
 </ul>

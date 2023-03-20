@@ -57,6 +57,6 @@ I see the following directories in the Github repo:
   <img src="/assets/images/screenshot-19mar2023-237pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
-Out of all the directories I see, `libexec/` has the most files in it.  While this doesn't *necessarily* mean that it's the most important directory, it does indicate that a lot of development has taken place in that directory.  It also means that, if I were to finish reading through all the files in that directory, I will have taken a big step toward understanding the codebase as a whole.
+When I look inside each of these directories, I see that `libexec/` has the most files in it.  While this doesn't *necessarily* mean that it's the most important directory, it does indicate that a lot of development has taken place in that directory.  It also means that, if I were to finish reading through all the files in that directory, I will have taken a big step toward understanding the codebase as a whole.
 
 I decide to start there.

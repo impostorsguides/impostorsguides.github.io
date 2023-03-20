@@ -15,3 +15,7 @@ I'm feeling more confident about grokking codebases, now that I've finished read
 ## Something else entirely?
 
 Is there something you'd like me to cover?  Reach out to me on [Twitter](https://www.twitter.com/impostorsguides) or email me at [impostorsguides] at {gmail} dot [com].
+
+## Some resources to keep reading
+
+[The Missing Semester of Your CS Education (MIT Course)](https://missing.csail.mit.edu/)
