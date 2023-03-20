@@ -1,4 +1,8 @@
-Where do we go from here?  A couple options:
+The term "grok" means `understand (something) thoroughly and intuitively`.  But it's deceptive, because there's always more to understand about any given codebase.  Each reader must decide for themselves whether they've learned enough to move on to other challenges.
+
+And that's kind of the point of this guide- if people have an idea in their head that "I'll be a ninja/rockstar/whatever once I understand codebase X", this guide will hopefully burst that bubble.  Hopefully you've learned something from reading this, but now you also understand how much more there is to learn.
+
+With that said, where do we go from here?  A couple options:
 
 ## More about the RBENV git history
 
@@ -22,7 +26,7 @@ Is there something you'd like me to cover?  Reach out to me on [Twitter](https:/
 
 ## It's Your Call
 
-The term `grok` is wanting, because there's always more to understand about any given codebase.  Each reader must decide for themselves whether they've learned enough to move on to other challenges.  I *think* I'm ready, but I reserve the right to come back later, and dive into some of the above. ;-)
+I think *I'm* ready to move on, but I reserve the right to come back later, and dive into some of the above. ;-)
 
 ## Some resources to keep reading
 
