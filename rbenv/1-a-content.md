@@ -1,43 +1,62 @@
-Having finished reading [the code for RBENV's shims](https://docs.google.com/document/d/1xG_UdRde-lPnQI7ETjOHPwN1hGu0KqtBRrdCLBGJoU8/edit), I'm now looking for something else to look at.  I know RBENV's codebase is more than just the shim, so I feel like there is more to learn than just that.  One of my goals is to get to the point where I know enough about RBENV to contribute to its codebase.  In order to do that, I definitely need a wider understanding of it than I currently have.  Plus, RBENV's logic is the first thing that happens in the execution chain when you run a program, so what happens there affects everything downstream.  So I feel like staying in RBENV-land for now.
+Having finished reading [the code for RBENV's shims](https://docs.google.com/document/d/1xG_UdRde-lPnQI7ETjOHPwN1hGu0KqtBRrdCLBGJoU8/edit), we need to decide what's next.  [RBENV's README on Github](https://github.com/rbenv/rbenv/tree/c4395e58201966d9f90c12bd6b7342e389e7a4cb/) could help inform that decision.
 
-I decide to peruse [RBENV's Github page](https://github.com/rbenv/rbenv/tree/c4395e58201966d9f90c12bd6b7342e389e7a4cb/).  A couple statements stand out:
+A couple possibilities stand out:
+
+## Shim Rehashing
 
 > Through a process called rehashing, rbenv maintains shims in that directory to match every Ruby command across every installed version of Ruby...
 
-Richie says: This brings up a good question- we've already looked at the shim file itself, but where did that shim file come from?  It sounds like that's part of the “rehashing” process described here, but how does that process work?
+This brings up a good question- we've already looked at the shim file itself, but where did that shim file come from?  It sounds like that's part of the “rehashing” process described here, but how does that process work?
 
-<p style="text-align: center">
-  <img src="/assets/images/choosing-the-ruby-version.png" width="70%" alt="README section on 'Choosing the Ruby Version'"  style="border: 1px solid black; padding: 0.5em">
-</p>
+From the README:
 
-Richie says: The process in which RBNV checks which Ruby version to use is something I *thought* I understood from my last write-up.  But it turns out there's additional logic to do this which doesn't live in the shim file itself.  Maybe I should try to find where that extra logic lives?
+> Choosing the Ruby Version
+When you execute a shim, rbenv determines which Ruby version to use by reading it from the following sources, in this order:
+>
+> The RBENV_VERSION environment variable, if specified. You can use the rbenv shell command to set this environment variable in your current shell session.
+>
+> The first .ruby-version file found by searching the directory of the script you are executing and each of its parent directories until reaching the root of your filesystem.
+>
+> The first .ruby-version file found by searching the current working directory and each of its parent directories until reaching the root of your filesystem. You can modify the .ruby-version file in the current working directory with the rbenv local command.
+>
+> The global ~/.rbenv/version file. You can modify this file using the rbenv global command. If the global version file is not present, rbenv assumes you want to use the "system" Ruby—i.e. whatever version would be run if rbenv weren't in your path.
 
-> (step 6 in the install process) (Optional) Install ruby-build, which provides the rbenv install command that simplifies the process of installing new Ruby versions.
+The process by which RBNV checks which Ruby version to use is something I *thought* I understood from my last write-up.  But it turns out there's additional logic to do this which doesn't live in the shim file itself.  Maybe I should try to find where that extra logic lives?
 
-Richie says: when I install new Ruby versions, I typically use `rbenv install`.  This is a pretty important part of the RBENV lifecycle, so it would pay to understand how it works.
+## Installing Ruby via RBENV
 
-> rbenv init is the only command that crosses the line of loading extra commands into your shell. Coming from RVM, some of you might be opposed to this idea.
+The README also talks about Ruby installation, a process which seems important in the Ruby version management lifecycle:
 
-Why would someone be opposed to this idea?  Seems like there's something important or controversial here that I don't fully understand.
-
+> ...`ruby-build`, which provides the rbenv install command that simplifies the process of installing new Ruby versions.
+>
 > The `rbenv install` command doesn't ship with rbenv out of the box, but is provided by the `ruby-build` project.
 
-Richie says: Why wouldn't they ship RBENV with `rbenv install` already included?  I've used it before and it seems both useful and important enough to include by default.  If one *doesn't* use RBENV, I don't know what the process is to wire up a new Ruby version with RBENV once you install it yourself, but I can't imagine it's easy.
+Why wouldn't they ship RBENV with `rbenv install` already included?  I've used it before and it seems both useful and important enough to include by default.  If one *doesn't* use RBENV, I don't know what the process is to wire up a new Ruby version with RBENV once you install it yourself, but I can't imagine it's easy.
+
+## Shell Integration
+
+From the README:
+
+> `rbenv init` is the only command that crosses the line of loading extra commands into your shell. Coming from RVM, some of you might be opposed to this idea.
+
+Why would someone be opposed to this idea?  It seems like there's something important or controversial here that I don't fully understand.
+
+## RBENV sub-commands
+
+Again from the README:
 
 > Like git, the rbenv command delegates to subcommands based on its first argument.
 
-Richie says: How does it do this?  The delegation process seems important since that's how RBENV executes any and all commands that it exposes.
+The delegation process seems important since that's how RBENV executes any and all commands that it exposes.  How does this work, under-the-hood?
 
-—-------
+## Making A Decision
 
-The above questions are all perfectly valid starting points for diving into the code.  However, I'm thinking I want to take a more methodical approach.  I see the following directories, and I don't know what they mean:
+I see the following directories in the Github repo:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-237pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
-My curiosity might be satisfied if I just start at the top and work my way down through the directories and files.  This seems like the best way to get a “lay of the land”, or a broad overview, as far as RBENV's codebase goes.
+Out of all the directories I see, `libexec/` has the most files in it.  While this doesn't *necessarily* mean that it's the most important directory, it does indicate that a lot of development has taken place in that directory.  It also means that, if I were to finish reading through all the files in that directory, I will have taken a big step toward understanding the codebase as a whole.
 
-Let's do that.
-
-EDIT: after walking through the directories and their files from top to bottom, I realized the files could be divided into two categories: files related to specific `rbenv` commands (i.e. `rbenv versions`, `rbenv rehash`, etc.) and files related to the infrastructure of the codebase itself (i.e. code for github workflows, code for compiling a faster implementation of `realpath`, the `Makefile`, etc).  So this section will cover those command files (all of which are located in the `libexec/` directory), and the next section will cover those infrastructure files (which are located in various other directories).
+I decide to start there.
