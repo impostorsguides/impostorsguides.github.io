@@ -8,7 +8,9 @@ permalink: /
 
 This is "David and Goliath" on Github.
 
-I want to help newbie developers grok complex, widely-used open-source programs that they might otherwise be too intimidated to approach.
+I want to help newbie developers understand complex, widely-used open-source programs that they might otherwise be too intimidated to approach.
+
+I have a theory that this understanding will help people who suffer from impostor syndrome feel less like impostors.  This site is an attempt to test that theory, both on them and on myself.
 
 # Who is this site for?
 
