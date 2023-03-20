@@ -10,4 +10,4 @@ next-title: "src/configure"
 next-permalink: /rbenv/infrastructure/src-configure
 ---
 
-{% include_relative 2-ag-content.md %}
+{% include_relative 3-ag-content.md %}

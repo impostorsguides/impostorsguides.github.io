@@ -10,4 +10,4 @@ next-title: "rubygems_plugin.rb"
 next-permalink: /rbenv/infrastructure/rubygems_plugin-rb
 ---
 
-{% include_relative 2-ad-content.md %}
+{% include_relative 3-ad-content.md %}

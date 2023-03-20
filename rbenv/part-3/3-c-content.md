@@ -1,4 +1,4 @@
-This directory seems super-simple- it just contains one file in it called "rbenv", which Github tells me is a "symbolic link" file:
+The `bin/` directory seems super-simple- it just contains one file in it called "rbenv", which Github tells me is a "symbolic link" file:
 
 <p style="text-align: center">
   <img src="/assets/images/contents-of-bin-dir.png" width="70%" alt="The contents of the bin/ directory"  style="border: 1px solid black; padding: 0.5em">
