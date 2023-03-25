@@ -1,10 +1,6 @@
-NOTE- the analysis of this command's test coverage was written after I had already finished reading the code for the commands in "libexec/", and therefore reflects a level of knowledge that I didn't yet have on my first pass through this code.
-
-Let's look at the tests for this file first, to get a sense of what the expected behavior is.  We'll look at the code afterward.
+Before reading the code for each command, we'll start by looking at the command's tests.  In the spirit of ["tests as executable documentation"](https://web.archive.org/web/20230321145910/https://subscription.packtpub.com/book/application-development/9781788836111/1/ch01lvl1sec13/executable-documentation){:target="_blank" rel="noopener"}, reading the tests first should give us a sense of what the expected behavior is.  The headers for the `Tests` and `Code` section are also links to the code we'll be looking at.
 
 ## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats)
-
-TODO: Move explanation of BATS here, since this is the first time we encounter BATS tests.
 
 The first line of code is:
 
@@ -12,7 +8,35 @@ The first line of code is:
 #!/usr/bin/env bats
 ```
 
-This is a shebang, but it's not a `bash` shebang.  Instead, it's a `bats` shebang.  [`bats` is a test-runner program](https://github.com/sstephenson/bats) that Sam Stephenson (the original author of RBENV) wrote, and it's used here as RBENV's test framework.  But it's not RBENV-specific- you could technically use it to test any shell script.  This shebang tells the shell that the way we run these tests is by calling `bats` plus the name of the test file.
+This is a shebang, but it's not a `bash` shebang.  Instead, it's a `bats` shebang.  [`bats` is a test-runner program](https://github.com/sstephenson/bats) that Sam Stephenson (the original author of RBENV) wrote, and it's used here as RBENV's test framework.  But it's not RBENV-specific; you could technically use it to test any shell script.
+
+### Experiment: running the BATS tests
+
+To run these tests, we'll need to install `bats` first.  The installation instructions are [here](https://github.com/sstephenson/bats#installing-bats-from-source).  Once that's done, we can navigate to the home directory of our cloned RBENV codebase, and run the following:
+
+```
+$ bats ./test/rbenv.bats
+
+ ✓ blank invocation
+ ✓ invalid command
+ ✓ default RBENV_ROOT
+ ✓ inherited RBENV_ROOT
+ ✓ default RBENV_DIR
+ ✓ inherited RBENV_DIR
+ ✓ invalid RBENV_DIR
+ ✓ adds its own libexec to PATH
+ ✓ adds plugin bin dirs to PATH
+ ✓ RBENV_HOOK_PATH preserves value from environment
+ ✓ RBENV_HOOK_PATH includes rbenv built-in plugins
+
+11 tests, 0 failures
+
+$
+```
+
+They all pass, as we'd expect.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next line of code:
 
@@ -20,9 +44,15 @@ Next line of code:
 load test_helper
 ```
 
-This `load` method comes from [this line of code](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test#L32) in `bats`.  Here we're loading a helper file called `test_helper`, which lives [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash).  Loading `test_helper` does lots of things for us that help our tests run as expected, such as updating the value of `PATH` to include the `rbenv` commands that we want to test, as well as giving us access to helper functions that let us run those commands and assert that the results succeeded or failed, along with asserting that the printed output of the commands included certain text.
+This `load` method comes from [this line of code](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test#L32) in `bats`.  Here we're loading a helper file called `test_helper`, which lives [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash).
 
-The next block of code is our first test:
+Loading `test_helper` does lots of things for us that help our tests run as expected, such as:
+
+- [updating the value of `PATH`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L22) to include the `rbenv` commands that we want to test,
+- `export`ing the environment variables that we'll need, [such as `RBENV_ROOT`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L18)
+- [giving us access to helper functions](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L45) that let us run those commands and assert that the results succeeded or failed.
+
+The next block of code is also our first test:
 
 ```
 @test "blank invocation" {
@@ -32,9 +62,33 @@ The next block of code is our first test:
 }
 ```
 
-Here we're testing that an attempt to run `rbenv` without any arguments will fail.  We use `test_helper`'s `run` command to execute the `rbenv` command by itself, then we call `test_helper`'s `assert_failure` function, which fails this test if the previously-run command (aka `run rbenv`) was zero (which means it succeeded).  In other words, if `run rbenv` succeeded, the test we're reading now would fail.
+### Annotations and Regexes
 
-There is also a 2nd assertion below the first one, which states that the 0th line of the printed output should be equal to the output of the `rbenv --version` command.  So when the user runs `rbenv` without any arguments, the first line of printed output they should see is the version number for their RBENV installation.  I try this on my machine, and it works as expected:
+The first thing I notice is the `@test` snippet.  I'm not sure what Sam Stephenson would call this, but I would call it an "annotation", because I have a bit of experience with the Java language and the Java community [uses similar syntax](https://web.archive.org/web/20230309020001/https://en.wikipedia.org/wiki/Java_annotation), which they also refer to as annotations.
+
+Annotations are used as metadata, to help BATS identify which code represents tests that should be run.  If we search the BATS codebase for the string `@test` and look through the results, eventually we find [this line of code](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-preprocess#L34).  This is a regular expression (or a regex for short).  If you aren't familiar with regexes, they're a very powerful tool for finding and parsing strings.  See [here](https://web.archive.org/web/20221024181745/https://linuxtechlab.com/bash-scripting-learn-use-regex-basics/) for more information.
+
+This isn't a walk-through of the BATS codebase so I want to keep this part short, but essentially what's happening here is we're providing a pattern for `bash` to use when searching for lines of code.  `bash` will read each line of code in a test file (for example, `test/rbenv.bats`) and see if it matches the pattern.  If it does, we know we've found a test.  The pattern includes the string `@test`, which is why each of the tests in our file start with `@test`.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Back to our test block.  Here we're verifying that an attempt to run `rbenv` without any arguments will fail:
+
+ - We use `test_helper`'s [`run` command](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test#L50) to execute the `rbenv` command without any arguments or flags.
+ - Then we call `test_helper`'s `assert_failure` function, which checks to make sure the last command which was run (i.e. `run rbenv`) had a non-zero exit code.
+ - If this is true (i.e. if something went wrong), the test passes.  If not, the test fails.
+
+I would call this a "sad-path test".  When testing our code, we not only want to test what happens when things go right (i.e. the "happy-path"), but also what happens when things go wrong.  This gives us confidence that our code will work as expected in all scenarios, not just the good ones.
+
+Running the command `rbenv` by itself, with no arguments, is considered a "sad-path" because the `rbenv` command needs you to pass it the name of another command, before it can do anything.  For example, if you give it the `versions` command by running `rbenv version`, RBENV knows that you want to see a list of all the Ruby versions which are installed on your system.  But by itself, the `rbenv` command does nothing.  Therefore, running `rbenv` by itself would be considered a user error.
+
+There is also a 2nd assertion below the first one:
+
+```
+  assert_line 0 "$(rbenv---version)"
+```
+
+This line states that the 1st line of the printed output (the indexing here is 0-based) should be equal to the output of the `rbenv --version` command.  So when the user runs `rbenv` without any arguments, the first line of printed output they should see is the version number for their RBENV installation.  I try this on my machine, and it works as expected:
 
 ```
 $ rbenv
@@ -60,6 +114,83 @@ For full documentation, see: https://github.com/rbenv/rbenv#readme
 
 Here we can see that the first line of printed output is `rbenv 1.2.0-16-gc4395e5`.
 
+### Experiment: writing our own BATS test
+
+I create a file called `foo.bats` inside the same `test/` folder as `rbenv.bats`, with the following content:
+
+```
+#!/usr/bin/env bats
+
+@test "testing out the bats commands" {
+  run echo "Hello world"
+  assert_success
+}
+```
+
+When I try to run it with the `bats` command, I get:
+
+```
+$ bats foo.bats
+ ✗ testing out the bats commands
+   (in test file foo.bats, line 5)
+     `assert_success' failed with status 127
+   /var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/bats.84975.src: line 5: assert_success: command not found
+
+1 test, 1 failure
+```
+
+Hmm I'm missing the `assert_success` command, which I know exists because we can see it further down in `tests/rbenv.bats`.  Where is that method in the codebase?
+
+I search the `bats` Github repo, thinking it would be there, but it's not.  I then search the RBENV repo, and I find it [here](https://github.com/rbenv/rbenv/blob/117a38157537eeb59d73bf8a958363688fdf6383/test/test_helper.bash), inside `test_helper.bash`.
+
+OK, so we need to load `test_helper`, just like the other tests do.  I update the test file to look like the following:
+
+```
+#!/usr/bin/env bats
+
+load test_helper
+
+@test "testing out the bats commands" {
+  run echo "Hello world"
+  assert_success
+}
+```
+
+I then run it again:
+
+```
+$ bats ./foo.bats
+ ✓ testing out the bats commands
+
+1 test, 0 failures
+```
+
+Now, I want to purposely generate a failure, but not the kind we just saw (i.e. a failure caused by a failure to import a dependency).  Instead, I want it to fail because the test completed, but the result wasn't what we expect.  I change `assert_success` in my test to `assert_failure` and re-run it:
+
+```
+$ bats ./foo.bats
+ ✗ testing out the bats commands
+   (from function `flunk' in file test_helper.bash, line 42,
+    from function `assert_failure' in file test_helper.bash, line 55,
+    in test file foo.bats, line 7)
+     `assert_failure' failed
+   expected failed exit status
+
+1 test, 1 failure
+```
+
+Now we see a `✗` character instead of a `✓` character next to the test description.  We also see which assertion failed:
+
+```
+`assert_failure' failed
+```
+
+Lastly, we see `expected failed exit status`, which tells us why `assert_failure` failed.
+
+Great, that's a (very preliminary) introduction to writing our own BATS test.  We'll see lots more BATS syntax in the subsequent tests.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
 Next test:
 
 ```
@@ -70,7 +201,11 @@ Next test:
 }
 ```
 
-This test covers the sad-path case of when a user tries to run an RBENV command that doesn't exist.  We run a fake command called `does-not-exist`, call our `assert_failure` helper function to ensure that the previous command failed, and check that the output which was printed to STDOUT contained the line "rbenv: no such command \`does-not-exist'".
+This test covers the sad-path case of when a user tries to run an RBENV command that doesn't exist.  We do the following:
+
+- run a fake RBENV command called `rbenv does-not-exist`,
+- call our `assert_failure` helper function to ensure that the previous command failed, and
+- check that the output which was printed to STDOUT contained the line "rbenv: no such command \`does-not-exist'".
 
 I try this on my machine as well:
 
@@ -79,7 +214,64 @@ $ rbenv foo
 rbenv: no such command `foo'
 ```
 
-Looks good!  Next test is:
+Looks good!
+
+One question, though- what's the difference between `assert_output` and `assert_line 0`?  Could we have replaced the `assert_line 0` in our previous test with `assert_output`?
+
+### Experiment- replacing `assert_line 0` with `assert_output`
+
+I try it out, making the above-mentioned replacement in test #1:
+
+```
+@test "blank invocation" {
+  run rbenv
+  assert_failure
+  assert_output "$(rbenv---version)"
+}
+```
+
+When I run this, I get the following:
+
+```
+$ bats test/rbenv.bats
+
+ ✗ blank invocation
+   (from function `assert_equal' in file test/test_helper.bash, line 65,
+    from function `assert_output' in file test/test_helper.bash, line 74,
+    in test file test/rbenv.bats, line 8)
+     `assert_output "$(rbenv---version)"' failed
+   expected: rbenv 1.2.0-16-gc4395e5
+   actual:   rbenv 1.2.0-16-gc4395e5
+   Usage: rbenv <command> [<args>]
+
+   Some useful rbenv commands are:
+      commands    List all available rbenv commands
+      local       Set or show the local application-specific Ruby version
+      global      Set or show the global Ruby version
+      shell       Set or show the shell-specific Ruby version
+      install     Install a Ruby version using ruby-build
+      uninstall   Uninstall a specific Ruby version
+      rehash      Rehash rbenv shims (run this after installing executables)
+      version     Show the current Ruby version and its origin
+      versions    List installed Ruby versions
+      which       Display the full path to an executable
+      whence      List all Ruby versions that contain the given executable
+
+   See `rbenv help <command>' for information on a specific command.
+   For full documentation, see: https://github.com/rbenv/rbenv#readme
+```
+
+OK, so it failed because we expected `rbenv 1.2.0-16-gc4395e5` to be the only output for that command (which is what `assert_output` apparently means).  But it wasn't; in addition to the string from the expeted output, the actual output included things like:
+
+- usage instructions for the command,
+- some common rbenv commands,
+- a link to the docs, etc.
+
+So our experiment taught us that these two BATS helpers are not, in fact, interchangeable.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Next test is:
 
 ```
 @test "default RBENV_ROOT" {
@@ -92,12 +284,19 @@ Looks good!  Next test is:
 At first I thought it was strange that we're including a call to the `root` command inside the test file for the `rbenv` command.  I would have expected the test file for `rbenv` to only include calls to `rbenv`, not to other commands as well.  Otherwise, if such a test fails, it could be because of a failure in that other command, as opposed to in the `rbenv` command.
 
 After giving this some thought, I suspect it's because:
+ - we want to test how `rbenv` responds to a known-valid command (unlike the previous test, which tested a known-invalid command), and
+ - this command's implementation is only a single line of code, so it allows us to accomplish this goal with minimal added complexity.
 
-we intentionally want to test how `rbenv` responds to a known-valid command (unlike the previous test, which tested a purposely invalid command),
-we know the `root` command is such a command, and
-this command's implementation is only a single line of code, so it allows us to accomplish our goal with minimal added complexity and risk of the failure I mentioned just now.
+I skipped ahead a bit because I was curious where `RBENV_ROOT` and `HOME` are used.  Judging by the environment variables which are passed to the `run rbenv root` command, this test appears to cover the behavior beginning at [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L54){:target="_blank" rel="noopener"}.
 
-Judging by the environment variables which are passed to the `run rbenv root` command, this test appears to cover the behavior beginning at [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L54) (I skipped ahead a bit because I was curious where `RBENV_ROOT` and `HOME` are used).  We pass an empty value for `RBENV_ROOT` and an arbitrary but unsurprising value for `HOME` as environment variables, and we assert that a) the command succeeded (i.e. its return code was 0), and b) that the printed output included the `.rbenv/` directory, prepended with the value we set for `HOME`.
+The test does the following:
+
+- passes an empty value for `RBENV_ROOT` and an arbitrary but unsurprising value for `HOME` as environment variables, and
+- asserts that:
+  - the command succeeded, and
+  - that the printed output included the `.rbenv/` directory, prepended with the value we set for `HOME`.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next test:
 
@@ -109,7 +308,9 @@ Next test:
 }
 ```
 
-This test is similar to the previous test, except this time we set a non-empty value for `RBENV_ROOT` and assert that that value is used as the output for the `root` command.  We leave `HOME` blank because `HOME` is only needed to help construct `RBENV_ROOT` if `RBENV_ROOT` doesn't already exist, again according to [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L54).
+This test is similar to the previous test, except this time we set a non-empty value for `RBENV_ROOT` and assert that that value is used as the output for the `root` command.  We leave `HOME` blank because `HOME` is only needed to help construct `RBENV_ROOT` if `RBENV_ROOT` doesn't already exist, again according to [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L54){:target="_blank" rel="noopener"}.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next test:
 
@@ -120,9 +321,11 @@ Next test:
 }
 ```
 
-Here we appear to be testing [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L61).  We assert that, if no prior value has been set for `RBENV_DIR`, we set it equal to the value of the shell's `PWD` environment variable (which is also the same as the output of the `pwd` shell command, which is what "$(pwd)" resolves to here).
+Here we appear to be testing [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L61){:target="_blank" rel="noopener"}.  We assert that, if no prior value has been set for `RBENV_DIR`, we set it equal to the value of the shell's `PWD` environment variable (which is also the same as the output of the `pwd` shell command, which is what "$(pwd)" resolves to here).
 
 Note that we won't be able to run `rbenv echo` in our shell unless we manually update our `PATH` environment variable to include RBENV's `test/libexec/` directory.  The `test_helper` file does this for us when we run our test, but if we're not running a test then we have to do this ourselves.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next test:
 
@@ -135,9 +338,18 @@ Next test:
 }
 ```
 
-This test covers the same block of code as the previous test, except this time we're specifying a non-default value for `RBENV_DIR` (as opposed to testing what happens when the default value is used).
+This test covers the same block of code as the previous test, except this time we're testing the `else` branch instead of the `if` branch:
 
-We create a variable named `dir` and set it equal to `BATS_TMPDIR` with "/myproject" appended to the end (the value of the `BATS_TMPDIR` env var is set [here](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test#L304), and more info on `BATS_TMPDIR` can be found [here](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/README.md#special-variables)).  We then create a directory whose name is the value of our `dir` variable, and we set the `RBENV_DIR` env var equal to this directory before running `rbenv echo RBENV_DIR`.  We assert that the command printed the value that we specified for the `RBENV_DIR` env var, since that's the env var that we passed to `rbenv echo`.  In other words, [the block of code that we're testing](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L61) didn't modify the value of `RBENV_DIR` in any way.
+- We create a variable named `dir` and set it equal to `BATS_TMPDIR` with "/myproject" appended to the end.
+  - The value of the `BATS_TMPDIR` env var is set [here](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test#L305){:target="_blank" rel="noopener"} if it's not already set.
+  - More info on `BATS_TMPDIR` and other BATS-specific environment variables can be found [here](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/README.md#special-variables){:target="_blank" rel="noopener"}.
+- We then create a directory whose name is the value of our `dir` variable.
+- We set the `RBENV_DIR` env var equal to this directory.
+- We then run `rbenv echo RBENV_DIR`.
+- Lastly, we assert that the command printed the value that we specified for the `RBENV_DIR` env var, since that's the env var that we passed to `rbenv echo`.
+  - In other words, we assert that [the block of code that we're testing](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L61){:target="_blank" rel="noopener"} didn't modify the value of `RBENV_DIR` in any way.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next test:
 
@@ -151,7 +363,70 @@ Next test:
 }
 ```
 
-Here we're testing the same [block of logic](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L61) as the last test, but this time we're testing a different edge case.  Inside that block's `else` branch, we attempt to navigate into the directory we specify via `RBENV_DIR`.  If that succeeds, we reset `RBENV_DIR` to be equal to the directory we just `cd`'ed into.  If that fails, we abort and print the error message "rbenv: cannot change working directory to \`$dir'".  That's the edge case we're testing- when the navigation into the specified directory fails, the command fails and the expected error message is printed to STDERR.
+Here we're testing the same [block of logic](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L61) as the last test, but this time we're testing a different edge case.
+
+Inside that block's `else` branch, we try to `cd` into the directory specified by `RBENV_DIR`.  As of this point, the value of `RBENV_DIR` is not known to be a valid directory, so this may or may not work.
+
+If it *does* work, [we reset `RBENV_DIR`](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv#L35){:target="_blank" rel="noopener"} to be equal to our current directory.  But if it fails, we abort and print the error message `rbenv: cannot change working directory to '$dir'`.  That's the edge case we're testing- when the navigation into the specified directory fails, the command fails and the expected error message is printed to STDERR.
+
+Why do we reset `RBENV_DIR`?  My guess is that this is to ensure the value of `RBENV_DIR` is formatted in a readable manner.  For example, let's see what happens if I call the `rbenv` command and pass in `RBENV_DIR=..` in the command line.  I add a few `echo` statements to the code:
+
+```
+...
+if [ -z "${RBENV_DIR}" ]; then
+  RBENV_DIR="$PWD"
+else
+  echo "RBENV_DIR 1: $RBENV_DIR" >> /Users/myusername/Workspace/OpenSource/rbenv/test/log4tests
+
+  [[ $RBENV_DIR == /* ]] || RBENV_DIR="$PWD/$RBENV_DIR"
+
+  echo "RBENV_DIR 2: $RBENV_DIR" >> /Users/myusername/Workspace/OpenSource/rbenv/test/log4tests
+
+  cd "$RBENV_DIR" 2>/dev/null || abort "cannot change working directory to \`$RBENV_DIR'"
+
+  RBENV_DIR="$PWD"
+
+  echo "RBENV_DIR 3: $RBENV_DIR" >> /Users/myusername/Workspace/OpenSource/rbenv/test/log4tests
+
+  cd "$OLDPWD"
+fi
+...
+```
+
+I added 3 loglines above (the ones containing `RBENV_DIR 1`, `RBENV_DIR 2`, and `RBENV_DIR 3`), so we can see what the value of `RBENV_DIR` is after each line of code.  Notice the line `RBENV_DIR="$PWD"` is *not* commented-out yet.
+
+I then write the following test:
+
+```
+#!/usr/bin/env bats
+
+load test_helper
+
+@test "attempt to run foo" {
+  RBENV_DIR=".." run rbenv echo RBENV_DIR
+  assert_success
+}
+```
+
+When I run this test and view the `log4tests` file, I see:
+
+```
+RBENV_DIR 1: ..
+RBENV_DIR 2: /Users/myusername/Workspace/OpenSource/rbenv/test/..
+RBENV_DIR 3: /Users/myusername/Workspace/OpenSource/rbenv
+```
+
+Next, when I comment out `RBENV_DIR="$PWD"` and re-run the test, I see the following in `log4tests`:
+
+```
+RBENV_DIR 1: ..
+RBENV_DIR 2: /Users/myusername/Workspace/OpenSource/rbenv/test/..
+RBENV_DIR 3: /Users/myusername/Workspace/OpenSource/rbenv/test/..
+```
+
+The paths `/Users/myusername/Workspace/OpenSource/rbenv/test/..` and `/Users/myusername/Workspace/OpenSource/rbenv` both refer to the same location in the directory structure, even though they look different, since the `test/` and `..` from the first path cancel each other out.  The command `RBENV_DIR="$PWD"` simply ensures that `RBENV_DIR` stores the 2nd, more readable path.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next test:
 
@@ -162,35 +437,11 @@ Next test:
 }
 ```
 
-This test is a bit confusing, because when I search [the `libexec/rbenv` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv) for the string "libexec", I only find one result ([here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L23)), which doesn't appear to do what the test is asserting.  This makes me wonder how the test is passing.  I wonder if the reason for that is because of [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L25) inside `test_helper`.  I run just that one test two separate times, the first time with that line intact:
+After some digging, I discovered that  this test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L79){:target="_blank" rel="noopener"}.  I ran the test with this line of code in-place, and then re-ran it with the code commented-out, and the test failed when the line was commented out.  I consider that to be pretty solid proof that this is the line of code under test.
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar2023-109pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
+We will dive into what this line of code does when we get to the code itself, further down.  But from the description of this test (`adds its own libexec to PATH`), we can deduce that the `libexec/` folder contains commands that we'll want to execute from the terminal.  We know this because we learned from Part 1 that `PATH` is the list of folders which UNIX checks when we give it a command to execute.  Adding more folders to `PATH` (such as `libexec/`) means we'll have access to more commands.
 
-I get the following:
-
-<p style="text-align: center">
-  <img src="/assets/images/test-output-12mar2023-117pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-Next I comment out just that line:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar23-118pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-...and I run the test again, this time getting the following:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar23-118pm-2.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-To me, this indicates that the test is testing logic inside `test_helper`, *not* logic inside `libexec/rbenv`.  This could be worth a pull request.
-
-(stopping here for the day; 90621 words)
-
-UPDATE: I was wrong.  After some digging into the code, I discovered that [another line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L79) (inside the `rbenv` file itself) is actually the code which this test covers.  I ran that same test with and without this line of code in place, and the test failed when the line was commented out.  So I feel comfortable with leaving this test as-is, and continuing on with the analysis.
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next test is:
 
@@ -206,7 +457,13 @@ Next test is:
 }
 ```
 
-This test seems to cover the 4-line block of code starting [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L76).  This test creates two plugins, one named `ruby-build` and one named `rbenv-each`.  We then run the command to `echo` `$PATH`, with ":" as a separator so that each item in `$PATH` prints on its own line, and assert that the command was successful.  The test then asserts that the first item in `$PATH` is the value stored in `bin_path` and pre-pended to `$PATH` [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L79), and that the next two items in `$PATH` are the paths to the two plugins that we installed.  The `libexec/` directory comes first in `$PATH` because the line which prepends `libexec/` to `$PATH` is executed *after* the `for` loop which prepends each plugin directory to `$PATH`.
+This test covers the 4-line block of code starting [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L76){:target="_blank" rel="noopener"}.  Inside the test, we create two directories, one named `ruby-build` and one named `rbenv-each`.  From the name of the directory ( `plugins/`), we can assume that this is where RBENV plugins are stored, so we can deduce that creating these two sub-directories means we're creating two RBENV plugins for the purposes of our test.  Since there's no additional setup (such as creating files inside of those directories), we can assume that's all we need to do in order to make our test think these plugins actually exist.
+
+We then call `run rbenv echo -F: "PATH"`, which tells RBENV to `echo` `$PATH`.  We pass the `-F:` flag to tell `rbenv echo` to use ":" as a separator.  This will cause each item in `$PATH` to print on its own line.  We could have called `run rbenv echo "PATH"` without the `-F:` flag, but then our entire `PATH` will print on one line, which will make it really hard to call `assert_line 0` etc. further down in the code.
+
+Lastly, we assert that the command was successful, and that the first item in `$PATH` is the value prepended to `$PATH` [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L79){:target="_blank" rel="noopener"}, and that the next two items in `$PATH` are the paths to the two plugins that we "installed" when we ran `mkdir` twice at the start of our test.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next test:
 
@@ -220,13 +477,51 @@ Next test:
 }
 ```
 
-This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81).  We set the value of the `RBENV_HOOK_PATH` env var so that it includes two hard-coded paths, and then run `rbenv echo` on this env var.  We assert that the command was successful and that the two hard-coded paths are printed, followed by `${RBENV_ROOT}/rbenv.d` (which the aforementioned line of code appends to the end of `$PATH`.
+This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81){:target="_blank" rel="noopener"}.  It takes any previously-set value of `RBENV_HOOK_PATH`, and adds `${RBENV_ROOT}/rbenv.d` to the end of that value.
 
-Side note- we can test whether a given test covers certain lines of code by simply commenting out those lines in the command and seeing which tests fail:
+To test this, we set the value of `RBENV_HOOK_PATH` so that it includes two hard-coded paths, `/my/hook/path` and `/other/hooks`.  We then run `rbenv echo` on this env var, again telling `rbenv echo` to use `:` as a separator via the `-F` flag.  We assert that the command was successful and that our two paths are printed, followed by `${RBENV_ROOT}/rbenv.d`.
 
+We can increase our confidence that this test covers the above line of code by simply commenting out that line in the `rbenv` command, and seeing whether the test fails:
 
+```
+# RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${RBENV_ROOT}/rbenv.d"
+```
 
-The above 2 failures include the test we're currently examining.
+When I re-run the test, I get:
+
+```
+$ bats rbenv.bats
+ ✓ blank invocation
+ ✓ invalid command
+ ✓ default RBENV_ROOT
+ ✓ inherited RBENV_ROOT
+ ✓ default RBENV_DIR
+ ✓ inherited RBENV_DIR
+ ✓ invalid RBENV_DIR
+ ✓ adds its own libexec to PATH
+ ✓ adds plugin bin dirs to PATH
+ ✗ RBENV_HOOK_PATH preserves value from environment
+   (from function `assert_equal' in file test_helper.bash, line 65,
+    from function `assert_line' in file test_helper.bash, line 79,
+    in test file rbenv.bats, line 69)
+     `assert_line 2 "${RBENV_ROOT}/rbenv.d"' failed
+   expected: TEST_DIR/root/rbenv.d
+   actual:   /Users/myusername/Workspace/OpenSource/rbenv/rbenv.d
+ ✗ RBENV_HOOK_PATH includes rbenv built-in plugins
+   (from function `assert_equal' in file test_helper.bash, line 65,
+    from function `assert_output' in file test_helper.bash, line 74,
+    from function `assert_success' in file test_helper.bash, line 49,
+    in test file rbenv.bats, line 75)
+     `assert_success "${RBENV_ROOT}/rbenv.d:${BATS_TEST_DIRNAME%/*}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"' failed
+   expected: TEST_DIR/root/rbenv.d:/Users/myusername/Workspace/OpenSource/rbenv/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks
+   actual:   /Users/myusername/Workspace/OpenSource/rbenv/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks
+
+11 tests, 2 failures
+```
+
+The above 2 failures include the test we're currently examining as well as the next one, meaning that test also covers this same line of code.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Last test:
 
@@ -238,63 +533,27 @@ Last test:
 }
 ```
 
-Here we unset `RBENV_HOOK_PATH`, run the command, assert that it was successful, and assert that the printed output matched a certain series of directories, delimited by the ":" character.
+Here we do the following:
 
-I'm reasonably certain that this test covers the block of code [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81), from lines 81-91.  But it's a bit hard to follow how each directory in `RBENV_HOOK_PATH` ends up where it is.  To clarify this, I decide to `echo` some lines to a file.  I update the `rbenv` command to look like the following:
+ - unset `RBENV_HOOK_PATH`,
+ - run the command,
+ - assert that it was successful, and
+ - assert that the printed output references the following directories, delimited by the ":" character:
+    - `${RBENV_ROOT}/rbenv.d`
+    - `${BATS_TEST_DIRNAME%/*}/rbenv.d`
+    - `/usr/local/etc/rbenv.d`
+    - `/etc/rbenv.d`
+    - `/usr/lib/rbenv/hooks`
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar2023-121pm.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="updating the code for experimentation's sake">
-</p>
+This test covers the block of code [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81-L91){:target="_blank" rel="noopener"}.  We can see that the order of the above directories matches the order in which they're added to `RBENV_HOOK_PATH` by the code:
 
-And I update the test to look like the following:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar2023-122pm.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="updating the code for experimentation's sake">
-</p>
-
-When I run the test, and `cat` the output file `foo.txt`, I see the following:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar2023-123pm.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="updating the code for experimentation's sake">
-</p>
-
-The first version of `RBENV_HOOK_PATH` that we see is:
-
-```
-RBENV_HOOK_PATH #1: :/var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/rbenv.Nbj/root/rbenv.d
-```
-
-This seems to equal the value of `RBENV_ROOT` that was printed to the screen, with `/rbenv.d` appended to the end.  That matches the logic of [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81).
-
-The next version of `RBENV_HOOK_PATH` that we see is:
-
-```
-RBENV_HOOK_PATH #2: :/var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/rbenv.Nbj/root/rbenv.d:/Users/myusername/Workspace/OpenSource/rbenv/rbenv.d
-```
-
-This matches the previous value of `RBENV_HOOK_PATH #1`, plus everything from `bin_path` *except for* the final "/libexec" from `bin_path`.  Instead of that missing last part, we have "/rbenv.d" at the end.  This matches the logic of [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L84).
-
-The next version of `RBENV_HOOK_PATH` that we see is:
-
-```
-RBENV_HOOK_PATH #3: :/var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/rbenv.CGK/root/rbenv.d:/Users/myusername/Workspace/OpenSource/rbenv/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks
-```
-
-This matches the previous value of `RBENV_HOOK_PATH #2`, if the string `:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks` were appended to the end.  This matches the logic of [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L86).
-
-The next version of `RBENV_HOOK_PATH` that we see is:
-
-```
-RBENV_HOOK_PATH #5: /var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/rbenv.CGK/root/rbenv.d:/Users/myusername/Workspace/OpenSource/rbenv/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks
-```
-
-This matches the previous value of `RBENV_HOOK_PATH #3` that we saw, except that the leading ":" character is removed from the beginning.  That matches the logic of [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L90).
-
-Comparing `RBENV_HOOK_PATH #5` with `expected_output` shows that they are exactly the same string.  So this explains why each directory ends up in its given location.  Cool, that was helpful.
+ - [This line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81) adds `${RBENV_ROOT}/rbenv.d` to the front of `RBENV_HOOK_PATH`.  It would also add any previously-set value of `RBENV_HOOK_PATH` before `${RBENV_ROOT}/rbenv.d` if we had previously set such a value, but we didn't in this test.
+ - [This block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L82-L85) adds `${BATS_TEST_DIRNAME%/*}/rbenv.d` to `RBENV_HOOK_PATH`.
+ - Lastly, [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L86) adds `/usr/local/etc/rbenv.d`, `/etc/rbenv.d`, and `/usr/lib/rbenv/hooks` to `RBENV_HOOK_PATH`.
 
 That's all for the `rbenv` command's tests.  Let's move onto the code.
 
-## [Code](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv)
+## [Code](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv){:target="_blank" rel="noopener"}
 
 This file's first line is:
 
@@ -302,7 +561,9 @@ This file's first line is:
 #!/usr/bin/env bash
 ```
 
-This is the shebang, which we're already familiar with.  This tells us that we will be using bash-flavored rules when dictating how the script will be processed.  So no more zsh oddities to Google!
+This is the shebang, which we're already familiar with from Part 1.  This tells us that UNIX will use `bash` to process the script.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 The next line of code is:
 
@@ -310,39 +571,61 @@ The next line of code is:
 `set -e`
 ```
 
-We already know what that is- it tells the interpreter to immediately exit with a non-zero status code as soon as the first error is raised (as opposed to continuing on executing the rest of the file).  So we don't need to spend too much time here.
+We recognize this line from Part 1 as well- it tells the interpreter to immediately exit with a non-zero status code as soon as the first error is raised (as opposed to continuing on executing the rest of the file).
 
-(stopping here for the day; 7774 words)
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next line of code is:
 
 ```
 if [ "$1" = "--debug" ]; then
-```
-
-This feels easier to read, now that we've had some experience with `if` statements and the `[[` / `test` commands.  The one thing I'm unsure about is "$1".  I'm pretty sure it evaluates to one of the arguments that the terminal command was passed, but I'm not sure if it's 0-based or 1-based.  A quick Google should leads us [here](https://web.archive.org/web/20211006091051/https://stackoverflow.com/questions/29258603/what-do-0-1-2-mean-in-shell-script):
-
-<p style="text-align: center">
-  <img src="/assets/images/stackoverflow-answer-positional-arguments.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="StackOverflow answer about positional arguments">
-</p>
-
-So "$1" is the first non-filename argument sent to the script.  Based on this, we can conclude that if the first argument is equal to "--debug", then...do something (TBD in the next line of code).
-
-Speaking of which:
-
-```
-  export RBENV_DEBUG=1
-  shift
+...
 fi
 ```
 
-The `export` statement looks familiar from our discussion on environment variables.  Here we're just setting `RBENV_DEBUG` equal to 1 and exporting it so that it's available to any subsequent code that relies on it, either in this file or another file.
+We recognize the `if` statement and the `[[` syntax from Part 1- we're testing whether `$1` evaluates to the string "--debug".  I suspect that `$1` represents the first argument that gets passed to the command, but I'm not sure if the indexing is 0-based or 1-based.  A quick Google should leads me [here](https://web.archive.org/web/20211006091051/https://stackoverflow.com/questions/29258603/what-do-0-1-2-mean-in-shell-script){:target="_blank" rel="noopener"}:
 
-My understanding of `export` is that, once an environment variable is `export`ed, it's available to *any* other script that needs it.  That makes me wonder if, after I pass `--debug` to this script, whether it would be available to me in the same terminal script where I ran the command, or whether the env var is unset by the time the script completes.  I suspect it wouldn't be available outside this code, especially since [I don't see any code in the repo](https://github.com/rbenv/rbenv/search?p=1&q=RBENV_DEBUG) which unsets `RBENV_DEBUG`, but I'm not sure how that var is wiped away.
+<p style="text-align: center">
+  <img src="/assets/images/stackoverflow-answer-positional-arguments.png" width="90%" style="border: 1px solid black; padding: 0.5em" alt="StackOverflow answer about positional arguments">
+</p>
 
-[The answer I found](https://unix.stackexchange.com/a/28349/142469) says that an `export`ed variable is available in the same script, in a child script, and in a function which is called inside that same script, but not in another sibling script or in a parent process.  A separate, but also helpful, answer says that the processes in which scripts run are organized like a tree, and that an env var which is set in process A will be accessible in process A's script and in any child processes, but not in any parent processes.  Makes sense to me.
+My guess was correct.  Based on this, we can conclude that if the first argument is equal to "--debug", then... what?  Next line of code:
 
-What about `shift`, what does that do?  According to [the docs](https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_09_07.html), when called without params, it trims off the first arg from the array of args passed to the script.  I did a test script to see how it works:
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+```
+  export RBENV_DEBUG=1
+```
+
+We recognize the `export` statement from Part 1.  We set `RBENV_DEBUG` equal to 1, and then export it.
+
+We know from [here](https://unix.stackexchange.com/a/28349/142469){:target="_blank" rel="noopener"} that an `export`ed variable is available in the same script, in a child script, and in a function which is called inside that same script, but not in another sibling script or in a parent process.
+
+[We also know](https://unix.stackexchange.com/a/27568/142469){:target="_blank" rel="noopener"} that the processes in which scripts run are organized like a tree, and that an environment variable which is set in process `A` will be accessible in process `A`'s script and in any child processes, but not in any parent processes.
+
+Next line of code.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+```
+shift
+```
+
+What does `shift` do?  According to [the docs](https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_09_07.html){:target="_blank" rel="noopener"}, when called without params, it trims off the first arg from the array of args passed to the script:
+
+> This command takes one argument, a number. The positional parameters are shifted to the left by this number, N. The positional parameters from N+1 to $# are renamed to variable names from $1 to $# - N+1.
+>
+> Say you have a command that takes 10 arguments, and N is 4, then $4 becomes $1, $5 becomes $2 and so on.  $10 becomes $7 and the original $1, $2 and $3 are thrown away.
+>
+> ...
+>
+> If N is not present, it is assumed to be 1.
+
+I did a test script to see how it works.
+
+### Experiment- the `shift` command
+
+I write a script containing the following code:
 
 ```
 #!/usr/bin/env bash
@@ -350,25 +633,33 @@ What about `shift`, what does that do?  According to [the docs](https://tldp.org
 echo "old arg length: $#"
 echo "old args: $@"
 
+echo
+echo "Calling shift..."
+echo
 shift
 
 echo "new arg length: $#"
 echo "new args: $@"
 ```
 
-When I run it, I get:
+I run it, passing it the args `foo`, `bar`, and `baz`, and I get:
 
 ```
 $ ./foo bar baz buzz
 old arg length: 3
 old args: bar baz buzz
+
+Calling shift...
+
 new arg length: 2
 new args: baz buzz
 ```
 
-Success!  It does what I thought.
+Great, it does what I thought it would- decreases the argument count by 1, and lops the first argument off the front of the list.
 
-So if the user passes `--debug` as their first arg to `rbenv`, we set RBENV_DEBUG and trim the `--debug` flag off the list of args.
+So to summarize the entire `if` block: if the user passes `--debug` as their first arg to `rbenv`, we set RBENV_DEBUG and trim the `--debug` flag off the list of args.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next line:
 
@@ -382,7 +673,9 @@ Since the `-n` flag is passed to the `[` command, I run `man test` and search fo
 -n string     True if the length of string is nonzero.
 ```
 
-OK, so if the length of `$RBENV_DEBUG` is non-zero (aka if it has been set), then do what's inside the `if` block.  Which is:
+So if the length of `$RBENV_DEBUG` is non-zero (i.e. if we just set it), then execute the code inside this `if`-block.  Which is:
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 ```
 # https://wiki-dev.bash-hackers.org/scripting/debuggingtips#making_xtrace_more_useful
@@ -390,57 +683,12 @@ export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 set -x
 ```
 
-The first line of code is a comment, containing a URL which may be helpful later.
+The first line of code is a comment, containing [a link to an article](https://wiki-dev.bash-hackers.org/scripting/debuggingtips#making_xtrace_more_useful){:target="_blank" rel="noopener"} about a program named `xtrace`.  Inside the article, we see the following:
 
-Next line is another `export` statement, and woof, is it ugly.  Let's inspect each of the 4 values inside it, as a first step.  I add 4 `echo` statements to the body of the `if` block:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar2023-133pm.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="Adding more `echo` debugging statements">
-</p>
-
-I then run `rbenv –debug commands` and get:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar2023-135pm.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="Output of the additional `echo` debugging statements">
-</p>
-
-The first 2 lines are fine:
-
-```
-BASH_SOURCE: /usr/local/bin/rbenv
-LINENO: 12
-```
-
-`BASH_SOURCE` resolves to `/usr/local/bin/rbenv`, the file it's currently executing (which I looked up in the terminal using `ls -la`, and is just a symlink to the `libexec/rbenv` file we `vim`ed into).  And `LINENO` outputs `12`, which is the line of code we're on in that file.  But the next 2 lines are weird:
-
-```
-FUNCNAME:
-FUNCNAME[0]: [0]
-```
-
-Not super-clear on what those do.  This may be a case where I `echo`'ed the wrong thing, in which case the above is a red herring.
-
-Let me take a different tack, and search what `PS4` is.  The only line of code in this codebase containing the string `PS4` is the `export` line we're currently reading, so I know `PS4` isn't *directly* referenced anywhere else in the codebase.  That sort of implies to me that `PS4` must be used by something else, probably the system itself, in which case the name `PS4` has a special meaning in bash.
-
-I Google "PS4" and find that I'm right about this.  [This article](https://web.archive.org/web/20220517005905/https://www.thegeekstuff.com/2008/09/bash-shell-take-control-of-ps1-ps2-ps3-ps4-and-prompt_command/) says that "The PS4 shell variable defines the prompt that gets displayed, when you execute a shell script in debug mode...  It also says that "PS4 (is used) by 'set -x' to prefix tracing output", which relates to the line of code after the `export` line we're currently on.
-
-So when I see lines like the following in the output of `rbenv –debug commands`:
-
-```
-+(/usr/local/bin/rbenv:24): enable -f /usr/local/Cellar/rbenv/1.2.0/libexec/rbenv-realpath.dylib realpath
-+(/usr/local/bin/rbenv:55): '[' -z '' ']'
-+(/usr/local/bin/rbenv:56): RBENV_ROOT=/Users/myusername/.rbenv
-```
-The `+(/usr/local/bin/rbenv:56): ` comes from `+(${BASH_SOURCE}:${LINENO}): `.
-
-And therefore, `RBENV_ROOT=/Users/myusername/.rbenv` comes from `${FUNCNAME[0]:+${FUNCNAME[0]}(): }`?  This is still really hard to read.
-
-I remember that, luckily, there was a URL mentioned in the comment of this block of code.  Maybe that URL will help me understand what's happening here?
-
-[One of the first things I read](https://archive.ph/l0HmS) on that URL is:
-
-> `xtrace` output would be more useful if it contained source file and line number. Add this assignment PS4 at the beginning of your script to enable the inclusion of that information:
+> #### Making xtrace more useful
+> (by AnMaster)
 >
+> xtrace output would be more useful if it contained source file and line number. Add this assignment PS4 at the beginning of your script to enable the inclusion of that information:
 >
 > `export PS4='+(${BASH_SOURCE:-}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'`
 >
@@ -455,143 +703,187 @@ I remember that, luckily, there was a URL mentioned in the comment of this block
 > `+(somefile.bash:412): myfunc(): echo 'Hello world'`
 >
 > That helps a lot when the script is long, or when the main script sources many other files.
-
-Oh, I think I see.  Because we aren't currently inside a function, we don't see `FUNCNAME[0]` by itself.  But if we were, we'd see the name of that function.
-
-—-----
-
-I kept noticing the phrase `xtrace` being thrown around on some of the links I encountered while trying to solve the above.  I Googled "what is xtrace bash", and found [this link](https://unix.stackexchange.com/questions/536263/turn-on-xtrace-with-environment-variable), which says:
-
-<p style="text-align: center">
-  <img src="/assets/images/stackoverflow-answer-12mar2023-138pm.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="StackOverflow answer about `xtrace`">
-</p>
-
-One interesting sentence here is "if you turn on the "-x" option... Bash outputs each line of script as it executes it."  It's interesting partly because we *didn't* see *every* line of code that was executed.  We only saw a *subset* of them.  For example, in the series of output lines I quoted above:
-
 ```
-+(/usr/local/bin/rbenv:24): enable -f /usr/local/Cellar/rbenv/1.2.0/libexec/rbenv-realpath.dylib realpath
-+(/usr/local/bin/rbenv:55): '[' -z '' ']'
-+(/usr/local/bin/rbenv:56): RBENV_ROOT=/Users/myusername/.rbenv
-```
-The first line number is 24, and the next line number is 55.  Line 24 in the output is not the same as line 24 in the Github file, but I'm guessing that's just because the interpreter strips out all the comment lines (including the 1-line shebang) before it calculates the interpreted line numbers.  But why does it skip from 24 to 55?
 
-Oh, I think I see.  The reason it skips is, perhaps, because we enter into the `if` block, not the `else` block, and the `if` block just defines a function, and a function definition doesn't actually execute any code.  The next line of code after the `if/else` logic is, in fact, the `if [ -z "${RBENV_ROOT}" ]; then` code on (what it thinks is) line 55.
+The article mentions that, by setting an environment variable called `PS4` equal to some complicated string, the output of our command line will look different.
 
-—-----
+So what is PS4, and what does it do?
 
-OK, so to sum it up so far, if `$RBENV_DEBUG` has a length greater than zero (aka if debug mode is turned on), then we reset the debug-mode shell prompt to print out the line of code, and the command that's currently being executed.
+I try `man PS4` but get no answer.  I Google "PS4 bash", and I open up [the first result I see](https://web.archive.org/web/20230304080135/https://www.thegeekstuff.com/2008/09/bash-shell-take-control-of-ps1-ps2-ps3-ps4-and-prompt_command/).  It mentions not only PS4, but also PS1, PS2, and PS3.  I scroll down to the section on PS4 and I see:
 
-One additional tidbit I learned was from [this link](https://web.archive.org/web/20220727073711/https://www.shell-tips.com/bash/prompt/#gsc.tab=0), which says "The default value (of $PS4) is "+". The first character of the $PS4 expanded value is replicated for each level of indirection."
+> PS4 – Used by "set -x" to prefix tracing output
+>
+> The PS4 shell variable defines the prompt that gets displayed, when you execute a shell script in debug mode as shown below.
 
-This seems to imply that the prompt will replicate the first character of $PS4 (a `+` character in my case, and in the new over-ridden $PS4 value above) once for each level of nesting / abstraction we're in.  However, that doesn't seem to happen when I try the test script below:
+OK, so we're updating the prompt which is displayed when `set -x` is executed.  That makes sense, because right after we set `PS4` inside our file, the next line is `set -x`.
+
+But what are we updating `PS4` to?
+
+Judging by the dollar-sign-plus-curly-brace syntax, there appears to be some parameter expansion happening here.  On a hunch, I try an experiment.
+
+### Experiment- `BASH_SOURCE` and `LINENO`
+
+I make a script named `foo` with the first half of our `PS4` value, i.e. everything before the space in the middle:
 
 ```
 #!/usr/bin/env bash
 
-function baz() {
-  echo "inside baz"
+echo "+(${BASH_SOURCE}:${LINENO}):"
+```
+
+When I `chmod` and run it, I get:
+
+```
+$ chmod +x foo
+
+$ ./foo
+
++(./foo:3):
+```
+
+So the `+(`, `:`, and `):` don't do anything special- they're literal characters which get printed directly to the screen.  That leaves `${BASH_SOURCE}`, which looks like it gets evaluated to `./foo`, and `${LINENO}`, which looks like it resolves to `3`.
+
+What about the 2nd half of `PS4`?
+
+```
+${FUNCNAME[0]:+${FUNCNAME[0]}(): }
+```
+
+After Googling `FUNCNAME`, I find [the online `man` page entry](https://web.archive.org/web/20230322221925/https://www.man7.org/linux/man-pages/man1/bash.1.html){:target="_blank" rel="noopener"} for `FUNCNAME`:
+
+```
+FUNCNAME
+              An array variable containing the names of all shell
+              functions currently in the execution call stack.  The
+              element with index 0 is the name of any currently-
+              executing shell function.  The bottom-most element (the
+              one with the highest index) is "main".  This variable
+              exists only when a shell function is executing.
+              Assignments to FUNCNAME have no effect.  If FUNCNAME is
+              unset, it loses its special properties, even if it is
+              subsequently reset.
+```
+
+So `FUNCNAME` is an array variable.  That explains why we're invoking `FUNCNAME[0]` inside the parameter expansion syntax.  And it "contain(s) the names of all shell functions currently in the execution call stack."  Lastly, it "...exists only when a shell function is executing."
+
+So how can I reproduce this behavior?  Let's try another experiment.
+
+### Experiment- attempting to print `FUNCNAME`
+
+I make a script named `foo`, which looks like this:
+
+```
+#!/usr/bin/env bash
+
+bar() {
+  for method in "${FUNCNAME[@]}"; do
+    echo "$method"
+  done
+  echo "-------"
 }
 
-function foo() {
-  echo "inside foo"
-  (baz);
+foo() {
+  for method in "${FUNCNAME[@]}"; do
+    echo "$method"
+  done
+  echo "-------"
+  bar
 }
 
-function bar() {
-  echo "inside bar"
-  (foo);
-}
-
-set -x
-
-bar;
+foo
 ```
 
-I was expecting something like the following, or similar:
+It implements two functions, one named `foo` and one named `bar`.  Each function iterates over `FUNCNAME` call stack and prints each item in the call stack.  In addition, `foo` calls `bar`, so `bar` should have one more item in its callstack than `foo` does.
+
+When I run `foo`, I get:
 
 ```
-+ bar
-+ echo 'inside bar'
-inside bar
-++ foo
-++ echo 'inside foo'
-inside foo
-+++ baz
-+++ echo 'inside baz'
-inside baz
+$ ./foo
+foo
+main
+-------
+bar
+foo
+main
+-------
 ```
 
-But instead, I see:
+Success- `bar` had one more item printed than `foo` did, just like we hoped.
+
+Getting back to the 2nd half of the `PS4` value:
 
 ```
-+ bar
-+ echo 'inside bar'
-inside bar
-+ foo
-+ echo 'inside foo'
-inside foo
-+ baz
-+ echo 'inside baz'
-inside baz
+${FUNCNAME[0]:+${FUNCNAME[0]}(): }
 ```
 
-In other words, I never see more than one "+" per line, regardless of how deep inside the call stack I am.  So what does "level of indirection" mean here?
+We see `${ ... }`, so we know we're dealing with parameter expansion again.  And if we take out the two references to `FUNCNAME[0]` (which we know will equal the current function **if we're currently inside a function**), then we're left with `${__:+__():}`.
 
-[I post another StackExchange question](https://unix.stackexchange.com/questions/715831/ps4-in-bash-how-can-i-reproduce-the-level-of-indirection-behavior-mentioned), and eventually I get [an answer](https://unix.stackexchange.com/a/715835/142469):
+I'm curious what `:+` means, so I look for these two characters in [the parameter expansion docs](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"}.  I see:
 
+> ${parameter:+word}
+>
+> If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
+>
+> ```
+> $ var=123
+> $ echo ${var:+var is set and not null}
+> var is set and not null
+> ```
+
+So you can pass in a variable, and if that variable is set, `bash` will print whatever string you give it.  That seems to be what's happening here, except instead of checking for `var`, we're checking for `FUNCNAME[0]`.  If it's set, we print its value, followed by `():`.
+
+And that actually fits with what we were told by the article that was linked in the code comment.  It said the terminal would appear...
+
+> ...like this when you trace code inside a function:
+>
+> `+(somefile.bash:412): myfunc(): echo 'Hello world'`
+
+The `myfunc():` before `echo 'Hello world'` is our value of `FUNCNAME[0]` in the example.
+
+Does all that pan out when we actually run `rbenv` with the `--debug` flag?  Let's try with `rbenv --debug version`:
+
+```
+$ rbenv --debug version
+```
+
+There's a ton of output.  Below is one line from that output which comes from *outside* of a function...
+
+```
++(/Users/myusername/.rbenv/bin/rbenv:73): shopt -s nullglob
+```
+
+...and another which comes from *inside* a function:
+
+```
+++(/Users/myusername/.rbenv/bin/rbenv:41): abs_dirname(): local path=/Users/myusername/.rbenv/bin/rbenv
+```
+
+Although we haven't yet reached these lines of code and don't yet know what they do, the format of the output does line up with what we've learned about our new `PS4` value.
+
+### Aside- what is `xtrace`?
+
+I kept noticing the phrase `xtrace` being thrown around on some of the links I encountered while trying to solve the above.  I Googled "what is xtrace bash", and found [this link](https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_02_03.html), which says:
 
 <p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar2023-141pm.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="StackOverflow answer">
+  <img src="/assets/images/stackoverflow-answer-12mar2023-138pm.png" width="100%" style="border: 1px solid black; padding: 0.5em" alt="StackOverflow answer about `xtrace`">
 </p>
 
-I try the suggested script and I get the same results that the commenter mentioned.  Success!
+That's a lot, but the bottom table shows the short notation of `set -x` corresponds to the long notation of `set -o xtrace`, or "set the xtrace option".  So `xtrace` is the name of a mode in bash.
 
-So what is `eval` in bash?
+And the cool thing is, you don't have to enable `set -x` only at the beginning of the script, like RBENV's code does.  According to the above link from TLDP, you can enable it and disable it anywhere you want in your code, as many times as you want.
 
-From [The Linux Documentation Project](https://web.archive.org/web/20220824231216/https://tldp.org/LDP/abs/html/internal.html):
+So if you're trying to debug something tricky and you want to avoid getting overloaded with `PS4` output for every line of your code, you can turn it on for just the buggy section of your code, and turn it off immediately after.  Sounds useful!
 
-> eval
->
-> eval   arg1   [arg2]   ...   [argN]
->
-> Combines the arguments in an expression or list of expressions and evaluates them. Any variables within the expression are expanded. The net result is to convert a string into a command.
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
-And from [StackOverflow](https://stackoverflow.com/questions/11065077/the-eval-command-in-bash-and-its-typical-uses):
+So summarizing the first 2 blocks of code: we first check if the user passed `--debug` as the first argument.  If they do:
 
-> `eval` takes a string as its argument, and evaluates it as if you'd typed that string on a command line.
+ - we set the `RBENV_DEBUG` env var.
+ - Then in the 2nd block, if the `RBENV_DEBUG` env var has been set:
+    - we change the terminal prompt to output more useful version of `PS4`, and
+    - we call `set -x` to put bash into debug mode.
 
-And lastly, in [ComputerHope](https://web.archive.org/web/20220524230137/https://www.computerhope.com/unix/bash/eval.htm):
-
-> It's similar to running `bash -c "string"`, but `eval` executes the command in the current shell environment rather than creating a child shell process.
-
-Now my question is: why would you need to call `eval` and pass it a command?  Why not just call the command itself?
-
-It seems like that could be tricky to accomplish, for example if part of the command that `exec` would run is the first command in the string.  Ex.:
-
-```
-command="echo 'Hello world'"
-eval $command
-```
-
-How would one run `command` without `eval`, in this case?
-
-[The ComputerHope post](https://web.archive.org/web/20220524230137/https://www.computerhope.com/unix/bash/eval.htm) has more examples:
-
-<p style="text-align: center">
-  <img src="/assets/images/computerhope-post-on-eval-12mar2023.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="More info on the `eval` command">
-</p>
-
-This `ssh-agent` example is actually pretty similar to the way `rbenv init` is called, i.e. by adding `eval "$(rbenv init -)"` to your `.zshrc` file.
-
-Question: Why do we need the `-` character in `eval "$(rbenv init -)"`?  And why do we need to call `rbenv init` inside `eval` at all?  Why not just call it by itself?
-
-Oh wait, I think I remember I answered this for myself already.  One of the things that the `rbenv init` does is `echo` certain executable commands to the screen, so that `eval` can execute them.  I can investigate further why they need to be `echo`ed instead of just run in-line, but a) I'm sure the authors had their reasons, and b) I don't want to get too side-tracked from my main goal of understanding the current file.  I will get to those other files in due course.
-
-—--------
-
-So summarizing the first 2 blocks of code: we first check if the user passed `--debug` as the first argument.  If they do, we set the `RBENV_DEBUG` env var.  Then in the 2nd block, if the `RBENV_DEBUG` env var has been set, we change the terminal prompt to output more useful information (such as the stack trace including the filename and line of code, and the current code being executed) and we call `set -x` to put bash into debug mode.
-
-But why do we need to separate these steps into different blocks of code?  Why didn't we just do something like the following:
+But why do we need to separate these steps into different blocks of code?  Why didn't we just combine them, like so:
 
 ```
 if [ "$1" = "--debug" ]; then
@@ -600,77 +892,118 @@ if [ "$1" = "--debug" ]; then
 fi
 ```
 
-In other words, combine the conditional check of the 1st `if` block and body of the 2nd `if` block?
-
 The reason is because we need to `export` the `RBENV_DEBUG` environment variable so that other commands can access it for their own purposes.
 
-(stopping here for the day; 9444 words)
+If we look for `RBENV_DEBUG` throughout the codebase, we can see it used in multiple locations:
+
+<center style="margin-bottom: 3em">
+  <img src="/assets/images/screenshot-24mar2023-623pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
+</center>
+
+All of the line numbers are pretty low: I see lines 4, 5, 6, 11, 10, 4, etc.  So it looks like at the start of all these files, we check if `RBENV_DEBUG` has been set, and if it has, we invoke `xtrace` via the `set -x` command.  This implies that you can't just turn on `xtrace` in an entry script and expect it to remain on in any child scripts that the parent invokes.  Rather, you need to turn it on for each file that you expect to run.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next line of code is:
 
 ```
 abort() {
-...}
+  { if [ "$#" -eq 0 ]; then cat -
+    else echo "rbenv: $*"
+    fi
+  } >&2
+  exit 1
+}
 ```
 
-This just declares (but doesn't actually call) a function named `abort`.  Nothing surprising here.
-
-
-Next line of code is:
+This declares a function named `abort`.  There's a block of code surrounded with curly braces, with `>&2` appended to the end:
 
 ```
   { if [ "$#" -eq 0 ]; then cat -
   ...  } >&2
 ```
 
-A couple questions here:
+I'm a bit thrown off by this syntax here. Why is this code...
 
-First, what does "$#" evaluate to?  According to [StackOverflow](https://web.archive.org/web/20211120050118/https://askubuntu.com/questions/939620/what-does-mean-in-bash):
+```
+if [ "$#" -eq 0 ]; then cat -
+    else echo "rbenv: $*"
+    fi
+```
+
+...wrapped inside this code?
+
+```
+{
+...
+} >&2
+```
+
+Let's start on the outside and work our way in.  What is the function of the curly braces?
+
+I Google "curly braces bash", and the first result I get is [this one from Linux.com](https://web.archive.org/web/20230306114329/https://www.linux.com/topic/desktop/all-about-curly-braces-bash/){:target="_blank" rel="noopener"}, which sounds promising.  I scan through the article looking for syntax which is similar to what we're doing, and along the way I learn some interesting but unrelated stuff (for instance, `echo {10..0..2}` will print every 2nd number from 10 down to 0 in your terminal).
+
+Finally I get to the last section of the article, called "Output Grouping".  It's here that I learn that "...you can also use `{ ... }` to group the output from several commands into one big blob."
+
+<center style="margin-bottom: 3em">
+  <img src="/assets/images/screenshot-25mar2023-937am.png" width="100%" style="border: 1px solid black; padding: 0.5em" alt="...you can also use `{ ... }` to group the output from several commands into one big blob.">
+</center>
+
+Cool, mystery solved- we're capturing the output of everything inside the curly braces, so we can output it all together (instead of just the last statement).
+
+Next question- what is `>&2` at the end there?  In the above example, we were redirecting all the output to a file, but that doesn't look like what we're doing here since there's no filename to send things to.
+
+I Google ">&2 bash".  The first result is from [StackExchange](https://askubuntu.com/questions/1182450/what-does-2-mean-in-a-shell-script){:target="_blank" rel="noopener"}:
+
+> Using > to redirect output is the same as using 1>. This says to redirect stdout (file descriptor 1).
+>
+> Normally, we redirect to a file. However, we can use >& to redirect to stdout (file descriptor 1) or stderr (file descriptor 2) instead.
+>
+> Therefore, to redirect stdout (file descriptor 1) to stderr (file descriptor 2), you can use >&2
+
+Hmmm, so we're redirecting the output of whatever is inside the curly braces, and sending it to stderr.
+
+TODO: answer what STDIN, STDOUT, and STDERR are here.
+
+Let's now move on to the code inside the curlies, and work our way out.
+
+First question- what does `$#` evaluate to?  According to [StackOverflow](https://web.archive.org/web/20211120050118/https://askubuntu.com/questions/939620/what-does-mean-in-bash):
 
 > `echo $#` outputs the number of positional parameters of your script.
 
-So `[ "$#" -eq 0 ]` means "if the # of positional parameters is equal to zero".
+So `[ "$#" -eq 0 ]` means "if the # of positional parameters is equal to zero"?  Let's test that with an experiment.
 
-But whose positional parameters are we talking about- the `abort` function's params, or rbenv's params?
+### Experiment- counting parameters
 
-I try a simple function definition in my terminal:
-
-```
-function foo() {
-  if [ "$#" -eq 0 ]; then
-    echo 'no args given';
-  else
-    echo "$# args given";
-  fi
-}
-```
-
-I then run it a few times:
-
-```
-$ foo
-no args given
-$ foo bar baz
-2 args given
-```
-
-OK, so we *might* be talking about the # of args sent to `abort`.  To get more info, I try putting the above function inside a script file named "foo":
+I write the following script, named `foo`:
 
 ```
 #!/usr/bin/env bash
 
-function foo() {
-  if [ "$#" -eq 0 ]; then
-    echo 'no args given';
-  else
-    echo "$# args given";
-  fi
-}
-
-foo "$@"
+if [ "$#" -eq 0 ]; then
+  echo "no args given"
+else
+  echo "$# args given"
+fi
 ```
 
-I then run it as follows:
+When I run it with no args, I see:
+
+```
+$ ./foo
+
+no args given
+```
+
+When I run it with one arg, I see:
+
+```
+$ ./foo bar
+
+1 args given
+```
+
+And when I run it with multiple args, I see:
 
 ```
 $ ./foo bar baz
@@ -678,32 +1011,62 @@ $ ./foo bar baz
 2 args given
 ```
 
-OK, so we therefore *must* be talking about the # of args passed to `abort`.
+Good enough for me!  I think we can conclude that `[ "$#" -eq 0 ]` returns true if the number of args is equal to zero.
 
-NOTE FROM RICHIE- verify that the above is correct.
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
-Second, What is `cat -`?
+But whose positional parameters are we talking about- the `abort` function's params, or rbenv's params?
+
+I try wrapping my experiment code in a simple function definition:
+
+```
+function myFunc() {
+  if [ "$#" -eq 0 ]; then
+    echo 'no args given';
+  else
+    echo "$# args given";
+  fi
+}
+
+shift
+
+myFunc "$@"
+```
+
+Using the knowledge of `shift` that we learned from the `PS4` discussion, I `shift` one arg off the list of args sent to my `foo` script, and then I call `myFunc`.  If `$#` refers to the number of args sent to the file, then the `shift` shouldn't have any effect.  But if it refers to the # of args sent to `myFunc`, then we'll see the count number be one less than we sent to the file.
+
+When I run the script file with multiple args, I see:
+
+```
+$ ./foo bar baz
+
+1 args given
+```
+
+We passed 2 args, but `1 args given` was our output.  So we therefore *must* be talking about the # of args passed to `abort`.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Back to our block of code:
+
+```
+  { if [ "$#" -eq 0 ]; then cat -
+  ...  } >&2
+```
+
+So if the number of args we pass to `abort` is 0, then we execute `cat -`.  What is `cat -`?
 
 I type `help cat` in my terminal, and get the following:
 
 > The `cat` utility reads files sequentially, writing them to the standard output.  The file operands are processed in command-line order.  If file is a single dash ('-') or absent, `cat` reads from the standard input.
 
-OK, so if there are no args passed to `abort`, then we read from standard input.  Not sure why, though.  Maybe it'll become clearer if we continue reading the code.
-
-Last question about this code snippet: what is `>&2` at the end there?
-
-From [StackExchange](https://askubuntu.com/questions/1182450/what-does-2-mean-in-a-shell-script):
+OK, so if there are no args passed to `abort`, then we read from standard input.  We don't yet know why, though, at least not by looking at just this code.  Maybe it'll become clearer if we continue reading.  Before moving on, I start a list of unanswered questions to keep track of:
 
 ```
-Using > to redirect output is the same as using 1>. This says to redirect stdout (file descriptor 1).
+Unanswered questions:
 
-Normally, we redirect to a file. However, we can use >& to redirect to stdout (file descriptor 1) or stderr (file descriptor 2) instead.
-
-Therefore, to redirect stdout (file descriptor 1) to stderr (file descriptor 2), you can use >&2
+1. Why do we read from standard input if the # of arguments passed to `abort()` is zero?
 ```
-Hmmm, so we're redirecting the output of whatever is inside the curly braces, and sending it to stderr.
-
-TODO: answer what STDIN, STDOUT, and STDERR are here.
 
 Next line of code is:
 
