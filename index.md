@@ -14,9 +14,7 @@ I have a theory that this understanding will help people who suffer from imposto
 
 # Who is this site for?
 
-Any developer who aspires to level up, but who feels like working on mission-critical open-source apps is "out of their league".  If you've ever said to yourself "I'd never be able to understand (codebase XYZ), only rockstar 10x ninjas* can grok that", this site is for you.
-
-\* do people still talk like that?
+Any developer who aspires to level up, but who feels like working on mission-critical open-source apps is "out of their league".  If you've ever said to yourself "Maybe an engineering manager or a staff engineer could grok that, but I'd never be able to", this site is for you.
 
 # Who is this site *not* for?
 
