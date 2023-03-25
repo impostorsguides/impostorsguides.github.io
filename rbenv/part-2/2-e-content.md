@@ -1222,21 +1222,19 @@ We were lucky here, because the function we were studying is called throughout t
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
-[Next line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L23) is:
+[Next line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L23){:target="_blank" rel="noopener"} is:
 
 ```
 if enable -f "${BASH_SOURCE%/*}"/../libexec/rbenv-realpath.dylib realpath 2>/dev/null; then
 ```
 
-(stopping here for the day; 10545 words)
-
 Reading this line, I ask myself a few questions:
 
-What does the `enable` command do?
-What does its `-f` flag mean?
-What are the command's positional arguments?
-What does `2>/dev/null` do?
-What kind of file extension is `.dylib`?  What does that imply about the contents of the file?
+ - What does the `enable` command do?
+ - What does its `-f` flag mean?
+ - What are the command's positional arguments?
+ - What does `2>/dev/null` do?
+ - What kind of file extension is `.dylib`?  What does that imply about the contents of the file?
 
 I type both `man enable` and `help enable` in my terminal, but each time I see `No manual entry for enable`.  Looks like I only have Google to turn to.
 
