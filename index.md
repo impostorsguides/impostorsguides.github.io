@@ -1,9 +1,8 @@
 ---
 layout: home
 permalink: /
+title: This site, in 10 seconds
 ---
-
-# This site, in 10 seconds
 
 This is "David and Goliath" on Github.
 
