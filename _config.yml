@@ -20,7 +20,7 @@
 header_pages:
  - resources
 
-title: The Impostor's Guide To Software Engineering
+title: Impostor's Guides
 description: >- # this means to ignore newlines until "baseurl:"
   A resource for people who want to become better developers and engineers.
 baseurl: "" # the subpath of your site, e.g. /blog
