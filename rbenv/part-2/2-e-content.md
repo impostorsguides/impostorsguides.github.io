@@ -1581,73 +1581,52 @@ OK, simple enough!
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
-Moving on to the first line of the `else` block:
+Moving on to the `else` block:
+
+```
+[ -z "$RBENV_NATIVE_EXT" ] || abort "failed to load \`realpath' builtin"
+
+READLINK=$(type -p greadlink readlink 2>/dev/null | head -n1)
+[ -n "$READLINK" ] || abort "cannot find readlink - are you missing GNU coreutils?"
+
+resolve_link() {
+  $READLINK "$1"
+}
+
+abs_dirname() {
+  local cwd="$PWD"
+  local path="$1"
+
+  while [ -n "$path" ]; do
+    cd "${path%/*}"
+    local name="${path##*/}"
+    path="$(resolve_link "$name" || true)"
+  done
+
+  pwd
+  cd "$cwd"
+}
+```
+
+This is a lot.  We'll process it in steps, but it looks like we're doing something similar here (defining a function named `abs_dirname`), albeit this time with a bit of setup beforehand.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+First line of this block of code is:
 
 ```
 [ -z "$RBENV_NATIVE_EXT" ] || abort "failed to load \`realpath' builtin"
 ```
 
-So if the test inside the single square brackets is falsy, then we `abort` with the quoted error message.  But what is that test?  And why is there a single, escaped backtick before `realpath`, followed by a lone single-quote?  Why not just have opening and closing single-quotes?
+Judging by the `||` symbol, we know that if the test inside the single square brackets is falsy, then we `abort` with the quoted error message.
 
-The first question is easy enough to answer.  We just run `help test` in our terminal again, and search for `-z` using the forward-slash syntax.  We get:
+But what is that test?  To find out, we run `help test` in our terminal again, and search for `-z` using the forward-slash syntax.  We get:
 
 >  -z string     True if the length of string is zero.
 
-OK, so if the `$RBENV_NATIVE_EXT` environment variable is empty, then the test is truthy.  If that env var has already been set, then the test is falsy, and we would abort.
+OK, so if the `$RBENV_NATIVE_EXT` environment variable is empty, then the test is truthy.  If that env var has already been set, then the test is falsy, and we would abort using our previously-defined function, which triggers a non-zero exit.
 
-I'm not sure that my 2nd question is super-important, but I'm also not sure that it's *not* important.  On the surface, it *seems* to relate to the specifics of how the text of the error message is resolved, which doesn't feel like a blocker to me making progress right now.  Nevertheless, it wouldn't hurt to spend 5-10 minutes spiking on what the purpose of the single backtick is.  Who knows, it could lead to something surprising!
-
-Let's try copy-pasting the code after the `||` symbol into a new terminal window:
-
-```
-$ abort "failed to load \`realpath' builtin"
-zsh: command not found: abort
-```
-
-Oh, right.  This `abort` command is actually a function that we defined earlier in this file.  No worries, let's copy that entire function into our terminal and re-run the above code:
-
-<p style="text-align: center">
-  <img src="/assets/images/abort-command-in-terminal-12mar2023.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-Everything from `Saving session... onwards appears to happen in my terminal due to running `exit 1`.  I verified this by opening another new terminal and just running `exit 1` by itself:
-
-<p style="text-align: center">
-  <img src="/assets/images/typing-exit-1-into-terminal-12mar2023.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="typing `exit 1` into the terminal">
-</p>
-
-You might well see something different in your terminal, depending on what your terminal startup scripts are (i.e. what's in your .zshrc and .zshenv files).
-
-Oh right!  There's a difference between how zsh and bash operate!  I forgot that I'm supposed to be running tests like this in a bash script, since the "rbenv" file has a bash shebang.  Doy!
-
-Sometimes I beat myself up over forgetting stuff like this.  It's hard to realize that I'm making the same mistakes more than once- it makes me feel like I'm not making forward progress.  And it's something that one of my less-compassionate former managers criticized me for, on more than one occasion.  So when I beat myself up over this, it's their voice I hear in my head, saying "Maybe you're not cut out for this.  Maybe you should go do something else."  Part of why I'm doing this project is to prove them wrong.  Everytime I learn something new or have an a-ha moment, I like to imagine them getting miffed and storming away in a huff.  It's petty, I know.  I'd love it if they weren't living rent-free in my head.  Maybe someday I'll grow out of this and become a better person.  Until then, this is what I have to keep me going lol.
-
-OK, I'll re-run the above tests in my "foo" bash script:
-
-```
-#!/usr/bin/env bash
-
-abort() {
-  {
-    if [ "$#" -eq 0 ]; then cat -
-      else echo "rbenv: $*"
-    fi
-  } >&2
-  exit 1
-}
-
-abort "failed to load \`realpath' builtin"
-```
-
-Running the above results in:
-
-```
-$ ./foo
-rbenv: failed to load `realpath' builtin
-$
-```
-
-So our terminal process doesn't get killed when we run the above script.  The process that gets killed when the script runs `exit 1` is the process that our terminal creates (or "spawns", in terminal-speak) when it runs the script.  But when we copy-paste the above script directly in our terminal, then the process that runs the code is the same as the process that's running our terminal tab, so that's why we saw that `[Process completed]` output (and also why we were no longer able to type commands into that terminal tab).
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next line of code:
 
@@ -1655,89 +1634,71 @@ Next line of code:
   READLINK=$(type -p greadlink readlink 2>/dev/null | head -n1)
 ```
 
-So we're setting a variable called `READLINK` equal to...something.  I'll try to figure out what that is momentarily, but first- why is this variable capitalized here?  I thought capitalization was a convention that is reserved for environment variables, but this variable isn't `export`ed here.  I search for `READLINK` in all-caps elsewhere in the codebase, and I see the following:
+So we're setting a variable called `READLINK` equal to...something.
 
-<p style="text-align: center">
-  <img src="/assets/images/gh-screenshot-12mar2023-517pm.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="Searching the Github repo">
-</p>
+I decide to look up the commit which introduced this line of code.  I do my `git blame / git checkout` dance until [I find it in Github](https://github.com/rbenv/rbenv/commit/81bb14e181c556e599e20ca6fdc86fdb690b8995).  The commit message reads:
 
-Of the all-caps results in Github search tool (i.e. the first 3 out of 4 files), not one of them uses a value declared by another file.  So we're definitely not working with an environment variable here.  So why the caps?
+> `readlink` comes from GNU coreutils.  On systems without it, rbenv used to spin out of control when it didn't have `readlink` or `greadlink` available because it would re-exec the frontend script over and over instead of the worker script in libexec.
 
-I think I may be right on this, judging by [this StackOverflow post](https://web.archive.org/web/20220812210953/https://stackoverflow.com/questions/673055/correct-bash-and-shell-script-variable-capitalization):
-
-<p style="text-align: center">
-  <img src="/assets/images/so-screenshot-12mar2023-518pm.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="StackOverflow post about upper casing for environment variables">
-</p>
-
-> If it's your variable, lowercase it.  If you export it, uppercase it.
-
-So I'm *somewhat* more convinced that `READLINK` should ideally be lower-cased, but I'm not *completely* convinced.  For the sake of completeness, I decide to look up the commit which introduced this line of code.  I do my `git blame / git checkout` dance until [I find it in Github](https://github.com/rbenv/rbenv/commit/81bb14e181c556e599e20ca6fdc86fdb690b8995).  The commit message reads:
-
-> readlink comes from GNU coreutils.  On systems without it, rbenv used to spin out of control when it didn't have readlink or greadlink available because it would re-exec the frontend script over and over instead of the worker script in libexec.
-
-And the diff is:
-
-<p style="text-align: center">
-  <img src="/assets/images/gh-diff-12mar2023-520pm.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="Github diff">
-</p>
-
-It doesn't look like anything which should be capitalized, according to the convention that StackOverflow describes.  Unless I'm missing something, this could well be a candidate for a change / PR.  Such a PR certainly doesn't seem like it would do any *harm*, and it might even help.  After all, if I asked this question and spent some cognitive effort to answer it, perhaps others have as well.
-
-That said, I'll save that decision for a later day, since I want to keep plugging away at this code for now.
+That's somewhat helpful.  Although I don't yet know which `worker script` they're referring to, it's not crazy that RBENV might want to exit with a warning that a dependency is missing, rather than silently suffer from performance issues.
 
 Back to the main question: what value are we assigning to the `READLINK` variable?
 
-Let's start with that `type -p` command.  I try `man type` and `help type` in the terminal, but just get the "General Commands Manual" for both.  I Google "bash type command", and [the first result](https://archive.ph/n1OJg) seems somewhat useful:
+I start with that `type -p` command.  I try `help type` in the terminal, and because I'm using the `zsh` shell (and my `help` command is aliased to `run-help`), I get the following:
 
-> The type command is used to find out if command is builtin or external binary file. It also indicate how it would be interpreted if used as a command name...
->
-> The -p option is used to find (if) the name of the disk file (external command) would be executed by the shell. It will return nothing if it is not a disk file.
+```
+whence [ -vcwfpamsS ] [ -x num ] name ...
+       For each name, indicate how it would be interpreted if used as a
+       command name.
 
-Further down in the search results, I find [a link to Linuxize.com](https://web.archive.org/web/20220527191309/https://linuxize.com/post/linux-type-command/).  In the past, when searching for answers, I've had good experiences with them, so I check their link as well:
+       If  name  is  not  an alias, built-in command, external command,
+       shell function, hashed command, or a  reserved  word,  the  exit
+       status  shall be non-zero, and -- if -v, -c, or -w was passed --
+       a message will be written to standard output.  (This is  differ-
+       ent  from  other  shells that write that message to standard er-
+       ror.)
 
-> The type command is used to display information about the command type. It will show you how a given command would be interpreted if typed on the command line...
->
-> The syntax for the type command is as follows:
->
-`type [OPTIONS] FILE_NAME...`
->
-> For example, to find the type of the wc command , you would type the following:
->
->`type wc`
->
-> The output will be something like this:
->
->`wc is /usr/bin/wc`
->
-> You can also provide more than one arguments to the type command:
->
->`type sleep head`
->
-> The output will include information about both sleep and head commands:
->
-> `sleep is /bin/sleep`
-> `head is /usr/bin/head`
->
-> The -p option will force type to return the path to the command only if the command is an executable file on the disk:
->
-> For example, the following command will not display any output because the pwd command is a shell builtin.
->
-`type -p pwd`
+       whence is most useful when name is only the last path  component
+       of  a  command, i.e. does not include a `/'; in particular, pat-
+       tern matching only succeeds if just the non-directory  component
+       of the command is passed.
 
-This seems to check out: I see no output when I update my `foo` script as follows, and run it:
+       ...
+
+       -p     Do a path search for name even if it  is  an  alias,  re-
+              served word, shell function or builtin.
+```
+
+Looks like `type` and `whence` share the same documentation in `zsh`.  They might be aliases of each other.  I'm not sure, but I trust the authors of my shell's docs so I let it go.
+
+These docs are a bit confusing, however.  I'm not sure what `indicate how it would be interpreted` means.  I decide to do an experiment with the `type` command and its `-p` flag.
+
+### Experiment- the `type -p` command
+
+I see that `name` is the first argument of the `type` command, but I'm not sure what kind of `name` the command expects.  From the above docs, I see `If  name  is  not  an alias, built-in command, external command, shell function, hashed command, or a  reserved  word,  the  exit status  shall be non-zero,...`.  I interpret this to mean that `name` refers to the name of a command, alias, reserved word, etc.
+
+I make a `foo` script, which looks like so and uses `ls` as the value of `name`:
 
 ```
 #!/usr/bin/env bash
 
-echo $(type -p pwd)
+echo $(type -p ls)
 ```
 
-When I change `pwd` in the script to `ls` and re-run it, I see:
+When I run it, I get:
 
 ```
 $ ./foo
 
 /bin/ls
+```
+
+When I change `ls` in the script to `chmod` and re-run it, I see:
+
+```
+$ ./foo
+
+/bin/chmod
 ```
 As a final experiment, I create a directory named `~/foo`, containing a script named `bar`, and make it executable:
 
@@ -1752,8 +1713,9 @@ I then try the `type -p` command on my new script, from within my `foo` bash scr
 ```
 #!/usr/bin/env bash
 
-echo $(type -p bar baz ls)
+echo $(type -p ~/foo/bar ~/foo/baz ls)
 ```
+
 When I run it, I get:
 
 ```
@@ -1762,58 +1724,76 @@ $ ./foo
 /Users/myusername/foo/bar /Users/myusername/foo/baz /bin/ls
 ```
 
-Hmmm, this is a bit unexpected.  The reason I passed two of my own scripts AND the `ls` command is because I was expecting to see just the first two filepaths (i.e. `/Users/myusername/foo/bar` and `/Users/myusername/foo/baz`), NOT `/bin/ls`.  What's happening here?
+I see the 3 paths I expected.  Great, I think this all makes sense.
 
-I re-read the example code and realize that the example they gave was for the `pwd` command, NOT the `ls` command.  I re-run my `./foo` script after replacing `ls` with `pwd`, and I see the expected result of `/Users/myusername/foo/bar /Users/myusername/foo/baz`.
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
-So what's the difference between `pwd` and `ls`?  I run the following in my `foo` script:
+Moving on, we already know what `2>/dev/null` is from earlier- here we redirect any error output from `type -p` to `/dev/null`, aka [the black hole of the console](https://web.archive.org/web/20230116003037/https://linuxhint.com/what_is_dev_null/){:target="_blank" rel="noopener"}.
 
-```
-#!/usr/bin/env bash
+TODO: experiment w/ `/dev/null`?
 
-echo $(type ls)
-echo $(type pwd)
-```
-
-```
-$ ./foo
-
-ls is /bin/ls
-pwd is a shell builtin
-```
-So `pwd` is a true shell builtin, while `ls` is...not?
-
-[A post on FreeCodeCamp.com](https://web.archive.org/web/20211020190218/https://www.freecodecamp.org/news/bash-commands-bash-ls-bash-head-bash-mv-and-bash-cat-explained-with-examples/) has the answer:
-
-> `ls` is a command on Unix-like operating systems to list contents of a directory, for example folder and file names.
-
-Ah, so `ls` is a Unix command, NOT a shell builtin.  A subtle difference for someone like me, but it just means that `ls` comes from Unix, while `pwd` comes from bash / zsh / etc.
-
-So the reason `/bin/ls` showed up in my output of `type -p` is because `/bin/ls` is a valid "executable file on the disk".  I think that makes sense!
-
-Moving on from `type -p` to `2>/dev/null`.  We already know what this is from yesterday- we're piping any error output from running `type -p` to `/dev/null`, aka the black hole of the console.  But what do we do with any non-error output?  That's answered by the last bit of code from this line: `| head -n1`.  Running `man head` gives us:
+But what do we do with any non-error output?  That's answered by the last bit of code from this line: `| head -n1`.  Running `man head` gives us:
 
 ```
 head – display first lines of a file
 ...-n count, --lines=count
              Print count lines of each of the specified files.
 ```
-So it seems like `| head -n1` means that we just want the first line of the input that we're piping in from `type -p`?  Let's test this hypothesis.  I run my `foo` script (which currently `echo`'s two lines, see above) and pipe the output:
+So it seems like `| head -n1` means that we just want the first line of the input that we're piping in from `type -p`?  Let's test this hypothesis.
+
+### Experiment- the `head` command
+
+I make a simple script that looks like so:
+
+```
+#!/usr/bin/env bash
+
+echo "Hello"
+echo "World"
+```
+
+When I run it by itself, I get:
+
+```
+$ ./foo
+
+Hello
+World
+```
+
+Next, I run it a 2nd time, but this time with `| head -n1` at the end:
 
 ```
 $ ./foo | head -n1
 
-ls is /bin/ls
+Hello
 ```
-Looks like our hypothesis is correct!
 
-So to sum up this line of code: we're declaring a variable named `READLINK`, and declaring its value to be the first absolute path returned from `type -p greadlink readlink`.  If that command doesn't find any absolute paths, we can assume that the value of `READLINK` will be empty.  And that knowledge comes in handy, because the next line of code is:
+This time I only see 1 of the 2 lines I previously saw.  Looks like our hypothesis is correct!
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+So to sum up this line of code:
+
+```
+READLINK=$(type -p greadlink readlink 2>/dev/null | head -n1)
+```
+
+ - We print out the paths to two commands, one named `greadlink` and one named `readlink`, in that order.
+ - We take the first value we find, preferring `greadlink` since it comes first in the argument order.
+ - Finally, we store that value in a variable named `READLINK` (likely capitalized to avoid a name collision with the `readlink` command).
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+The next line of code is:
 
 ```
 [ -n "$READLINK" ] || abort "cannot find readlink - are you missing GNU coreutils?"
 ```
 
-We already learned what `[ -n ...]` does from reading about `$RBENV_DEBUG`.  It returns true if the length of `...` (or, in our case, `$READLINK`) is non-zero.  So if the length of `$READLINK` *is* zero, then we `abort` with the specified error message.
+We already learned what `[ -n ...]` does from reading about `$RBENV_DEBUG`.  It returns true if the length of (in our case) `$READLINK` is non-zero.  So if the length of `$READLINK` *is* zero, then we `abort` with the specified error message.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Let's look at the next 3 lines of code together, since it's just a simple function declaration:
 
@@ -1822,170 +1802,90 @@ Let's look at the next 3 lines of code together, since it's just a simple functi
     $READLINK "$1"
   }
 ```
-Here we resolve `$READLINK` to the absolute filepath of either `greadlink` or `readlink` (since these were the two commands passed to `type -p`, in that order, and `head -n1` will return the first of the two filepaths that were piped to it from `type`).  Passing the filepath here has the effect of returning the filepath to the executable, and we pass that executable an argument (i.e. the "$1").  Note that calling this function doesn't actually execute `greadlink` or `readlink`- if you skip ahead a bit, you can see that's actually done when we call the `resolve_link` function from inside `$( ...)` (aka bash's command substitution feature).  For more info on command substitution, see [this StackOverflow post](https://web.archive.org/web/20220603122201/https://stackoverflow.com/questions/27472540/difference-between-and-in-bash).
+
+When we call this `resolve_link` function, we invoke either the `greadlink` command or (if that doesn't exist) the `readlink` command.  When we do this, we pass any arguments which were passed to `resolve_link`.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next line of code:
 
 ```
-  abs_dirname() {
+abs_dirname() {
+  local cwd="$PWD"
+  local path="$1"
 
-  ...}
+  while [ -n "$path" ]; do
+    cd "${path%/*}"
+    local name="${path##*/}"
+    path="$(resolve_link "$name" || true)"
+  done
+
+  pwd
+  cd "$cwd"
+}
 ```
 
 So here's where we're declaring the version of `abs_dirname` from the `else` block (as an alternative to the `abs_dirname` function in our `if` block above).
 
-Next two lines of code are:
+The first two lines of code in our function body are:
 
 ```
     local cwd="$PWD"
     local path="$1"
 ```
 
-Here we declare two local variables: one named `cwd` (which likely stands for "current working directory", and in which we store the absolute directory of whichever directory we're currently in when we run the `rbenv` command), and one named `path` (which contains the first argument we pass to `abs_dirname`).
+We declare two local variables:
+
+ - A var named `cwd`.
+    - This likely stands for "current working directory".
+    - Here we store the absolute directory of whichever directory we're currently in when we run the `rbenv` command.
+ - A var named `path`, which contains the first argument we pass to `abs_dirname`.
 
 Next line of code:
 
 ```
 while [ -n "$path" ]; do
-...done
+...
+done
 ```
 
 In other words, while the length of our `path` local variable is greater than zero, we do...something.  That something is:
 
-(stopping here for the day 14405 words)
-
 ```
-      cd "${path%/*}"
-      local name="${path##*/}"
-      path="$(resolve_link "$name" || true)"
+cd "${path%/*}"
+local name="${path##*/}"
+path="$(resolve_link "$name" || true)"
 ```
-The above 3 lines of code are inside the aforementioned `while` loop.  Taken together, they are pretty hard for me to get my head around.  Rather than my usual strategy of deducing their meanings one by one and then piecing them together to form an overall meaning, I decide to use a different strategy.  I'll try adding multiple `echo` statements to the code, seeing what's actually happening overall, and then use that to inform my understanding of the individual lines.  In the past, this has helped me avoid getting too bogged down in my own guesses and hypotheses, and in the process straying too far from what the code actually does.
 
-I update the `while` loop's code to read as follows:
+The above 3 lines of code are inside the aforementioned `while` loop.  Taken together, they are pretty hard for me to get my head around.
+
+To see what's actually happening at each step in this loop, I try adding multiple `echo` statements to the `while` loop's code:
 
 <p style="text-align: center">
-  <img src="/assets/images/updating-while-loop-12mar2023-637pm.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="Updating the `while` loop">
+  <a href="/assets/images/screenshot-12mar2023-655pm.png" target="_blank">
+    <img src="/assets/images/screenshot-12mar2023-655pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
+  </a>
 </p>
 
-I then re-run `eval "$(rbenv init - )"` so that my changes take effect, and run `rbenv commands`.
+Note that I make the above change inside the code for my RBENV installation (i.e. the code at `~/.rbenv/libexec/rbenv`), **not** the code I've pulled down from Github.
 
-Nothing happens.  Hmmm, weird.
+I prefaced the `echo` statements with `>&2` because I don't want these `echo` statements to be interpreted as the output of the `abs_dirname` function.
 
-I decide to add an `echo` tracer before the `while` loop, to see if I'm reaching this line of code:
-
-<p style="text-align: center">
-  <img src="/assets/images/add-echo-tracer-12mar2023-638pm.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="Adding another `echo` statement">
-</p>
-
-When I run `eval "$(rbenv init - )"` again, I get:
-
-```
-$ eval "$(rbenv init - )"
-
-zsh: command not found: inside
-inside rbenv command
-```
-
-Oh, right.  If I `echo` from this `rbenv` file, the output is sent to `eval`, and it tries to run `inside rbenv command` as if that string is itself a command.  I change the line slightly, to read as follows:
+Another change I need to make in this same file is to temporarily comment out the `if`-block that we just finished reading, to make sure that our `else`-block gets evaluated:
 
 <p style="text-align: center">
-  <img src="/assets/images/adding-echo-tracer-12mar2023-639pm.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="Updating the `echo` statement">
-</p>
-
-Note that I could have also changed it to echo to STDERR, instead of STDOUT, as follows:
-
-<p style="text-align: center">
-  <img src="/assets/images/alternate-echo-approach-12mar2023-641pm.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="Alternate approach to `echo` statement">
-</p>
-
-I sort of like the `>&2` approach, and that's what I'll use, simply because it's fewer keystrokes.  But both tracer strategies accomplish the same goal, so it hardly matters which we choose.
-
-I retry this and now see the following:
-
-```
-$ eval "$(rbenv init - )"
-
-inside rbenv command
-echo 'inside rbenv command'
-```
-
-So we now know we're reaching our tracer statement, but for some reason we're not reaching the code inside the `while` loop.  Maybe that loop is never being run because its conditional check is never truthy?
-
-Let's check if that's the case.  I add another tracer, this time just before the start of the loop:
-
-<p style="text-align: center">
-  <img src="/assets/images/add-moar-echo-12mar2023-643pm.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="Adding yet more `echo` statements">
-</p>
-
-Re-running the `rbenv init` line:
-
-```
-$ eval "$(rbenv init - )"
-
-inside rbenv command
-echo 'inside rbenv command'
-```
-
-Still no tracer.  This might (must?) mean that the `abs_dirname` function (which our latest tracer resides in) is not getting called.  I decide to see where it's called, and add more tracers there.  The only other reference to `abs_dirname`, besides the two function definitions inside our `if` and `else` blocks, about 25 lines down:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar2023-645pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I add another tracer just before that line:
-
-<p style="text-align: center">
-  <img src="/assets/images/echo-statement-12mar2023-651pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-Re-running `rbenv init`:
-
-```
-$ eval "$(rbenv init - )"
-
-just before bin_path
-inside rbenv command
-echo 'inside rbenv command'
-```
-
-Weird...so we do see this new tracer, but we don't see the tracers inside the `abs_dirname` definition.
-
-I added the tracers to the 2nd of the 2 definitions of `abs_dirname`...  ohhhhh... Shoot.  This is totally my bad.  I was mis-remembering what condition was checked in the `if`/`else` block.  I thought I remembered that it was checking whether the length of some string was greater than zero.  By extension, I was therefore mistakenly thinking we'd reach the `else` block, not the `if` block.  TL;DR- I was putting my initial tracers in the wrong implementation of `abs_dirname`.
-
-OK, so I *could* move the tracers to the other `abs_dirname`.  But the whole point of the tracers was to see what the body of the `while` loop does, and that `while` loop is in the 2nd implementation of `abs_dirname`.  We already figured out what the 1st version of that function does, so moving the tracers to *that* function would be redundant at this point.  What we want is to force a way for the 2nd version of the function to be used, so that we can see what *it's code* does.  How do we do that?
-
-One way is to just prevent the `if` check from happening.  Why don't we just temporarily comment it out?  Once we've answered our question, we can un-comment it again.
-
-I do the following (note that I also had to comment out the `fi` which closes the `if` block; this happened further down, below the screenshot):
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar2023-653pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
+  <a href="/assets/images/screenshot-12mar2023-653pm.png" target="_blank">
+    <img src="/assets/images/screenshot-12mar2023-653pm.png" width="100%" style="border: 1px solid black; padding: 0.5em">
+  </a>
 </p>
 
 Re-running the `rbenv init` command:
-
-```
-$ eval "$(rbenv init - )"
-
-before while loop
-before: path: /usr/local/bin/rbenv
-rbenv: no such command `init'
-inside rbenv command
-```
-
-I suspect this is because I didn't update my initial `echo` tracer statements inside the `while` loop to print to STDERR, the way I did with my later `echo` statements.  I do this now:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar2023-655pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-Re-running:
 
 <p style="text-align: center">
   <img src="/assets/images/much-output-12mar2023-656pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-Ah-ha!  This is more output to parse, which means more head-work, but I don't see the `no such command` error, nor any other lines which look like errors.  And indeed, when I run `rbenv commands`, I get the logging statements above, plus a list of commands I can run from `rbenv`:
+And when I run `rbenv commands`, I get the logging statements above, plus a list of commands I can run from `rbenv`:
 
 <p style="text-align: center">
   <img src="/assets/images/much-echo-12mar2023-702pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -2013,17 +1913,21 @@ And re-running `rbenv commands`:
 
 So at a certain point the condition in our `while` loop becomes falsy, which means we no longer execute further loops.  What is it inside the loop which causes that condition to *become* falsy, and what can we infer about the purpose of the code from that change?
 
-The `while` loop's condition becomes falsy when `[ -n "$path" ]` is falsy.  This happens when the length of `$path` is non-zero (aka greater than zero, since the length can never be less than zero).  The length of "$path" will be greater than zero when the length of `$(resolve_link "$name" || true)` is greater than zero.  Out of curiosity, I check the length of `$(true)` in my "foo" bash script, and I get `0`:
+The `while` loop's condition is true as long as `[ -n "$path" ]` is true.  In other words, the `while` loop continues looping until the length of `"$path"` becomes 0.  But the length of `"$path"` will be greater than zero as long as the length of `$(resolve_link "$name" || true)` is greater than zero.
+
+Out of curiosity, I check the length of `$(true)` in my "foo" bash script:
 
 ```
 #!/usr/bin/env bash
 
-path="$(true)"
+foo="$(true)"
 
-echo "length: ${#path}"
+echo "length: ${#foo}"
 ```
 
-Running this script results in:
+Remember that the `#` in `${#foo}` means that we're checking for the *length* of `foo`.
+
+Running this script, I get:
 
 ```
 $ ./foo
@@ -2031,15 +1935,50 @@ $ ./foo
 length: 0
 ```
 
-The `while` loop continuously re-sets the value of `$path` to be `resolve_link "$name"`, until the value that this expression resolves to becomes falsy.  At that point, it sets the value of `$path` to the boolean `true`.  Since the length of the `true` boolean is zero (as is the length of the `false` boolean, FYI), this causes the `while` loop to exit.
+The `while` loop continuously re-sets the value of `$path` to be `resolve_link "$name"`, until the value becomes empty.  At that point, it sets the value of `$path` to the boolean `true`.  Since the length of the `true` boolean is zero (as is the length of the `false` boolean, FYI), this causes the `while` loop to exit.
 
-OK, so it seems like the purpose of the `while` loop is to keep `cd`ing into successive values of `path` until the value of `resolve_link` is falsy.  And as we learned earlier, the value of `resolve_link is determined by the value of either the `greadlink` or `readlink` commands.  These commands return output if the param you pass it is a symlink pointing to another file, and don't return output if the param you pass it is a non-symlink file.  I verified this by taking the following steps:
+It seems like the purpose of this loop is to keep `cd`ing into successive values of `path` until the value of `resolve_link` is falsy.  And as we learned earlier, the value of `resolve_link` is determined by the value of either the `greadlink` or `readlink` commands.
 
--create an executable file named `bar`, and place it inside a directory named `foo`.
--create a symlink to the `foo/bar` file in the same directory as the `foo` directory.  I name the symlink file `baz`.  The command for this is `ln -s foo/bar baz`.
--from the directory containing the symlink, run `readlink baz`.  Verify that the output is `foo/bar`.
--from the same directory, run `readlink foo/bar`.  Verify that nothing is output.
--repeat the last 2 steps, but with `greadlink` instead of `readlink`.  Verify the same output happens.
+These commands return output if the param you pass it is a symlink pointing to another file, and don't return output if the param you pass it is a non-symlink file.
+
+We can verify this by taking the following steps:
+
+- create an executable file named `bar`, and place it inside a directory named `foo`.
+- create a symlink to the `foo/bar` file in the same directory as the `foo` directory.  I name the symlink file `baz`.  The command for this is `ln -s foo/bar baz`.
+- From the directory containing the symlink, run `readlink baz`.
+- Verify that the output is `foo/bar`.
+- From the same directory, run `readlink foo/bar`.
+- Verify that nothing is output.
+- Repeat the above `readlink` steps, but with `greadlink` instead.
+- Verify the same output appears.
+
+Here are the above steps in action:
+
+```
+$ mkdir foo
+
+$ touch bar
+
+$ chmod +x bar
+
+$ ln -s foo/bar baz
+
+$ readlink baz
+
+foo/bar
+
+$ readlink foo/bar
+
+$
+
+$ greadlink baz
+
+foo/bar
+
+$ greadlink foo/bar
+
+$
+```
 
 So the purpose of the `while` link is to allow us to keep `cd`ing until we've arrived at the real, non-symlink home of the command represented by the `$name` variable (in our case, `rbenv`).  When that happens, we exit the `while` loop and run the next two lines of code:
 
@@ -2048,13 +1987,21 @@ pwd
 cd "$cwd"
 ```
 
-`pwd` stands for `print working directory`, which means we `echo` the directory we're currently sitting in.  After we `echo` that, we `cd` back into the directory we were in before we started the `while` loop.  Why do we do this?
+`pwd` stands for `print working directory`, which means we `echo` the directory we're currently sitting in.  After we `echo` that, we `cd` back into the directory we were in before we started the `while` loop.
 
-What the heck is going on here?  Why is the last statement of this function a call to navigate to our original directory?  Given that the `cd` call is the last item in our function, doesn't that make the return value of the `cd` operation also the return value of our `abs_dirname` function?  And why do we need to print the current working directory beforehand?
+I'm confused about why we do this.  Here are the questions I have in my head right now:
 
-At this point I started to wonder whether all these weird things were related.  Specifically, my hypothesis is that the purpose of the call to `cd` is to negate the changes of the `cd`ing which happened inside the `while` loop.  If that's true, I wonder whether the function is somehow returning the value output by `pwd`, given that (at that point) the return value of `pwd` is the same as the canonical directory of the `rbenv` command.  Once we've output that, we wouldn't need to be inside its canonical directory anymore, so it's safe to `cd` back into where we started from.
+- Coming from Ruby, I'm accustomed to looking at the last statement of a function as the return value of that function.  So why is the last statement of this function a call to navigate to our original directory?
+- Given that the `cd` call is the last item in our function, doesn't that make the return value of the `cd` operation also the return value of our `abs_dirname` function?
+- Why do we need to print the current working directory beforehand?
 
-But how could the value of `pwd` be captured?  True, it's being sent to STDOUT, but that's just like `echo`'ing it to the screen.  It's not actually getting `return`ed, is it?  And at any rate, it's not the last line of code in the function, so it can't possibly be the `return` value, can it?
+At this point I started to wonder whether all these weird things were related.
+
+I suspect that the purpose of the final call to `cd` is to undo the directory changes that we made while inside the `while` loop.  If that's true, I wonder whether the function is using `echo` to return the value output by `pwd`.
+
+<!-- Once we've output that, we wouldn't need to be inside its canonical directory anymore, so it's best to `cd` back into where we started from.  If we didn't do this final `cd`, then calling `abs_dirname` would have an undesirable side effect- we'd be left in a different directory after calling the function, compared to where we were before calling it.
+
+But how could the value of `pwd` be captured?  True, it's being sent to STDOUT, but that's just like `echo`'ing it to the screen.  It's not actually getting `return`ed, is it?  And at any rate, it's not the last line of code in the function, so it can't possibly be the `return` value, can it? -->
 
 Let's test this out by writing our own function which does something similar.  I re-write my `~/foo/bar` script to look like this:
 
@@ -2162,64 +2109,106 @@ So when we print both "Hello world" and the current working directory, the retur
 
 My current working hypothesis is therefore that the return value of a function is the sum of all things that it `echo`s.
 
-When I Google "bash return value of a function", the first result I see is [a blog post in LinuxJournal.com](https://web.archive.org/web/20220718223538/https://www.linuxjournal.com/content/return-values-bash-functions) which is readable and informative.  Among other things, it tells me:
+When I Google "bash return value of a function", the first result I see is [a blog post in LinuxJournal.com](https://web.archive.org/web/20220718223538/https://www.linuxjournal.com/content/return-values-bash-functions){:target="_blank" rel="noopener"}.  Among other things, it tells me:
 
-> Bash functions, unlike functions in most programming languages do not allow you to return a value to the caller. When a bash function ends its return value is its status: zero for success, non-zero for failure.
->
-> Although bash has a return statement, the only thing you can specify with it is the function's status, which is a numeric value like the value specified in an exit statement... If a function does not contain a return statement, its status is set based on the status of the last statement executed in the function. To actually return arbitrary values to the caller you must use other mechanisms.
->
-> The simplest way to return a value from a bash function is to just set a global variable to the result. Since all variables in bash are global by default this is easy:
->
->```
->function myfunc()
->{
->    myresult='some value'
->}
->
->myfunc
->echo $myresult
->```
->
-> The code above sets the global variable myresult to the function result. Reasonably simple, but as we all know, using global variables, particularly in large programs, can lead to difficult to find bugs.
->
-> A better approach is to use local variables in your functions. The problem then becomes how do you get the result to the caller. One mechanism is to use command substitution:
->
->```
->function myfunc()
->{
->    local  myresult='some value'
->    echo "$myresult"
->}
->
->result=$(myfunc)   # or result=`myfunc`
->echo $result
->```
->
-> Here the result is output to the stdout and the caller uses command substitution to capture the value in a variable. The variable can then be used as needed.
->
-> The other way to return a value is to write your function so that it accepts a variable name as part of its command line and then set that variable to the result of the function:
->
->```
->function myfunc()
->{
->    local  __resultvar=$1
->    local  myresult='some value'
->    eval $__resultvar="'$myresult'"
->}
->
->myfunc result
->echo $result
->```
->
-> Since we have the name of the variable to set stored in a variable, we can't set the variable directly, we have to use eval to actually do the setting. The eval statement basically tells bash to interpret the line twice, the first interpretation above results in the string result='some value' which is then interpreted once more and ends up setting the caller's variable.
+- "Bash functions, unlike functions in most programming languages do not allow you to return a value to the caller.  When a bash function ends its return value is its status: zero for success, non-zero for failure."
+- "To return values, you can:
+  - set a global variable with the result, or
+  - use command substitution, or
+  - pass in the name of a variable to use as the result variable."
 
-To summarize, the post lets us know that bash functions don't return values in the same way that a regular programming language does, and then outlines 3 strategies to achieve the same effect.  The code in `rbenv` uses strategy # 2.
+Let's try each of these out:
 
-For reference, the 2nd result in Google was [a StackOverflow post](https://stackoverflow.com/a/17338371/2143275), which provided some helpful extra color:
+### Experiment- setting a global variable inside a function
 
-> Functions in Bash are not functions like in other languages; they're actually commands...Shell commands are connected by pipes (aka streams), and not fundamental or user-defined data types, as in "real" programming languages. There is no such thing like a return value for a command, maybe mostly because there's no real way to declare it...When a command wants to get input it reads it from its input stream, or the argument list. In both cases text strings have to be parsed.  When a command wants to return something, it has to echo it to its output stream. Another often practiced way is to store the return value in dedicated, global variables. Writing to the output stream is clearer and more flexible...As others have written in this thread, the caller can also use command substitution $() to capture the output.
+I create a script with the following contents:
 
-So the way I interpret this is, if you `echo` things from your function, and you call your function inside the bash command substitution syntax (i.e. `$(...)`), the things you `echo` will be the return value of your command substitution.  That fits the pattern of the code inside the `rbenv` file, namely where our `abs_dirname` function is called (see below).  So we can conclusively say that the return value of this 2nd implementation of `abs_dirname` is the result of `pwd`, and the call to `cd "$pwd"` is just cleanup code.
+```
+#!/usr/bin/env bash
+
+foo() {
+  myVarName="Hey there"
+}
+
+echo "value before: $myVarName"     # should be empty
+
+foo
+
+echo "value after: $myVarName"      # should be non-empty
+```
+
+When I run it, I get:
+
+```
+$ ./foo
+
+value before:
+value after: Hey there
+```
+
+So it looks like, when we don't make a variable local inside a function, its scope does indeed become global, and we can access it outside the function.
+
+### Experiment- using command substitution to return a value from a function
+
+I update my script to read as follows:
+
+```
+#!/usr/bin/env bash
+
+foo() {
+  echo "Hey there"
+}
+
+echo "value before function call: $myVarName" # should be empty
+
+myVarName=$(foo)
+
+echo "value after function call: $myVarName" # should be non-empty
+```
+
+When I run it, I get:
+
+```
+$ ./foo
+
+value before function call:
+value after function call: Hey there
+```
+
+So by using command substitution (aka the `"$( ... )"` syntax), we can capture anything `echo`'ed from within the function.
+
+### Experiment- passing in the name of a variable to use
+
+I update the script one last time to read as follows:
+
+```
+#!/usr/bin/env bash
+
+foo() {
+  local varName="$1"
+  local result="Hey there"
+  eval $varName="'$result'"
+}
+
+echo "value before function call: $myVarName" # should be empty
+
+foo myVarName
+
+echo "value after function call: $myVarName" # should be non-empty
+```
+
+When I run it, I get:
+
+```
+$ ./foo
+
+value before function call:
+value after function call: Hey there
+```
+
+Credit for these experiments goes to [the LinuxJournal link from earlier](https://www.linuxjournal.com/content/return-values-bash-functions){:target="_blank" rel="noopener"}.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next few lines of code:
 
@@ -2232,9 +2221,13 @@ fi
 export RBENV_ROOT
 ```
 
-This seems pretty standard.  A quick jog of the memory to see what `-z` does again, and we find out that it returns true if the following value (in this case, "$RBENV_ROOT") has a length of zero.
+We've seen the `-z` flag for `[` before- it checks whether a value has a length of zero.
 
 So if the RBENV_ROOT variable has not been set, then we set it equal to "${HOME}/.rbenv", i.e. the ".rbenv" hidden directory located as a subdir of our UNIX home directory.  If it *has* been set, then we just trim off any trailing "/" character.  Then we export it as a environment variable.
+
+The purpose of this code seems to be ensuring that `RBENV_ROOT` is set to some value, whether it's the value that the user specified or the default value.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next few lines of code:
 
@@ -2242,11 +2235,14 @@ Next few lines of code:
 if [ -z "${RBENV_DIR}" ]; then
   RBENV_DIR="$PWD"
 else
-...fi
+...
+fi
 export RBENV_DIR
 ```
 
-Here we examine everything except the code inside the `else` block, which we'll look at next.  This block of code is similar to the block before it.  We check if a variable has not yet been set (in this case, `RBENV_DIR` instead of `RBENV_ROOT`).  If it's not yet set, then we set it equal to the current working directory.  Later, once we've exited the `if/else` block, we export `RBENV_DIR` as an environment variable.
+Let's examine everything *except* the code inside the `else` block, which we'll look at next.
+
+This block of code is similar to the block before it.  We check if a variable has not yet been set (in this case, `RBENV_DIR` instead of `RBENV_ROOT`).  If it's not yet set, then we set it equal to the current working directory.  Once we've exited the `if/else` block, we export `RBENV_DIR` as an environment variable.
 
 Now the code inside the `else` block:
 
@@ -2257,10 +2253,13 @@ Now the code inside the `else` block:
   cd "$OLDPWD"
 ```
 
-The first line of code tries to execute one piece of code (`[[ $RBENV_DIR == /* ]]`), and if that fails, executes a 2nd piece (`RBENV_DIR="$PWD/$RBENV_DIR"`).  The first command it tries is a pattern-match, [according to StackExchange](https://web.archive.org/web/20220628171954/https://unix.stackexchange.com/questions/72039/whats-the-difference-between-single-and-double-equal-signs-in-shell-compari):
-> `[[ $a == $b ]]` is not comparison, it's pattern matching. You need `[[ $a == "$b" ]]` for byte-to-byte equality comparison.
+The first line of code tries to execute one piece of code (`[[ $RBENV_DIR == /* ]]`), and if that fails, executes a 2nd piece (`RBENV_DIR="$PWD/$RBENV_DIR"`).  The first command it tries is a pattern-match, [according to StackExchange](https://web.archive.org/web/20220628171954/https://unix.stackexchange.com/questions/72039/whats-the-difference-between-single-and-double-equal-signs-in-shell-compari){:target="_blank" rel="noopener"}:
 
-Hypothesizing that we're checking to see if `$RBENV_DIR` is a string that represents a directory structure, I write the following test script:
+> `[[ $a == $b ]]` is not comparison, it's pattern matching.
+
+The particular pattern that we're matching against returns true if `$RBENV_DIR` **starts with** the `/` character.
+
+Hypothesizing that we're checking to see if `$RBENV_DIR` is a string that represents an absolute path, I write the following test script:
 
 ```
 #!/usr/bin/env bash
@@ -2274,47 +2273,48 @@ else
 fi
 ```
 
-I get `True` when I run this script, and `False` when I remove the leading `/` char in `foo` (so that it reads `foo/bar/baz` instead of `/foo/bar/baz`).  So we can confidently say that this first line of code appends the current working directory plus `/` to the front of `RBENV_DIR`, if that variable doesn't start with a `/`.
+I get `True` when I run this script, and `False` when I remove the leading `/` char.  So we can confidently say that this first line of code appends the absolute path to the current working directory to the front of `RBENV_DIR`, if that variable doesn't start with a `/`.
 
-The next line of code is:
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+The next block of code is:
 
 ```
 cd "$RBENV_DIR" 2>/dev/null || abort "cannot change working directory to \`$RBENV_DIR'"
-```
-
-Here we're just attempting to `cd` into our latest version of `$RBENV_DIR`, sending any error message to `/dev/null`, and aborting with a helpful error message if that `cd` attempt fails.
-
-Next line of code is:
-
-```
 RBENV_DIR="$PWD"
-```
-
-I'm honestly not sure why we're doing this.  Assuming we've reached this line of code, that means we've just `cd`'ed into our current location using the same value of `$RBENV_DIR` that we currently have.  So (to me) this just seems like setting the variable's value to the value it already contains.  It's like saying `a=1; a=1;`.  Given the previous `cd` command succeeded, when would the value of `$PWD` be anything different from the current value of `RBENV_DIR`?  Let's put this question aside for now, and keep going.
-
-The last line of code in the `else` block is:
-
-```
 cd "$OLDPWD"
 ```
 
-Hmmm, we haven't encountered `$OLDPWD` yet.  Is this set somewhere else in the codebase?  A quick Github search says no:
-
-<p style="text-align: center">
-  <img src="/assets/images/searching-gh-for-oldpwd-12mar2023.png" width="90%" style="border: 1px solid black; padding: 0.5em" alt="Searching Github for the string '$OLDPWD'">
-</p>
-
-Weird.  I'll try Googling it.  The first link that turns up is from a site called [RIP Tutorial](https://web.archive.org/web/20210921235302/https://riptutorial.com/bash/example/16875/-oldpwd).  It's pretty basic, but that's fine because it contains the answer to our question:
-
-> `OLDPWD` (OLDPrintWorkingDirectory) contains directory before the last `cd` command:
+Here we're attempting to `cd` into our latest version of `$RBENV_DIR`, sending any error message to `/dev/null`, and aborting with a helpful error message if that `cd` attempt fails.  We then set the value of `RBENV_DIR` to the value of `$PWD` (the directory we're currently in), before `cd`ing into `OLDPWD`, an environment variable [that `bash` maintains ](https://web.archive.org/web/20220127091111/https://riptutorial.com/bash/example/16875/-oldpwd){:target="_blank" rel="noopener"} which comes with `bash` and which stores the directory we were in prior to our current one:
 
 ```
-~> $ cd directory
-directory> $ echo $OLDPWD
+$ cd /home/user
+
+$ mkdir directory
+
+$ echo $PWD
+
+/home/user
+
+$ cd directory
+
+$ echo $PWD
+
+/home/user/directory
+
+$ echo $OLDPWD
+
 /home/user
 ```
 
-So `$OLDPWD` comes standard with our shell.  Good enough!
+I'm honestly not sure why we're doing this.  Assuming we've reached this line of code, that means we've just `cd`'ed into our current location using the same value of `$RBENV_DIR` that we currently have.  So (to me) this just seems like setting the variable's value to the value it already contains.  Given the previous `cd` command succeeded, when would the value of `$PWD` be anything different from the current value of `RBENV_DIR`?
+
+After submitting [this PR](https://github.com/rbenv/rbenv/pull/1493){:target="_blank" rel="noopener"}, I discovered the answer.  This sequence of code is doing two things:
+
+ - It ensures that the value we store in `RBENV_DIR` is a valid directory, by attempting to `cd` into it and aborting if this fails.
+ - It [normalizes](https://web.archive.org/web/20220619163902/https://www.linux.com/training-tutorials/normalizing-path-names-bash/){:target="_blank" rel="noopener"} the value of `RBENV_DIR`, "...remov(ing) unneeded /./ and ../dir sequences."
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next line of code is:
 
@@ -2322,6 +2322,8 @@ Next line of code is:
 export RBENV_DIR
 ```
 Here we just make the result of our `RBENV_DIR` setting into an environment variable, so that it's available elsewhere in the codebase.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next line of code is:
 
@@ -2331,18 +2333,33 @@ Next line of code is:
 
 Here we check if `$RBENV_ORIG_PATH` has been set yet.  If not, we set it equal to our current path and export it as an environment variable.
 
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
 Next line of code is:
 
 ```
 shopt -s nullglob
 ```
 
-I've never seen the `shopt` command before.  I try running `man` and `help` in my `bash` script, but I just get `No manual entry for shopt`.  I turn to Google, and [the first result](https://web.archive.org/web/20220815163336/https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html) is from GNU.org, which says:
+I've never seen the `shopt` command before.  I try looking up the docs on my machine, but I get `No manual entry for shopt` for `man` and `shopt not found` for `help`.
 
-> This builtin allows you to change additional shell optional behavior...
-> Toggle the values of settings controlling optional shell behavior. The settings can be either those listed below, or, if the -o option is used, those available with the -o option to the set builtin command (see The Set Builtin). With no options, or with the -p option, a list of all settable options is displayed, with an indication of whether or not each is set; if optnames are supplied, the output is restricted to those options.
+I try Google, and [the first result](https://web.archive.org/web/20220815163336/https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html){:target="_blank" rel="noopener"} is from GNU.org, which says:
 
-[The next Google result](https://web.archive.org/web/20220714115608/https://www.computerhope.com/unix/bash/shopt.htm), from ComputerHope.com, adds the following:
+```
+shopt
+
+shopt [-pqsu] [-o] [optname ...]
+
+Toggle the values of settings controlling optional shell behavior.
+
+...
+
+-s
+
+Enable (set) each optname.
+```
+
+[The next Google result](https://web.archive.org/web/20220714115608/https://www.computerhope.com/unix/bash/shopt.htm){:target="_blank" rel="noopener"}, from ComputerHope.com, adds the following:
 
 > On Unix-like operating systems, shopt is a builtin command of the Bash shell that enables or disables options for the current shell session.
 
@@ -2354,24 +2371,28 @@ The option name that we're passing is `nullglob`.  Further down, in the descript
 
 > If set, bash allows patterns which match no files to expand to a null string, rather than themselves.
 
-Lastly, [StackExchange](https://unix.stackexchange.com/a/504591/142469) has an example of what would happen before and after `nullglob` is set:
+Lastly, [StackExchange](https://unix.stackexchange.com/a/504591/142469){:target="_blank" rel="noopener"} has an example of what would happen before and after `nullglob` is set:
 
 > Filename globbing patterns that don't match any filenames are simply expanded to nothing rather than remaining unexpanded.
+>
+> ```
+> $ echo my*file
+> my*file
+> $ shopt -s nullglob
+> $ echo my*file
+>
+> $
+> ```
 
-```
-$ echo my*file
-my*file
-$ shopt -s nullglob
-$ echo my*file
-```
+This code sets a shell option so that we can change the way we pattern-match against files.  In particular, if a pattern doesn't match any files, it will expand to nothing.  This indicates that we'll be attempting to match files against a pattern in the near future.
 
-OK, so we're setting a shell option so that we can change the way we pattern-match against files.  I'm still not quite clear on *why* we're doing this, however.  I dig into the git history using my `git blame / git checkout` dance again.  There's only one issue and one commit.  [Here's the issue](https://github.com/rbenv/rbenv/pull/102) with its description:
+To figure out why we're doing this, I dig into the git history using my `git blame / git checkout` dance again.  There's only one issue and one commit.  [Here's the issue](https://github.com/rbenv/rbenv/pull/102){:target="_blank" rel="noopener"} with its description:
 
 > The purpose of this branch is to provide a way to install self-contained plugin bundles into the $RBENV_ROOT/plugins directory without any additional configuration. These plugin bundles make use of existing conventions for providing rbenv commands and hooking into core commands.
 >
 > ...
 >
-> Say you have a plugin named foo. It provides an rbenv foo command and hooks into the rbenv exec and rbenv which core commands. Its plugin bundle directory structure would be as follows:
+> Say you have a plugin named foo. It provides an `rbenv foo` command and hooks into the `rbenv exec` and `rbenv which` core commands. Its plugin bundle directory structure would be as follows:
 >
 >```
 >foo/
@@ -2385,7 +2406,7 @@ OK, so we're setting a shell option so that we can change the way we pattern-mat
 >        foo.bash
 >```
 >
-> When the plugin bundle directory is installed into ~/.rbenv/plugins, the rbenv command will automatically add ~/.rbenv/plugins/foo/bin to $PATH and ~/.rbenv/plugins/foo/etc/rbenv.d/exec:~/.rbenv/plugins/foo/etc/rbenv.d/which to $RBENV_HOOK_PATH.
+> When the plugin bundle directory is installed into `~/.rbenv/plugins`, the `rbenv` command will automatically add `~/.rbenv/plugins/foo/bin` to `$PATH` and `~/.rbenv/plugins/foo/etc/rbenv.d/exec:~/.rbenv/plugins/foo/etc/rbenv.d/which` to `$RBENV_HOOK_PATH`.
 
 I think this clarifies not only the `shopt` line, but the next few lines after that:
 
@@ -2399,9 +2420,55 @@ done
 export PATH="${bin_path}:${PATH}"
 ```
 
-After adding a few `>&2 echo` statements, I learn that `$0` is `/usr/local/bin/rbenv`, and `bin_path` is `/usr/local/Cellar/rbenv/1.2.0/libexec`.  So for each of the `/bin` folders that are located inside `rbenv`'s `/plugins` subfolder (in other words, for all RBENV plugins we've installed`, we add that `/bin` folder to our `$PATH` folder so we can call the plugin's command from our terminal.  Then we add `/usr/local/Cellar/rbenv/1.2.0/libexec` to the front of our `$PATH`, and re-set `$PATH` to its new value.  This code seems like it's in charge of making any RBENV plugins that we've installed ready-to-use.
+Let's address these two lines first:
 
-I hypothesize that the call to `shopt -s nullglob` seems to be intended to prevent any non-existent directories from being added to `$PATH` by accident, though I could be wrong.  I write a quick experiment script to try and emulate what we see in the `for` loop above:
+```
+bin_path="$(abs_dirname "$0")"
+...
+export PATH="${bin_path}:${PATH}"
+```
+
+On my machine, `bin_path` resolves to `/Users/myusername/.rbenv/libexec` when I `echo` it to the screen.  By adding this path to our `PATH` variable, we're implying that one or more files inside `/libexec` should be executable, since (I believe) that's what the `PATH` directory is for.
+
+The `libexec/` folder contains both the file we're looking at now (`rbenv`) and the other rbenv command files (`libexec/rbenv-version`, `libexec/rbenv-help`, etc.).  Skipping ahead to the end of the file, I suspect the reason we're adding `libexec/` to `PATH` is because, later on, we call [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L127){:target="_blank" rel="noopener"}:
+
+```
+exec "$command_path" "$@"
+```
+
+I added an `echo` statement to this line of code, so I can tell you that `$command_path` resolves to the filename of the command you pass to `rbenv`.  For example, if you run `rbenv help` in your terminal, then `$command_path` resolves to `rbenv-help`.  And when we `exec rbenv-help`, we're able to run that file, since `libexec/` is now in our `PATH`.
+
+Now onto the middle part of the above code, the `for` loop:
+
+```
+for plugin_bin in "${RBENV_ROOT}/plugins/"*/bin; do
+  PATH="${plugin_bin}:${PATH}"
+done
+```
+
+[The above Github issue](https://github.com/rbenv/rbenv/pull/102){:target="_blank" rel="noopener"} posited a world where we have an RBENV plugin named `foo`.  It exposes a command named `rbenv foo`.  When the GH issues says:
+
+```
+...the `rbenv` command will automatically add `~/.rbenv/plugins/foo/bin` to `$PATH`...
+```
+
+...it's telling us that this process (and any child processes) will be able to call `rbenv-foo`, because the `rbenv-foo` file is located in `~/.rbenv/plugins/foo/bin`, a folder which is now being added to `PATH`.
+
+Since this takes place inside a `for` loop which iterates over the contents of `"${RBENV_ROOT}/plugins/"*/bin;`, this is true for any plugins which are installed within `"${RBENV_ROOT}/plugins/"`.
+
+And the reason for `shopt -s nullglob`?  Remember what the StackExchange post said:
+
+```
+Filename globbing patterns that don't match any filenames are simply expanded to nothing rather than remaining unexpanded.
+```
+
+I suspect that, with the `nullglob` option turned on, the pattern `"${RBENV_ROOT}/plugins/"*/bin;` expands to nothing **if no plugins are installed**.  So turning this option on means our `for` loop will iterate 0 times if the `plugins/` directory is empty.
+
+I decide to do an experiment to see if I'm right.
+
+### Experiment- testing the behavior of `nullglob`
+
+I write a script to try and emulate what we see in the `for` loop above:
 
 ```
 #!/usr/bin/env bash
@@ -2455,12 +2522,15 @@ $ ./script
 
 No output when `shopt -s nullglob` is set.  Based on this experiment, I think we can safely say that our hypothesis is correct.
 
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
 Next line of code is:
 
 ```
 RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${RBENV_ROOT}/rbenv.d"
 ```
-This just resets the current value of `RBENV_HOOK_PATH` to add "${RBENV_ROOT}/rbenv.d" to the end.  But what is "${RBENV_ROOT}/rbenv.d"?  I run `find . -name rbenv.d` and get:
+
+This appears to add `${RBENV_ROOT}/rbenv.d` to the end of the current value of `RBENV_HOOK_PATH`.  But what is "${RBENV_ROOT}/rbenv.d"?  I run `find . -name rbenv.d` and get:
 
 ```
 $ find . -name rbenv.d
@@ -2497,33 +2567,102 @@ drwxr-xr-x  4 myusername  staff   128 Sep  4 10:13 ..
 -rw-r--r--  1 myusername  staff  1427 Sep  4 10:13 rubygems_plugin.rb
 ```
 
-(stopping here for the day; 18534 words)
+I Google "gem-rehash", and the first thing I find is [this deprecated Github repo](https://github.com/rbenv/rbenv-gem-rehash){:target="_blank" rel="noopener"}.  The description says:
 
-I've seen things ending in ".d" before, but I don't know what I'm supposed to infer from that ending.  I guess I thought it was a file extension of some sort, but here ".d" has been added to the name of a directory, not a file.  I Google 'what does ".d" stand for bash', and the first two results I see ([this](https://web.archive.org/web/20220619172419/https://unix.stackexchange.com/questions/4029/what-does-the-d-stand-for-in-directory-names) and [this](https://web.archive.org/web/20201130081947/https://serverfault.com/questions/240181/what-does-the-suffix-d-mean-in-linux)) are both from StackExchange.  Some excerpts from these pages:
+> Never run rbenv rehash again. This rbenv plugin automatically runs rbenv rehash every time you install or uninstall a gem.
+>
+> This plugin is deprecated since its behavior is now included in rbenv core.
 
-> "d" stands for directory and such a directory is a collection of configuration files which are often fragments that are included in the main configuration file. The point is to compartmentalize configuration concerns to increase maintainability.
+I notice that:
+
+ - The deprecated repo contains a file named `rubygems_plugin.rb`, just like our `rbenv/rbenv.d/exec/gem-rehash` directory does.
+ - The deprecated repo contains a file named `etc/rbenv.d/exec/~gem-rehash.bash`, which is very similar (but not identical) to the `rbenv.d/exec/gem-rehash.bash` file that we saw in the RBENV repo above.
+
+In the `rbenv-gem-rehash` README file, I also see the following:
+
+> rbenv-gem-rehash consists of two parts: a RubyGems plugin and an rbenv plugin.
 >
-> When you have a distinction such as /etc/httpd/conf vs /etc/httpd/conf.d, it is usually the case that /etc/httpd/conf contains various different kinds of configuration files, while a .d directory contains multiple instances of the same configuration file type (such as "modules to load", "sites to enable" etc), and the administrator can add and remove as needed.
+> The RubyGems plugin hooks into the gem install and gem uninstall commands to run rbenv rehash afterwards, ensuring newly installed gem executables are visible to rbenv.
 >
->...
+> The rbenv plugin is responsible for making the RubyGems plugin visible to RubyGems. It hooks into the rbenv exec command that rbenv's shims use to invoke Ruby programs and configures the environment so that RubyGems can discover the plugin.
+
+Based on this, I think we can now determine the reason for this line of code:
+
+```
+RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${RBENV_ROOT}/rbenv.d"
+```
+
+The reason is that we don't want to re-run the `rbenv rehash` command every time we install a new Ruby gem.  We want RBENV to do that for us, automatically.  The way it does that is by hooking into the Rubygems `gem install` and `gem uninstall` commands.  And the way it hooks in is by updating `RBENV_HOOK_PATH`.
+
+### The `.d` extension
+
+We've seen `rbenv.d` a few times now, and I thought the `.d` looked funny.  It looks like a file extension, but it's being used on a directory.  Furthermore, I don't know what I'm supposed to infer from that `.d`.
+
+I Google 'what does ".d" stand for bash', and the first result I see is ([this](https://web.archive.org/web/20220619172419/https://unix.stackexchange.com/questions/4029/what-does-the-d-stand-for-in-directory-names){:target="_blank" rel="noopener"}:
+
+> The .d suffix here means directory. Of course, this would be unnecessary as Unix doesn't require a suffix to denote a file type but in that specific case, something was necessary to disambiguate the commands (/etc/init, /etc/rc0, /etc/rc1 and so on) and the directories they use (/etc/init.d, /etc/rc0.d, /etc/rc1.d, ...)
 >
-> The main driving force behind the existence of this directory naming convention is for easier package management of configuration files. Whether its rpm, deb or whatever, it is much easier (and probably safer) to be able to drop a file into a directory so that it is auto included into a program's configuration instead of trying to edit a global config file.
->
->...
->
-> When distribution packaging became more and more common, it became clear that we needed better ways of forming such configuration files out of multiple fragments, often provided by multiple independent packages. Each package that needs to configure some shared service should be able to manage only its configuration without having to edit a shared configuration file used by other packages.
->
-> The most common convention adopted was to permit including a directory full of configuration files, where anything dropped into that directory would become active and part of that configuration. As that convention became more widespread, that directory was usually named after the configuration file that it was replacing or augmenting. But since one cannot have a directory and a file with the same name, some method was required to distinguish, so .d was appended to the end of the configuration file name. Hence, a configuration file /etc/Muttrc was augmented by fragments in /etc/Muttrc.d, /etc/bash_completion was augmented with /etc/bash_completion.d/*, and so forth.
->
+> This convention was introduced at least with Unix System V but possibly earlier.
+
+Another answer from that same post:
+
 > Generally when you see that *.d convention, it means "this is a directory holding a bunch of configuration fragments which will be merged together into configuration for some service."
 
-OK, I think I see now.  So the `.d` suffix means "this is a directory containing configuration files which are compartmentalized in some fashion, and which are meant to be bundled up together into a single aggregate configuration."  And that makes sense, because that actually jives with what we see if we skip a few lines of code ahead.  According to the original PR, an RBENV plugin should include both a `bin` folder and an `etc` folder.  The `etc` folder, in turn, includes an `rbenv.d` folder, which then includes a folder for each "rbenv" command that it wants to hook into.  The loop in the "rbenv" file that we're examining iterates over each of these command sub-directories, and includes that sub-directory in the `RBENV_HOOK_PATH` environment variable.
+OK, I think I see now.  So the `.d` suffix means:
 
-So taken together, this loop and the `bin_path` loop that we just covered are how RBENV gives a user access to the plugin commands that user has installed.
+- This is a directory containing configuration files.
+- These files are meant to be bundled up together into a single aggregate configuration file.
+- This file likely has the same name as the directory.
 
-But let's not get too far ahead of ourselves.  We still have to talk about that 2nd `for` loop and what its code does.
+Does this jive with what we see in the RBENV folders?
 
-Next bit of code is:
+### Do the files within these directories count as configuration files?
+
+If we refer back to what we read in the "How It Works" section of the `rbenv-gem-rehash` readme, we saw that "rbenv-gem-rehash consists of two parts: a RubyGems plugin and an rbenv plugin."  It seems like a safe bet that the "RubyGems plugin" part corresponds to the file `rubygems_plugin.rb`, and I would bet money that the `rbenv plugin` part corresponds to the `rbenv-gem-rehash/etc/rbenv.d/exec/~gem-rehash.bash` part.
+
+If we look at that file, it's pretty short, containing only the following:
+
+```
+# Remember the current directory, then change to the plugin's root.
+cwd="$PWD"
+cd "${BASH_SOURCE%/*}/../../.."
+
+# Make sure `rubygems_plugin.rb` is discovered by RubyGems by adding
+# its directory to Ruby's load path.
+export RUBYLIB="$PWD:$RUBYLIB"
+
+cd "$cwd"
+```
+
+It looks like all this file does is prepend the root `rbenv-gem-rehash` folder to the `RUBYLIB` environment variable and export it.  And judging by the comments above the `export` statement, `RUBYLIB` sounds a Ruby-specific equivalent to `PATH`, which we've already learned about.
+
+Googling `RUBYLIB`, I find [an excerpt of a book](https://web.archive.org/web/20220831132623/https://www.oreilly.com/library/view/ruby-in-a/0596002149/ch02s02.html){:target="_blank" rel="noopener"} written by Yukihiro Matsumoto (aka Matz), the creator of Ruby:
+
+> In addition to using arguments and options on the command line, the Ruby interpreter uses the following environment variables to control its behavior.  The ENV object contains a list of current environment variables.
+>
+> ...
+>
+> RUBYLIB
+>
+> Search path for libraries. Separate each path with a colon (semicolon in DOS and Windows).
+
+So `RUBYLIB` helps Ruby search for libraries.  Sounds like we were right about that.
+
+To summarize, the files inside `rbenv.d` help ensure that we can automatically run `rbenv rehash` whenever we install or uninstall Ruby gems.  That sounds more like configuration logic to me, rather than application logic (which I would define as logic which a user would invoke directly, like a command such as `rbenv version`).
+
+### Are the files in these directories being merged together somehow?
+
+Well, neither the RBENV nor the `rbenv-gem-rehash` READMEs mention any "merging of configuration files".  And so far, we've only seen these directories being added to `PATH` or the `RBENV_HOOK_PATH` env vars.  Perhaps we will see these files being merged later, but also, perhaps not.
+
+### Is there a file with the same name as the `rbenv.d` directory?
+
+As a matter of fact, yes- it's the one we're currently reading!
+
+Having thoroughly examined this block of code, let's mode onto the next one.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Next block of code is:
 
 ```
 if [ "${bin_path%/*}" != "$RBENV_ROOT" ]; then
@@ -2532,14 +2671,63 @@ if [ "${bin_path%/*}" != "$RBENV_ROOT" ]; then
 fi
 ```
 
-This looks like more of that pattern-matching that we heard about in the last `for` loop, for `bin_path`.  I suspect this means that, if "$RBENV_ROOT" doesn't contain the string stored in our `bin_path` variable, then we append the "/rbenv.d" directory of our `bin_path` to what will eventually become our "RBENV_HOOK_PATH" environment variable.  And that fits with what the comment on that 2nd line of code tells us.  So the way we detect whether "rbenv was cloned to RBENV_ROOT" is to check whether RBENV_ROOT already contains the value stored in our `bin_path` variable.
+Based on the comment and the logic of the test in the `if` statement, we can conclude that `"${bin_path%/*}"` would equal `"$RBENV_ROOT"` if "rbenv was cloned to `RBENV_ROOT`".  But I'm not sure under what circumstances rbenv would be "cloned to `RBENV_ROOT`".
+
+As you may recall, `bin_path` resolves to `/Users/myusername/.rbenv/libexec` on my machine, so `"${bin_path%/*}"` will resolve to `/Users/myusername/.rbenv` when the `%/*` bit of the parameter expansion does its job and removes the final `/` and anything after it.  When I add another `echo` statement here, I see that `RBENV_ROOT` resolves to the same path- `/Users/myusername/.rbenv`.  So these two paths are equal for me, and I won't reach the code inside the `if` check.
+
+When *would* someone reach that code?  Apparently, when "rbenv was cloned to RBENV_ROOT".  I'm not sure what that means, but I know that `[ "${bin_path%/*}" != "$RBENV_ROOT" ]` would have to be false in order for us to reach that code.  And this test would be false if we passed in a different value for `RBENV_ROOT` when running our code, i.e. `RBENV_ROOT="~/my/other/directory/rbenv" rbenv version`.  You might do this if, for example, you pulled down the RBENV code from Github into a project directory, and wanted to run a command with `RBENV_ROOT` set to that directory.  But then why wouldn't `bin_path` *also* get updated?
+
+Taking a step back, I know that this `if` block was added as part of [this PR](https://github.com/rbenv/rbenv/pull/638){:target="_blank" rel="noopener"}, which was the PR responsible for bringing in the `gem-rehash` logic into RBENV core.  Therefore, we can probably assume that this logic was part of that effort.  So how does this `if` block fit into the effort to bring `gem-rehash` into core?
+
+I don't see it.  I may have to punt on this question until later.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Moving on to the next line of code:
 
 ```
 RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
 ```
-This just means we're further updating RBENV_HOOK_PATH to include more potential RBENV configuration directories, including those inside `/usr/local/etc`, `/etc`, and `/usr/lib/`.
+This just means we're further updating RBENV_HOOK_PATH to include more `rbenv.d` directories, including those inside `/usr/local/etc`, `/etc`, and `/usr/lib/`.  These directories may or may not even exist on the user's machine (for example, I don't currently have a `/usr/local/etc/rbenv.d` directory on mine).  They're just directories where the user *might* have installed additional hooks.
+
+Why these specific directories?  They appear to be a part of a convention known as the [Filesystem Hierarchy Standard](https://web.archive.org/web/20230326013203/https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard){:target="_blank" rel="noopener"}, or the conventional layout of directories on a UNIX system.  Using this convention means that developers on UNIX machines can trust that the files they're looking for are likely to live in certain places.
+
+For example, the two main directories we're using in this line of code are `/usr/` and `/etc/`.  The FHS describes these directories as follows:
+
+ - `/etc/`- "Host-specific system-wide configuration files."
+ - `/usr/`- "Secondary hierarchy for read-only user data; contains the majority of (multi-)user utilities and applications. Should be shareable and read-only."
+    - `/usr/local/`- "Tertiary hierarchy for local data, specific to this host. Typically has further subdirectories (e.g., bin, lib, share)."
+    - `/usr/lib/`- "Libraries for the binaries in /usr/bin and /usr/sbin."
+
+Honestly, the above is a bit too abstract for me.  I did find [this link](https://archive.is/hXKpL){:target="_blank" rel="noopener"} which has more concrete examples.  It mentions that it refers to the FHS for Linux, not for UNIX, but [this StackOverflow post](https://web.archive.org/web/20150928165243/http://unix.stackexchange.com/questions/98751/is-the-filesystem-hierarchy-standard-a-unix-standard-or-a-gnu-linux-standard/){:target="_blank" rel="noopener"} says that both Linux and UNIX follow the same FHS, so I think we're OK.  The site says these directories might contain the following types of files:
+
+#### /etc
+
+ - the name of your device
+ - password files
+ - network configuration
+ - DNS configuration
+ - crontab configuration
+ - date and time configuration
+
+It also notes that `/etc` should only contain static files; no executable / binary files allowed.
+
+#### /usr
+
+> Over time, this directory has been fashioned to store the binaries and libraries for the applications that are installed by the user. So for example, while bash is in /bin (since it can be used by all users) and fdisk is in /sbin (since it should only be used by administrators), user-installed applications like vlc are in /usr/bin.
+
+##### /usr/lib
+
+> This contains the essential libraries for packages in /usr/bin and /usr/sbin just like /lib.
+
+##### /usr/local
+
+> This is used for all packages which are compiled manually from the source by the system administrator.
+This directory has its own hierarchy with all the bin, sbin and lib folders which contain the binaries and applications of the compiled software.
+
+In summary, though I can't yet quote chapter-and-verse of what each folder's purpose is on a UNIX machine, for now it's enough to know that there's a concept called the Filesystem Hierarchy Standard, and that it specifies the purposes of the different folders in your UNIX system.  I can always refer to the official docs if I need to look up this information.  The homepage of the standard is [here](https://www.pathname.com/fhs/){:target="_blank" rel="noopener"}, and the document containing the standard is [here](https://www.pathname.com/fhs/pub/fhs-2.3.pdf){:target="_blank" rel="noopener"}.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next few lines of code:
 
@@ -2548,17 +2736,27 @@ for plugin_hook in "${RBENV_ROOT}/plugins/"*/etc/rbenv.d; do
   RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${plugin_hook}"
 done
 ```
-This is that 2nd `for` loop that I mentioned earlier (the one that I skipped ahead to).  This appears to be the main event, where we actually add the configuration for each of RBENV's commands that each of the user's plugins hook into.
+
+In an earlier `for` loop, we updated the `PATH` variable to include any executables which were provided by any RBENV hooks that we've installed.  This was so that we could run that hook's commands from our terminal.
+
+Here, we appear to be telling RBENV which hooks the user has installed.  This is not so that we can run that hook's commands, but so that a hook's logic will be executed when we run an *RBENV* command.  By adding a path to `RBENV_HOOK_PATHS`, we give an RBENV command another directory to search through when that command executes its hooks.
+
+We're skipping ahead a bit, but [here is an example](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L12) of that process in action.  The `version-name` command calls `rbenv-hooks version-name`, which internally relies on the `RBENV_HOOKS_PATH` variable to print out a list of hooks for (in this case) the `version-name` command.  For each of those paths, we look for any `.bash` scripts, and then we run `source` on each of those scripts, so that those scripts are executed in our current shell environment.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next line of code:
 
 ```
 RBENV_HOOK_PATH="${RBENV_HOOK_PATH#:}"
+export RBENV_HOOK_PATH
 ```
 
-This syntax is a bit weird.  It's definitely parameter expansion, but I haven't seen the `#:` syntax before.  I search [the GNU docs](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html) for "#:" since it looks like a specific kind of expansion pattern, but I don't see those two characters used together anywhere in the docs.  Maybe it's just the "#" pattern I've seen before, for instance when I saw `parameter#/*`, but with `:` instead of `/*`?
+This syntax is definitely parameter expansion, but I haven't seen the `#:` syntax before.  I don't know if `#:` is a specific command in parameter expansion (like `:+` or similar), or if `:` is a character that we're performing the `#` operation on.
 
-Let's try an experiment.  I update my test script to read as follows:
+I search [the GNU docs](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html) for `#:`, since it looks like a specific kind of expansion pattern, but I don't see those two characters used together anywhere in the docs.  Maybe it's just the `#` pattern we've seen before, for instance when we saw `parameter#/*`?  In that case, we were removing any leading `/` character from the start of the parameter.  Maybe here we're doing the same, but with the `:` character instead?
+
+As an experiment, I update my test script to read as follows:
 
 ```
 #!/usr/bin/env bash
@@ -2574,23 +2772,21 @@ When I run it, I see:
 $ ./bar
 foo:bar/baz/buzz:quox
 ```
-In my script, when I update FOO to add a `:` at the beginning (i.e. ':foo:bar/baz/buzz:quox'), and I re-run the script, I see:
+
+Nothing has changed- the output is the same as the input.
+
+When I update FOO to add a `:` at the beginning (i.e. ':foo:bar/baz/buzz:quox'), and I re-run the script, I see:
 
 ```
 $ ./bar
 foo:bar/baz/buzz:quox
 ```
-So yes, it looks like our hypothesis was correct, and that the parameter expansion is just removing any leading `:` symbol from RBENV_HOOK_PATH.
 
+The leading `:` character has been removed.  So yes, it looks like our hypothesis was correct, and that the parameter expansion is just removing any leading `:` symbol from `RBENV_HOOK_PATH`.
 
-Next line of code is:
+The last line of code in this block is just us `export`ing the `RBENV_HOOK_PATH` variable, so that it can be used by child processes.
 
-```
-export RBENV_HOOK_PATH
-```
-This should be straightforward- we're just exporting RBENV_HOOK_PATH so that it can be used elsewhere in RBENV's code.
-
-Note that we haven't actually seen yet where RBENV_HOOK_PATH is used.  We'll likely see that sometime in the future, in some other file we encounter.
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next line of code is:
 
@@ -2600,15 +2796,20 @@ shopt -u nullglob
 
 This just turns off the `nullglob` option in our shell that we turned on before we started adding plugin configurations.  This is a cleanup step, not too surprising to see it here.
 
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
 Next few lines of code:
 
 ```
 command="$1"
 case "$command" in
-...esac
+...
+esac
 ```
 
-Here's where we get to the meat of this file.  We're grabbing the first argument sent to `rbenv`, and we're deciding what to do with it via a `case` statement.  Everything else we've done in this file, from loading plugins to setting up helper functions like `abort`, has led us to this point.  The internals of that case statement will dictate how RBENV responds to the command the user has entered.
+Here's where we get to the meat of this file.  We're grabbing the first argument sent to the `rbenv` command, and we're deciding what to do with it via a `case` statement.  Everything else we've done in this file, from loading plugins to setting up helper functions like `abort`, has led us to this point.  The internals of that case statement will dictate how RBENV responds to the command the user has entered.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Let's take each branch of the `case` statement in turn:
 
@@ -2619,9 +2820,48 @@ Let's take each branch of the `case` statement in turn:
   } | abort
   ;;
 ```
-We've seen the `)` closing parenthesis syntax before.  This (plus the empty string before it) just means that if the first argument is empty (i.e. if the user just types `rbenv` by itself, with no argos), then we do what's in the curly braces (i.e. we call the `rbenv—version` and `rbenv-help` scripts), and we pipe that output to the `abort` command that we defined earlier in this file.  If we try this out in our terminal (i.e. we just type `rbenv` with no argos), we see the version print out, followed by info on how the `rbenv` command is used (its syntax and its possible arguments).
 
-Pretty straightforward.  Next case branch is:
+
+We've seen the `)` closing parenthesis syntax before.  It denotes a specific case in the case statement.  If the value of `$command` matches our case, then we do what's in the curly braces, and we pipe that output to the `abort` command that we defined earlier in this file.
+
+The `""` before the `)` character is the specific case we're dealing with.  This branch of the case statement will execute if `$command` matches the empty string (i.e. if the user just types `rbenv` by itself, with no args).  The code we execute in that scenario is that we call the `rbenv—version` and `rbenv-help` scripts.
+
+Again, the output of those two commands gets piped to the `abort` command, which will send the output to `stderr` and return a non-zero exit code, which implies that calling `rbenv` with no args is a failure mode of this command.
+
+If we go into our terminal and type `rbenv` with no args, we see this happen.  The version number prints out, followed by info on how the `rbenv` command is used (its syntax and its possible arguments).  If we then type `echo "$?"` immediately after that to print the last exit status, we see `1` print out.
+
+```
+$ rbenv
+
+rbenv 1.2.0-16-gc4395e5
+Usage: rbenv <command> [<args>]
+
+Some useful rbenv commands are:
+   commands    List all available rbenv commands
+   local       Set or show the local application-specific Ruby version
+   global      Set or show the global Ruby version
+   shell       Set or show the shell-specific Ruby version
+   install     Install a Ruby version using ruby-build
+   uninstall   Uninstall a specific Ruby version
+   rehash      Rehash rbenv shims (run this after installing executables)
+   version     Show the current Ruby version and its origin
+   versions    List installed Ruby versions
+   which       Display the full path to an executable
+   whence      List all Ruby versions that contain the given executable
+
+See `rbenv help <command>' for information on a specific command.
+For full documentation, see: https://github.com/rbenv/rbenv#readme
+
+$ echo "$?"
+
+1
+```
+
+Pretty straight-forward.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Next case branch is:
 
 ```
 -v | --version )
@@ -2629,7 +2869,19 @@ Pretty straightforward.  Next case branch is:
   ;;
 ```
 
-So if the argument is "-v" or "--version", then we execute the "rbenv---version" script, whose output we saw earlier (just a one-line output of, in my case, "rbenv 1.2.0").
+This time we're comparing `$command` against two values instead of just one: `-v` or `--version`.  If it matches either pattern, we `exec` the `rbenv---version` script, which is just a one-line output of (in my case) "rbenv 1.2.0":
+
+```
+ $ rbenv -v
+
+rbenv 1.2.0-16-gc4395e5
+
+$ rbenv --version
+
+rbenv 1.2.0-16-gc4395e5
+```
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next case branch is:
 
@@ -2638,7 +2890,33 @@ Next case branch is:
   exec rbenv-help
   ;;
 ```
-If the user types "rbenv -h" or "rbenv –help", we just run the "rbenv-help" script.  Again, no real surprises here.
+Again, two patterns to match against.  If the user types `rbenv -h` or `rbenv –help`, we just run the `rbenv-help` script:
+
+```
+$ rbenv -h
+
+Usage: rbenv <command> [<args>]
+
+Some useful rbenv commands are:
+   commands    List all available rbenv commands
+   local       Set or show the local application-specific Ruby version
+   global      Set or show the global Ruby version
+   shell       Set or show the shell-specific Ruby version
+   install     Install a Ruby version using ruby-build
+   uninstall   Uninstall a specific Ruby version
+   rehash      Rehash rbenv shims (run this after installing executables)
+   version     Show the current Ruby version and its origin
+   versions    List installed Ruby versions
+   which       Display the full path to an executable
+   whence      List all Ruby versions that contain the given executable
+
+See `rbenv help <command>' for information on a specific command.
+For full documentation, see: https://github.com/rbenv/rbenv#readme
+```
+
+Again, no real surprises here.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next up is:
 
@@ -2646,17 +2924,24 @@ Next up is:
 * )
 ...;;
 ```
+
 The `* )` line is the catch-all / default case branch.  Any `rbenv` command that wasn't captured by the previous branches will be captured by this branch.  How we handle that is determined by what's inside the branch, starting with the next line:
 
 ```
   command_path="$(command -v "rbenv-$command" || true)"
 ```
-Here we're declaring a variable called `command_path`, and setting its value equal to the result of a response from a command substitution.  That command substitution is *either* the result of `command -v "rbenv-$command"`, or (if that result is a falsy value) the simple boolean value `true`.  What is the value of that aforementioned result?  That depends on what the `command` is inside `$(...)`.  It appears to be a shell builtin; I don't think it's the same thing as the `command` variable that we declared at the beginning of the case statement, since if it were then we'd need to refer to it as `"$command"` (including the dollar sign and double-quotes).
+Here we're declaring a variable called `command_path`, and setting its value equal to the result of a response from a command substitution.  That command substitution is **either**:
 
-I update my `./bar` bash script to simply run `help command`, since when I run `help command` in my `zsh` shell I just get the General Commands Manual.  I get the following:
+ - the result of `command -v "rbenv-$command"`, or (if that result is a falsy value)
+ - the simple boolean value `true`.
+
+The value of the command substitution depends on what `command -v "rbenv-$command` evaluates to.  It's a bit confusing to parse because `command` is the name of a shell builtin, but `$command` is the name of a shell variable that we declared earlier.
+
+If we run `help command` to see what this shell builtin does, we get:
 
 ```
-$ ./bar
+bash-3.2$ help command
+
 command: command [-pVv] command [arg ...]
     Runs COMMAND with ARGS ignoring shell functions.  If you have a shell
     function called `ls', and you wish to call the command `ls', you can
@@ -2666,216 +2951,236 @@ command: command [-pVv] command [arg ...]
     The -V option produces a more verbose description.
 ```
 
-OK, so `command foo` is the same as running the `foo` command directly in your terminal.  I test this by adding the `~/foo` directory (which contains my `bar` script) into my $PATH variable, and running `command bar` in my terminal.  I get the same `command: command [-pVv] command [arg ...]` output that I mentioned above.
+So calling `command ls` is the same as calling `ls`.  I could see this being useful if the command you want to run is stored in a variable, and is dynamically set.  For example:
 
-So this is a useful way of running commands whose named are dynamically interpreted in a script, such as `command -v "rbenv-$command"` inside our command substitution.
+```
+$ myCommand="pwd"
 
-As the `help` description mentions, the `-v` flag prints a description of the command you're running.  When I pass `-v` to `command bar` in my terminal, I see `/Users/myusername/foo/bar` *instead of* the regular output of my `bar` script.  It makes sense to me that this is the path to my `bar` script, because this will end up being the string that we store in the variable named `command_path`.
+$ if [ "$myCommand" = "pwd" ]; then
+> command "$myCommand"
+> fi
 
-So to sum up this line of code, we use command substitution to try and get the path to the command that the user passed to the `rbenv` script.  If there is no path, then we pass the boolean `true` to the command substitution.
+/Users/myusername/Workspace/OpenSource/rbenv
+```
 
-Recall from earlier that passing a boolean to a command substitution results in a response with a length of zero.  That knowledge is useful when interpreting our next line of code:
+As the `help` description mentions, adding the `-v` flag results in a printed description of the command you're running.  When I pass `-v` to `command ls` in my terminal, I see `/bin/ls` *instead of* the regular output of the `ls` command.  Therefore, the path to the `$command` will end up being the string that we store in the variable named `command_path`.
+
+That is, unless no such path exists, in which case we'll store the boolean `true` instead.  Recall from earlier that passing a boolean to a command substitution results in a response with a length of zero.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+That knowledge is useful when interpreting our next line of code:
 
 ```
 if [ -z "$command_path" ]; then
-  ...fi
+...
+fi
 ```
 
-In other words, if the user's input doesn't correspond to an actual command path, then we execute the code inside this `if` block.  That code is:
+In other words, if the user's input doesn't correspond to an actual command path, then we execute the code inside this `if` block.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+That code is:
 
 ```
-    if [ "$command" == "shell" ]; then
-      abort "shell integration not enabled. Run \`rbenv init' for instructions."
-    else
-      abort "no such command \`$command'"
-    fi
-```
-So if the user's input was the string "shell", then we abort with one error message ("shell integration not enabled. Run \`rbenv init' for instructions.").  Otherwise, we abort with a different error message ("no such command \`$command'").  I'm able to reproduce the `else` case by simply running `rbenv foobar` in my terminal.  However, when I try to reproduce the `if` case by running `rbenv shell`, I get something unexpected:
-
-```
-$ rbenv shell
-rbenv: no shell-specific version configured
+if [ "$command" == "shell" ]; then
+  abort "shell integration not enabled. Run \`rbenv init' for instructions."
+else
+  abort "no such command \`$command'"
+fi
 ```
 
-The error message "rbenv: no shell-specific version configured" is not the same as the message in the `if` block.  Why is that?
+So if the user's input was the string "shell", then we abort with one error message ("shell integration not enabled. Run \`rbenv init' for instructions.").
 
-(stopping here for the day; 20542 words)
+We would reach this branch if we tried to run `rbenv shell` before adding `eval "$(rbenv init - bash)"` to our `~/.bashrc` config file (if we're using `bash` as a shell) or `eval "$(rbenv init - zsh)"` to our `~/.zshrc` file (if we're using `zsh` as a shell).  In this case, `$command_path` would be empty.
 
-I'm reasonably confident that we at least reach [line 110](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L110) of this file, so I put tracer statements there and in a few lines before that, all the way up to line 98:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar2023-731pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-When I `eval` my code and re-run `rbenv shell`, I see something unexpected:
+On my machine, I have the above `rbenv init` command added to my `~/.zshrc` file, so I can't reproduce this error in `zsh`.  I don't have the equivalent line added to my `~/.bashrc` file, however, so if I open up a `bash` shell and type `rbenv shell`, I get the following:
 
 ```
-$ rbenv shell
+bash-3.2$ rbenv shell
 
-command at line 98: sh-shell
-command_path: /usr/local/Cellar/rbenv/1.2.0/libexec/rbenv-sh-shell
-pwd: /Users/myusername/Workspace/OpenSource/rbenv
-command: sh-shell
-rbenv: no shell-specific version configured
+rbenv: shell integration not enabled. Run `rbenv init' for instructions.
 ```
 
-Somehow, the string `sh-` is being prepended to my argument.  I didn't notice this same thing happening when I ran `eval` a moment ago (which runs `rbenv init`, if you recall).  Instead, `eval` outputs the following:
+We'll get to why `$command_path` has a value in my `zsh` and no value in my `bash` later, when we examine the `rbenv-init` file in detail.
+
+In our `else` clause (i.e. if `$command` does *not* equal `"shell"`), we abort with a `no such command` error.  I'm able to reproduce the `else` case by simply running `rbenv foobar` in my terminal.
 
 ```
-$ eval "$(rbenv init - )"
+bash-3.2$ rbenv foobar
 
-command at line 98: init
-command_path: /usr/local/Cellar/rbenv/1.2.0/libexec/rbenv-init
-pwd: /Users/myusername/Workspace/OpenSource/rbenv
-command: init
+rbenv: no such command `foobar'
 ```
 
-Where (and why) is `sh-` being prepended?
+So to sum up this entire `if` block- its purpose appears to be to handle any sad-path cases, specifically:
 
-The weird thing is that it appears to have already happened by the time we store `$1` in the `command` variable.  But I thought `$1` represents the first terminal argument in its original form, before any application code has touched it.  So either something is altering the arguments before they get to this point (which I'm not sure is even possible, and if it were, it would feel kind of hacky), or the code in the `rbenv` file (i.e. the `rbenv` command itself) is being called from elsewhere in the codebase and prepending `sh-` to it, but only for certain commands (this seems more likely).
+ - if the user enters a command that isn't recognized by RBENV, or
+ - if the user tries to run `rbenv shell` without having enabled shell integration by adding the right code to their shell's configuration file.
 
-I do a search in the Github repo for the string "sh-", thinking that if that string is being added by some application code, then it will have to exist somewhere in the codebase.  I see the following:
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
-<p style="text-align: center">
-  <img src="/assets/images/searching-gh-for-sh-prefix.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-That 2nd result looks interesting.  I'm not 100% on the parameter expansion that's taking place on line 117, but it looks like if that condition is met, then `rbenv` is called with the command `sh-$command`, which would fit the description of the more likely scenario we described above.  But what does the plural `commands` evaluate to within that file (`libexec/rbenv-init`)?  I open it up to find out:
-
-<p style="text-align: center">
-  <img src="/assets/images/search-continues-for-sh-prefix-12mar2023-737pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-It looks like it's the result of running `rbenv-commands --sh`.  I run this same command, and get:
+Moving on to the next line of code:
 
 ```
-$ eval "$(rbenv init - )"
-
-command at line 98: commands
-command_path: /usr/local/Cellar/rbenv/1.2.0/libexec/rbenv-commands
-pwd: /Users/myusername/Workspace/OpenSource/rbenv
-command: commands
-rehash
-shell
+shift 1
 ```
+This just shifts the first argument off the list of `rbenv`'s arguments.  The argument we're removing was previously stored in the `command` variable, and we've already processed it so we don't need it anymore.
 
-I still have those tracer statements in my code so there's a bit of noise, but if we ignore those, the important lines are the last two:
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Next line of code:
 
 ```
-rehash
-shell
+if [ "$1" = --help ]; then
+  ...
+else
+  ...
+fi
+;;
 ```
+Now that we've shifted off the `command` argument in the previous line, we have a new value for `$1`.  Here we check whether that new first arg is equal to the string `--help`.  An example of this would be if the user runs `rbenv init --help`.
 
-At this point, I have a pretty confident working hypothesis that the block of code we're currently examining in `rbenv-init` is executed whenever we run an `rbenv` command, and that if the argument we pass to `rbenv` is either `rehash` or `shell`, then the code prepends `sh-` to the command.  The only part of that hypothesis which I'm not 100% sure on is the first part- why and how would the code in `rbenv-init` be executed on every command run?  I thought that code was only executed once, when we "init" or initialize RBENV itself?
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
-I add a tracer statement to `rbenv-init` to see whether that statement gets hit on a non-init rbenv command:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar2023-738pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-My tracer statement gets hit when I run `eval`:
-
-```
-$ eval "$(rbenv init - )"
-
-command at line 98: init
-command_path: /usr/local/Cellar/rbenv/1.2.0/libexec/rbenv-init
-pwd: /Users/myusername/foo
-command: init
-rehash
-shell
-```
-
-But *not* when I run `rbenv shell`:
+Next block of code:
 
 ```
-$ rbenv shell
-
-command at line 98: sh-shell
-command_path: /usr/local/Cellar/rbenv/1.2.0/libexec/rbenv-sh-shell
-pwd: /Users/myusername/foo
-command: sh-shell
-rbenv: no shell-specific version configured
+if [[ "$command" == "sh-"* ]]; then
+  echo "rbenv help \"$command\""
+else
+  exec rbenv-help "$command"
+fi
 ```
 
-However, I notice something interesting just below my tracer, on line 110:
+In the first half of this nested conditional, we check whether the user entered a command which starts with "sh-".  If they did, **and** if they followed that command with `--help`, then we print "rbenv help "$command" to STDOUT.
+
+I try this in my terminal by typing "rbenv sh-shell –help", and I see the following:
 
 ```
-case "$shell" in
-fish )
-  cat <<EOS
-function rbenv
-  set command \$argv[1]
-  set -e argv[1]
-  switch "\$command"
-  case ${commands[*]}
-    rbenv "sh-\$command" \$argv|source
-  case '*'
-    command rbenv "\$command" \$argv
-  end
-end
-EOS
-```
-I can understand the gist of this: We have a case statement that branches based on the value of a variable named `$shell`.  If the user's shell is the fish shell (an alternative to bash, zsh, etc.), then we print a string to STDOUT (presumably so it can be `eval`'ed by the runner of the script, as we've seen happen elsewhere).
+$ rbenv sh-shell --help
 
-Interestingly, that string is a definition of a function named `rbenv`!
-
-I examine each of the branches in this case statement, and I see branches for `fish`, `ksh`, and and a default catch-all `* )` at the end, which presumably handles shells like `bash` and `zsh`.  That branch's logic is simpler: it `cat`s a string which opens (but doesn't close) the new `rbenv()` function:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar2023-742pm.png" width="50%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-A few lines down, another `cat` statement appears which finishes the function's definition:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar2023-744pm.png" width="50%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-Here we again see similar logic around prepending `sh-` to the command that gets executed.
-
-I don't want to spend too much time diving into this code; we'll get to it when we dissect the `rbenv-init` file itself (which I may decide to do next, given it appears to affect how the current file is executed).  But I do just want to add one last tracer statement to this `rbenv()` function, to see whether it really is the function that's being executed here.  I think it's worth confirming my understanding up to this point, before we move on and wrap up the `rbenv` file.
-
-I add a tracer to just before the line of code in the `rbenv-init` file which concatenates `sh-` to the command:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar2023-745pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I then re-run `eval` and run `rbenv shell`.  I see the following:
-
-```
-$ rbenv shell
-
-line 150 of rbenv function definition
-command at line 98: sh-shell
-command_path: /usr/local/Cellar/rbenv/1.2.0/libexec/rbenv-sh-shell
-pwd: /Users/myusername/foo
-command: sh-shell
-rbenv: no shell-specific version configured
+rbenv help "sh-shell"
 ```
 
-There's my newest tracer statement!  So we can be reasonably confident that we now know where `sh-` gets prepended to the command.  We still don't know *why* this is happening, though.  To answer that question, we'll probably have to dive into the Github history.  But we'll save that question for our examination of `rbenv-init`, so that we can unblock ourselves.
+Why would we print **this** to the screen?  At this point we know enough to tell the user which command they *should have* run.  Why don't we just run it for them and save them a step?
 
-Before we get back to the `rbenv` file, let's clean up all the tracer statements we added today, and re-run `rbenv shell` to make sure they're all gone:
+I find [the PR which added this block of code](https://github.com/rbenv/rbenv/pull/914){:target="_blank" rel="noopener"} and read up on it.  Turns out the code used to look like this:
 
 ```
-$ eval "$( rbenv init - )"
-$ rbenv shell
-rbenv: no shell-specific version configured
+if [ "$1" = --help ]; then
+  exec rbenv-help "$command"
+else
+  exec "$command_path" "$@"
+fi
 ```
 
-So going back to an earlier question of "Why don't we see the expected output when running `rbenv shell`?"  The reason for this is that the condition inside line 111 is false.  The reason it's false is because the length of the `command_path` variable is greater-than-zero.  The reason its length is greater-than-zero is because `command -v "rbenv-$command"` returned a value.  And the reason it returned a value is because it found a file named `rbenv-sh-shell` inside the `libexec` directory.
+This is much closer to what I'd expect.  But according to the PR description, this caused the `rbenv shell --help` command to trigger an error.  I check out the commit just before this PR was merged and try to reproduce the error:
 
-Something else dawns on me a bit later.  This new knowledge also represents the answer to a question that I asked myself a few days ago, but didn't write down because I didn't want to get distracted.  That question was, "When I type `which rbenv` in my terminal, why do I see the following instead of a simple path to an executable file?
+```
+$ rbenv shell --help
+
+(eval):2: parse error near `\n'
+```
+
+OK, so what caused this error?
+
+I remember we have the ability to run in verbose mode by passing in the `RBENV_DEBUG` environment variable, so I try running `RBENV_DEBUG=1 rbenv shell --help`.  It results in a ton of output of course, and the last few lines of that output are:
+
+```
+...
++ [rbenv-help:124] echo
++ [rbenv-help:125] echo 'Sets a shell-specific Ruby version by setting the `RBENV_VERSION'\''
+environment variable in your shell. This version overrides local
+application-specific versions and the global version.
+
+<version> should be a string matching a Ruby version known to rbenv.
+The special version string `system'\'' will use your default system Ruby.
+Run `rbenv versions'\'' for a list of available Ruby versions.'
++ [rbenv-help:126] echo
+(eval):2: parse error near `\n'
+```
+
+Here we can see the lines of code that are reached (`rbenv-help:124`, `rbenv-help:125`, and `rbenv-help:126`).
+
+For comparison, I run this same command but with `rbenv version` instead of `rbenv shell`, and the last few lines of the verbose output are:
+
+```
+...
++ [rbenv-help:124] echo
+
++ [rbenv-help:125] echo 'Shows the currently selected Ruby version and how it was
+selected. To obtain only the version string, use `rbenv
+version-name'\''.'
+Shows the currently selected Ruby version and how it was
+selected. To obtain only the version string, use `rbenv
+version-name'.
++ [rbenv-help:126] echo
+```
+
+The same lines of code are logged, but no `(eval):2` error at the end.  So I **think** the problem must be in the code that we're trying to `eval`, i.e. `exec rbenv-help "$command"`.
+
+I wanted to see what exactly this code was.  So I added the following `echo` statement above it:
+
+```
+if [ "$1" = --help ]; then
+  echo "$(rbenv-help "$command")" >&2
+  echo "----------" >&2
+  exec rbenv-help "$command"
+else
+```
+
+I'm capturing the output of the same command that we're trying to `exec`, sending it to `echo`, and redirecting `stdout` to `stderr` so that my `echo` statement won't interfere with anything else that's going on in the code.  I also `echo` a divider line, so we can know where my printed statements end and the code takes over again.
+
+Here's the result when I run `rbenv shell --help`:
+
+```
+$ rbenv shell --help
+
+Usage: rbenv shell <version>
+       rbenv shell --unset
+
+Sets a shell-specific Ruby version by setting the `RBENV_VERSION'
+environment variable in your shell. This version overrides local
+application-specific versions and the global version.
+
+<version> should be a string matching a Ruby version known to rbenv.
+The special version string `system' will use your default system Ruby.
+Run `rbenv versions' for a list of available Ruby versions.
+----------
+(eval):2: parse error near `\n'
+```
+
+OK, so we're trying to `exec` a printed set of usage instructions which are meant for humans to read (not for `bash` to run).  But this error only happened with `rbenv shell`, not with `rbenv version`.
+
+What if I capture the output from `rbenv version` instead?  Does it also print out usage instructions?
+
+```
+$ rbenv version --help
+Usage: rbenv version
+
+Shows the currently selected Ruby version and how it was
+selected. To obtain only the version string, use `rbenv
+version-name'.
+Usage: rbenv version
+
+Shows the currently selected Ruby version and how it was
+selected. To obtain only the version string, use `rbenv
+version-name'.
+```
+
+Yep, `"$(rbenv-help $command)"` evaluates to the usage instructions for `version`, just like it did with `shell`.  So why is it trying to `eval` usage instructions for `shell`, but not `version`?  We know from [the PR diff](https://github.com/rbenv/rbenv/pull/914/files){:target="_blank" rel="noopener"} that the solution was to treat commands that are prefixed with `sh-` differently.  Where is this happening?
+
+OK, I'll stop here and admit that I cheated a little.  I initially was stumped by this question, so I decided to punt on it for the time being and continued onward.  Then, months later when I was re-reading and editing this post, I went back with the knowledge I had gained reading the other files in this repo and leveraged that knowledge to deduce what is happening here.
+
+TL;DR- one of the things that RBENV does when you add that `eval "$(rbenv init -)"` string to your shell config is that it creates a shell function (also called `rbenv`).  When you run `rbenv` commands from inside your terminal, you're **not** running the `rbenv` bash script, at least not directly.  Instead, you're **actually** running *this shell function*, which in turn calls the `rbenv` shell script.  You can verify this by running `which rbenv` from your terminal:
 
 ```
 $ which rbenv
 
 rbenv () {
 	local command
-	command="${1:-}"
+	command="$1"
 	if [ "$#" -gt 0 ]
 	then
 		shift
@@ -2887,167 +3192,71 @@ rbenv () {
 }
 ```
 
-The answer is that, when you give the `which` command an argument, it looks for that argument name among the locally-defined functions before it starts checking the directories in the $PATH environment variable.  It stops at the first match it finds, which in this case is the function that `init` defined.
+Instead of printing `path/to/file/rbenv.bash` or something similar, it prints out a complete shell function.  It's this shell function that gets defined by the `eval "$(rbenv init -)"` call in your shell config every time you open a new terminal tab.  Since UNIX will check for shell functions before it checks your `PATH` for any commands, this is the first implementation of the `rbenv` command that it finds, and so this is what gets run when you type `rbenv` into your terminal.
 
-(stopping here for the day; 21619 words)
+As part of its logic, the shell function executes [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L147-L152){:target="_blank" rel="noopener"}, which checks if the command that the user is running begins with `sh-`.  If it does, it runs `eval` plus the name of the command with its `sh-` prefix.  Otherwise, it runs the command via the `command` command (which we discussed earlier).
 
-Moving on to the next line of code:
-
-```
-shift 1
-```
-This just shifts the first argument off the list of `rbenv`'s arguments.  The argument we're removing was previously stored in the `command` variable, so we don't need it on the shell's list of arguments anymore.  It's not strictly necessary to remove it, as far as I know- I suspect we could leave it where it is and access the next argument with `$2` instead.  It's probably a matter of style and preference.
-
-Next line of code:
+It's **this** call to `eval` that is erroring out.  We can prove that to ourselves by changing that block of code in `rbenv-init` to look like the following:
 
 ```
-if [ "$1" = --help ]; then
- ...else
-...fi
-;;
-```
-Remember that, since we shifted off the `command` argument in the previous line, we now have a new value for "$1".  Here we check whether that new first arg is equal to the string "--help".  An example of this would be if the user types "rbenv init –help".  If we've reached this line of code, we know that the command is a valid RBENV command, because the previous "if" block's job was to `abort` if the command that the user entered didn't correspond to a valid command path.
-
-Also interestingly, the code authors didn't wrap "--help" in quotes here, so that's another difference between bash and a regular language like Ruby- you don't need to wrap your strings in quotes.  I probably still will, lol.
-
-Next line of code:
-
-```
-    if [[ "$command" == "sh-"* ]]; then
-      echo "rbenv help \"$command\""
-    else
-      exec rbenv-help "$command"
-    fi
+set -e
+  case "\$command" in
+  ${commands[*]})
+    echo 'just before eval' >&2
+    eval "\$(rbenv "sh-\$command" "\$@")"
+    echo 'just after eval' >&2
+    ;;
+  *)
 ```
 
-In the first half of this conditional (the "if" block), we see that if the user had previously entered a value that started with "sh-" for their *original* first arg (before we shifted it off the list), AND their original *2nd* arg (now arg #1) is equal to "--help"), then we print "rbenv help "$command" to STDOUT.
-
-I try this in my terminal by typing "rbenv sh-shell –help", and I see the following:
+I added the call to `set -e` before the `case` statement (so that the code will exit immediately if the `eval` code throws an error), as well as the two `echo` statements, one before `eval` and one after.  I then `source` my `~/.zshrc` file so that these changes take effect, and I run `which rbenv` to confirm that they appear in the updated shell function:
 
 ```
-$ rbenv sh-shell --help
+$ which rbenv
 
-rbenv help "sh-shell"
+rbenv () {
+	local command
+	command="$1"
+	if [ "$#" -gt 0 ]
+	then
+		shift
+	fi
+	set -e
+	case "$command" in
+		(rehash | shell) echo 'just before eval' >&2
+			eval "$(rbenv "sh-$command" "$@")"
+			echo 'just after eval' >&2 ;;
+		(*) command rbenv "$command" "$@" ;;
+	esac
+}
 ```
 
-This is actually *not* what I expect, since printing `rbenv help "sh-shell"` to STDOUT should cause the caller of our code to `exec` the above command, NOT to just print it to the screen.
-
-To figure this out, I realize I'm going to need to put tracer statements into the `rbenv` function, the one that gets dynamically compiled when running `rbenv init`.  This feels like a lot of work to answer a relatively trivial question, and I wouldn't blame the reader if they decided it wasn't worthwhile.  But I know this question will gnaw at me and take up cognitive load in my head, so I decide to timebox it at 10 minutes.
-
-I add tracers on lines 143, 145, 151, 154, and 155 of the "rbenv-init" file(see below):
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar2023-749pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I then re-run `eval` and then run `rbenv sh-shell –help`:
+Then, when I run `rbenv shell --help`, I see the following:
 
 ```
-$ rbenv sh-shell --help
+$ rbenv shell --help
 
-command inside rbenv func: sh-shell
-inside if of rbenv func
-inside catch-all of case statement
-command inside catch-all: sh-shell
-command: sh-shell
-inside if block
-rbenv help "sh-shell"
+just before eval
+(eval):2: parse error near `\n'
+
+[Process completed]
 ```
 
-Everything from "command: sh-shell" onwards is from tracer statements inside the "rbenv" file.  Everything up to that point is from tracer statements inside "rbenv-init".
+I see "just before eval", but **not** "just after eval".  Since we added the `set -e` option to our shell function, the code exited after the first error that it encountered.  Since we only saw the first of the two `echo` statements immediately before and after our call to `eval`, it **must** have been this call to `eval` which threw an error.
 
-I see we reached the `command inside catch-all: sh-shell` tracer statement, meaning the next line of code to be executed is `command rbenv "\$command" "\$@";;`.  I suspect that this resolves to `command rbenv sh-shell --help`, and when I run this resolved command in my terminal, I see:
+Now it's starting to make sense why the PR author structured their code the way they did.  Since all `sh-` scripts will be treated the same way by this `case` statement,
 
-```
-$ command rbenv sh-shell --help
-command: sh-shell
-inside if block
-rbenv help "sh-shell"
-```
-This is the code I expected, given what we've already seen.  I suspect the execution is reaching the `rbenv-sh-shell` file.  Although I'm rapidly losing my motivation to keep this investigation going, I decide it's pretty easy to at least add some tracer statements to that file.  If adding these tracers sheds light on anything, it might boost my motivation, so that's what I (grudgingly) do.
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
-I add a single tracer statement to start with, as the first line of executable code in `rbenv-sh-shell`:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar2023-750pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-Although I don't think I need to run `eval` again, I do it anyway just to be safe.  Then I re-run `rbenv sh-shell --help` and see:
-
-```
-$ rbenv sh-shell --help
-
-command inside rbenv func: sh-shell
-inside if of rbenv func
-inside catch-all of case statement
-command inside catch-all: sh-shell
-command: sh-shell
-inside if block
-rbenv help "sh-shell"
-```
-
-Interesting: I don't see my tracer statement.  I try removing the redirect to STDERR (i.e. the `>&2` at the beginning of the tracer) and re-run it:
-
-```
-$ rbenv sh-shell --help
-
-command inside rbenv func: sh-shell
-inside if of rbenv func
-inside catch-all of case statement
-command inside catch-all: sh-shell
-command: sh-shell
-inside if block
-rbenv help "sh-shell"
-```
-
-Still no tracer.  Looks like my hypothesis that we've reached the `rbenv-sh-shell` file is incorrect.
-
-At this point, I'm wondering whether I have the right expectation about this `echo` statement inside the `if` block of the `rbenv` file:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-12mar2023-751pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-More specifically, I'm wondering whether `echo`ing to STDOUT here really does trickle up to the caller (who then runs `eval` on it), or whether *this* echo actually does `echo` to the screen.
-
-I think I can test this by doing a similar `echo` statement which doesn't correspond to a valid terminal command, and seeing whether I get some sort of "invalid command" error.  Or even simpler, I could just remove the `>&2` redirect on line 124, and see if the word "inside" triggers that same "invalid command" error.  If these echo statements are being `eval`ed by the caller of the `rbenv` file, then my `echo "inside if block"` should trigger the error I expect when I direct the "echo" to STDOUT as opposed to STDERR (as I'm doing now).
-
-I remove ">&2" and re-run the code:
-
-```
-$ rbenv sh-shell --help
-
-command inside rbenv func: sh-shell
-inside if of rbenv func
-inside catch-all of case statement
-command inside catch-all: sh-shell
-command: sh-shell
-inside if block
-rbenv help "sh-shell"
-```
-
-I continue to see my "inside if block" tracer statement, without any "invalid command" error.  Looks like the "echo" statement on line 125 really is an "echo", and not meant to be "eval"ed by another line of code somewhere.
-
-OK, so now I think I at least understand the path of execution.  If we've reached the "else" block, we can assume that the user's command did *not* begin with "sh-", AND that the 2nd argument was "--help", AND that the "command" they entered is a valid RBENV command.  So we show them the `help` script for the command they entered.
-
-But I'm still not sure *why we needed* the "if" block of code here.  At this point we know enough to tell the user which command they *should have* run.  Why don't we just run it for them and save them a step?
-
-I think that's an important question to ask at some point, but I don't want to lose my forward momentum.  I decide to start [a running list of questions](https://docs.google.com/document/d/1yhR5_Z5JoAB4I0ZsA8qPxCwfTBMuWSYRAGv7vBvys-Y/edit?usp=sharing) to come back and revisit at a later time.  I capture this one and a few other related ones.  I think answering this question would require a deep dive into the Github history of this section of the code, and while I think that's a worthwhile activity to do, I don't think now is the time to do it.  I could be wrong about that, but I'm guided by a preference for "going broad" and getting a basic understanding of the overall codebase, before "going deep" and diving into the history of one specific part.  It might just be a matter of personal preference, and this whole thing is an experiment anyway, so after I'm done writing this book, I'll revisit the strategy to judge its success.
-
-Next line of code:
+Next (and final!) line of code in this file:
 
 ```
   else
     exec "$command_path" "$@"
 ```
 
-(stopping here for the day; 22757 lines of code)
-
-This is the line of code which actually executes the command that the user typed.  The "$@" is just how we pass in any flags or arguments to that command.
-
-As a side note, this could have / should have been a hint to me that the above "echo" command really was a true "echo", and not a signal to the calling code about which command to exec.  I think it would have helped if the text that was echo'ed was clearly not a command, for example by prefixing it with the "usage: " string that is used elsewhere.  But just the fact that the "if" branch uses "echo" while the "else" branch uses "exec" is a signal that, at this layer of abstraction, we are not "echo"ing commands for someone else to run.  Same with the "exec" block in the earlier "else" block of code above.
+This is the line of code which actually executes the command that the user typed.  The `$@` syntax expands into [the flags or arguments](https://web.archive.org/web/20230319115333/https://stackoverflow.com/questions/3898665/what-is-in-bash){:target="_blank" rel="noopener"} we pass to that command.
 
 That's it!  That's the entire `rbenv` file.  What should we do next?
 
 Normally I'd want to copy the order in which the files appear in the "libexec" directory.  But given what we saw with "rbenv-init" and how it has a big effect on how the "rbenv" file is called, I think it makes more sense to start there and come back to the next file ("rbenv–-version") afterward.
-
