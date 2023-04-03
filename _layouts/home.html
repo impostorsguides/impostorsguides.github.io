@@ -1,51 +1,61 @@
 ---
-layout: default
+layout: base
 ---
 
 <div class="home">
+  {%- if page.title -%}
+    <h1 class="page-heading">{{ page.title }}</h1>
+  {%- endif -%}
 
   {{ content }}
 
-  {% capture site_lang %}{{ site.lang | default: "en" }}{% endcapture %}
 
-  <ul class="post-list">
-    {% for post in paginator.posts %}
-      {% capture post_lang %}{{ post.lang | default: site_lang }}{% endcapture %}
-      {% capture lang %}{% if post_lang != site_lang %}{{ post_lang }}{% endif %}{% endcapture %}
+  {% if site.paginate %}
+    {% assign posts = paginator.posts %}
+  {% else %}
+    {% assign posts = site.posts %}
+  {% endif %}
 
-      <li{% if lang != empty %} lang="{{ lang }}"{% endif %}>
-        <header class="post-header">
-          <h1 class="post-title">
-            {% if post.external-url %}
-              <a class="post-link" href="{{ post.external-url }}">{{ post.title | escape }} &rarr;</a>
-            {% else %}
-              <a class="post-link" href="{{ post.url | relative_url }}">{{ post.title | escape }}</a>
-            {% endif %}
-          </h1>
 
-          <p class="post-meta">
-            {% include date.html date=post.date lang=lang %}
-            {% if post.categories != empty or post.tags != empty %}
-              {% include category_links.html categories=post.categories tags=post.tags %}
-            {% endif %}
-            {% if post.external-url %}
-              • <a href="{{ post.url | relative_url }}">Permalink</a>
-            {% endif %}
-          </p>
-        </header>
-
-        <div class="post-content">
+  {%- if posts.size > 0 -%}
+    {%- if page.list_title -%}
+      <h2 class="post-list-heading">{{ page.list_title }}</h2>
+    {%- endif -%}
+    <ul class="post-list">
+      {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+      {%- for post in posts -%}
+      <li>
+        <span class="post-meta">{{ post.date | date: date_format }}</span>
+        <h3>
+          <a class="post-link" href="{{ post.url | relative_url }}">
+            {{ post.title | escape }}
+          </a>
+        </h3>
+        {%- if site.show_excerpts -%}
           {{ post.excerpt }}
-        </div>
-        {% if post.content contains site.excerpt_separator %}
-          <p class="post-continue">
-            <a href="{{ post.url | relative_url }}">{% include i18n.html lang=lang value="morelink" default="Read on" %} &rarr;</a>
-          </p>
-        {% endif %}
+        {%- endif -%}
       </li>
-    {% endfor %}
-  </ul>
+      {%- endfor -%}
+    </ul>
 
-  {% include pagination.html %}
+    {% if site.paginate %}
+      <div class="pager">
+        <ul class="pagination">
+        {%- if paginator.previous_page %}
+          <li><a href="{{ paginator.previous_page_path | relative_url }}" class="previous-page">{{ paginator.previous_page }}</a></li>
+        {%- else %}
+          <li><div class="pager-edge">•</div></li>
+        {%- endif %}
+          <li><div class="current-page">{{ paginator.page }}</div></li>
+        {%- if paginator.next_page %}
+          <li><a href="{{ paginator.next_page_path | relative_url }}" class="next-page">{{ paginator.next_page }}</a></li>
+        {%- else %}
+          <li><div class="pager-edge">•</div></li>
+        {%- endif %}
+        </ul>
+      </div>
+    {%- endif %}
+
+  {%- endif -%}
 
 </div>

@@ -1,5 +1,5 @@
 ---
-layout: rbenv-page
+layout: page
 category: rbenv-pt-2
 id: 39
 previous-title: "rbenv-whence"

@@ -1,5 +1,5 @@
 ---
-layout: rbenv-page
+layout: page
 category: rbenv-pt-3
 id: 40
 previous-title: The `which` command

@@ -1,5 +1,5 @@
 ---
-layout: rbenv-page
+layout: page
 title: Conclusion
 permalink: /rbenv/conclusion
 category: rbenv-conclusion

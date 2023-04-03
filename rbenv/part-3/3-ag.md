@@ -1,5 +1,5 @@
 ---
-layout: rbenv-page
+layout: page
 category: rbenv-pt-3
 id: 47
 previous-title: "Makefile.in"

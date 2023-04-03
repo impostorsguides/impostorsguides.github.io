@@ -1,5 +1,5 @@
 ---
-layout: rbenv-page
+layout: page
 category: rbenv-pt-3
 id: 45
 previous-title: "gem-rehash.bash"

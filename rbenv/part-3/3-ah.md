@@ -1,5 +1,5 @@
 ---
-layout: rbenv-page
+layout: page
 category: rbenv-pt-3
 id: 48
 previous-title: "bash.h"

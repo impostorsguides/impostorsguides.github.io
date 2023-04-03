@@ -17,6 +17,8 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
+header_pages:
+ - resources
 
 title: The Impostor's Guide To Software Engineering
 description: >- # this means to ignore newlines until "baseurl:"
@@ -36,7 +38,8 @@ google_analytics:
 comments: false
 
 # Build settings
-remote_theme: jekyll-whiteglass
+theme: minima
+
 plugins:
   - jekyll-archives
   - jekyll-paginate
@@ -93,3 +96,4 @@ kramdown:
 # jekyll-paginate
 paginate_path: /posts/:num/
 paginate: 5
+
