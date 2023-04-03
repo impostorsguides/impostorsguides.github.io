@@ -34,7 +34,7 @@ Based on the name of [this issue](https://github.com/rbenv/rbenv/pull/638/files)
 
 OK, another question: *when* does this file get executed?  What kicks off the installation of the now-part-of-the-core-code "rbenv-gem-rehash" gem?
 
-I add some tracer statements to the start of the file (the one located at `/Users/richiethomas/.rbenv`, NOT the one located at `/Users/richiethomas/Workspace/OpenSource/rbenv`):
+I add some tracer statements to the start of the file (the one located at `/Users/myusername/.rbenv`, NOT the one located at `/Users/myusername/Workspace/OpenSource/rbenv`):
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-954am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
@@ -87,7 +87,7 @@ I also think it's not very optimal if a user needs to remember to `rbenv rehash`
 
 This implies that the goal of moving the `rbenv-gem-rehash` logic into the core repo was to prevent the user from needing to manually run `rbenv rehash` every time they install a new gem.  I wonder if this means that "rubygems_plugin.rb" gets run when a new gem is installed?
 
-I add some loglines to "rubygems_plugin.rb" which are similar to the ones I added before, but this time I add them to the version located at `/Users/richiethomas/.rbenv/rbenv.d/exec/gem-rehash`:
+I add some loglines to "rubygems_plugin.rb" which are similar to the ones I added before, but this time I add them to the version located at `/Users/myusername/.rbenv/rbenv.d/exec/gem-rehash`:
 
 ```
 puts "inside rubygems_plugin.rb"          # this is the logline I added
@@ -171,13 +171,13 @@ Back to the call stack I was inspecting.
   <img src="/assets/images/screenshot-19mar2023-1013am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
-The call stack goes in reverse order, starting with the lowest-level file and going down to the start of the process.  I want to start at the top, so I open "/Users/richiethomas/.rbenv/versions/2.7.5/bin/gem" and go to line 9:
+The call stack goes in reverse order, starting with the lowest-level file and going down to the start of the process.  I want to start at the top, so I open "/Users/myusername/.rbenv/versions/2.7.5/bin/gem" and go to line 9:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1014am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
-So we require `gem_runner`, which triggers a bit of `kernel_require` magic, and eventually we get to line 16 of `/Users/richiethomas/.rbenv/versions/2.7.5/lib/ruby/2.7.0/rubygems/gem_runner.rb`:
+So we require `gem_runner`, which triggers a bit of `kernel_require` magic, and eventually we get to line 16 of `/Users/myusername/.rbenv/versions/2.7.5/lib/ruby/2.7.0/rubygems/gem_runner.rb`:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1015am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
@@ -189,7 +189,7 @@ Before continuing on, I notice the comment on line 14 above:
 # Load additional plugins from $LOAD_PATH
 ```
 
-While browsing the files in the stack trace, I also come across this comment block in "/Users/richiethomas/.rbenv/versions/2.7.5/lib/ruby/2.7.0/rubygems.rb":
+While browsing the files in the stack trace, I also come across this comment block in "/Users/myusername/.rbenv/versions/2.7.5/lib/ruby/2.7.0/rubygems.rb":
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1016am.png" width="90%" style="border: 1px solid black; padding: 0.5em">

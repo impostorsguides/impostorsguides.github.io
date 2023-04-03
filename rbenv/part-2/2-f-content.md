@@ -831,7 +831,7 @@ new argv: baz buzz
 
 Here we see that, initially, the "$command" variable is undefined (as shown by the "old command: <blank>" line.  After we run "set command $argv[1]", its value changes to "bar".  This has the effect of declaring a variable named "command", and setting its value equal to the first argument in the list.
 
-We also see that, initially, the argos passed to the foo function are "bar", "baz", and "buzz".  After I call "set -e argv[1]", the new argos are "baz" and "buzz".  This means that "set -e argv[1]" has the effect of removing the first arg from the arg list.  This is the same thing that "shift" does in zsh.
+We also see that, initially, the args passed to the foo function are "bar", "baz", and "buzz".  After I call "set -e argv[1]", the new args are "baz" and "buzz".  This means that "set -e argv[1]" has the effect of removing the first arg from the arg list.  This is the same thing that "shift" does in zsh.
 
 Taken together, these two lines mean that we're creating a variable named "command" and setting its value equal to the value of "argv[1]", and then we're deleting argv[1] itself.
 

@@ -273,14 +273,14 @@ Before running `make`, I do an `ls -la` to see which files already exist:
 $ ls -la
 
 total 72
-drwxr-xr-x   8 richiethomas  staff    256 Mar 19 11:01 .
-drwxr-xr-x  19 richiethomas  staff    608 Mar 18 11:41 ..
--rw-r--r--   1 richiethomas  staff    519 Dec  2 00:43 Makefile
--rw-r--r--   1 richiethomas  staff    610 Mar 19 10:59 Makefile.in
--rw-r--r--   1 richiethomas  staff    496 Mar 12 16:41 bash.h
--rwxr-xr-x   1 richiethomas  staff    954 Mar 18 11:41 configure
--rw-r--r--   1 richiethomas  staff    832 Mar 12 16:41 realpath.c
--rwxr-xr-x   1 richiethomas  staff  14696 Mar 18 11:41 shobj-conf
+drwxr-xr-x   8 myusername  staff    256 Mar 19 11:01 .
+drwxr-xr-x  19 myusername  staff    608 Mar 18 11:41 ..
+-rw-r--r--   1 myusername  staff    519 Dec  2 00:43 Makefile
+-rw-r--r--   1 myusername  staff    610 Mar 19 10:59 Makefile.in
+-rw-r--r--   1 myusername  staff    496 Mar 12 16:41 bash.h
+-rwxr-xr-x   1 myusername  staff    954 Mar 18 11:41 configure
+-rw-r--r--   1 myusername  staff    832 Mar 12 16:41 realpath.c
+-rwxr-xr-x   1 myusername  staff  14696 Mar 18 11:41 shobj-conf
 ```
 
 I then run `make` in this directory:
@@ -300,15 +300,15 @@ I then re-run `ls -la` to see which new files have been created:
 $ ls -la
 
 total 80
-drwxr-xr-x   9 richiethomas  staff    288 Mar 19 11:03 .
-drwxr-xr-x  19 richiethomas  staff    608 Mar 18 11:41 ..
--rw-r--r--   1 richiethomas  staff    546 Mar 19 11:03 Makefile
--rw-r--r--   1 richiethomas  staff    610 Mar 19 10:59 Makefile.in
--rw-r--r--   1 richiethomas  staff    496 Mar 12 16:41 bash.h
--rwxr-xr-x   1 richiethomas  staff    954 Mar 18 11:41 configure
--rw-r--r--   1 richiethomas  staff    832 Mar 12 16:41 realpath.c
--rw-r--r--   1 richiethomas  staff   1424 Mar 19 11:03 realpath.o
--rwxr-xr-x   1 richiethomas  staff  14696 Mar 18 11:41 shobj-conf
+drwxr-xr-x   9 myusername  staff    288 Mar 19 11:03 .
+drwxr-xr-x  19 myusername  staff    608 Mar 18 11:41 ..
+-rw-r--r--   1 myusername  staff    546 Mar 19 11:03 Makefile
+-rw-r--r--   1 myusername  staff    610 Mar 19 10:59 Makefile.in
+-rw-r--r--   1 myusername  staff    496 Mar 12 16:41 bash.h
+-rwxr-xr-x   1 myusername  staff    954 Mar 18 11:41 configure
+-rw-r--r--   1 myusername  staff    832 Mar 12 16:41 realpath.c
+-rw-r--r--   1 myusername  staff   1424 Mar 19 11:03 realpath.o
+-rwxr-xr-x   1 myusername  staff  14696 Mar 18 11:41 shobj-conf
 ```
 
 NOTE- ignore the `total 72` vs `total 80` here.  We did not add 8 new files.  The number mentioned by `total` is explained in the `man` entry for `ls`:
@@ -323,34 +323,34 @@ Looks like only `realpath.o` was created, at least in this directory.  I do note
 $ ls -la ../libexec
 
 total 312
-drwxr-xr-x  28 richiethomas  staff    896 Mar 19 11:03 .
-drwxr-xr-x  19 richiethomas  staff    608 Mar 18 11:41 ..
--rwxr-xr-x   1 richiethomas  staff   2894 Mar 18 11:41 rbenv
--rwxr-xr-x   1 richiethomas  staff    632 Mar 18 11:41 rbenv---version
--rwxr-xr-x   1 richiethomas  staff    812 Mar 18 11:41 rbenv-commands
--rwxr-xr-x   1 richiethomas  staff    562 Mar 18 11:41 rbenv-completions
--rwxr-xr-x   1 richiethomas  staff   1095 Mar 12 16:41 rbenv-exec
--rwxr-xr-x   1 richiethomas  staff    894 Mar 18 11:41 rbenv-global
--rwxr-xr-x   1 richiethomas  staff   3534 Mar 18 11:41 rbenv-help
--rwxr-xr-x   1 richiethomas  staff   1247 Mar 18 11:41 rbenv-hooks
--rwxr-xr-x   1 richiethomas  staff   2541 Mar 18 11:41 rbenv-init
--rwxr-xr-x   1 richiethomas  staff   1376 Mar 18 11:41 rbenv-local
--rwxr-xr-x   1 richiethomas  staff   1022 Mar 18 11:41 rbenv-prefix
--rwxr-xr-x   1 richiethomas  staff  49584 Mar 19 11:03 rbenv-realpath.dylib
--rwxr-xr-x   1 richiethomas  staff   4403 Mar 18 11:41 rbenv-rehash
--rwxr-xr-x   1 richiethomas  staff    111 Mar 18 11:41 rbenv-root
--rwxr-xr-x   1 richiethomas  staff    444 Mar  1 18:04 rbenv-sh-rehash
--rwxr-xr-x   1 richiethomas  staff   2845 Mar 18 11:41 rbenv-sh-shell
--rwxr-xr-x   1 richiethomas  staff    380 Feb 28 08:35 rbenv-shims
--rwxr-xr-x   1 richiethomas  staff    498 Mar 18 11:41 rbenv-version
--rwxr-xr-x   1 richiethomas  staff    658 Mar 18 11:41 rbenv-version-file
--rwxr-xr-x   1 richiethomas  staff    501 Mar 18 11:41 rbenv-version-file-read
--rwxr-xr-x   1 richiethomas  staff    447 Feb 28 08:35 rbenv-version-file-write
--rwxr-xr-x   1 richiethomas  staff    836 Mar 18 11:41 rbenv-version-name
--rwxr-xr-x   1 richiethomas  staff    458 Mar 18 11:41 rbenv-version-origin
--rwxr-xr-x   1 richiethomas  staff   2318 Mar 18 11:41 rbenv-versions
--rwxr-xr-x   1 richiethomas  staff    767 Mar 18 11:41 rbenv-whence
--rwxr-xr-x   1 richiethomas  staff   1714 Mar 18 11:41 rbenv-which
+drwxr-xr-x  28 myusername  staff    896 Mar 19 11:03 .
+drwxr-xr-x  19 myusername  staff    608 Mar 18 11:41 ..
+-rwxr-xr-x   1 myusername  staff   2894 Mar 18 11:41 rbenv
+-rwxr-xr-x   1 myusername  staff    632 Mar 18 11:41 rbenv---version
+-rwxr-xr-x   1 myusername  staff    812 Mar 18 11:41 rbenv-commands
+-rwxr-xr-x   1 myusername  staff    562 Mar 18 11:41 rbenv-completions
+-rwxr-xr-x   1 myusername  staff   1095 Mar 12 16:41 rbenv-exec
+-rwxr-xr-x   1 myusername  staff    894 Mar 18 11:41 rbenv-global
+-rwxr-xr-x   1 myusername  staff   3534 Mar 18 11:41 rbenv-help
+-rwxr-xr-x   1 myusername  staff   1247 Mar 18 11:41 rbenv-hooks
+-rwxr-xr-x   1 myusername  staff   2541 Mar 18 11:41 rbenv-init
+-rwxr-xr-x   1 myusername  staff   1376 Mar 18 11:41 rbenv-local
+-rwxr-xr-x   1 myusername  staff   1022 Mar 18 11:41 rbenv-prefix
+-rwxr-xr-x   1 myusername  staff  49584 Mar 19 11:03 rbenv-realpath.dylib
+-rwxr-xr-x   1 myusername  staff   4403 Mar 18 11:41 rbenv-rehash
+-rwxr-xr-x   1 myusername  staff    111 Mar 18 11:41 rbenv-root
+-rwxr-xr-x   1 myusername  staff    444 Mar  1 18:04 rbenv-sh-rehash
+-rwxr-xr-x   1 myusername  staff   2845 Mar 18 11:41 rbenv-sh-shell
+-rwxr-xr-x   1 myusername  staff    380 Feb 28 08:35 rbenv-shims
+-rwxr-xr-x   1 myusername  staff    498 Mar 18 11:41 rbenv-version
+-rwxr-xr-x   1 myusername  staff    658 Mar 18 11:41 rbenv-version-file
+-rwxr-xr-x   1 myusername  staff    501 Mar 18 11:41 rbenv-version-file-read
+-rwxr-xr-x   1 myusername  staff    447 Feb 28 08:35 rbenv-version-file-write
+-rwxr-xr-x   1 myusername  staff    836 Mar 18 11:41 rbenv-version-name
+-rwxr-xr-x   1 myusername  staff    458 Mar 18 11:41 rbenv-version-origin
+-rwxr-xr-x   1 myusername  staff   2318 Mar 18 11:41 rbenv-versions
+-rwxr-xr-x   1 myusername  staff    767 Mar 18 11:41 rbenv-whence
+-rwxr-xr-x   1 myusername  staff   1714 Mar 18 11:41 rbenv-which
 ```
 
 Yep, that's the only file with a timestamp of today's date (Nov 27), apart from the current and parent directories "." and ".." at the top of the output.
@@ -495,10 +495,10 @@ I run `ls -la /usr/local/bin/gcc*` and get the following:
 
 ```
 $ ls -la /usr/local/bin/gcc*
-lrwxr-xr-x  1 richiethomas  admin  31 Dec  3 10:35 /usr/local/bin/gcc-12 -> ../Cellar/gcc/12.2.0/bin/gcc-12
-lrwxr-xr-x  1 richiethomas  admin  34 Dec  3 10:35 /usr/local/bin/gcc-ar-12 -> ../Cellar/gcc/12.2.0/bin/gcc-ar-12
-lrwxr-xr-x  1 richiethomas  admin  34 Dec  3 10:35 /usr/local/bin/gcc-nm-12 -> ../Cellar/gcc/12.2.0/bin/gcc-nm-12
-lrwxr-xr-x  1 richiethomas  admin  38 Dec  3 10:35 /usr/local/bin/gcc-ranlib-12 -> ../Cellar/gcc/12.2.0/bin/gcc-ranlib-12
+lrwxr-xr-x  1 myusername  admin  31 Dec  3 10:35 /usr/local/bin/gcc-12 -> ../Cellar/gcc/12.2.0/bin/gcc-12
+lrwxr-xr-x  1 myusername  admin  34 Dec  3 10:35 /usr/local/bin/gcc-ar-12 -> ../Cellar/gcc/12.2.0/bin/gcc-ar-12
+lrwxr-xr-x  1 myusername  admin  34 Dec  3 10:35 /usr/local/bin/gcc-nm-12 -> ../Cellar/gcc/12.2.0/bin/gcc-nm-12
+lrwxr-xr-x  1 myusername  admin  38 Dec  3 10:35 /usr/local/bin/gcc-ranlib-12 -> ../Cellar/gcc/12.2.0/bin/gcc-ranlib-12
 ```
 
 So Homebrew names this executable `gcc-12`, not `gcc`.  Why is that?  If the package name is `gcc`, I would expect there to be a `gcc` executable in `/usr/bin/local` as well.  Is that an unreasonable expectation?

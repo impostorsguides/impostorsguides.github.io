@@ -165,7 +165,7 @@ I then try a few of the other flags, and I see different info:
 ```
 $ uname -a
 
-Darwin richiethomas-16mbpr19.local 22.3.0 Darwin Kernel Version 22.3.0: Mon Jan 30 20:42:11 PST 2023; root:xnu-8792.81.3~2/RELEASE_X86_64 x86_64
+Darwin myusername-16mbpr19.local 22.3.0 Darwin Kernel Version 22.3.0: Mon Jan 30 20:42:11 PST 2023; root:xnu-8792.81.3~2/RELEASE_X86_64 x86_64
 
 $ uname -m
 
@@ -173,7 +173,7 @@ x86_64
 
 $ uname -n
 
-richiethomas-16mbpr19.local
+myusername-16mbpr19.local
 
 $ uname -p
 
