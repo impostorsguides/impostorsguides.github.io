@@ -7,8 +7,20 @@ layout: base
     <h1 class="post-title">{{ page.title | escape }}</h1>
   </header>
 
+  {% if page.previous-permalink %}
+    <div style="margin-bottom: 2em" />
+    Previous: <a href={{ page.previous-permalink }}>{{ page.previous-title }}</a>
+    </div>
+  {% endif %}
+
   <div class="post-content">
     {{ content }}
   </div>
+
+  {% if page.next-permalink %}
+  <div style="margin-top: 2em" />
+    Next: <a href={{ page.next-permalink }}>{{ page.next-title }}</a>
+  </div>
+  {% endif %}
 
 </article>
