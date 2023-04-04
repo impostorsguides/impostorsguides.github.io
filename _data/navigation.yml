@@ -1,13 +1,7 @@
 # If you want to link only specific pages in your header, add the path to the
 # pages in order as they should show up.
 main:
-  - title: Home
-    url: /
   - title: Resources
     url: /resources/
-social_media:
-  - title: Twitter
-    url: https://www.twitter.com/impostorsguides
-    external: 'true'
 
 
