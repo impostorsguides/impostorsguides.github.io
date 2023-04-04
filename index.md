@@ -1,8 +1,10 @@
 ---
 layout: home
 permalink: /
-title: This site, in 10 seconds
+title: Welcome to Impostor's Guides
 ---
+
+## This site, in 10 seconds
 
 This is "David and Goliath" on Github.
 
@@ -10,15 +12,15 @@ I want to help newbie developers understand complex, widely-used open-source pro
 
 I have a theory that this understanding will help people who suffer from impostor syndrome feel less like impostors.  This site is an attempt to test that theory, both on them and on myself.
 
-# Who is this site for?
+## Who is this site for?
 
 Any developer who aspires to level up, but who feels like working on mission-critical open-source apps is "out of their league".  If you've ever said to yourself "Maybe an engineering manager or a staff engineer could grok that, but I'd never be able to", this site is for you.
 
-# Who is this site *not* for?
+## Who is this site *not* for?
 
 Anyone who **doesn't** like a lot of hand-holding.  I err on the side of over-explaining things here.  If that will make you feel like I'm talking down to you, then you're probably not my target audience.
 
-# What This Site Is About
+## What This Site Is About
 
 The programming community could stand to be a more welcoming place for beginners.  Greybeards always tell newbies to "read the fucking manual", but "the manual" is quite often written for people who are already experts, or at least it appears written that way to those same newbies.
 
@@ -26,19 +28,17 @@ The programming community could stand to be a more welcoming place for beginners
 
 I'm a journeyman engineer myself, and I may have gotten some things wrong in these posts.  If you spot an error and want to help fix it, feel free to reach out [here](https://twitter.com/impostorsguides) (for now).  You can also use the same link to reach out with general questions or comments.
 
-# Why the focus on Ruby and Rubyists?  Are you saying Rubyists are impostors?
+## Why the focus on Ruby and Rubyists?
 
-*Absolutely not*.  I mostly work with Ruby in my day job.  I got my start in Ruby, at a bootcamp (RIP Dev Bootcamp <3).  I love the Ruby community and its MINASWAN ethos.  I'm not implying anything about Rubyists or their skill level.
+I mostly work with Ruby in my day job.  I got my start in Ruby, at a bootcamp (RIP Dev Bootcamp <3).  I love the Ruby community and its MINASWAN ethos.
 
-Simply put, Ruby is the language I love and choose to work in.
-
-# What prior knowledge do you need to follow this?
+## What prior knowledge do you need to follow this?
 
  - You need to know how to use `git`.  If you don't yet know this crucial tool, a good free resource is [the "Pro Git" book](https://git-scm.com/book/en/v2), a free, comprehensive book available entirely online.
  - You need very basic knowledge of how to navigate in a terminal.  You should be familiar with `cd`, `ls`, `pwd`, and similarly elementary commands.
  - You need some basic programming knowledge, such as familiarity with if-blocks, case statements, what variables are, etc.
 
-# This Site's Principles
+## This Site's Principles
 
  - The best way to learn something is to teach it.
  - If you can't explain something in simple terms, you don't understand it well enough.
@@ -47,7 +47,7 @@ Simply put, Ruby is the language I love and choose to work in.
  - They're also great hands-on activities.
  - Whenever possible, use resources that are free (as in beer).  This guide is for everyone, and everyone can afford "free".
 
-# A Note About Links
+## A Note About Links
 
 I use internet-archived links whenever possible, so you can see what I saw at the time I encountered the pages that I reference.
 
@@ -59,7 +59,7 @@ My first choice for these archived links is usually [The Wayback Machine](https:
 
 In these cases, I use Archive.ph instead.  I'm looking for a back-up archiver which doesn't obfuscate links, and would appreciate any suggestions.
 
-# If you like what you read
+## If you like what you read
 
 Please consider sharing it on [Hacker News](https://news.ycombinator.com/) or your social media.  It helps me reach more newbie developers.
 
