@@ -1,8 +1,10 @@
-## The shebang line
+Our first line of code in the shim file is:
 
 ```
 #!/usr/bin/env bash
 ```
+
+## The shebang line
 
 From a Google search for the string `"#!/usr/bin/env bash"`, I learned that this line of code is called a ["shebang"](https://archive.ph/lO8UI).
 
@@ -10,7 +12,7 @@ In UNIX, a shebang is a special line of code at the top of a script file which t
 
 ### Different types of shebangs
 
-Note that you might sometimes see `#!/usr/bin/bash` instead of as a shebang, instead of `#!/usr/bin/env bash`.  The difference between the two is illustrated in further detail [here](https://archive.ph/ouudu) and [here](https://archive.ph/4jEZL).  But the gist of it is that `/usr/bin/env` checks your terminal environment for variables, sets them, and then runs your command.  If we type just `env` into our terminals, we can see a list of the environment variables that `env` will set:
+Note that you might sometimes see `#!/usr/bin/bash` instead of as a shebang, instead of `#!/usr/bin/env bash`.  The difference between these two is that `/usr/bin/env` checks your terminal environment for variables, sets them, and then runs your command.  If we type just `env` into our terminals, we can see a list of the environment variables that `env` will set:
 
 ```
 ~/Workspace/OpenSource ()  $ env
@@ -27,13 +29,13 @@ PWD=/Users/myusername/Workspace/OpenSource
 
 The benefit of using the `/usr/bin/env bash` shebang instead of `/usr/bin/bash` is that the former will likely work on more peoples' machines than the latter.  This is because one of the environment variables that `/usr/bin/env` loads is the `$PATH` env var (as we can see above in the output of the `env` command).
 
-If we use the `/usr/bin/bash` shebang, then whoever runs our script **must** have `bash` installed in their `/usr/bin/` directory.  Not everyone fits this description.  If we use the `/usr/bin/env bash` shebang (and therefore if we load `PATH` into our environment), then UNIX will search through all the directories in `PATH` until it finds `bash`.
+If we use the `/usr/bin/bash` shebang, then whoever runs our script **must** have `bash` installed in their `/usr/bin/` directory.  But that's not a safe bet.  For example, my `bash` executable is installed at `/bin/bash`, with no `/usr/` prefix.  If we load `PATH` into our environment via the `/usr/bin/env bash` shebang, then UNIX will search through all the directories in `PATH` until it finds `bash`, so we have more changes to find the `bash` executable.
 
-By relying on `/usr/bin/env bash`, we're no longer dependent on `bash` being located in a specific directory on our user's machine.
+More info on the differences between the two types of shebangs, including some *downsides* of using `/usr/bin/env bash`, can be found [here](https://archive.ph/ouudu) and [here](https://archive.ph/4jEZL).
 
 ### Why use a shebang?
 
-We *could* (hypothetically) leave the shebang out from this file.  But **somehow** we have to tell UNIX  how to run the file (i.e. which program to use).  If we don't do so in the file itself (i.e. by using a shebang), we'd have to do so when we type the command into the terminal.  So instead of typing `bundle install` in the command line, we'd have to type the following every time:
+Hypothetically, we *could* leave the shebang out from this file.  But **somehow** we have to tell UNIX which program to use when running the file.  If we don't do so in the file itself (i.e. by using a shebang), we'd have to do so when we type the command into the terminal.  So instead of typing `bundle install` in the command line, we'd have to type the following every time:
 
 ```
 /usr/bin/env bundle install
@@ -47,15 +49,15 @@ or:
 
 Using a shebang not only saves us a few keystrokes, but it's also one less thing that we humans can mess up when manually typing our command into the terminal.
 
+### Other shells besides `bash`
+
 As I mentioned before, the string "bash" at the end of the shebang tells UNIX to use `bash` when interpreting the code which follows.  But `bash` is not the only interpreter we can tell UNIX to use for a script that we write.  The only reason the code author used it here is because they wrote the subsequent code in bash.  If they had written it in Ruby, they could have written `#!/usr/bin/env ruby` instead (i.e. replace `bash` with `ruby` in the shebang).  In fact, let's try doing exactly that, as an experiment.
 
-### Experiment- writing a script with a Ruby shebang
+#### Experiment- writing a script with a Ruby shebang
 
-We start by writing a regular Ruby script with a `.rb` file extension.  We'll call it "hello.rb":
+We start by writing a regular Ruby script with a `.rb` file extension.  We'll name the file `hello.rb`, and the file will include the following code:
 
 ```
-# hello.rb
-
 puts "Hello world!"
 ```
 
@@ -109,7 +111,7 @@ Hello world
 
 Success!  We've told bash which interpreter we want to use, meaning that we no longer need to use the `ruby` command at the terminal prompt.
 
-### Experiment- does the shebang have to be on the first line?
+#### Experiment- does the shebang have to be on the first line?
 
 I update my script so that the shebang is on line 2 instead of line 1:
 
@@ -135,20 +137,22 @@ So as it turns out, the shebang line *must* be on the very first line of the fil
 We have a `.rb` file extension at the end, but the terminal doesn't use the extension when deciding how to interpret the file.  I came across [this StackOverflow post](https://archive.ph/YpR6y) while looking for documentation on this:
 
 <p style="text-align: center">
-  <img src="/assets/images/file-extension-for-terminal.png" width="50%" alt="StackOverflow question about which file extension to use for a shell script"  style="border: 1px solid black; padding: 0.5em">
+  <img src="/assets/images/file-extension-for-terminal.png" width="70%" alt="StackOverflow question about which file extension to use for a shell script"  style="border: 1px solid black; padding: 0.5em">
 </p>
 
 Which had [this answer](https://archive.ph/YpR6y#selection-1971.36-1981.6):
 
 <p style="text-align: center">
-  <img src="/assets/images/file-extension-not-used.png" width="50%" alt="File extensions aren't used when the terminal tries to interpret a file."  style="border: 1px solid black; padding: 0.5em">
+  <img src="/assets/images/file-extension-not-used.png" width="70%" alt="File extensions aren't used when the terminal tries to interpret a file."  style="border: 1px solid black; padding: 0.5em">
 </p>
 
-This got me wondering *why* a terminal doesn't use file extensions.  So [I posted a question on StackOverflow](https://superuser.com/questions/1771550/why-do-unix-terminals-use-shebangs-instead-of-file-extensions-when-deciding-how), but unfortunately it was interpreted as being opinion-based and was therefore closed.  I dunno, I thought there might have been an objective, fact-based reason for why shebangs are preferred by the interpreter over file extensions.  But I can see where they're coming from, too.
+This got me wondering *why* a terminal doesn't use file extensions.  So [I posted a question on StackOverflow](https://superuser.com/questions/1771550/why-do-unix-terminals-use-shebangs-instead-of-file-extensions-when-deciding-how).
 
-Oh well, onward!
+From the comments, it looks like this is one big difference between Windows and UNIX.  The former takes the approach of using the file extension to determine which program to use when executing a given file, in a part of the OS called (I think?) the file association registry.  This means Windows application developers have to tell the OS which file extensions their application can open.  The benefit of this is, no shebang in the file itself.
 
-### Why aren't new files executable by default?
+UNIX, on the other hand, has no such registry.  This means that the author of a file (rather than the author of an application) gets to decide how to open their file.  Different philosophies, different trade-offs.
+
+## File Permissions
 
 Why is it necessary to run `chmod +x` on our file, before we can execute it?  Why can't a user execute their own file by default?  I asked myself this same question, and since I couldn't find an answer online already, [I asked StackOverflow](https://archive.ph/G8Ine).
 
@@ -160,11 +164,9 @@ The question I asked involves a command called `umask` which isn't super-importa
 
 Because [UNIX is multi-user in nature](https://archive.ph/EVocS), it needs to account for the scenario where a user gains access to a system that they shouldn't have access to, and writes a malicious script that they then try to execute.  Because they don't have permission to execute the script without authorization from the system's administrator, they are prevented from doing so.  This, in a nutshell, is why we have to `chmod` our scripts every time.
 
-## File Permissions
+#### Experiment- analyzing a file's permissions
 
 File permissions are divided into 3 different categories- one for the file's owner, one for the group that the user belongs to, and one for everybody else.  The `+x` flag for `chmod` actually updates the "executable" permissions for *all 3* of those groups, *not* just for me, the file's creator.  We can see this in action by running an experiment.
-
-### Experiment- analyzing a file's permissions
 
 We delete our old `foo` file and creating a new one, then looking at its permissions:
 
@@ -177,11 +179,9 @@ $ ls -l foo
 
 The key here is the `-rw-r--r--` section.  According to [this source](https://archive.ph/PYAv0), the first `-` means that what we're looking at are *file* permissions, not *directory* permissions.  If we're looking at directory permissions, the `-` is replaced with a `d`.
 
-Characters 2 through 4 are for the first permissions category (i.e. the file creator).  Characters 5-7 are for users in the creator's group, and the last 3 characters are for everyone else.  In each group of 3 characters, `r` means that group can read the file, `w` means they can write to it, and `x` means they can execute it.
+Characters 2-4 are for the first permissions category (i.e. the file creator).  Characters 5-7 are for users in the same user group as the file's creator, and characters 8-10 are for everyone else.  In each of these bunches of 3 characters, `r` means that group can read the file, `w` means they can write to it, and `x` means they can execute it.
 
-By default, the file creator has `read` and `write` permissions, but not `execute` permissions.  I Googled why this is, but was unable to find an answer; it seems like a file's creator should be able to execute their own file, no?
-
-Anyway, let's run `chmod +x foo` and then re-run `ls -l foo`:
+Let's run `chmod +x foo` and then re-run `ls -l foo`:
 
 ```
 $ chmod +x foo
@@ -194,7 +194,7 @@ As we can see, now each permissions category has `x` set.
 
 ## The `PATH` variable
 
-Let's go back to the `/usr/bin/env` command in our shebang, and specifically to the environment variables which are loaded by that command.  An important example of these is the `PATH` variable.  It's important because it contains a list of directories that UNIX will search through, when it looks for the command we ask `env` to run (as well as the order in which the search will happen).  So if my shebang is `#!/usr/bin/env ruby`, and my `PATH` variable looks like the following:
+Let's go back to the `/usr/bin/env` command in our shebang, and specifically to the environment variables which are loaded by that command.  As we discussed, an important example of these is the `PATH` variable.  It's important because it contains a list of directories that UNIX will search through, when it looks for the command we ask `env` to run (as well as the order in which the search will happen).  So if my shebang is `#!/usr/bin/env ruby`, and my `PATH` variable looks like the following:
 ```
 /Users/myusername/.rbenv/shims:/usr/local/sbin:/usr/local/bin:/usr/bin:/bin
 ```
@@ -215,44 +215,29 @@ UNIX splits the `PATH` string using `IFS` as that delimiter when you type a comm
 
 The `IFS` link above contains an experiment, which I've modified slightly below so we can see an example of this env var and its usage.
 
-### Experiment- IFS and delimiters
+#### Experiment- IFS and delimiters
 
-The script below iterates over a string which is delimited with spaces, using a for-loop.  We haven't encountered a `bash`-flavored for-loop yet, but we will later on in the code.
+Our `$PATH` variable is pretty inscrutable, with all those directories concatenated together.  Let's write a script to make it easier to read.
 
 ```
 #!/usr/bin/env bash
 
-string="foo bar baz"
+string="$PATH"
 
-for i in $string
+for path in $string
 do
-  echo "'$i' is the substring"
+  echo "$path"
 done
 ```
 When I run the script, I see:
 
 ```
 $ ./foo
-'foo' is the substring
-'bar' is the substring
-'baz' is the substring
+
+/Users/myusername/.nvm/versions/node/v18.12.1/bin:/Users/myusername/.rbenv/shims:/Users/myusername/.yarn/bin:/Users/myusername/.config/yarn/global/node_modules/.bin:/Users/myusername/.rbenv/shims:/Users/myusername/.rbenv/bin:/usr/local/lib/ruby/gems/3.1.0:/Users/myusername/.cargo/bin:/usr/local/opt/redis@3.2/bin:/usr/local/opt/mongodb@3.2/bin:/usr/local/sbin:/Users/myusername/.yarn/bin:/Users/myusername/.config/yarn/global/node_modules/.bin:/usr/local/opt/ruby/bin:/Users/myusername/.asdf/shims:/Users/myusername/.asdf/bin:/Users/myusername/.rbenv/shims:/usr/local/opt/redis@3.2/bin:/usr/local/opt/mongodb@3.2/bin:/usr/local/sbin:/Users/myusername/.yarn/bin:/Users/myusername/.config/yarn/global/node_modules/.bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/Applications/Postgres.app/Contents/Versions/latest/bin
 ```
 
-I then change the string declaration to use `:` as a delimiter instead of spaces:
-
-```
-string="foo:bar:baz"
-```
-
-When I re-run the script, I get:
-```
-$ ./foo
-'foo:bar:baz' is the substring
-```
-
-Now we only get one iteration instead of 3, because we haven't updated the `IFS` variable to reflect the change we made to our string.
-
-Lastly, I re-define the `IFS` env var like so:
+Then, I add the following to the top of the script:
 
 ```
 IFS=":"
@@ -260,15 +245,41 @@ IFS=":"
 
 When I re-run the script, I get:
 ```
-$ ./foo
-'foo' is the substring
-'bar' is the substring
-'baz' is the substring
+bash-3.2$ ./foo
+
+/Users/myusername/.nvm/versions/node/v18.12.1/bin
+/Users/myusername/.rbenv/shims
+/Users/myusername/.yarn/bin
+/Users/myusername/.config/yarn/global/node_modules/.bin
+/Users/myusername/.rbenv/shims
+/Users/myusername/.rbenv/bin
+/usr/local/lib/ruby/gems/3.1.0
+/Users/myusername/.cargo/bin
+/usr/local/opt/redis@3.2/bin
+/usr/local/opt/mongodb@3.2/bin
+/usr/local/sbin
+/Users/myusername/.yarn/bin
+/Users/myusername/.config/yarn/global/node_modules/.bin
+/usr/local/opt/ruby/bin
+/Users/myusername/.asdf/shims
+/Users/myusername/.asdf/bin
+/Users/myusername/.rbenv/shims
+/usr/local/opt/redis@3.2/bin
+/usr/local/opt/mongodb@3.2/bin
+/usr/local/sbin
+/Users/myusername/.yarn/bin
+/Users/myusername/.config/yarn/global/node_modules/.bin
+/usr/local/bin
+/System/Cryptexes/App/usr/bin
+/usr/bin
+/bin
+/usr/sbin
+/sbin
+/Library/Apple/usr/bin
+/Applications/Postgres.app/Contents/Versions/latest/bin
 ```
 
-When we update `IFS` to match the delimiters in our string, we once again get our 3 iterations.
-
-This illustrates that the empty-space character " " was the default internal field separator on my machine.  Replacing ` ` with `:` in *both* the string and the `IFS` variable resulted in the same output, but making that same change in only the string *or* the variable would result in a single line of output, rather than 3 separate lines.
+Note that some directories (such as `/Users/myusername/.rbenv/shims`) appear multiple times.  That's a sign of less-than-great code cleanliness on my part, namely in my shell config scripts.  One day I'll figure out and fix the root cause of that issue. ;-)
 
 This experiment also shows that iterating over a string is similar to iterating over an array, where the items in the array are equivalent to the items in the string separated by the value of `$IFS`.  So if, like my machine, yours uses the " " character, then a string like "foo bar baz" (with 3 words and two spaces) will be separated into 3 separate strings ("foo", "bar", and "baz") for the purposes of iteration.
 
