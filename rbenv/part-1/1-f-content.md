@@ -14,15 +14,19 @@ We saw a regular `bash` for-loop earlier, in our experiment with delimiters and 
 
 If we haven't seen this variable defined yet, does that mean it's defined or built-in by the language?  As usual, Googling turns up [a StackOverflow post](https://web.archive.org/web/20230406161948/https://stackoverflow.com/questions/73134672/linux-shell-for-arg-do){:target="_blank" rel="noopener"}:
 
-<p style="text-align: center">
-  <img src="/assets/images/arg-for-loop.png" width="70%" alt="What is `arg` in a bash `for` loop?" style="border: 1px solid black; padding: 0.5em">
-</p>
+<center style="margin-bottom: 3em">
+  <a href="/assets/images/arg-for-loop.png" target="_blank">
+    <img src="/assets/images/arg-for-loop.png" width="90%" alt="What is `arg` in a bash `for` loop?" style="border: 1px solid black; padding: 0.5em">
+  </a>
+</center>
 
 Scrolling down in the answer a bit, we see:
 
-<p style="text-align: center">
-  <img src="/assets/images/arg-for-loop-2.png" width="70%" alt="Omitting `in` in a bash `for` loop?" style="border: 1px solid black; padding: 0.5em">
-</p>
+<center style="margin-bottom: 3em">
+  <a href="/assets/images/arg-for-loop-2.png" target="_blank">
+  <img src="/assets/images/arg-for-loop-2.png" width="90%" alt="Omitting `in` in a bash `for` loop?" style="border: 1px solid black; padding: 0.5em">
+  </a>
+</center>
 
 The above statement implies that `$@` expands to the list of arguments provided to the script.  Let's see if that's true with another experiment.
 
@@ -63,6 +67,9 @@ bar
 baz
 buzz
 ```
+
+They print on separate lines this time, because now we're iterating over them with the `for` loop instead of printing them all at once via `$@`.
+
 And finally, testing whether we can eliminate `in "$@"`:
 
 ```
@@ -82,7 +89,9 @@ baz
 buzz
 ```
 
-Awesome!  So we learned:
+Awesome!  Nothing changed, meaning that the `in "$@"` bit is optional in this case.
+
+So we learned:
 
  - `$@` stands for the arguments that you pass to the script
  - If you write a `for` loop but leave off the `in ___` part, bash defaults to using `$@`
@@ -97,37 +106,100 @@ case "$arg" in
 esac
 ```
 
-I've seen case statements before (Ruby has them, as well), but I still feel like familiarizing myself with any bash-specific idiosyncracies.
+If you've done any programming before, you've likely seen case statements before (Ruby has them, as well).  But it might still pay to familiarize ourselves with the way `bash` in particular handles them.
 
-I find [this link](https://web.archive.org/web/20220820011836/https://linuxize.com/post/bash-case-statement/){:target="_blank" rel="noopener"}, which explains bash's case statement syntax.  I would have preferred a more official form of documentation, but:
+I try `help case` in my `bash` terminal, and get the following:
 
- - [the link from The Linux Documentation Project](https://web.archive.org/web/20230316230422/http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_03.html){:target="_blank" rel="noopener"} struck me as much-less beginner-friendly, and
- - neither `man case` nor `help case` turned up anything useful.
+```
+bash-3.2$ help case
 
- At any rate, here are the highlights from the link I found:
+case: case WORD in [PATTERN [| PATTERN]...) COMMANDS ;;]... esac
+    Selectively execute COMMANDS based upon WORD matching PATTERN.  The
+    `|' is used to separate multiple patterns.
+```
 
+OK, pretty short and doesn't tell me much more than I already know.
 
-1. Each `case` statement starts with the `case` keyword, followed by the case expression and the `in` keyword. The statement ends with the `esac` keyword.
+I find [this link](https://web.archive.org/web/20220820011836/https://linuxize.com/post/bash-case-statement/){:target="_blank" rel="noopener"}, which explains bash's case statement syntax.  It's much too long to copy/paste in its entirety, but there's a lot of good stuff in it.  Here is the general pattern that `case` statements take in `bash`:
 
-1. You can use multiple patterns separated by the `|` operator. The `)` operator terminates a pattern list.
+```
+case EXPRESSION in
 
-1. A pattern can have [special characters](https://web.archive.org/web/20220820011901/https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html){:target="_blank" rel="noopener"}.
+  PATTERN_1)
+    STATEMENTS
+    ;;
 
-1. A pattern and its associated commands are known as a clause.
+  PATTERN_2)
+    STATEMENTS
+    ;;
 
-1. Each clause must be terminated with `;;`.
+  PATTERN_N)
+    STATEMENTS
+    ;;
 
-1. The commands corresponding to the first pattern that matches the expression are executed.
+  *)
+    STATEMENTS
+    ;;
+esac
+```
 
-1. It is a common practice to use the wildcard asterisk symbol (`*`) as a final pattern to define the default case. This pattern will always match.
+And here is a specific example the article provides:
 
-1. If no pattern is matched, the return status is zero. Otherwise, the return status is the [exit status](https://web.archive.org/web/20220806222213/https://linuxize.com/post/bash-exit/){:target="_blank" rel="noopener"} of the executed commands.
+```
+#!/bin/bash
 
-None of this is terribly surprising, since these rules all appear to match how case statements work in Ruby and other languages I've worked with.
+echo -n "Enter the name of a country: "
+read COUNTRY
+
+echo -n "The official language of $COUNTRY is "
+
+case $COUNTRY in
+
+  Lithuania)
+    echo -n "Lithuanian"
+    ;;
+
+  Romania | Moldova)
+    echo -n "Romanian"
+    ;;
+
+  Italy | "San Marino" | Switzerland | "Vatican City")
+    echo -n "Italian"
+    ;;
+
+  *)
+    echo -n "unknown"
+    ;;
+esac
+```
+
+From these snippets and from the article as a whole, my takeaways are:
+
+ - Each `case` statement starts with the `case` keyword, followed by the case expression and the `in` keyword. The statement ends with the `esac` keyword.
+
+ - The `)` operator terminates a pattern list.
+
+ - You can use multiple patterns separated by the `|` operator.
+
+ - A pattern can have [special characters](https://web.archive.org/web/20220820011901/https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html){:target="_blank" rel="noopener"}.
+
+ - A pattern and its associated commands are known as a clause.
+
+ - Each clause must be terminated with `;;`.
+
+ - The commands corresponding to the first pattern that matches the expression are executed.
+
+ - It is a common practice to use the wildcard asterisk symbol (`*`) as a final pattern to define the default case. This pattern will always match.
+
+ - If no pattern is matched, the return status is zero.
+
+ - Otherwise, the return status is the [exit status](https://web.archive.org/web/20220806222213/https://linuxize.com/post/bash-exit/){:target="_blank" rel="noopener"} of the executed commands (aka the clause).
+
+The only thing new here, IMHO, is the syntax.  In general, these rules all appear to match how case statements work in Ruby and other languages I've worked with.
 
 ### Experiment- building a simple `case` statement
 
-In case this is your first time encountering case statements, let's build a simple one here.  I start by updating my `foo` script to look like the following:
+To solidify our understanding of how `bash` handles case statements, let's build a simple one here.  I start by updating my `foo` script to look like the following:
 
 ```
 #!/usr/bin/env bash
@@ -204,22 +276,62 @@ $ ./foo 4
 4
 ```
 
-Interestingly, when I remove the quotes from around the numbers in the case statements, the script continues to function as normal.
+Lastly, I try adding a clause with more than one pattern:
 
-### Pattern-matching in case statements
+```
+#!/usr/bin/env bash
 
-The earlier bullet points also explain the syntax of the subsequent line, which is a condition that the case statement will match against:
+case "$@" in
+  "1" )
+    echo "One"
+    ;;
+  "2" )
+    echo "Two"
+    ;;
+  "3" )
+    echo "Three"
+    ;;
+  "4" | "5" )
+    echo "Either four or five"
+    ;;
+  *)
+    echo "$@"
+    ;;
+esac
+```
+
+When I run it, I get:
+
+```
+$ ./foo 4
+
+Either four or five
+
+$ ./foo 5
+
+Either four or five
+```
+
+No surprises so far- all the examples worked the way I'd expect.  Interestingly, when I remove the quotes from around the numbers in the case statements, the script continues to function as normal.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Next line of code:
 
 ```
     -e* | -- ) break ;;
     ...
 ```
 
-We see two patterns (`-e` and `--`), separated by the `|` character, then terminated by the `)` character, as mentioned in bullet point 2 above.  If the current arg in the iteration matches either pattern, we exit the `for` loop (i.e. we `break`).
+## Pattern-matching in case statements
 
-Because of point #7 above, I suspect that any text starting with `-e` would fit the `-e*` pattern.  To prove it, I perform an experiment.
+The earlier bullet points also explain the syntax of this first clause of the case statement.
 
-### Experiment- the `-e*` flag in a case statement
+We see two patterns (`-e` and `--`), separated by the `|` character, then terminated by the `)` character, as mentioned in bullet points 2 and 3 above.  If the current arg in the iteration matches either pattern, we exit the `for` loop (i.e. we `break`).  Otherwise, we fall through and check the next clause in the case statement.
+
+Because of point #8 above, I suspect that any text starting with `-e` would fit the `-e*` pattern.  To prove it, I perform an experiment.
+
+#### Experiment- the `-e*` flag in a case statement
 
 I write the following script:
 
@@ -228,7 +340,7 @@ I write the following script:
 
 for arg; do
   case "$arg" in
-    -e* ) echo "Pattern matched; exiting..."
+    -e* ) echo "Pattern matched on arg $arg; exiting..."
     break ;;
     * )
       echo "arg is: $arg" ;;
@@ -244,17 +356,29 @@ I then run the following:
 
 ```
 $ ./foo bar -ebaz buzz
+
 arg is: bar
-Pattern matched; exiting...
+Pattern matched on arg -ebaz; exiting...
 Outside the for loop
 ```
 
-So we printed our first arg, and then "Pattern matched; exiting...", then we did *not* print the third arg (`buzz`).  This is because "-ebaz" starts with "-e", which matched the `break` condition of `-e*`.  Lastly, we printed "Outside the for loop" to prove that `break`ing doesn't result in an exit of the entire script.  Based on this result, I think we can safely say that we were correct, and the `-e*` flag returns true if a given string starts with `-e`, regardless of what follows after.
+So we printed our first arg, and then "Pattern matched on arg -ebaz; exiting...", then we did **not** print the third arg (`buzz`).  This is because "-ebaz" starts with "-e", which matched the `break` condition of `-e*`.  Lastly, we printed "Outside the for loop" to prove that `break`ing doesn't result in an exit of the entire script.  Based on this result, I think we can safely say that we were correct, and the `-e*` flag returns true if a given string starts with `-e`, regardless of what follows after.
 
-To figure out what the `-e` flag actually does, I just ran `ruby –help` and searched for the `-e` entry.  This flag lets you execute Ruby code directly in your terminal, without having to pass a filename to the Ruby interpreter:
+We know that this flag is for the `ruby` command because the case statement clause is located inside the aforementioned `if` check in the shim:
+
+```
+if [ "$program" = "ruby" ]; then
+...
+```
+
+So to figure out what the `-e` flag actually does, I just ran `ruby –help` and searched for the `-e` entry.
+
+As it turns out, this flag lets you execute Ruby code directly in your terminal, without having to pass a filename to the Ruby interpreter:
 
 <p style="text-align: center">
-  <img src="/assets/images/ruby-help-e.png" width="70%" alt="`ruby --help` output`">
+  <a href="/assets/images/ruby-help-e.png" target="_blank">
+    <img src="/assets/images/ruby-help-e.png" width="90%" alt="`ruby --help` output`">
+  </a>
 </p>
 
 For example:
@@ -269,19 +393,20 @@ So passing Ruby code directly to the `ruby` interpreter in your terminal (via th
 
 Regarding the 2nd pattern (`--`), I've seen it used in terminal commands before but I doubt I could explain its purpose.  StackOverflow [saves the day again](https://web.archive.org/web/20220623104640/https://unix.stackexchange.com/questions/11376/what-does-double-dash-mean){:target="_blank" rel="noopener"}:
 
-<p style="text-align: center">
-  <img src="/assets/images/double-dash.png" width="70%" alt="What is a double-dash?" style="border: 1px solid black; padding: 0.5em">
-</p>
+<center style="margin-bottom: 3em">
+  <a target="_blank" href="/assets/images/double-dash.png">
+    <img src="/assets/images/double-dash.png" width="90%" style="border: 1px solid black; padding: 0.5em">
+  </a>
+</center>
 
 I think this means that everything before `--` is meant to be a flag, and everything after that is an argument to the script itself.
 
-Hmmm OK, but you still need to be able to process the subsequent arguments in the script, right?  In our case, if the text matches the `--` pattern, does that mean the script breaks out of the list of args, meaning we won't process anything after `--`?
+We can deduce something from this clause and the conditions it matches (`-e*` or `--`).  And that is that both of these conditions, in their own way, are meant to signify that everything else which comes afterward is an argument that tells the `ruby` command **what** to process, **not** a flag which tells the script **how** to process it.
 
-Not quite.  We'll see shortly that the last line of the shim file makes use of `"$@"` again, specifically to pass those args to `$program`.  The value of `$@` is not modified at all by anything in the `for` loop, so all the args which get passed to the shim file are *also* passed in their original form to `$program`.  By `break`ing here, the only thing we're doing here is preventing those positional arguments from affecting the value of `RBENV_DIR`, which (as we'll see shortly) is the real purpose of the `for`-loop.
+If we don't match either of these two conditions, it's probably a safe bet that the argument we've passed still represent our attempt to tell `ruby` how to process something.  That leads us to our next block of code:
 
-### More pattern-matching with case statements
+## Setting `RBENV_DIR`
 
-Next line of code:
 
 ```
     */* )
@@ -290,11 +415,13 @@ Next line of code:
 
 ```
 
-Judging by the `)` terminator character and the `;;` a few lines down, we can see that this is another pattern that the case statement will match against.  The only thing that throws me off is the difference between the above pattern (`*/* )`) and the one in my experiment script (`* )`), which I borrowed from the link on case statements.
+Judging by the `)` terminator character and the `;;` a few lines down, we can see that this is another clause of our case statement, and that `*/*` is a pattern that the case statement will match against.
 
-The pattern searches for a forward-slash, with zero or more arbitrary characters before and/or after it.  To me, that looks like it's trying to match against a file path.  Let's check that with an experiment.
+One difference I notice is that the `*/* )` pattern here doesn't exactly match the `* )` pattern in the example code we read earlier.
 
-### Experiment: how to check for a filepath in a case statement
+It looks like our pattern here searches for a forward-slash, surrounded on either side with zero or more arbitrary characters.  The one thing I can think of which would match that pattern is a file path.  Let's check that with an experiment.
+
+#### Experiment: matching the `*/*` pattern
 
 I make a `bash` script which looks like so
 
@@ -327,6 +454,26 @@ match: /
 not a match:
 ```
 
+I have the following patterns:
+
+ - 3 patterns with no forward slashes (just 3 random numbers)
+ - 4 patterns containing a forward slash:
+    - one with characters both before and after
+    - one with a character to the right of the slash
+    - one with a character to the left of the slash, and
+    - one with no characters before or after
+ - an empty string
+
+When I run the script:
+
+ - the first group of 3 patterns **don't** match
+ - the second group of 4 patterns **do** match
+ - the final empty string does **not** match
+
 So yes, it appears to be looking for strings which match the `/` symbol with zero or more characters of text on either side.
 
 But just because it *looks* like a valid filepath, doesn't mean it *is* one.  So how do we know it's a file?
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+We'll answer that question on the next page.
