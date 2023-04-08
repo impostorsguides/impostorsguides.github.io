@@ -1,6 +1,6 @@
 We're getting close to the end here, only 3 more commands.  First, the tests:
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/versions.bats)
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/versions.bats){:target="_blank" rel="noopener"}
 
 After the `bats` shebang and the loading of `test_helper`, the first block of code is:
 
@@ -285,7 +285,7 @@ Here we create an installed Ruby version "1.8.7" and a symlink, as in the last t
 
 That's all the tests.  Now on to the code:
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-versions)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-versions){:target="_blank" rel="noopener"}
 
 (stopping here for the day; 78722 words)
 
@@ -332,7 +332,7 @@ for arg; do
 done
 ```
 
-First we explicitly unset any variables named `bare` or `skip_aliases`.  To be honest, not sure why this is necessary.  The string `skip_aliases` only occurs in one file within the `rbenv` codebase, and that's in this file.  This was also the case even as of [the PR](https://github.com/rbenv/rbenv/pull/812/files) which introduced this code.
+First we explicitly unset any variables named `bare` or `skip_aliases`.  To be honest, not sure why this is necessary.  The string `skip_aliases` only occurs in one file within the `rbenv` codebase, and that's in this file.  This was also the case even as of [the PR](https://github.com/rbenv/rbenv/pull/812/files){:target="_blank" rel="noopener"} which introduced this code.
 
 Two theories I can think of:
 
@@ -466,7 +466,7 @@ Neither of these `declare` statements caused the `declare`d value to show up in 
 
 Without posting a question in the RBENV repo's "Issues" Github page, I can't say for sure what the reason is.  But to me, the most likely reason for using `unset` in the `versions` file was to guard against any users who have `declare`'ed variables with the same names as the ones used in this file.  I'm content to move on from here.
 
-NOTE: I might want to read more about `declare` [here](https://linuxhint.com/bash_declare_command/).
+NOTE: I might want to read more about `declare` [here](https://linuxhint.com/bash_declare_command/){:target="_blank" rel="noopener"}.
 
 Next block of code:
 
@@ -566,7 +566,7 @@ list_versions() {
 
 (stopping here for the day; 79797 words)
 
-We declare a helper function called `list_versions`.  Inside it, we temporarily turn on the `nullglob` option, so that when we attempt to expand the glob "$versions_dir"/* on the next line, it will expand to an empty string if the directory's contents are empty (i.e. it contains no filepaths or directory paths).  See [here](https://web.archive.org/web/20211102131455/http://bash.cumulonim.biz/NullGlob.html) for more info.
+We declare a helper function called `list_versions`.  Inside it, we temporarily turn on the `nullglob` option, so that when we attempt to expand the glob "$versions_dir"/* on the next line, it will expand to an empty string if the directory's contents are empty (i.e. it contains no filepaths or directory paths).  See [here](https://web.archive.org/web/20211102131455/http://bash.cumulonim.biz/NullGlob.html){:target="_blank" rel="noopener"} for more info.
 
 If it does contain one or more paths, then for each path in that `versions_dir` directory, we do the following:
 
@@ -606,7 +606,7 @@ The first part of this is the `sed` command:
 sed 'h; s/[+-]/./g; s/.p\([[:digit:]]\)/.z.\1/; s/$/.z/; G; s/\n/ /'
 ```
 
-After Googling "sed bash", I find [the GNU.org manual](https://web.archive.org/web/20221016162544/https://www.gnu.org/software/sed/manual/sed.html) for `sed`.  After reading through the introduction and getting my bearings, I find [the section on `sed` scripts](https://web.archive.org/web/20221016162544/https://www.gnu.org/software/sed/manual/sed.html#sed-scripts).  It implies that the commands inside the stringified script are delimited using semi-colons:
+After Googling "sed bash", I find [the GNU.org manual](https://web.archive.org/web/20221016162544/https://www.gnu.org/software/sed/manual/sed.html){:target="_blank" rel="noopener"} for `sed`.  After reading through the introduction and getting my bearings, I find [the section on `sed` scripts](https://web.archive.org/web/20221016162544/https://www.gnu.org/software/sed/manual/sed.html#sed-scripts){:target="_blank" rel="noopener"}.  It implies that the commands inside the stringified script are delimited using semi-colons:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-18mar23-1048am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
@@ -627,7 +627,7 @@ The first `sed` command is "h;".  When I look up this command in the commands su
           Replace the contents of the hold space with the contents of the pattern space.
 ```
 
-I'm not sure what "hold space" and "pattern space" refer to, so I Google "bash sed hold space".  I find [this StackOverflow answer](https://stackoverflow.com/a/12834372/2143275), which says:
+I'm not sure what "hold space" and "pattern space" refer to, so I Google "bash sed hold space".  I find [this StackOverflow answer](https://stackoverflow.com/a/12834372/2143275){:target="_blank" rel="noopener"}, which says:
 
 > When sed reads a file line by line, the line that has been currently read is inserted into the pattern buffer (pattern space). Pattern buffer is like the temporary buffer, the scratchpad where the current information is stored. When you tell sed to print, it prints the pattern buffer.
 >
@@ -635,7 +635,7 @@ I'm not sure what "hold space" and "pattern space" refer to, so I Google "bash s
 
 OK, for each line that `sed` encounters, it first puts that line in the "hold space", or the place in memory that it uses to store things for later.
 
-The next `sed` command is `s/[+-]/./g;`.  I think I recognize the square brackets from Ruby regexes, but there's always the chance that `sed` regexes work differently.  In [the GNU `sed` manual](https://www.gnu.org/software/sed/manual/sed.html), I search for the string "bracket" and find the section ["5.5 Character Classes and Bracket Expressions"](https://www.gnu.org/software/sed/manual/sed.html#Character-Classes-and-Bracket-Expressions):
+The next `sed` command is `s/[+-]/./g;`.  I think I recognize the square brackets from Ruby regexes, but there's always the chance that `sed` regexes work differently.  In [the GNU `sed` manual](https://www.gnu.org/software/sed/manual/sed.html){:target="_blank" rel="noopener"}, I search for the string "bracket" and find the section ["5.5 Character Classes and Bracket Expressions"](https://www.gnu.org/software/sed/manual/sed.html#Character-Classes-and-Bracket-Expressions){:target="_blank" rel="noopener"}:
 
 > A bracket expression is a list of characters enclosed by '[' and ']'. It matches any single character in that list; if the first character of the list is the caret '^', then it matches any character not in the list. For example, the following command replaces the words 'gray' or 'grey' with 'blue':
 >
@@ -651,7 +651,7 @@ The `/g` at the end stands for "global", which means the pattern will match *all
 
 What that means for us is, `sed` will find all examples of a "+" or "-" character, and replace it with a "." character.
 
-We can test this by running just this particular `sed` regex against a test file.  I make a simple text file named "bar" and paste the following Ruby versions inside it.  The Ruby versions were taken from [the official Ruby release list](https://web.archive.org/web/20221006111802/https://www.ruby-lang.org/en/downloads/releases/):
+We can test this by running just this particular `sed` regex against a test file.  I make a simple text file named "bar" and paste the following Ruby versions inside it.  The Ruby versions were taken from [the official Ruby release list](https://web.archive.org/web/20221006111802/https://www.ruby-lang.org/en/downloads/releases/){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-18mar2023-1056am.png" width="30%" style="border: 1px solid black; padding: 0.5em">
@@ -673,9 +673,9 @@ Next `sed` command is:
 s/.p\([[:digit:]]\)/.z.\1/;
 ```
 
-This is another search-and-replace command.  The first "." after the "/" character matches any single character, according to [this link](https://web.archive.org/web/20221021041253/https://users.monash.edu.au/~erict/Resources/sed/) (I searched for "period" in the GNU docs, but didn't find anything relevant).  The subsequent "p" matches the literal character "p".
+This is another search-and-replace command.  The first "." after the "/" character matches any single character, according to [this link](https://web.archive.org/web/20221021041253/https://users.monash.edu.au/~erict/Resources/sed/){:target="_blank" rel="noopener"} (I searched for "period" in the GNU docs, but didn't find anything relevant).  The subsequent "p" matches the literal character "p".
 
-Next is the `\(...\)` syntax.  The slashes simply escape the opening and closing parentheses.  The parentheses themselves are meant to create a sub-expression, as mentioned [here](https://web.archive.org/web/20221016162544/https://www.gnu.org/software/sed/manual/sed.html#Back_002dreferences-and-Subexpressions).  The concept of sub-expressions is actually related to the `\1` syntax that we also see in the current `sed` command.  From the docs:
+Next is the `\(...\)` syntax.  The slashes simply escape the opening and closing parentheses.  The parentheses themselves are meant to create a sub-expression, as mentioned [here](https://web.archive.org/web/20221016162544/https://www.gnu.org/software/sed/manual/sed.html#Back_002dreferences-and-Subexpressions){:target="_blank" rel="noopener"}.  The concept of sub-expressions is actually related to the `\1` syntax that we also see in the current `sed` command.  From the docs:
 
 > back-references are regular expression commands which refer to a previous part of the matched regular expression. Back-references are specified with backslash and a single digit (e.g. '\1'). The part of the regular expression they refer to is called a subexpression, and is designated with parentheses.
 >
@@ -707,7 +707,7 @@ Next is the `\(...\)` syntax.  The slashes simply escape the opening and closing
 
 Note that I actually got lucky finding the info on `\1`.  I was searching the GNU docs for the word "parentheses", found section 5.7, and saw that it also referenced the `\1` syntax.
 
-Next are the double-brackets followed by `:digit:` followed by the double-closing-brackets.  We get an explanation of this character sequence from [the "Bracket Expressions" docs](https://www.gnu.org/software/sed/manual/sed.html#Character-Classes-and-Bracket-Expressions) that we looked at previously:
+Next are the double-brackets followed by `:digit:` followed by the double-closing-brackets.  We get an explanation of this character sequence from [the "Bracket Expressions" docs](https://www.gnu.org/software/sed/manual/sed.html#Character-Classes-and-Bracket-Expressions){:target="_blank" rel="noopener"} that we looked at previously:
 
 > Finally, certain named classes of characters are predefined within bracket expressions, as follows.
 >
@@ -734,7 +734,7 @@ We can test this by combining this new `sed` command with the previous command w
 
 Here we can see that, for example, `2.0.0.p247` has been changed to `2.0.0.z.247`, because ".p247" matches the replacement pattern.  On the other hand, `2.1.0.preview1` remains unchanged because the "p" character is not followed by a digit.
 
-Next `sed` command is `s/$/.z/;`.  Another search-and-replace command.  The "$" sign represents the end of the input, again according to [this link](https://web.archive.org/web/20221021041253/https://users.monash.edu.au/~erict/Resources/sed/).  So we're searching for the end of the input, and we're replacing it with ".z".  Essentially we're concatenating ".z" to the end of the input line.  We can test that again, by running this command after our previous commands:
+Next `sed` command is `s/$/.z/;`.  Another search-and-replace command.  The "$" sign represents the end of the input, again according to [this link](https://web.archive.org/web/20221021041253/https://users.monash.edu.au/~erict/Resources/sed/){:target="_blank" rel="noopener"}.  So we're searching for the end of the input, and we're replacing it with ".z".  Essentially we're concatenating ".z" to the end of the input line.  We can test that again, by running this command after our previous commands:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-18mar2023-1103am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -750,7 +750,7 @@ Next `sed` command:
 G;
 ```
 
-From the "3.2 sed commands summary" section of [the GNU `sed` docs](https://web.archive.org/web/20221016162544/https://www.gnu.org/software/sed/manual/sed.html#sed-commands-list), we see this command does the following:
+From the "3.2 sed commands summary" section of [the GNU `sed` docs](https://web.archive.org/web/20221016162544/https://www.gnu.org/software/sed/manual/sed.html#sed-commands-list){:target="_blank" rel="noopener"}, we see this command does the following:
 
 > G
 >
@@ -789,7 +789,7 @@ The first bit of syntax that Google is:
 LC_ALL=C
 ```
 
-I find [more GNU docs](https://web.archive.org/web/20220707190251/https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html) on the `LC_ALL` environment variable:
+I find [more GNU docs](https://web.archive.org/web/20220707190251/https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html){:target="_blank" rel="noopener"} on the `LC_ALL` environment variable:
 
 > 2.3.2 Locale Environment Variables
 >
@@ -799,9 +799,9 @@ I find [more GNU docs](https://web.archive.org/web/20220707190251/https://www.gn
 >
 > LC_ALL is an environment variable that overrides all of these. It is typically used in scripts that run particular programs. For example, configure scripts generated by GNU autoconf use LC_ALL to make sure that the configuration tests don't operate in locale dependent ways.
 
-OK, so `LC_ALL` is used to tell different programs (in our case, the `sort` command) how to handle characters that could be treated differently in different countries.  I happen to know, for example, that in the US we would write "one million dollars" as "$1,000,000.00" (i.e. separating using the comma character for thousands characters, and a period as the decimal separator), but that's not how people write "one million" in other countries.  According to [this link](https://www.beresfordresearch.com/how-to-write-a-million-in-different-countries/), that same number is written as "$1.000.000,00" in many South American countries (i.e. reversing the usage of commas and decimals).  I presume that `LC_ALL` would dictate a certain way for the user's computer to handle questions like this, regardless of what that user's previous setting was.
+OK, so `LC_ALL` is used to tell different programs (in our case, the `sort` command) how to handle characters that could be treated differently in different countries.  I happen to know, for example, that in the US we would write "one million dollars" as "$1,000,000.00" (i.e. separating using the comma character for thousands characters, and a period as the decimal separator), but that's not how people write "one million" in other countries.  According to [this link](https://www.beresfordresearch.com/how-to-write-a-million-in-different-countries/){:target="_blank" rel="noopener"}, that same number is written as "$1.000.000,00" in many South American countries (i.e. reversing the usage of commas and decimals).  I presume that `LC_ALL` would dictate a certain way for the user's computer to handle questions like this, regardless of what that user's previous setting was.
 
-What are we setting `LC_ALL` to here?  What does that `=C` mean?  Another result when I Googled for `LC_ALL` was [this StackOverflow post](https://web.archive.org/web/20221019143235/https://unix.stackexchange.com/questions/87745/what-does-lc-all-c-do).  One answer says the following:
+What are we setting `LC_ALL` to here?  What does that `=C` mean?  Another result when I Googled for `LC_ALL` was [this StackOverflow post](https://web.archive.org/web/20221019143235/https://unix.stackexchange.com/questions/87745/what-does-lc-all-c-do){:target="_blank" rel="noopener"}.  One answer says the following:
 
 > `LC_ALL` is the environment variable that overrides all the other localisation settings (except `$LANGUAGE` under some circumstances).
 >
@@ -829,7 +829,7 @@ According to the `man` page for `sort`:
 >
 > The sort utility sorts text and binary files by lines.  A line is a record separated from the subsequent record by a newline (default) or `NUL` `´\0´` character (`-z` option).  A record can contain any printable or unprintable characters.  Comparisons are based on one or more sort keys extracted from each line of input, and are performed lexicographically, according to the current locale's collating rules and the specified command-line options that can tune the actual sorting behavior.  By default, if keys are not given, sort uses entire lines for comparison.
 
-So `sort` uses the newline character to separate its input into lines, and sorts those lines [lexicographically](https://stackoverflow.com/questions/45950646/what-is-lexicographical-order), or sorting them as strings (rather than as numbers).  So the numbers 1, 2, and 10 would be sorted as "1", "10", and "2".  The user's locale settings would normally dictate which rules are used to compare one string with another for sorting purposes (that's what "collating rules" refers to here).  But in our case, since we're applying `LC_ALL=C`, the collating rules that we found from the StackOverflow answer will be used for all users, regardless of their localization settings.
+So `sort` uses the newline character to separate its input into lines, and sorts those lines [lexicographically](https://stackoverflow.com/questions/45950646/what-is-lexicographical-order){:target="_blank" rel="noopener"}, or sorting them as strings (rather than as numbers).  So the numbers 1, 2, and 10 would be sorted as "1", "10", and "2".  The user's locale settings would normally dictate which rules are used to compare one string with another for sorting purposes (that's what "collating rules" refers to here).  But in our case, since we're applying `LC_ALL=C`, the collating rules that we found from the StackOverflow answer will be used for all users, regardless of their localization settings.
 
 When I look up the `-t` flag in the `man` page, I see:
 
@@ -837,7 +837,7 @@ When I look up the `-t` flag in the `man` page, I see:
 >
 > Use `char` as a field separator character.
 
-So we're specifying the "." character as our "field separator".  But what is that?  I Google "bash sort field separator".  The first result is a StackOverflow article which doesn't turn out to be useful, but the 2nd result is [this link](https://web.archive.org/web/20220624080724/https://docstore.mik.ua/orelly/unix3/upt/ch22_03.htm):
+So we're specifying the "." character as our "field separator".  But what is that?  I Google "bash sort field separator".  The first result is a StackOverflow article which doesn't turn out to be useful, but the 2nd result is [this link](https://web.archive.org/web/20220624080724/https://docstore.mik.ua/orelly/unix3/upt/ch22_03.htm){:target="_blank" rel="noopener"}:
 
 > Section 22.2 explained how sort separates a line of input into two or more fields using whitespace (spaces or tabs) as field delimiters. The -t option lets you change the field delimiter to some other character.
 
@@ -881,7 +881,7 @@ Hmmm OK, so we are using the `-k` flag multiple times because we want to define 
 
 I think I see now- `field2` tells the `sort` command where to terminate one key and start the next key?
 
-I Google "bash sort keys" to try and get confirmation of this.  The first result is a StackOverflow post which (judging by its title) doesn't appear useful IMO.  The 2nd result is [this link](https://web.archive.org/web/20220410153515/https://riptutorial.com/bash/example/31704/sort-by-keys), from a site called "RIP Tutorial".  I've highlighted the relevant sentence below:
+I Google "bash sort keys" to try and get confirmation of this.  The first result is a StackOverflow post which (judging by its title) doesn't appear useful IMO.  The 2nd result is [this link](https://web.archive.org/web/20220410153515/https://riptutorial.com/bash/example/31704/sort-by-keys){:target="_blank" rel="noopener"}, from a site called "RIP Tutorial".  I've highlighted the relevant sentence below:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-18mar23-1113am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -931,13 +931,13 @@ As we can see, the 1st field (the part before the "." character) is sorted lexic
 
 Why would the RBENV core team want 10.1 to come before 2.1?  That seems counter-intuitive to me.
 
-I check [the PR](https://github.com/rbenv/rbenv/pull/1111) which introduced this change, and I see the following:
+I check [the PR](https://github.com/rbenv/rbenv/pull/1111){:target="_blank" rel="noopener"} which introduced this change, and I see the following:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-18mar2023-1115am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-I see the issue link ([#1086](https://github.com/rbenv/rbenv/issues/1086)), and I click on that to read more about the problem that this PR addresses.  I see the following:
+I see the issue link ([#1086](https://github.com/rbenv/rbenv/issues/1086){:target="_blank" rel="noopener"}), and I click on that to read more about the problem that this PR addresses.  I see the following:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-18mar2023-1116am.png" width="90%" style="border: 1px solid black; padding: 0.5em">

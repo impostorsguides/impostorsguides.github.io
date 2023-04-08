@@ -1,6 +1,6 @@
 First, the tests:
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-origin.bats)
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-origin.bats){:target="_blank" rel="noopener"}
 
 After the `bats` shebang and the loading of `test_helper`, the first block of code is:
 
@@ -26,7 +26,7 @@ Next block of code (and first test):
 
 First, this test performs a sanity check to ensure that RBENV's global “version” file does not exist.  It then runs the `version-origin` command and asserts that this non-existent global “version” file's path is returned anyway.
 
-Note- I'm not sure why we'd want a non-existent filepath to be returned by the `version-origin` command.  To me this is a bit misleading, as a novice user of this command could spend time banging their head against the wall trying to find a file that doesn't exist on their machine.  It's good that this test documents this behavior, but it's unexpected (to me, at least) that the behavior was implemented in this way.  I checked [the commit](https://github.com/rbenv/rbenv/commit/ab197ef51e5d99110015907c4346fde7c5a61de4) which introduced this test, but no answer to this question was provided in the description.  When it comes time to read through the command file itself, I'll check the `git blame` for this logic to see if that PR has a relevant description.
+Note- I'm not sure why we'd want a non-existent filepath to be returned by the `version-origin` command.  To me this is a bit misleading, as a novice user of this command could spend time banging their head against the wall trying to find a file that doesn't exist on their machine.  It's good that this test documents this behavior, but it's unexpected (to me, at least) that the behavior was implemented in this way.  I checked [the commit](https://github.com/rbenv/rbenv/commit/ab197ef51e5d99110015907c4346fde7c5a61de4){:target="_blank" rel="noopener"} which introduced this test, but no answer to this question was provided in the description.  When it comes time to read through the command file itself, I'll check the `git blame` for this logic to see if that PR has a relevant description.
 
 Next test:
 
@@ -95,7 +95,7 @@ SH
 
 This test is similar to one we saw in the previous file's test suite.  We create a hook which depends on the `IFS` (i.e. internal field separator) env var being set to contain certain characters.  These characters are the tab, whitespace, and newline characters.  We create a hook which first creates an array of strings containing these characters, and then prints a 2nd string which uses these characters as delimiters to split that single string into an array of strings.  Next we set `RBENV_VERSION` to equal the string “system” and we run the `version-origin` command, making sure to set `IFS` to contain the same characters as those we use as delimiters in our hook (tab, space, and newline).  Finally, we assert that the command exited successfully and that the IFS characters that we set were, in fact, used to delimit the single string into an array of strings.
 
-Note- it looks like we're passing an argument (i.e. the string “env”) to `version-origin` in this test.  I'm not sure what that is.  The argument doesn't appear to be used anywhere, nor does “$1” appear anywhere in the command itself.  I took a look at [the PR](https://github.com/rbenv/rbenv/pull/852/files) which introduced this line of code, and it looks like it might have been a copy-paste error, since the previous implementation of the test did not include an argument to the invocation of the command.  I make a commit on my local `rbenv` repo to remove this argument, but I don't want to make a PR just for this one minor fix because I don't think it's high-value enough by itself to be worth the core team's time.  I'll include it with other changes in a future PR, or make a PR for it by itself if I can't find other PR-worthy changes to make.
+Note- it looks like we're passing an argument (i.e. the string “env”) to `version-origin` in this test.  I'm not sure what that is.  The argument doesn't appear to be used anywhere, nor does “$1” appear anywhere in the command itself.  I took a look at [the PR](https://github.com/rbenv/rbenv/pull/852/files){:target="_blank" rel="noopener"} which introduced this line of code, and it looks like it might have been a copy-paste error, since the previous implementation of the test did not include an argument to the invocation of the command.  I make a commit on my local `rbenv` repo to remove this argument, but I don't want to make a PR just for this one minor fix because I don't think it's high-value enough by itself to be worth the core team's time.  I'll include it with other changes in a future PR, or make a PR for it by itself if I can't find other PR-worthy changes to make.
 
 Last test:
 
@@ -110,7 +110,7 @@ This test just asserts that the `version-origin` command ignores any value of `R
 
 That's it for specs, now onto the code:
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-origin)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-origin){:target="_blank" rel="noopener"}
 
 Let's get the usual suspects out of the way first:
 

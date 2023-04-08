@@ -10,9 +10,9 @@ Moving onto the next line of code.
 
 ## for-loops in bash
 
-We saw a regular `bash` for-loop earlier, in our experiment with delimiters.  This loop is a bit weird, though, because we haven't yet seen an `arg` variable explicitly defined by the code.  Yet here it is, being referenced in our loop.
+We saw a regular `bash` for-loop earlier, in our experiment with delimiters and `IFS`.  This loop is a bit weird, though, because we haven't yet seen an `arg` variable explicitly defined by the code.  Yet here it is, all the same.
 
-If we haven't seen this variable defined yet, does that mean it's defined or built-in by the language?  As usual, Googling turns up [a StackOverflow post](https://archive.ph/p4Cjp):
+If we haven't seen this variable defined yet, does that mean it's defined or built-in by the language?  As usual, Googling turns up [a StackOverflow post](https://web.archive.org/web/20230406161948/https://stackoverflow.com/questions/73134672/linux-shell-for-arg-do){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/arg-for-loop.png" width="70%" alt="What is `arg` in a bash `for` loop?" style="border: 1px solid black; padding: 0.5em">
@@ -99,9 +99,9 @@ esac
 
 I've seen case statements before (Ruby has them, as well), but I still feel like familiarizing myself with any bash-specific idiosyncracies.
 
-I find [this link](https://web.archive.org/web/20220820011836/https://linuxize.com/post/bash-case-statement/), which explains bash's case statement syntax.  I would have preferred a more official form of documentation, but:
+I find [this link](https://web.archive.org/web/20220820011836/https://linuxize.com/post/bash-case-statement/){:target="_blank" rel="noopener"}, which explains bash's case statement syntax.  I would have preferred a more official form of documentation, but:
 
- - [the link from The Linux Documentation Project](https://archive.ph/WCqYM) struck me as much-less beginner-friendly, and
+ - [the link from The Linux Documentation Project](https://web.archive.org/web/20230316230422/http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_03.html){:target="_blank" rel="noopener"} struck me as much-less beginner-friendly, and
  - neither `man case` nor `help case` turned up anything useful.
 
  At any rate, here are the highlights from the link I found:
@@ -111,7 +111,7 @@ I find [this link](https://web.archive.org/web/20220820011836/https://linuxize.c
 
 1. You can use multiple patterns separated by the `|` operator. The `)` operator terminates a pattern list.
 
-1. A pattern can have [special characters](https://web.archive.org/web/20220820011901/https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html).
+1. A pattern can have [special characters](https://web.archive.org/web/20220820011901/https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html){:target="_blank" rel="noopener"}.
 
 1. A pattern and its associated commands are known as a clause.
 
@@ -121,7 +121,7 @@ I find [this link](https://web.archive.org/web/20220820011836/https://linuxize.c
 
 1. It is a common practice to use the wildcard asterisk symbol (`*`) as a final pattern to define the default case. This pattern will always match.
 
-1. If no pattern is matched, the return status is zero. Otherwise, the return status is the [exit status](https://web.archive.org/web/20220806222213/https://linuxize.com/post/bash-exit/) of the executed commands.
+1. If no pattern is matched, the return status is zero. Otherwise, the return status is the [exit status](https://web.archive.org/web/20220806222213/https://linuxize.com/post/bash-exit/){:target="_blank" rel="noopener"} of the executed commands.
 
 None of this is terribly surprising, since these rules all appear to match how case statements work in Ruby and other languages I've worked with.
 
@@ -267,7 +267,7 @@ Hello
 
 So passing Ruby code directly to the `ruby` interpreter in your terminal (via the `-e` flag) is one of the two scenarios which will cause `rbenv` to assume that any **subsequent** args are meant to be positional args, not flags to the `ruby` command itself.
 
-Regarding the 2nd pattern (`--`), I've seen it used in terminal commands before but I doubt I could explain its purpose.  StackOverflow [saves the day again](https://web.archive.org/web/20220623104640/https://unix.stackexchange.com/questions/11376/what-does-double-dash-mean):
+Regarding the 2nd pattern (`--`), I've seen it used in terminal commands before but I doubt I could explain its purpose.  StackOverflow [saves the day again](https://web.archive.org/web/20220623104640/https://unix.stackexchange.com/questions/11376/what-does-double-dash-mean){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/double-dash.png" width="70%" alt="What is a double-dash?" style="border: 1px solid black; padding: 0.5em">

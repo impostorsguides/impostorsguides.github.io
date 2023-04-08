@@ -1,6 +1,6 @@
 First, the tests:
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/which.bats)
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/which.bats){:target="_blank" rel="noopener"}
 
 After the `bats` shebang and loading of `test_helper`, the first block of code is:
 
@@ -65,7 +65,7 @@ Next test:
 }
 ```
 
-This is a similar setup to the previous test, except this time there's a different environment variable passed to the command.  Again, not sure why the expected result is `RBENV_TEST_DIR` here, since it falls *after* `RBENV_ROOT` [in the path sequence](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L26) that `test_helper` sets.  Let's wait and see when we get to the code.
+This is a similar setup to the previous test, except this time there's a different environment variable passed to the command.  Again, not sure why the expected result is `RBENV_TEST_DIR` here, since it falls *after* `RBENV_ROOT` [in the path sequence](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L26){:target="_blank" rel="noopener"} that `test_helper` sets.  Let's wait and see when we get to the code.
 
 Next spec:
 
@@ -224,7 +224,7 @@ NOTE: I'm not sure why the `RBENV_TEST_DIR` setup is done in-line instead of wit
 
 On to the code itself:
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-which)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-which){:target="_blank" rel="noopener"}
 
 First block of code:
 
@@ -290,7 +290,7 @@ Here we create a helper function named `remove_from_path`.  As a first step insi
 
  - `path_to_remove`, which we set to the first argument to the function.
  - `path_before`, which we leave unset for now.
- - `result`, which we initialize to the value of `$PATH`, with any values of `~` replaced with the value of `$HOME`.  I found this by looking for the GNU "parameter expansion" docs [here](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html), and searching for the string "//":
+ - `result`, which we initialize to the value of `$PATH`, with any values of `~` replaced with the value of `$HOME`.  I found this by looking for the GNU "parameter expansion" docs [here](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"}, and searching for the string "//":
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-18mar2023-1145am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
@@ -352,7 +352,7 @@ counter: 4
 
 My `counter` variable shows me how many iterations occurred.  And this is more iterations than I expected!  I thought there would be only one iteration because of the "//" syntax, but it looks like there were 4 iterations!
 
-I post [a StackExchange question](https://unix.stackexchange.com/questions/722939/bash-parameter-expansion-how-to-replace-all-instances-of-pattern-with-stri) about this, and am waiting for an answer.
+I post [a StackExchange question](https://unix.stackexchange.com/questions/722939/bash-parameter-expansion-how-to-replace-all-instances-of-pattern-with-stri){:target="_blank" rel="noopener"} about this, and am waiting for an answer.
 
 At any rate, the result is our previous value of `$PATH`, minus a specific path specified as the first arg to the helper function.  The lines `  result="${result%:}"` and `echo "${result#:}"` just strip off leading and trailing `:` characters.
 
@@ -381,7 +381,7 @@ Next block of code:
 RBENV_VERSION="${RBENV_VERSION:-$(rbenv-version-name)}"
 ```
 
-Here we test whether the environment variable `RBENV_VERSION` is undefined or null, using the `:-` parameter expansion syntax mentioned in [the GNU docs](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html):
+Here we test whether the environment variable `RBENV_VERSION` is undefined or null, using the `:-` parameter expansion syntax mentioned in [the GNU docs](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"}:
 
 > ${parameter:-word}
 >
@@ -457,6 +457,6 @@ If one or the other of these conditions are false, it means that either:
 The user is using "system" Ruby, or
 the user is using a non-system Ruby version (i.e. a version installed via RBENV), but *does not* have the requested Ruby command installed *for their Ruby version*.
 
-In either case, we first let the user know that the command was not found by printing an error message to STDERR.  We then use the `rbenv whence` command to check which Ruby versions *do* include the requested command.  If there are any such versions, we print them to the screen.  Whether or not we found Ruby versions with the requested command, we exit with a return code of 127.  This exit code [tells the user's shell](https://web.archive.org/web/20220930064126/https://linuxconfig.org/how-to-fix-bash-127-error-return-code) that the command was not found.
+In either case, we first let the user know that the command was not found by printing an error message to STDERR.  We then use the `rbenv whence` command to check which Ruby versions *do* include the requested command.  If there are any such versions, we print them to the screen.  Whether or not we found Ruby versions with the requested command, we exit with a return code of 127.  This exit code [tells the user's shell](https://web.archive.org/web/20220930064126/https://linuxconfig.org/how-to-fix-bash-127-error-return-code){:target="_blank" rel="noopener"} that the command was not found.
 
 Holy cow!  We're finally done with the `libexec/` folder and its tests!  Now we can move on to the next folder in the main project directory: "rbenv.d/exec/".

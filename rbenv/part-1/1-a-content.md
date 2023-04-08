@@ -6,9 +6,9 @@
 
 This is the question which set me off on this entire project.
 
-For those unfamiliar with this command, it comes from the [Bundler library](https://bundler.io/).  Bundler provides "a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed", according to its website.  `bundle install` is one of the most common commands we find ourselves typing in Ruby.
+For those unfamiliar with this command, it comes from the [Bundler library](https://bundler.io/){:target="_blank" rel="noopener"}.  Bundler provides "a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed", according to its website.  `bundle install` is one of the most common commands we find ourselves typing in Ruby.
 
-I was frustrated that I didn't know how this command worked under-the-hood.  Since I'm a big believer that ["The best way to learn something is to explain it to someone else"](https://ideas.time.com/2011/11/30/the-protege-effect/), I decided to go down the rabbit hole.
+I was frustrated that I didn't know how this command worked under-the-hood.  Since I'm a big believer that ["The best way to learn something is to explain it to someone else"](https://ideas.time.com/2011/11/30/the-protege-effect/){:target="_blank" rel="noopener"}, I decided to go down the rabbit hole.
 
 **The bad news is, I didn't learn about `bundle` as part of this deep-dive.**  Note that I intend to repeat this process with the `bundle` command in a future post.
 

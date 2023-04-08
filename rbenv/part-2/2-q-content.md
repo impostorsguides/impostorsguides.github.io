@@ -1,6 +1,6 @@
 This one is just 3 lines of code with no test file.  I'm mostly including this post for the sake of completeness.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-root)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-root){:target="_blank" rel="noopener"}
 
 ```
 #!/usr/bin/env bash

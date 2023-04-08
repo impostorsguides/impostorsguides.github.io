@@ -163,13 +163,13 @@ Since I don't pass any value at all to the flag, I would expect the length of th
 
 Why are the last two cases not returning the results I expect?
 
-In this case, [this StackOverflow post](https://archive.ph/x5AYq) comes through with an answer:
+In this case, [this StackOverflow post](https://web.archive.org/web/20230406161647/https://unix.stackexchange.com/questions/400889/why-isnt-n-false-like-n/400895){:target="_blank" rel="noopener"} comes through with an answer:
 
 > `[ -n ]` does not use the `-n` test.
 >
 > The `-n` in `[ -n ]` is not a test at all. When there is only one argument between `[` and `]`, that argument is a string that is tested to see if it is empty. Even when that string has a leading `-`, it is still interpreted as an operand, not a test. Since the string `-n` is not empty (it contains two characters, `-` and `n`, not zero characters) `[ -n ]` evaluates to true.
 
-...and [here](https://unix.stackexchange.com/a/141025/142469):
+...and [here](https://unix.stackexchange.com/a/141025/142469){:target="_blank" rel="noopener"}:
 
 > You need to quote your variables. Without quotes you are writing `test -n` instead of `test -n <expression>`. The `test` command has no idea that you provided a variable that expanded to nothing.
 
@@ -247,7 +247,7 @@ bar="$(( 5+5 ))"
 echo "$bar"
 ```
 
-Side note- I found out from [this link](https://stackoverflow.com/questions/6348902/how-can-i-add-numbers-in-a-bash-script) that, if you want to add two integers in `bash`, you use the `$((...))` syntax.
+Side note- I found out from [this link](https://stackoverflow.com/questions/6348902/how-can-i-add-numbers-in-a-bash-script){:target="_blank" rel="noopener"} that, if you want to add two integers in `bash`, you use the `$((...))` syntax.
 
 As you can see, this script includes `set -x` at the top.  When I run this script, I see the following:
 

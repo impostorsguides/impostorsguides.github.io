@@ -1,6 +1,6 @@
 As usual, we'll do the test first, and the code afterward:
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/exec.bats)
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/exec.bats){:target="_blank" rel="noopener"}
 
 After the `bats` shebang and the loading of `test_helper`, the first block of code is:
 
@@ -18,7 +18,7 @@ create_executable() {
 }
 ```
 
-We define a helper function called `create_executable`.  This function sets a variable named `name` equal to the first argument.  I'm not sure what the question-mark syntax does, so I Google "bash parameter expansion question mark" and find [this answer on StackOverflow](https://web.archive.org/web/20201128182437/https://stackoverflow.com/questions/8889302/what-is-the-meaning-of-a-question-mark-in-bash-variable-parameter-expansion-as-i):
+We define a helper function called `create_executable`.  This function sets a variable named `name` equal to the first argument.  I'm not sure what the question-mark syntax does, so I Google "bash parameter expansion question mark" and find [this answer on StackOverflow](https://web.archive.org/web/20201128182437/https://stackoverflow.com/questions/8889302/what-is-the-meaning-of-a-question-mark-in-bash-variable-parameter-expansion-as-i){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-329am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -61,7 +61,7 @@ Let's break this into two pieces.  The first piece is:
   }
 ```
 
-This half is wrapped in curly braces, meaning we perform it as a single operation and send its contents to the next half.  What is that output?  Well, we check the length of something called "$#".  If we Google ""$#" bash" and click on [the first result](https://web.archive.org/web/20220516195326/https://askubuntu.com/questions/939620/what-does-mean-in-bash), we see:
+This half is wrapped in curly braces, meaning we perform it as a single operation and send its contents to the next half.  What is that output?  Well, we check the length of something called "$#".  If we Google ""$#" bash" and click on [the first result](https://web.archive.org/web/20220516195326/https://askubuntu.com/questions/939620/what-does-mean-in-bash){:target="_blank" rel="noopener"}, we see:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-334am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -186,7 +186,7 @@ OUT
 }
 ```
 
-This test appears to cover [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L20-L22).  We specify the Ruby version and make two executables within RBENV's directory for that version.  We then run `rbenv rehash` to generate the shims for these two new commands, since the completions for `exec` depend on which shims exist.  We then run `rbenv completions` for the `exec` command, and lastly we assert that we get both the "--help" completion and the names of the two executables we just installed.
+This test appears to cover [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L20-L22){:target="_blank" rel="noopener"}.  We specify the Ruby version and make two executables within RBENV's directory for that version.  We then run `rbenv rehash` to generate the shims for these two new commands, since the completions for `exec` depend on which shims exist.  We then run `rbenv completions` for the `exec` command, and lastly we assert that we get both the "--help" completion and the names of the two executables we just installed.
 
 Next test:
 
@@ -204,7 +204,7 @@ SH
 }
 ```
 
-We've seen a test like this before.  The goal is to cover [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L36-L41).  We create a hook file whose output depends on certain values being set for the [internal field separator](https://web.archive.org/web/20220715010436/https://www.baeldung.com/linux/ifs-shell-variable).  We then set the Ruby version to the machine's default version, and run `rbenv exec` with a command that we know will be on the user's machine (the `env` command, which ships with all `bash` terminals).  When we run `rbenv exec`, we set the value of the internal field separator to the characters which our hook depends on in order to produce the expected output.  Lastly, we assert that the command was successful and that the output was printed to STDOUT as expected.
+We've seen a test like this before.  The goal is to cover [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L36-L41){:target="_blank" rel="noopener"}.  We create a hook file whose output depends on certain values being set for the [internal field separator](https://web.archive.org/web/20220715010436/https://www.baeldung.com/linux/ifs-shell-variable){:target="_blank" rel="noopener"}.  We then set the Ruby version to the machine's default version, and run `rbenv exec` with a command that we know will be on the user's machine (the `env` command, which ships with all `bash` terminals).  When we run `rbenv exec`, we set the value of the internal field separator to the characters which our hook depends on in order to produce the expected output.  Lastly, we assert that the command was successful and that the output was printed to STDOUT as expected.
 
 (stopping here for the day; 96843 words)
 
@@ -235,9 +235,9 @@ OUT
 }
 ```
 
-This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L47).  It creates an executable whose logic consists of:
+This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L47){:target="_blank" rel="noopener"}.  It creates an executable whose logic consists of:
 
- - printing out the "$0" argument, which [expands to the name of the script that's being run](https://web.archive.org/web/20220923182330/https://www.gnu.org/software/bash/manual/html_node/Special-Parameters.html#:~:text=If%20Bash%20is%20invoked%20with,executed%2C%20if%20one%20is%20present.)
+ - printing out the "$0" argument, which [expands to the name of the script that's being run](https://web.archive.org/web/20220923182330/https://www.gnu.org/software/bash/manual/html_node/Special-Parameters.html#:~:text=If%20Bash%20is%20invoked%20with,executed%2C%20if%20one%20is%20present.){:target="_blank" rel="noopener"}
  - looping over all the arguments it receives, and printing each one.
 
 We then run `rbenv exec` with the name of that script, passing arguments which are formatted in many different ways:
@@ -245,7 +245,7 @@ We then run `rbenv exec` with the name of that script, passing arguments which a
 
  - as a flag ("-w")
  - as a string with spaces in it (in this case, resembling a path to a file)
- - as a double-dash ([signifying the end of command options](https://web.archive.org/web/20221023095659/https://unix.stackexchange.com/questions/11376/what-does-double-dash-mean))
+ - as a double-dash ([signifying the end of command options](https://web.archive.org/web/20221023095659/https://unix.stackexchange.com/questions/11376/what-does-double-dash-mean){:target="_blank" rel="noopener"})
  - as just regular ol' arguments ("extra" and "args")
 
 Lastly, we assert that the command exited successfully.  We then pass a heredoc string to `assert_output`, ensuring that the arguments printed out the way we expected.
@@ -316,7 +316,7 @@ fi
 
 An `if/else` conditional.  Let's get the `else` condition out of the way first, since that's easy.  If the condition is false, we print the string 'ruby 2.0 (rbenv test)'.
 
-What do we do if the condition is true?  And what *is* the condition, anyway?  To answer that, one thing to highlight is the use of double-brackets for the conditional test, as opposed to single brackets.  Single-brackets are usable in any POSIX-compliant shell.  But they have sharper edges and aren't as safe to use as double-brackets, [according to StackOverflow](https://web.archive.org/web/20221031220510/https://stackoverflow.com/questions/669452/are-double-square-brackets-preferable-over-single-square-brackets-in-b):
+What do we do if the condition is true?  And what *is* the condition, anyway?  To answer that, one thing to highlight is the use of double-brackets for the conditional test, as opposed to single brackets.  Single-brackets are usable in any POSIX-compliant shell.  But they have sharper edges and aren't as safe to use as double-brackets, [according to StackOverflow](https://web.archive.org/web/20221031220510/https://stackoverflow.com/questions/669452/are-double-square-brackets-preferable-over-single-square-brackets-in-b){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-338am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -403,7 +403,7 @@ So calling `head -n1 $found` means we're taking the very first line of the conte
 /bin/bash /var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/rbenv/root/versions/2.0/bin/rake
 ```
 
-The above is what `\$BASH "\$found"` [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/exec.bats#L91) resolves to.  Based on this, we know that we're running an executable file named `rake`...
+The above is what `\$BASH "\$found"` [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/exec.bats#L91){:target="_blank" rel="noopener"} resolves to.  Based on this, we know that we're running an executable file named `rake`...
 
 ```
 /var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/rbenv/root/versions/2.0/bin/rake
@@ -483,7 +483,7 @@ $ /bin/sh bar
 hello rake
 ```
 
-OK, *that* worked.  But then why do they include the Ruby shebang in the test file?  I know this file is executed by the other file we created [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/exec.bats#L85), and I know that file looks at the first line of the `rake` file to check for a Ruby shebang.  But if that shebang isn't going to be used, then why check for it at all?  I add this to my running list of questions and keep moving.
+OK, *that* worked.  But then why do they include the Ruby shebang in the test file?  I know this file is executed by the other file we created [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/exec.bats#L85){:target="_blank" rel="noopener"}, and I know that file looks at the first line of the `rake` file to check for a Ruby shebang.  But if that shebang isn't going to be used, then why check for it at all?  I add this to my running list of questions and keep moving.
 
 Last block of code for this test:
 
@@ -499,7 +499,7 @@ This confuses me.  We run the `rbenv rehash` command, but I'm not sure why becau
 
 Come to think of it, why is this test even needed?  If it's not running `rbenv`, it's not testing `rbenv`.  Why would we write a test just to ensure that a script named "ruby", which only exists within the scope of this one test, works the way we expect?  Of course it works the way we expect- we wrote it in our test!  We're essentially testing a fake script whose only purpose is to get a test to pass.  It seems like circular logic.
 
-I look up the git history for this test.  I find these 4 ([1](https://github.com/rbenv/rbenv/commit/4b6ab0389b5b5401ca530f3edbef024972b943fc), [2](https://github.com/rbenv/rbenv/commit/7fc5f46bbb843c6be95c3f87d19ba21fef25c5b8#diff-dcacfbee60d602ec801615df3c0d46f768d41c54d4b50debbbdaa9d50ff17e3e), [3](https://github.com/rbenv/rbenv/commit/7a10b64cf7e4df3261dec94f3c609a64a04998ef), and [4](https://github.com/rbenv/rbenv/commit/95a039aaaa3855ea2df4855ad38c06faaba01f9a#diff-dcacfbee60d602ec801615df3c0d46f768d41c54d4b50debbbdaa9d50ff17e3e)).  [One of the PRs](https://github.com/rbenv/rbenv/commit/95a039aaaa3855ea2df4855ad38c06faaba01f9a) mentions [an issue](https://github.com/rbenv/rbenv/issues/480) that the PR is meant to fix.  I open that and read a bit:
+I look up the git history for this test.  I find these 4 ([1](https://github.com/rbenv/rbenv/commit/4b6ab0389b5b5401ca530f3edbef024972b943fc){:target="_blank" rel="noopener"}, [2](https://github.com/rbenv/rbenv/commit/7fc5f46bbb843c6be95c3f87d19ba21fef25c5b8#diff-dcacfbee60d602ec801615df3c0d46f768d41c54d4b50debbbdaa9d50ff17e3e){:target="_blank" rel="noopener"}, [3](https://github.com/rbenv/rbenv/commit/7a10b64cf7e4df3261dec94f3c609a64a04998ef){:target="_blank" rel="noopener"}, and [4](https://github.com/rbenv/rbenv/commit/95a039aaaa3855ea2df4855ad38c06faaba01f9a#diff-dcacfbee60d602ec801615df3c0d46f768d41c54d4b50debbbdaa9d50ff17e3e){:target="_blank" rel="noopener"}).  [One of the PRs](https://github.com/rbenv/rbenv/commit/95a039aaaa3855ea2df4855ad38c06faaba01f9a){:target="_blank" rel="noopener"} mentions [an issue](https://github.com/rbenv/rbenv/issues/480){:target="_blank" rel="noopener"} that the PR is meant to fix.  I open that and read a bit:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-350am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -543,13 +543,13 @@ At the bottom, we see `exec "/usr/local/bin/rbenv" exec ...`.  That's us calling
 
 OK, *now* I see why this test is needed, *and* I see that it is in fact calling `rbenv exec` after all.  It's just doing it indirectly.  This is also why `rbenv-rehash` is needed- otherwise, the shim that we're calling here wouldn't exist!
 
-But I'm still confused about something I saw in that PR [here](https://github.com/rbenv/rbenv/commit/95a039aaaa3855ea2df4855ad38c06faaba01f9a):
+But I'm still confused about something I saw in that PR [here](https://github.com/rbenv/rbenv/commit/95a039aaaa3855ea2df4855ad38c06faaba01f9a){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-356am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-What is "shelling out to Ruby"?  And why / how did the reverted PR break this "shelling out" process?  I Google "shelling out to Ruby" and find [this StackOverflow link](https://web.archive.org/web/20150320011119/https://stackoverflow.com/questions/28628985/what-does-shell-out-or-shelling-out-mean), with the following answer:
+What is "shelling out to Ruby"?  And why / how did the reverted PR break this "shelling out" process?  I Google "shelling out to Ruby" and find [this StackOverflow link](https://web.archive.org/web/20150320011119/https://stackoverflow.com/questions/28628985/what-does-shell-out-or-shelling-out-mean){:target="_blank" rel="noopener"}, with the following answer:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-358am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -559,7 +559,7 @@ So it sounds like we're talking about calling a Ruby program from a shell progra
 
 (stopping here for the day; 98883 words)
 
-After a bit of clicking around RBENV's Github repo, I find [this issue](https://github.com/rbenv/rbenv/issues/14), which mentions the following:
+After a bit of clicking around RBENV's Github repo, I find [this issue](https://github.com/rbenv/rbenv/issues/14){:target="_blank" rel="noopener"}, which mentions the following:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-359am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -567,7 +567,7 @@ After a bit of clicking around RBENV's Github repo, I find [this issue](https://
 
 This appears to be the backstory for how the whole "-S" thing started.  In a very early version of RBENV (this issue is #14), its shims were incompatible with `ruby -S`.  But *how* were they incompatible?  Why would RBENV (in its state at that time) prevent `-S` from working?
 
-I see [the PR associated with this issue](https://github.com/rbenv/rbenv/commit/2a495dc9ac842f745239bb7bb6402a8d8c168992) from looking at the discussion in the issue, and I see that this PR adds the output of `rbenv-which "$RBENV_COMMAND"` to the front of the `$PATH`.  This change is supposed to fix the `-S` problem:
+I see [the PR associated with this issue](https://github.com/rbenv/rbenv/commit/2a495dc9ac842f745239bb7bb6402a8d8c168992){:target="_blank" rel="noopener"} from looking at the discussion in the issue, and I see that this PR adds the output of `rbenv-which "$RBENV_COMMAND"` to the front of the `$PATH`.  This change is supposed to fix the `-S` problem:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-400am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -575,7 +575,7 @@ I see [the PR associated with this issue](https://github.com/rbenv/rbenv/commit/
 
 It's important to note that, in the end, there continued to be issues with `-S` even after this PR was added.  But for now I just want to mentally catch up to the code authors and their state of mind *at the time they wrote this*.  Later, I can catch up the rest of the way.
 
-I try replicating some of the code from [the PR](https://github.com/rbenv/rbenv/commit/2a495dc9ac842f745239bb7bb6402a8d8c168992) in my terminal, using `ruby` as a stand-in for `RBENV_COMMAND` here:
+I try replicating some of the code from [the PR](https://github.com/rbenv/rbenv/commit/2a495dc9ac842f745239bb7bb6402a8d8c168992){:target="_blank" rel="noopener"} in my terminal, using `ruby` as a stand-in for `RBENV_COMMAND` here:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-401am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -603,13 +603,13 @@ EDIT: after a few days of thinking, I think I understand why this is important. 
 This is used to emulate `#!` on machines that don't support it
 ```
 
-Some machines apparently don't support shebangs.  Interesting.  I try to look up which ones, starting with Googling "shebang computing".  The first result is [a Wikipedia article](https://web.archive.org/web/20221102170415/https://en.wikipedia.org/wiki/Shebang_(Unix)) whose title is "Shebang (Unix)".  That title, plus the sentence in the 2nd paragraph (below), give a clue:
+Some machines apparently don't support shebangs.  Interesting.  I try to look up which ones, starting with Googling "shebang computing".  The first result is [a Wikipedia article](https://web.archive.org/web/20221102170415/https://en.wikipedia.org/wiki/Shebang_(Unix)){:target="_blank" rel="noopener"} whose title is "Shebang (Unix)".  That title, plus the sentence in the 2nd paragraph (below), give a clue:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-409am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-Together, these tell me that one type of machine that *wouldn't* support a shebang is a non-Unix system, such as Windows.  I find another StackOverflow answer [here](https://web.archive.org/web/20220725080603/https://stackoverflow.com/questions/7574453/shebang-notation-python-scripts-on-windows-and-linux), which tells me essentially the same thing, when I Google "do shebangs work in windows":
+Together, these tell me that one type of machine that *wouldn't* support a shebang is a non-Unix system, such as Windows.  I find another StackOverflow answer [here](https://web.archive.org/web/20220725080603/https://stackoverflow.com/questions/7574453/shebang-notation-python-scripts-on-windows-and-linux){:target="_blank" rel="noopener"}, which tells me essentially the same thing, when I Google "do shebangs work in windows":
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-413am.png" width="80%" style="border: 1px solid black; padding: 0.5em">
@@ -617,9 +617,9 @@ Together, these tell me that one type of machine that *wouldn't* support a sheba
 
 I feel like that's a good enough answer for now, so I keep going.
 
-So getting back to [the problem that initiated this whole discussion](https://github.com/rbenv/rbenv/issues/14), some Ruby programs (which would be affected if a Ruby shim were being used) were calling `ruby -S` to execute certain files, meaning those files would be checked for a Ruby shebang before being executed.  But RBENV shims use a `bash` shebang, not a `ruby` shebang.
+So getting back to [the problem that initiated this whole discussion](https://github.com/rbenv/rbenv/issues/14){:target="_blank" rel="noopener"}, some Ruby programs (which would be affected if a Ruby shim were being used) were calling `ruby -S` to execute certain files, meaning those files would be checked for a Ruby shebang before being executed.  But RBENV shims use a `bash` shebang, not a `ruby` shebang.
 
-According to [this issue](https://github.com/rbenv/rbenv/issues/14), the Rubinius installer included certain lines of code which would have caused an error when used with the version of RBENV at that time (SHA # 2fa743206067034aa5a68d7d730b6cbbb3db8124):
+According to [this issue](https://github.com/rbenv/rbenv/issues/14){:target="_blank" rel="noopener"}, the Rubinius installer included certain lines of code which would have caused an error when used with the version of RBENV at that time (SHA # 2fa743206067034aa5a68d7d730b6cbbb3db8124):
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-414am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
@@ -627,9 +627,9 @@ According to [this issue](https://github.com/rbenv/rbenv/issues/14), the Rubiniu
 
 It might be instructive to try and reproduce this error.  In order to do that, I'll need to use the same version of RBENV as the SHA above.  The easiest way to do that is to edit my PATH so that the first version of RBENV that it encounters is the one in my current directory, *not* the one that's installed (i.e. the one at `/usr/local/bin/rbenv`).  I can simply do this by prepending any command I enter into the terminal with "PATH='./libexec'".  Since the `rbenv` file lives in `libexec`, the shell will find the executable there and stop searching before it checks `/usr/local/bin/rbenv`.
 
-Since the above error was produced when attempting to install Rubinius, that's the same operation I'll attempt to do with the above updated PATH.  I *could* install Rubinius using a package manager like Homebrew, and if I were actually interested in Rubinius for its own sake, that's what I would do.  However, since I'm only interested in it because I'm trying to reproduce this error, I decide to use the "Install from source" instructions on [this link](https://github.com/rubinius/rubinius#installing-rubinius) instead.
+Since the above error was produced when attempting to install Rubinius, that's the same operation I'll attempt to do with the above updated PATH.  I *could* install Rubinius using a package manager like Homebrew, and if I were actually interested in Rubinius for its own sake, that's what I would do.  However, since I'm only interested in it because I'm trying to reproduce this error, I decide to use the "Install from source" instructions on [this link](https://github.com/rubinius/rubinius#installing-rubinius){:target="_blank" rel="noopener"} instead.
 
-"Installing from source" means downloading the original code from Github, and running an install command in that codebase.  The advantage of this is that, before I run the install command, I can roll back to an earlier version of the code, one that more closely matches what the RBENV core team would have been likely to see at the time.  I can't be 100% sure that it will be the same version they saw at the time, but I can compare the date of [the RBENV issue](https://github.com/rbenv/rbenv/issues/14) (Aug 5, 2011) with the dates of the Rubinius version releases, and I can likely get much, much closer.
+"Installing from source" means downloading the original code from Github, and running an install command in that codebase.  The advantage of this is that, before I run the install command, I can roll back to an earlier version of the code, one that more closely matches what the RBENV core team would have been likely to see at the time.  I can't be 100% sure that it will be the same version they saw at the time, but I can compare the date of [the RBENV issue](https://github.com/rbenv/rbenv/issues/14){:target="_blank" rel="noopener"} (Aug 5, 2011) with the dates of the Rubinius version releases, and I can likely get much, much closer.
 
 I try to clone the repo using the instructions below:
 
@@ -667,7 +667,7 @@ Updating files: 100% (6784/6784), done.
 ~/Workspace/OpenSource ()  $ cd rubinius
 ```
 
-Next step is to figure out how to roll back to a certain version.  I don't know which version I want, but I know which date I want to roll back to.  Can you check out an earlier commit based on a date, as opposed to a SHA?  I Google "git checkout a certain date", and get [this StackOverflow answer](https://stackoverflow.com/questions/6990484/how-to-checkout-in-git-by-date):
+Next step is to figure out how to roll back to a certain version.  I don't know which version I want, but I know which date I want to roll back to.  Can you check out an earlier commit based on a date, as opposed to a SHA?  I Google "git checkout a certain date", and get [this StackOverflow answer](https://stackoverflow.com/questions/6990484/how-to-checkout-in-git-by-date){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-419am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -750,7 +750,7 @@ $ PATH="/Users/myusername/Workspace/OpenSource/rbenv:$PATH" ./configure --prefix
 ERROR: Please unset RUBYLIB to configure Rubinius
 ```
 
-Damn.  I got an error, but not the one I was hoping for (i.e. something resembling the error in [the RBENV issue](https://github.com/rbenv/rbenv/issues/14)).  I Google the error ("ERROR: Please unset RUBYLIB to configure Rubinius"), and I see [this Github link](https://github.com/rbenv/rbenv-gem-rehash/pull/10) as the 2nd result:
+Damn.  I got an error, but not the one I was hoping for (i.e. something resembling the error in [the RBENV issue](https://github.com/rbenv/rbenv/issues/14){:target="_blank" rel="noopener"}).  I Google the error ("ERROR: Please unset RUBYLIB to configure Rubinius"), and I see [this Github link](https://github.com/rbenv/rbenv-gem-rehash/pull/10){:target="_blank" rel="noopener"} as the 2nd result:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-437am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -770,19 +770,19 @@ It looks like the only affected file is `etc/rbenv.d/exec/~gem-rehash.bash`.  I 
   <img src="/assets/images/screenshot-15mar2023-439am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-At this point I decide to give up.  I don't have a clear path to debugging the above errors, and I don't know how else to try and reproduce [this error](https://github.com/rbenv/rbenv/issues/14).
+At this point I decide to give up.  I don't have a clear path to debugging the above errors, and I don't know how else to try and reproduce [this error](https://github.com/rbenv/rbenv/issues/14){:target="_blank" rel="noopener"}.
 
 (stopping here for the day; 100193 words)
 
-OK, so I *think* I get the gist of [this PR](https://github.com/rbenv/rbenv/commit/2a495dc9ac842f745239bb7bb6402a8d8c168992): the intent was to look for the *version* of the executable that the user was searching for which corresponded to the one installed in RBENV's shims, and specifically the shim for the user's current RBENV version of Ruby.  That's what would be accomplished if we pre-pended `PATH` with the output of `rbenv-which "$RBENV_COMMAND"`.
+OK, so I *think* I get the gist of [this PR](https://github.com/rbenv/rbenv/commit/2a495dc9ac842f745239bb7bb6402a8d8c168992){:target="_blank" rel="noopener"}: the intent was to look for the *version* of the executable that the user was searching for which corresponded to the one installed in RBENV's shims, and specifically the shim for the user's current RBENV version of Ruby.  That's what would be accomplished if we pre-pended `PATH` with the output of `rbenv-which "$RBENV_COMMAND"`.
 
-It also makes sense what the two added lines of code are doing [here](https://github.com/rbenv/rbenv/commit/2a495dc9ac842f745239bb7bb6402a8d8c168992), and why that fits in with the above intent.  In the first added line, we create a variable named `RBENV_BIN_PATH`, which stores `RBENV_COMMAND_PATH` in the format needed to be prepended to `PATH`.  And in the 2nd line, we do the prepending.  From there, [this line of code](https://github.com/rbenv/rbenv/commit/2a495dc9ac842f745239bb7bb6402a8d8c168992#diff-d04f77bb5cee32ae66e503a1d4b712f0f2e775f8ecfed610ab5f17cbcaeb8cdcR22) would execute the originally-requested command (i.e. `ruby`), passing any additional arguments / flags.  If `-S` were one of these flags, Ruby would use the now-updated `PATH` to search for the executable (i.e. in [this error](https://github.com/rbenv/rbenv/issues/14), that executable would be `rake`).
+It also makes sense what the two added lines of code are doing [here](https://github.com/rbenv/rbenv/commit/2a495dc9ac842f745239bb7bb6402a8d8c168992){:target="_blank" rel="noopener"}, and why that fits in with the above intent.  In the first added line, we create a variable named `RBENV_BIN_PATH`, which stores `RBENV_COMMAND_PATH` in the format needed to be prepended to `PATH`.  And in the 2nd line, we do the prepending.  From there, [this line of code](https://github.com/rbenv/rbenv/commit/2a495dc9ac842f745239bb7bb6402a8d8c168992#diff-d04f77bb5cee32ae66e503a1d4b712f0f2e775f8ecfed610ab5f17cbcaeb8cdcR22){:target="_blank" rel="noopener"} would execute the originally-requested command (i.e. `ruby`), passing any additional arguments / flags.  If `-S` were one of these flags, Ruby would use the now-updated `PATH` to search for the executable (i.e. in [this error](https://github.com/rbenv/rbenv/issues/14){:target="_blank" rel="noopener"}, that executable would be `rake`).
 
-I also get why Mislav would make the comment he made [here](https://github.com/rbenv/rbenv/pull/372), saying that this solution prevents users from using a different version of Ruby.  This is because the directory which is prepended to PATH contains the user's current RBENV Ruby version.  That directory will always be found first, before any directories for other Ruby versions, since it's the first one in PATH (that's the whole point of the prepending operation in the first place).
+I also get why Mislav would make the comment he made [here](https://github.com/rbenv/rbenv/pull/372){:target="_blank" rel="noopener"}, saying that this solution prevents users from using a different version of Ruby.  This is because the directory which is prepended to PATH contains the user's current RBENV Ruby version.  That directory will always be found first, before any directories for other Ruby versions, since it's the first one in PATH (that's the whole point of the prepending operation in the first place).
 
-OK, I think I get the story up to [this point](https://github.com/rbenv/rbenv/pull/372).  Without going through each issue and PR with a fine-toothed comb, I can't be sure that this constitutes all the "-S"-related drama up to this point, but I'm willing to assume so for now.
+OK, I think I get the story up to [this point](https://github.com/rbenv/rbenv/pull/372){:target="_blank" rel="noopener"}.  Without going through each issue and PR with a fine-toothed comb, I can't be sure that this constitutes all the "-S"-related drama up to this point, but I'm willing to assume so for now.
 
-And it looks like this solution worked fine as of [this point](https://github.com/rbenv/rbenv/pull/372), with the exception that we're now locked into a specific Ruby version.  What I don't get is, why would this be a problem exactly?  Why would a user want to pick one Ruby version to use, but then shell out to another Ruby version from there?  Mislav calls it "the most common pitfall with rbenv" [here](https://github.com/rbenv/rbenv/pull/372), and references [this issue](https://github.com/rbenv/rbenv/issues/121) as an example, so that's where I start trying to answer this question.
+And it looks like this solution worked fine as of [this point](https://github.com/rbenv/rbenv/pull/372){:target="_blank" rel="noopener"}, with the exception that we're now locked into a specific Ruby version.  What I don't get is, why would this be a problem exactly?  Why would a user want to pick one Ruby version to use, but then shell out to another Ruby version from there?  Mislav calls it "the most common pitfall with rbenv" [here](https://github.com/rbenv/rbenv/pull/372){:target="_blank" rel="noopener"}, and references [this issue](https://github.com/rbenv/rbenv/issues/121){:target="_blank" rel="noopener"} as an example, so that's where I start trying to answer this question.
 
 The issue appears to be the following:
 
@@ -833,7 +833,7 @@ Each time we run `puts "$RUBY_VERSION"`, we've just finished running `RBENV_VERS
 What is changing the value of `RUBY_VERSION`?  I don't see that constant referenced anywhere in the RBENV codebase, so I'm unsure how it's being updated.
 
 
-Based on reading [this link](https://web.archive.org/web/20220911152812/https://www.rubyguides.com/2019/01/ruby-environment-variables/), I *think* `RUBY_VERSION` is set internally by Ruby.  So something we're doing outside of the `ruby` command must be influencing the way Ruby internally sets the value of this env var.
+Based on reading [this link](https://web.archive.org/web/20220911152812/https://www.rubyguides.com/2019/01/ruby-environment-variables/){:target="_blank" rel="noopener"}, I *think* `RUBY_VERSION` is set internally by Ruby.  So something we're doing outside of the `ruby` command must be influencing the way Ruby internally sets the value of this env var.
 
 My best guess right now is that a given Ruby installation hard-codes this env var's value, and that the behavior that results when you `puts RUBY_VERSION` depends on which Ruby installation you're running that from.  I'm thinking that Ruby gets its version from that hard-coded `RUBY_VERSION` constant, and that each installed version of Ruby has a different hard-coded value for that constant.
 
@@ -845,7 +845,7 @@ But something in this line bothers me:
 ruby -e 'system("RBENV_VERSION=system ruby -e \"puts RUBY_VERSION\"")'
 ```
 
-Since we're running `rbenv exec`, we must be reaching [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L24), which calls `rbenv-version-name`.  That file, in turn, [checks](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L6) whether `RBENV_VERSION` already exists, and if it doesn't, sets it according to the contents of the RBENV version file (either a `.rbenv-version` file or the global version file).  What's happening here when we call the above `system` command with two `ruby` commands, which isn't happening with the "one `perl` and one `ruby` command" version?
+Since we're running `rbenv exec`, we must be reaching [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L24){:target="_blank" rel="noopener"}, which calls `rbenv-version-name`.  That file, in turn, [checks](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L6){:target="_blank" rel="noopener"} whether `RBENV_VERSION` already exists, and if it doesn't, sets it according to the contents of the RBENV version file (either a `.rbenv-version` file or the global version file).  What's happening here when we call the above `system` command with two `ruby` commands, which isn't happening with the "one `perl` and one `ruby` command" version?
 
 I add some `echo` statements to that file, specifically here:
 
@@ -922,26 +922,26 @@ When running the `perl -e` version:
  - This explains why we see `RBENV_VERSION inside rbenv-exec: system` as the 2nd logline.
  - Because this value is defined, we don't enter the `if` block, and therefore we *don't* see the "inside 'if' block" logline.
  - Because of this, in turn, we don't set `RBENV_VERSION` equal to the output of `rbenv-version-file-read`, which would have set `RBENV_VERSION` equal to 2.7.5.  Instead, we leave its value as "system".
- - Because its value is still "system" by the time it reaches [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L44), we never prepend `PATH` with `RBENV_BIN_PATH` (i.e. the RBENV-specific path to the user's requested command).  In our case, remember, that requested command is "ruby".
+ - Because its value is still "system" by the time it reaches [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L44){:target="_blank" rel="noopener"}, we never prepend `PATH` with `RBENV_BIN_PATH` (i.e. the RBENV-specific path to the user's requested command).  In our case, remember, that requested command is "ruby".
  - Because `PATH` never gets prepended with the RBENV-specific path to the user's command, we use the default system path to that command.  In our case, that default system path to "ruby" is `/usr/bin/ruby`.
  - The version of Ruby in `/usr/bin/ruby` is (on my machine) 2.6.8, so that's what gets printed to the screen.
 
 When running the `ruby -e` version:
 
  - The `ruby` that we're running in `ruby -e` is the RBENV shim file for "ruby".  Therefore we're *actually* running `rbenv exec ruby -e`.
- - Inside `rbenv exec`, we eventually reach [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L24) and call `RBENV_VERSION="$(rbenv-version-name)"`.
- - `rbenv-version-name`, in turn, reaches [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L6), which detects that no value has been set for `RBENV_VERSION` up til now, so it enters the `if` block and reads the contents of the RBENV version file that it finds.
+ - Inside `rbenv exec`, we eventually reach [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L24){:target="_blank" rel="noopener"} and call `RBENV_VERSION="$(rbenv-version-name)"`.
+ - `rbenv-version-name`, in turn, reaches [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L6){:target="_blank" rel="noopener"}, which detects that no value has been set for `RBENV_VERSION` up til now, so it enters the `if` block and reads the contents of the RBENV version file that it finds.
 
 OK, I think we can safely say that this is the correct explanation of the difference in behavior between the `perl` and `ruby` commands, as well as the reason why the two commands end up with different versions of RBENV.
 
 But I don't understand this problem as well as I feel like I need to.  Reading up on the evolution of the problem from start to finish would improve my understanding of what happened when, and more importantly, why:
 
  - Many programs which execute Ruby commands do so using the "-S' flag, because this allows those programs to work on machines which don't support shebangs.
- - [Originally](https://github.com/rbenv/rbenv/blob/2fa743206067034aa5a68d7d730b6cbbb3db8124/libexec/rbenv), the only other places where `PATH` was being modified were [here](https://github.com/rbenv/rbenv/blob/2fa743206067034aa5a68d7d730b6cbbb3db8124/libexec/rbenv-init#L55) and [here](https://github.com/rbenv/rbenv/blob/2fa743206067034aa5a68d7d730b6cbbb3db8124/libexec/rbenv#L18).
+ - [Originally](https://github.com/rbenv/rbenv/blob/2fa743206067034aa5a68d7d730b6cbbb3db8124/libexec/rbenv){:target="_blank" rel="noopener"}, the only other places where `PATH` was being modified were [here](https://github.com/rbenv/rbenv/blob/2fa743206067034aa5a68d7d730b6cbbb3db8124/libexec/rbenv-init#L55){:target="_blank" rel="noopener"} and [here](https://github.com/rbenv/rbenv/blob/2fa743206067034aa5a68d7d730b6cbbb3db8124/libexec/rbenv#L18){:target="_blank" rel="noopener"}.
     - The 1st prepending adds the shims directory to PATH, inside `rbenv-init`.
     - The 2nd prepending adds `libexec/` to `PATH` (i.e. the place where all the RBENV command files live).
  - This caused RBENV to be incompatible with "-S", because _____.
- - [This PR](https://github.com/rbenv/rbenv/issues/14) was merged by Sam Stephenson, the original author of RBENV.  The goal was to make RBENV compatible with the aforementioned "-S" flag.
+ - [This PR](https://github.com/rbenv/rbenv/issues/14){:target="_blank" rel="noopener"} was merged by Sam Stephenson, the original author of RBENV.  The goal was to make RBENV compatible with the aforementioned "-S" flag.
  - The proposed solution was to prepend `RBENV_BIN_PATH` (i.e. `/Users/myusername/.rbenv/versions/2.7.5/bin` for the `ruby` command) to the beginning of `PATH`, but only when an RBENV command was invoked.
     - In other words, the value of `RBENV_BIN_PATH` for the `perl` command is `/usr/bin`, but since `RBENV_VERSION` is "system" when `perl` is the command, `/usr/bin` would never have been prepended to `PATH`.  A bit of context:
 
@@ -950,7 +950,7 @@ It's at this point that I stop and re-assess my focus on the "-S" bug.  I may no
 
 Now that we've discussed the tests, let's move on to the code:
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec){:target="_blank" rel="noopener"}
 
 First few lines of code:
 
@@ -990,7 +990,7 @@ if [ "$1" = "--complete" ]; then
 fi
 ```
 
-Here we check whether the user passed the `--complete` flag as the first argument to `rbenv exec`.  If they did, we run `rbenv-shims --short`.  This is a different command from what we usually run when the user passes `--complete`.  For instance, [here](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-commands#L9) we just echo basic strings when the user passes this flag.  I'm curious why we do things differently here.
+Here we check whether the user passed the `--complete` flag as the first argument to `rbenv exec`.  If they did, we run `rbenv-shims --short`.  This is a different command from what we usually run when the user passes `--complete`.  For instance, [here](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-commands#L9){:target="_blank" rel="noopener"} we just echo basic strings when the user passes this flag.  I'm curious why we do things differently here.
 
 First of all, what does `rbenv exec --complete` result in?
 
@@ -1047,7 +1047,7 @@ And that's just the output starting with A through G.  It looks like this output
 #   PATH="$RBENV_ROOT/versions/1.9.3-p327/bin:$PATH" bundle install
 ```
 
-And judging by the content of [the `rbenv-shims` file](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-shims) (which we'll get to later), it looks like if the user runs `rbenv shims --short`, rbenv will print the name of each shim in its `shims` directory.  Since (I believe?) there's meant to be one shim in that directory for each Ruby gem I have installed, I'm guessing that we add a shim to this folder whenever we install a Ruby gem which exposes a terminal command.
+And judging by the content of [the `rbenv-shims` file](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-shims){:target="_blank" rel="noopener"} (which we'll get to later), it looks like if the user runs `rbenv shims --short`, rbenv will print the name of each shim in its `shims` directory.  Since (I believe?) there's meant to be one shim in that directory for each Ruby gem I have installed, I'm guessing that we add a shim to this folder whenever we install a Ruby gem which exposes a terminal command.
 
 So that's why we run `exec rbenv-shims --short` here, and nothing else (i.e. no `echo`'ing as with other commands).  It looks like the only completions we expose for `rbenv exec` are for commands which you can run using `rbenv exec`.
 
@@ -1136,7 +1136,7 @@ Here's what we get when we run `rbenv exec ruby` in a new tab:
   <img src="/assets/images/screenshot-15mar2023-458am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-Interesting.  I suspect that the length is the same in both cases because it's a single string in both cases.  According to StackOverflow, `bash` [doesn't have data types](https://stackoverflow.com/a/29840856/2143275), so it's not as simple as calling `type` on a variable to see whether it's a string or an array.  I'm actually not immediately sure how I would go about testing this!  I may have to come back to this experiment when I've learned more `bash`.
+Interesting.  I suspect that the length is the same in both cases because it's a single string in both cases.  According to StackOverflow, `bash` [doesn't have data types](https://stackoverflow.com/a/29840856/2143275){:target="_blank" rel="noopener"}, so it's not as simple as calling `type` on a variable to see whether it's a string or an array.  I'm actually not immediately sure how I would go about testing this!  I may have to come back to this experiment when I've learned more `bash`.
 
 Next lines of code:
 
@@ -1172,13 +1172,13 @@ I see references to `PLUGINS` here, and the current version of the code does ref
 
 BTW- What is the difference, if any, between plugins and hooks, with respect to RBENV?  I'll have to add this to my running list of questions.
 
-While I was digging through the git history of `rbenv-exec`, I found [this commit](https://github.com/rbenv/rbenv/commit/99035a49a9c55d4a5ee67bdc7e372cc9221756c9#diff-0ca831c894125a742cf8127263c4eaacee60548229cbf76360cae72cf624dd7c) in Github.  It shows that the file originally looked like this:
+While I was digging through the git history of `rbenv-exec`, I found [this commit](https://github.com/rbenv/rbenv/commit/99035a49a9c55d4a5ee67bdc7e372cc9221756c9#diff-0ca831c894125a742cf8127263c4eaacee60548229cbf76360cae72cf624dd7c){:target="_blank" rel="noopener"} in Github.  It shows that the file originally looked like this:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-502am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-The file is clearly missing a lot of the code it now has, including the looping over the `scripts` variable and the `source`ing of each file.  Maybe if I find the commit which introduced that code, I can figure out why it's needed.  I find that commit [here](https://github.com/rbenv/rbenv/commit/a9837f3a066f6a2a7898ddb281a5ff34e1750df1), and the commit message is `look for plugin scripts to extend functionality`.  At the time of that commit, the entire file looked like this:
+The file is clearly missing a lot of the code it now has, including the looping over the `scripts` variable and the `source`ing of each file.  Maybe if I find the commit which introduced that code, I can figure out why it's needed.  I find that commit [here](https://github.com/rbenv/rbenv/commit/a9837f3a066f6a2a7898ddb281a5ff34e1750df1){:target="_blank" rel="noopener"}, and the commit message is `look for plugin scripts to extend functionality`.  At the time of that commit, the entire file looked like this:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-503am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
@@ -1199,7 +1199,7 @@ fi
 
 We shift off the current first-position argument, so that on the last line of code in this file, we can pass the remaining arguments to the command that we `exec`.  We then prepend the `PATH` variable with the value of `RBENV_BIN_PATH`.  We do this so that, in the subsequent `exec` command, the first suitable folder in which the shell finds the user's requested executable is the subfolder of the Ruby version that your configuration has asked RBENV to use.  For example, if my current RBENV Ruby version is 2.7.5, RBENV will prepend `/Users/myusername/.rbenv/versions/2.7.5/bin/` to my path, meaning my shell will search this folder first for any executable with the name of the command I'm trying to run.
 
-However, we only do this prepending if the user isn't currently using their system version of Ruby.  I was curious *why* we have this `if` check, and after a bit of digging I found [this commit](https://github.com/rbenv/rbenv/commit/8ee2f2657a088851d0aa75736c7b0305a10522f1).  It appears that, if the user is running the system version of Ruby, then their Ruby load path is already part of the overall PATH.  And adding it a 2nd time [could break things](https://github.com/rbenv/rbenv/commit/8ee2f2657a088851d0aa75736c7b0305a10522f1).
+However, we only do this prepending if the user isn't currently using their system version of Ruby.  I was curious *why* we have this `if` check, and after a bit of digging I found [this commit](https://github.com/rbenv/rbenv/commit/8ee2f2657a088851d0aa75736c7b0305a10522f1){:target="_blank" rel="noopener"}.  It appears that, if the user is running the system version of Ruby, then their Ruby load path is already part of the overall PATH.  And adding it a 2nd time [could break things](https://github.com/rbenv/rbenv/commit/8ee2f2657a088851d0aa75736c7b0305a10522f1){:target="_blank" rel="noopener"}.
 
 Last line of code is:
 
@@ -1221,7 +1221,7 @@ When I ran `rbenv exec ruby -e 'puts 1+1', I saw the following:
 
 So now we know what the actual command is that's being run.
 
-According to the SS64.com [command line reference](https://web.archive.org/web/20220628155926/https://ss64.com/bash/exec.html), `exec` replaces the shell without creating a new process if command is supplied.  The `-a` flag "passes name as the zeroth argument to command."
+According to the SS64.com [command line reference](https://web.archive.org/web/20220628155926/https://ss64.com/bash/exec.html){:target="_blank" rel="noopener"}, `exec` replaces the shell without creating a new process if command is supplied.  The `-a` flag "passes name as the zeroth argument to command."
 
 (stopping for the day; 34402 words)
 
@@ -1267,7 +1267,7 @@ Hello world
 2: 2
 ```
 
-Why is the 0th argument different from what I expected?  And why would we want "ruby" as the 0th argument?  It seems like `exec` can handle the full `/Users/myusername/.rbenv/versions/2.7.5/bin/ruby` command just fine, right?  I post a [question on StackExchange](https://unix.stackexchange.com/questions/717671/why-isnt-exec-a-working-the-way-i-expect), and am waiting for an answer.
+Why is the 0th argument different from what I expected?  And why would we want "ruby" as the 0th argument?  It seems like `exec` can handle the full `/Users/myusername/.rbenv/versions/2.7.5/bin/ruby` command just fine, right?  I post a [question on StackExchange](https://unix.stackexchange.com/questions/717671/why-isnt-exec-a-working-the-way-i-expect){:target="_blank" rel="noopener"}, and am waiting for an answer.
 
 In the meantime, let's take a look at the spec files for `rbenv-exec`.  Maybe that'll shed some light on the confusion I've had around this file.
 

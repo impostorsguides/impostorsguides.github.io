@@ -48,7 +48,7 @@ Same thing- it printed the name of the first command I entered into the terminal
 
 Before I forget, I delete my `echo` commands from both the `bundle` and `ruby` shims.
 
-But what is this weird syntax which evaluates to the name of the program?  After Googling that exact string `"${0##*/}"`, I find [this StackOverflow link](https://archive.ph/1wCki), which says:
+But what is this weird syntax which evaluates to the name of the program?  After Googling that exact string `"${0##*/}"`, I find [this StackOverflow link](https://web.archive.org/web/20150926110359/https://unix.stackexchange.com/questions/214465/what-does-prog-0-mean-in-a-bash-script/214469){:target="_blank" rel="noopener"}, which says:
 
 <p style="text-align: center">
   <img src="/assets/images/param-expansion-example-1.png" width="80%" alt="parameter expansion- first example" style="border: 1px solid black; padding: 0.5em">
@@ -140,7 +140,7 @@ This is expected.  The StackOverflow answer mentions that including only one `#`
 
 So one `#` will cause `./` to be removed, while two `##` will cause `./foo/foo/` to be removed.
 
-That's pretty much all there is to cover for this line of code.  Before moving on, I Google around a bit and find [this link](https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html), which looks like good documentation for me to bookmark and refer back to later, if I need to.
+That's pretty much all there is to cover for this line of code.  Before moving on, I Google around a bit and find [this link](https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"}, which looks like good documentation for me to bookmark and refer back to later, if I need to.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 

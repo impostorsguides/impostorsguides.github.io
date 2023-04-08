@@ -1,6 +1,6 @@
 Again, let's start with the test file, `help.bats`.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/help.bats)
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/help.bats){:target="_blank" rel="noopener"}
 
 After the shebang and the `test_helper` load, the first spec is:
 
@@ -239,7 +239,7 @@ This spec does the same as the previous spec, but with a multi-line extended des
 
 Now onto the command file itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help){:target="_blank" rel="noopener"}
 
 First few lines of code are almost too obvious to repeat at this point:
 
@@ -379,7 +379,7 @@ quox bar baz
 
 I continue Googling to get a bit more context.  My previous experience with bash tells me that `sed` is one of the most commonly-used utilities in shell scripting, so I think it'll pay to become a bit more familiar with it.
 
-The site HowToGeek [says the following](https://www.howtogeek.com/666395/how-to-use-the-sed-command-on-linux/):
+The site HowToGeek [says the following](https://www.howtogeek.com/666395/how-to-use-the-sed-command-on-linux/){:target="_blank" rel="noopener"}:
 
 > The `sed` command is a bit like chess: it takes an hour to learn the basics and a lifetime to master them (or, at least a lot of practice)...
 >
@@ -401,21 +401,21 @@ HowToGeek clarifies what the `-n` flag does:
 
 > By default, sed prints all lines. We'd see all the text in the file with the matching lines printed twice. To prevent this, we'll use the -n (quiet) option to suppress the unmatched text.
 
-ComputerHope, which I've often found to be another good resource during this project, adds [the following](https://www.computerhope.com/unix/used.htm):
+ComputerHope, which I've often found to be another good resource during this project, adds [the following](https://www.computerhope.com/unix/used.htm){:target="_blank" rel="noopener"}:
 
 > The sed stream editor performs basic text transformations on an input stream (a file, or input from a pipeline). While in some ways similar to an editor which permits scripted edits (such as ed), sed works by making only one pass over the input(s), and is consequently more efficient. But it is sed's ability to filter text in a pipeline which particularly distinguishes it from other types of editors.
 
-I'm still a bit unclear on the `-e` flag, however.  When I Google 'what does the "-e" flag do sed', the first result I see is [a StackExchange post](https://unix.stackexchange.com/questions/33157/what-is-the-purpose-of-e-in-sed-command) which proves helpful:
+I'm still a bit unclear on the `-e` flag, however.  When I Google 'what does the "-e" flag do sed', the first result I see is [a StackExchange post](https://unix.stackexchange.com/questions/33157/what-is-the-purpose-of-e-in-sed-command){:target="_blank" rel="noopener"} which proves helpful:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-123pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-From this and other answers in the post, I can see that `-e` tells `sed` to use the subsequent argument as a script to run against the input that it receives.  I search the file to see where this function is called, and I see [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L100) that we send the text of a yet-to-be-specified file to `sed`, which means we run the script that was passed to `-e` against the text from the filename.  However, I'm not clear on what this script is.  It appears to be 3 scripts in one, separated by newlines.  [I ask StackExchange for help](https://unix.stackexchange.com/questions/717738/what-is-the-function-of-this-script-passed-to-sed-e) and am waiting for an answer.
+From this and other answers in the post, I can see that `-e` tells `sed` to use the subsequent argument as a script to run against the input that it receives.  I search the file to see where this function is called, and I see [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L100){:target="_blank" rel="noopener"} that we send the text of a yet-to-be-specified file to `sed`, which means we run the script that was passed to `-e` against the text from the filename.  However, I'm not clear on what this script is.  It appears to be 3 scripts in one, separated by newlines.  [I ask StackExchange for help](https://unix.stackexchange.com/questions/717738/what-is-the-function-of-this-script-passed-to-sed-e){:target="_blank" rel="noopener"} and am waiting for an answer.
 
 (stopping here for the day; 36997 words)
 
-The next day, I have [my answer](https://unix.stackexchange.com/a/717747/142469).  The TL;DR is that I was right in thinking that the code inside the quotes represents 3 commands passed to `sed`, executed one-after-another.  When you pass "-e" to `sed`, you can then pass it commands which are chained in this style.  In our case, the 1st command says that if a line is encountered which does *not* start with a `#` symbol, quit the `sed` command entirely.  The 2nd command says that if a line is encountered which starts and ends with the same `#` symbol (i.e. it's just a one-character line containing `#`), to replace that lone character with a `# ` (i.e. `#` plus a space).  The 3rd command says that, if a line is encountered starting with `#` plus a space, to print that line (not including the `#-space` characters).
+The next day, I have [my answer](https://unix.stackexchange.com/a/717747/142469){:target="_blank" rel="noopener"}.  The TL;DR is that I was right in thinking that the code inside the quotes represents 3 commands passed to `sed`, executed one-after-another.  When you pass "-e" to `sed`, you can then pass it commands which are chained in this style.  In our case, the 1st command says that if a line is encountered which does *not* start with a `#` symbol, quit the `sed` command entirely.  The 2nd command says that if a line is encountered which starts and ends with the same `#` symbol (i.e. it's just a one-character line containing `#`), to replace that lone character with a `# ` (i.e. `#` plus a space).  The 3rd command says that, if a line is encountered starting with `#` plus a space, to print that line (not including the `#-space` characters).
 
 (stopping here for the day; 38048 words, mostly at the start of this file)
 
@@ -432,7 +432,7 @@ collect_documentation() {
 ...
 ```
 
-Here we open (but don't yet close) a declaration for a function called `collect_documentation`.  Inside we declare a local variable named `awk`, which I happen to know shares the same name as a shell utility.  GNU has [a user's guide](https://web.archive.org/web/20220915174506/https://www.gnu.org/software/gawk/manual/gawk.html) on the `awk` utility, which says that it's "a program that you can use to select particular records in a file and perform operations upon them."  [The Linux man page](https://web.archive.org/web/20220707035408/https://man7.org/linux/man-pages/man1/awk.1p.html) for `awk` has more details:
+Here we open (but don't yet close) a declaration for a function called `collect_documentation`.  Inside we declare a local variable named `awk`, which I happen to know shares the same name as a shell utility.  GNU has [a user's guide](https://web.archive.org/web/20220915174506/https://www.gnu.org/software/gawk/manual/gawk.html){:target="_blank" rel="noopener"} on the `awk` utility, which says that it's "a program that you can use to select particular records in a file and perform operations upon them."  [The Linux man page](https://web.archive.org/web/20220707035408/https://man7.org/linux/man-pages/man1/awk.1p.html){:target="_blank" rel="noopener"} for `awk` has more details:
 
 > The awk utility shall execute programs written in the awk programming language, which is specialized for textual data manipulation. An awk program is a sequence of patterns and corresponding actions. When input is read that matches a pattern, the action associated with that pattern is carried out.
 >
@@ -444,7 +444,7 @@ We assign a value to our local variable `awk`, and that value is `$(type -p gawk
 
 In the case of setting our local `awk` variable, `type -p gawk awk` searches the disk for the files associated with 2 commands, `gawk` and `awk`.  It pipes the results to `head -n1`, which means it takes the first filepath it finds from those 2 commands, and it pipes any errors to `/dev/null`.  So the value of the `awk` local variable is either the filepath for the `gawk` command or that of the `awk` command (if no filepath was found for `gawk`).
 
-I was curious why the value of the local variable was set using the `type` command, and not `which`, a command that I'm more familiar with.  I Google "type vs which bash" and get [this very authoritative-looking StackExchange post](https://unix.stackexchange.com/questions/85249/why-not-use-which-what-to-use-then).  The question itself says "We often hear that which should be avoided", and this is new information to me.  This seems important, because `which` is one of the first shell commands I learned and is something I rely on not-infrequently, so I decide to read up on this a bit.  Here are some snippets of information that I was able to pick up from the top-rated answer:
+I was curious why the value of the local variable was set using the `type` command, and not `which`, a command that I'm more familiar with.  I Google "type vs which bash" and get [this very authoritative-looking StackExchange post](https://unix.stackexchange.com/questions/85249/why-not-use-which-what-to-use-then){:target="_blank" rel="noopener"}.  The question itself says "We often hear that which should be avoided", and this is new information to me.  This seems important, because `which` is one of the first shell commands I learned and is something I rely on not-infrequently, so I decide to read up on this a bit.  Here are some snippets of information that I was able to pick up from the top-rated answer:
 
 > The `which` command is a broken heritage from the C-Shell and is better left alone in Bourne-like shells.
 >
@@ -482,7 +482,7 @@ I was curious why the value of the local variable was set using the `type` comma
 >
 > Now, on the standard front, POSIX specifies the `command -v` and `-V` commands (which used to be optional until POSIX.2008). UNIX specifies the `type` command (no option). That's all (`where`, `which`, `whence` are not specified in any standard).
 
-Another good StackOverflow question [here](https://stackoverflow.com/questions/592620/how-can-i-check-if-a-program-exists-from-a-bash-script) ("How would I validate that a program exists, in a way that will either return an error and exit, or continue with the script?"), with answer [here](https://stackoverflow.com/a/677212/2143275).  An excerpt:
+Another good StackOverflow question [here](https://stackoverflow.com/questions/592620/how-can-i-check-if-a-program-exists-from-a-bash-script){:target="_blank" rel="noopener"} ("How would I validate that a program exists, in a way that will either return an error and exit, or continue with the script?"), with answer [here](https://stackoverflow.com/a/677212/2143275){:target="_blank" rel="noopener"}.  An excerpt:
 
 > ### POSIX compatible:
 >
@@ -514,9 +514,9 @@ Continuing on with the `collect_documentation` function:
 
 If neither `gawk` nor `awk` is installed on the user's system, we echo an error message to STDERR and return a non-zero exit code.  But why wouldn't `awk` be installed on the user's system?  We have a `bash` shebang in this file; isn't `awk` part of every `bash` installation?
 
-And what is the difference between `awk` and `gawk`?  I ask a StackExchange question [here](https://unix.stackexchange.com/questions/717991/why-is-it-necessary-to-check-for-awk-in-this-bash-script), and eventually I get the answer that `awk` is part of the POSIX standard, but that the RBENV authors probably couldn't assume that the user would be running in a POSIX-compliant environment.
+And what is the difference between `awk` and `gawk`?  I ask a StackExchange question [here](https://unix.stackexchange.com/questions/717991/why-is-it-necessary-to-check-for-awk-in-this-bash-script){:target="_blank" rel="noopener"}, and eventually I get the answer that `awk` is part of the POSIX standard, but that the RBENV authors probably couldn't assume that the user would be running in a POSIX-compliant environment.
 
-Another question: I see both `type -p` and `command -v` being used for the same purpose in this file ([here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L26) and [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L46)).  Is there any difference between these?  From [shell-tips.com](https://web.archive.org/web/20220705053124/https://www.shell-tips.com/bash/type-command/#gsc.tab=0), I see the following:
+Another question: I see both `type -p` and `command -v` being used for the same purpose in this file ([here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L26){:target="_blank" rel="noopener"} and [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L46){:target="_blank" rel="noopener"}).  Is there any difference between these?  From [shell-tips.com](https://web.archive.org/web/20220705053124/https://www.shell-tips.com/bash/type-command/#gsc.tab=0){:target="_blank" rel="noopener"}, I see the following:
 
 > You can use the bash specific syntax `type -p` to find the actual path to an external shell command. It is similar to using `command -v` which is POSIX compliant. Both methods should be preferred in bash to the legacy `which` command.
 >
@@ -543,7 +543,7 @@ Next line of code:
 # shellcheck disable=SC2016
 ```
 
-I haven't seen code like this before, so I Google "shellcheck disable".  [The first result](https://web.archive.org/web/20220626113148/https://www.bashsupport.com/manual/editor/shellcheck/) refers to a program called ShellCheck.  I Google "what is ShellCheck", and [the first result](https://web.archive.org/web/20220915000849/https://www.shellcheck.net/) of *this* search describes it as "ShellCheck is an open source static analysis tool that automatically finds bugs in your shell scripts."  Back to the line of code, it appears that `shellcheck disable=SC2016` disables [rule number 2016](https://www.shellcheck.net/wiki/SC2016):
+I haven't seen code like this before, so I Google "shellcheck disable".  [The first result](https://web.archive.org/web/20220626113148/https://www.bashsupport.com/manual/editor/shellcheck/){:target="_blank" rel="noopener"} refers to a program called ShellCheck.  I Google "what is ShellCheck", and [the first result](https://web.archive.org/web/20220915000849/https://www.shellcheck.net/){:target="_blank" rel="noopener"} of *this* search describes it as "ShellCheck is an open source static analysis tool that automatically finds bugs in your shell scripts."  Back to the line of code, it appears that `shellcheck disable=SC2016` disables [rule number 2016](https://www.shellcheck.net/wiki/SC2016){:target="_blank" rel="noopener"}:
 
 > Expressions don't expand in single quotes, use double quotes for that.
 >
@@ -603,7 +603,7 @@ I wanted to see what "summary" expands to, after all is said and done.  I initia
   <img src="/assets/images/screenshot-15mar2023-136pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-I Google "awk print a string" and find [this result](https://www.gnu.org/software/gawk/manual/html_node/Print-Examples.html), which suggests using the `print` command instead.  I try this...
+I Google "awk print a string" and find [this result](https://www.gnu.org/software/gawk/manual/html_node/Print-Examples.html){:target="_blank" rel="noopener"}, which suggests using the `print` command instead.  I try this...
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-137pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -615,7 +615,7 @@ I Google "awk print a string" and find [this result](https://www.gnu.org/softwar
   <img src="/assets/images/screenshot-15mar2023-138pm.png" width="100%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-OK, so I'm still getting a "command not found" error, which means our string is still accidentally getting interpreted as a command.  I Google "awk print to stderr", since I suspect that printing to a destination other than STDOUT will have the effect we want.  I get [this link](https://archive.ph/FcIBj), with a comment (again by Stephane Chazelas; this guy is everywhere!) that suggests the command `​​print "foo" | "cat >&2"`.  I try the equivalent for my code:
+OK, so I'm still getting a "command not found" error, which means our string is still accidentally getting interpreted as a command.  I Google "awk print to stderr", since I suspect that printing to a destination other than STDOUT will have the effect we want.  I get [this link](https://web.archive.org/web/20230407073708/https://groups.google.com/g/comp.unix.shell/c/iLB2_h4QFIo){:target="_blank" rel="noopener"}, with a comment (again by Stephane Chazelas; this guy is everywhere!) that suggests the command `​​print "foo" | "cat >&2"`.  I try the equivalent for my code:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-139pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -641,7 +641,7 @@ This seems to fix the error, at least!  The only problem is, I'm not sure where 
 
 Great!  So the "summary" variable evaluates to "Set or show the global Ruby version".  We can be reasonably confident of this because that's the string printed out immediately before the "foobar" string.
 
-But wait, when I initially glanced at the call to `substr`, I saw that the 2nd parameter was `10`.  I had assumed that this meant we wanted the substring only up to the 10th character, and that the first param of `$0` was the index of the character that we wanted to start at.  This can't be the case, since we clearly have more than 10 characters in the output.  I look up the documentation for `substr` by Googling "awk substr", and I get [this result](https://web.archive.org/web/20201129014027/https://thomas-cokelaer.info/blog/2011/05/awk-the-substr-command-to-select-a-substring/), which says that the syntax of `substr` is as follows:
+But wait, when I initially glanced at the call to `substr`, I saw that the 2nd parameter was `10`.  I had assumed that this meant we wanted the substring only up to the 10th character, and that the first param of `$0` was the index of the character that we wanted to start at.  This can't be the case, since we clearly have more than 10 characters in the output.  I look up the documentation for `substr` by Googling "awk substr", and I get [this result](https://web.archive.org/web/20201129014027/https://thomas-cokelaer.info/blog/2011/05/awk-the-substr-command-to-select-a-substring/){:target="_blank" rel="noopener"}, which says that the syntax of `substr` is as follows:
 
 > substr(s, a, b) : it returns b number of chars from string s, starting at position a. The parameter b is optional, in which case it means up to the end of the string.
 
@@ -661,7 +661,7 @@ Yep!  So "Summary: " is 9 characters long.  The 10th character is the "S" in "Se
 
 I think we can move on now.  But before I forget, I make sure to clean up the print statements I added.
 
-One last thing before moving on to the next `awk` command is the line of code after the `summary` declaration: `next`.  [GNU.org says](https://web.archive.org/web/20220525202544/https://www.gnu.org/software/gawk/manual/html_node/Next-Statement.html):
+One last thing before moving on to the next `awk` command is the line of code after the `summary` declaration: `next`.  [GNU.org says](https://web.archive.org/web/20220525202544/https://www.gnu.org/software/gawk/manual/html_node/Next-Statement.html){:target="_blank" rel="noopener"}:
 
 > The next statement forces awk to immediately stop processing the current record and go on to the next record. This means that no further rules are executed for the current record, and the rest of the current rule's action isn't executed.
 >
@@ -729,14 +729,14 @@ I assumed that "help" would be populated the same way, but when I try "Help: foo
 
 I scroll down in the code a bit and I notice that, while there is a line here of `help = help "\n" $0`, it doesn't come with a regex before the opening curly brace, so maybe that means there's no matching lines?  But if that's the case, how does "help=" get populated?  I assume it must be happening somehow, otherwise why have `help = help "\n" $0` in the function at all?
 
-I don't think it's correct to say that curly braces without a regex means the code will never get executed.  I find a StackOverflow answer [here](https://web.archive.org/web/20160901162438/https://stackoverflow.com/questions/38596130/what-does-it-mean-when-an-awk-script-has-code-outside-curly-braces), which in fact says the opposite - that `awk` code without a regex will *always* be run:
+I don't think it's correct to say that curly braces without a regex means the code will never get executed.  I find a StackOverflow answer [here](https://web.archive.org/web/20160901162438/https://stackoverflow.com/questions/38596130/what-does-it-mean-when-an-awk-script-has-code-outside-curly-braces){:target="_blank" rel="noopener"}, which in fact says the opposite - that `awk` code without a regex will *always* be run:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-149pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
 
-I have a hypothesis that might address part of my confusion, specifically on where the 2nd reference to `usage` comes from.  I scroll through the code and see that `collect_documentation` is called by `documentation_for`, which in turn is called by `print_summary`.  [That function](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L106), in turn, declares local variables `summary`, `usage`, and `help`.  There are similar functions called [`print_help`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L120) and [`print_usage`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L143), which declare the same local variables in a similar way.
+I have a hypothesis that might address part of my confusion, specifically on where the 2nd reference to `usage` comes from.  I scroll through the code and see that `collect_documentation` is called by `documentation_for`, which in turn is called by `print_summary`.  [That function](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L106){:target="_blank" rel="noopener"}, in turn, declares local variables `summary`, `usage`, and `help`.  There are similar functions called [`print_help`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L120){:target="_blank" rel="noopener"} and [`print_usage`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L143){:target="_blank" rel="noopener"}, which declare the same local variables in a similar way.
 
 I also see that `documentation_for ` is called within the context of an `eval` command:
 
@@ -752,7 +752,7 @@ print_summary() {
 }
 ```
 
-Since the output of `collect_documentation` appears to be the 3 `print` statements [starting on line 88](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L88), my guess is that we `eval` the following:
+Since the output of `collect_documentation` appears to be the 3 `print` statements [starting on line 88](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L88){:target="_blank" rel="noopener"}, my guess is that we `eval` the following:
 
 ```
 summary="Summary: foobar"
@@ -812,7 +812,7 @@ I know I'm skipping ahead again, but I decide to do a quick experiment to see if
 
 I see that, when I pipe a multi-line string that begins with "Usage:" to `collect_documentation`, and I be sure to include the requisite # of spaces before lines 2-4, the entire multi-line string is included as part of the `usage=` assignment.  However, when I *don't* prepend lines 2-4 with those spaces, only the "Usage: " line is included in the `usage` assignment.  The rest of the lines are added to the `help` assignment.
 
-I think this actually makes sense- if we've already encountered the "Usage:" string on a previous line that was processed by `awk`, this means the `reading_usage` flag has been set, so it's now truthy.  That's the 2nd part of the `/^( *$|       )/ && reading_usage` condition.  And if there are sufficient space characters at the beginning (`^`) of the current line, that means the regex condition is met.  Note that there are actually 2 ways that the first condition could be triggered: one is by prepending the line with 7 spaces (i.e. the `|       `) half of the regex, and the other (according to [this guide](https://archive.ph/ybWob) to regex in `awk`) *seems to be* a line containing *only* zero or more spaces.  However, I can't reproduce this 2nd case.  When I try adding a line of only spaces, I get the following:
+I think this actually makes sense- if we've already encountered the "Usage:" string on a previous line that was processed by `awk`, this means the `reading_usage` flag has been set, so it's now truthy.  That's the 2nd part of the `/^( *$|       )/ && reading_usage` condition.  And if there are sufficient space characters at the beginning (`^`) of the current line, that means the regex condition is met.  Note that there are actually 2 ways that the first condition could be triggered: one is by prepending the line with 7 spaces (i.e. the `|       `) half of the regex, and the other (according to [this guide](https://web.archive.org/web/20230321100428/https://opensource.com/article/19/11/how-regular-expressions-awk){:target="_blank" rel="noopener"} to regex in `awk`) *seems to be* a line containing *only* zero or more spaces.  However, I can't reproduce this 2nd case.  When I try adding a line of only spaces, I get the following:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-153pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -861,7 +861,7 @@ Next line of code:
 
 Here we declare a helper function which will be used further down in the `awk` code.  This function, called "escape", looks for the characters `, \, $, or ", and escapes any and all instances it finds (i.e. it prepends it with the \ character).  It then returns the modified string.
 
-The & character has a special meaning here, according to [the GNU docs](https://web.archive.org/web/20220608181534/https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html) for the "sub()" function:
+The & character has a special meaning here, according to [the GNU docs](https://web.archive.org/web/20220608181534/https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html){:target="_blank" rel="noopener"} for the "sub()" function:
 
 > If the special character '&' appears in replacement, it stands for the precise substring that was matched by regexp. (If the regexp can match more than one string, then this precise substring may vary.) For example:
 >
@@ -905,7 +905,7 @@ baz
 buz"
 ```
 
-We can see that there are separate help lines for "foo", "bar", "baz", and "buzz".  I was initially expecting to see "bar\nbaz" on its own line, since I placed the newline in the middle of the string (not the beginning or the end, as referenced by ^ and $ in the regexes).  But it appears that the newline in the middle of that string was interpreted as a real newline, not as part of the string.  Note that we need the `Usage: foo` line because `collect_documentation` only prints output if there is either a `summary` or `usage` variable set by `awk`.  Also note that I initially tried a simple `echo` with no flags, not the `echo -e` command that you see above.  This resulted in the newlines being treated as a printable part of the string, not as regular newlines.  [According to StackOverflow](https://stackoverflow.com/questions/8467424/echo-newline-in-bash-prints-literal-n), the solution is to use either `echo -e` or `printf`.
+We can see that there are separate help lines for "foo", "bar", "baz", and "buzz".  I was initially expecting to see "bar\nbaz" on its own line, since I placed the newline in the middle of the string (not the beginning or the end, as referenced by ^ and $ in the regexes).  But it appears that the newline in the middle of that string was interpreted as a real newline, not as part of the string.  Note that we need the `Usage: foo` line because `collect_documentation` only prints output if there is either a `summary` or `usage` variable set by `awk`.  Also note that I initially tried a simple `echo` with no flags, not the `echo -e` command that you see above.  This resulted in the newlines being treated as a printable part of the string, not as regular newlines.  [According to StackOverflow](https://stackoverflow.com/questions/8467424/echo-newline-in-bash-prints-literal-n){:target="_blank" rel="noopener"}, the solution is to use either `echo -e` or `printf`.
 
 Question: if `printf` and `echo -e` automatically handle the newlines for us, why do we need the `trim` function at all?
 
@@ -921,7 +921,7 @@ END {
     }
 ```
 
-I have been confused by this `END` thing since I skipped ahead in the code a few days ago.  It looked like the termination of a heredoc, but I didn't see where the heredoc began, so I didn't know what to make of it.  Attempting to answer my question, I consulted [the GNU awk docs](https://www.gnu.org/software/gawk/manual/gawk.html#BEGIN_002fEND).  Searching for the string "END", I was rewarded with an answer:
+I have been confused by this `END` thing since I skipped ahead in the code a few days ago.  It looked like the termination of a heredoc, but I didn't see where the heredoc began, so I didn't know what to make of it.  Attempting to answer my question, I consulted [the GNU awk docs](https://www.gnu.org/software/gawk/manual/gawk.html#BEGIN_002fEND){:target="_blank" rel="noopener"}.  Searching for the string "END", I was rewarded with an answer:
 
 > All the patterns described so far are for matching input records. The BEGIN and END special patterns are different. They supply startup and cleanup actions for awk programs. BEGIN and END rules must have actions; there is no default action for these rules because there is no current record when they run.
 
@@ -1082,7 +1082,7 @@ First we unset the `usage` variable if it has already been set, to guarantee tha
 
 ### Quick aside
 
-I checked the status of [the PR I submitted to RBENV](https://github.com/rbenv/rbenv/pull/1422) (the one about the `KSH_ARRAYS` option), and it looks like it was merged!  Holy crap, I'm now officially a contributor to the RBENV codebase! :party:
+I checked the status of [the PR I submitted to RBENV](https://github.com/rbenv/rbenv/pull/1422){:target="_blank" rel="noopener"} (the one about the `KSH_ARRAYS` option), and it looks like it was merged!  Holy crap, I'm now officially a contributor to the RBENV codebase! :party:
 
 Next block of code:
 
@@ -1121,7 +1121,7 @@ fi
 ```
 This is the `else` block for the `if [ -z "$1" ] || [ "$1" == "rbenv" ]; then` condition.  If that condition is false, that means the user provided an argument to `rbenv help` which was *not* "rbenv" (i.e. they typed `rbenv help` plus a specific command like `global`, `local`, etc.  In this case, we do the following:
 
-First, we set the `command` variable equal to the first argument.  If that command is associated with a file in our `$PATH` directories, then we either print any `usage` instructions for that command (if they exist), or else print the `help` instructions for that command.  Remember that the `print_help` method specifies that we only print `help` instructions if either `summary` or `usage` instructions also exist.  So I think this means we don't actually need the `if [ -n "$usage" ] || ` check on [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L126).  Because if we've reached this line, that means the `if` check [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L169) (which is the same check) must have failed.  Alternately, we could keep that `if` check and delete [the one here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L168), which (I think?) should have the same effect.
+First, we set the `command` variable equal to the first argument.  If that command is associated with a file in our `$PATH` directories, then we either print any `usage` instructions for that command (if they exist), or else print the `help` instructions for that command.  Remember that the `print_help` method specifies that we only print `help` instructions if either `summary` or `usage` instructions also exist.  So I think this means we don't actually need the `if [ -n "$usage" ] || ` check on [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L126){:target="_blank" rel="noopener"}.  Because if we've reached this line, that means the `if` check [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L169){:target="_blank" rel="noopener"} (which is the same check) must have failed.  Alternately, we could keep that `if` check and delete [the one here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L168){:target="_blank" rel="noopener"}, which (I think?) should have the same effect.
 
 TODO- submit a PR for this change.
 

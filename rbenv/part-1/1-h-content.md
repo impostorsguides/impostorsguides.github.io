@@ -16,7 +16,7 @@ exec [ -cl ] [ -a argv0 ] [ command [ arg ... ] ]
        shell executes it, and exits when the command is complete.
 ```
 
-OK, so we're *replacing the current shell* with the command that we're running, "rather than forking".  What does that mean?  I Google "what is exec in bash", and one of the first links I find is from [ComputerHope](https://archive.ph/axmcj):
+OK, so we're *replacing the current shell* with the command that we're running, "rather than forking".  What does that mean?  I Google "what is exec in bash", and one of the first links I find is from [ComputerHope](https://web.archive.org/web/20230323171516/https://www.computerhope.com/unix/bash/exec.htm){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/what-is-exec.png" width="70%" alt="What is the `exec` bash command?" style="border: 1px solid black; padding: 0.5em">
@@ -30,7 +30,7 @@ To be honest, that explanation creates more questions for me than it answers, in
 
 ## What is a process?
 
-I Google "what is a process in unix" and find a few answers.  The first one is from [TechTarget.com](https://archive.ph/1gKHE):
+I Google "what is a process in unix" and find a few answers.  The first one is from [TechTarget.com](https://web.archive.org/web/20230306013812/https://www.techtarget.com/whatis/definition/process){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/what-is-a-process.png" width="70%" alt="What is a process in UNIX?" style="border: 1px solid black; padding: 0.5em">
@@ -43,7 +43,7 @@ So from this definition, we learned that:
  - The child process shares resources with the parent process.  I'm not yet sure what resources they mean.
  - If the parent process dies, the child process also dies.
 
-Another useful link comes from [TheUnixSchool.com](https://archive.ph/0qS4Y):
+Another useful link comes from [TheUnixSchool.com](https://web.archive.org/web/20221005124821/https://www.theunixschool.com/2012/09/what-is-process-in-unix-linux.html){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/what-is-a-process-2.png" width="70%" alt="What is a process in UNIX?" style="border: 1px solid black; padding: 0.5em">
@@ -56,7 +56,7 @@ From this link, we additionally learned that:
 
 OK, I guess this helps somewhat.  But what's the difference between `exec`ing and `fork`ing?
 
-[This StackOverflow answer](https://stackoverflow.com/a/1653415/2143275) is a bit long, but it addresses this question:
+[This StackOverflow answer](https://stackoverflow.com/a/1653415/2143275){:target="_blank" rel="noopener"} is a bit long, but it addresses this question:
 
 <p style="text-align: center">
   <img src="/assets/images/fork-vs-exec.png" width="70%" alt="What's the difference between `fork` and `exec`?" style="border: 1px solid black; padding: 0.5em">
@@ -79,7 +79,7 @@ $ exec "/usr/bin/env" ruby -e "puts 5"
 
 Since "the shell exits when the command is complete", the final output I see in my terminal tab is `[Process completed]`, and I can no longer run any commands in this tab.  I have to close this tab and open a new one to resume entering commands in the terminal.
 
-Next, I want to see if I can observe this forking behavior as it happens.  I think I'll need to print out the current PID in order to do this, so I Google "how to print the current pid in bash" and find [this link](https://archive.ph/r5smn), which tells me to use `"$$"`.
+Next, I want to see if I can observe this forking behavior as it happens.  I think I'll need to print out the current PID in order to do this, so I Google "how to print the current pid in bash" and find [this link](https://web.archive.org/web/20210515210156/https://www.xmodulo.com/process-id-pid-shell-script.html){:target="_blank" rel="noopener"}, which tells me to use `"$$"`.
 
 I open a new tab, create a script named `./foo` to read as follows:
 

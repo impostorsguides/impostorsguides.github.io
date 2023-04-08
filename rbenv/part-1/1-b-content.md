@@ -6,7 +6,7 @@ Our first line of code in the shim file is:
 
 ## The shebang line
 
-From a Google search for the string `"#!/usr/bin/env bash"`, I learned that this line of code is called a ["shebang"](https://archive.ph/lO8UI).
+From a Google search for the string `"#!/usr/bin/env bash"`, I learned that this line of code is called a ["shebang"](https://web.archive.org/web/20230323182633/https://en.wikipedia.org/wiki/Shebang_(Unix)){:target="_blank" rel="noopener"}.
 
 In UNIX, a shebang is a special line of code at the top of a script file which tells UNIX which program to use in order to execute the code which comes after it.  In this case, since the shebang ends in "bash", we're telling UNIX to use `bash` to evaluate the code.
 
@@ -31,7 +31,7 @@ The benefit of using the `/usr/bin/env bash` shebang instead of `/usr/bin/bash` 
 
 If we use the `/usr/bin/bash` shebang, then whoever runs our script **must** have `bash` installed in their `/usr/bin/` directory.  But that's not a safe bet.  For example, my `bash` executable is installed at `/bin/bash`, with no `/usr/` prefix.  If we load `PATH` into our environment via the `/usr/bin/env bash` shebang, then UNIX will search through all the directories in `PATH` until it finds `bash`, so we have more changes to find the `bash` executable.
 
-More info on the differences between the two types of shebangs, including some *downsides* of using `/usr/bin/env bash`, can be found [here](https://archive.ph/ouudu) and [here](https://archive.ph/4jEZL).
+More info on the differences between the two types of shebangs, including some *downsides* of using `/usr/bin/env bash`, can be found [here](https://web.archive.org/web/20230326212656/https://www.baeldung.com/linux/bash-shebang-lines){:target="_blank" rel="noopener"} and [here](https://web.archive.org/web/20230316084258/https://stackoverflow.com/questions/16365130/what-is-the-difference-between-usr-bin-env-bash-and-usr-bin-bash){:target="_blank" rel="noopener"}.
 
 ### Why use a shebang?
 
@@ -77,7 +77,7 @@ $ ./hello.rb
 zsh: permission denied: ./hello.rb
 ```
 
-OK, well this is just because we haven't yet updated the file permissions to [make the file executable](https://askubuntu.com/questions/229589/how-to-make-a-file-e-g-a-sh-script-executable-so-it-can-be-run-from-a-termi).  That's a step we'll need to do whenever we make a brand-new file.  We do that with the `chmod` command, passing `+x` to tell UNIX to update the file's execution permission:
+OK, well this is just because we haven't yet updated the file permissions to [make the file executable](https://askubuntu.com/questions/229589/how-to-make-a-file-e-g-a-sh-script-executable-so-it-can-be-run-from-a-termi){:target="_blank" rel="noopener"}.  That's a step we'll need to do whenever we make a brand-new file.  We do that with the `chmod` command, passing `+x` to tell UNIX to update the file's execution permission:
 
 ```
 $ chmod +x hello.rb
@@ -134,19 +134,19 @@ So as it turns out, the shebang line *must* be on the very first line of the fil
 
 ### Can the computer use the file extension instead of the shebang?
 
-We have a `.rb` file extension at the end, but the terminal doesn't use the extension when deciding how to interpret the file.  I came across [this StackOverflow post](https://archive.ph/YpR6y) while looking for documentation on this:
+We have a `.rb` file extension at the end, but the terminal doesn't use the extension when deciding how to interpret the file.  I came across [this StackOverflow post](https://web.archive.org/web/20211027134850/https://superuser.com/questions/267632/file-extension-for-file-to-be-run-by-terminal){:target="_blank" rel="noopener"} while looking for documentation on this:
 
 <p style="text-align: center">
   <img src="/assets/images/file-extension-for-terminal.png" width="70%" alt="StackOverflow question about which file extension to use for a shell script"  style="border: 1px solid black; padding: 0.5em">
 </p>
 
-Which had [this answer](https://archive.ph/YpR6y#selection-1971.36-1981.6):
+Which had [this answer](https://superuser.com/a/885285){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/file-extension-not-used.png" width="70%" alt="File extensions aren't used when the terminal tries to interpret a file."  style="border: 1px solid black; padding: 0.5em">
 </p>
 
-This got me wondering *why* a terminal doesn't use file extensions.  So [I posted a question on StackOverflow](https://superuser.com/questions/1771550/why-do-unix-terminals-use-shebangs-instead-of-file-extensions-when-deciding-how).
+This got me wondering *why* a terminal doesn't use file extensions.  So [I posted a question on StackOverflow](https://superuser.com/questions/1771550/why-do-unix-terminals-use-shebangs-instead-of-file-extensions-when-deciding-how){:target="_blank" rel="noopener"}.
 
 From the comments, it looks like this is one big difference between Windows and UNIX.  The former takes the approach of using the file extension to determine which program to use when executing a given file, in a part of the OS called (I think?) the file association registry.  This means Windows application developers have to tell the OS which file extensions their application can open.  The benefit of this is, no shebang in the file itself.
 
@@ -154,7 +154,7 @@ UNIX, on the other hand, has no such registry.  This means that the author of a 
 
 ## File Permissions
 
-Why is it necessary to run `chmod +x` on our file, before we can execute it?  Why can't a user execute their own file by default?  I asked myself this same question, and since I couldn't find an answer online already, [I asked StackOverflow](https://archive.ph/G8Ine).
+Why is it necessary to run `chmod +x` on our file, before we can execute it?  Why can't a user execute their own file by default?  I asked myself this same question, and since I couldn't find an answer online already, [I asked StackOverflow](https://web.archive.org/web/20230406160905/https://stackoverflow.com/questions/75627561/my-umask-output-is-022-why-cant-i-execute-a-file-i-just-created-without-c/){:target="_blank" rel="noopener"}.
 
 The question I asked involves a command called `umask` which isn't super-important here.  The thrust of my question was "Why can't a file's creator execute a file without jumping through `chmod` hoops?"  The answer came about in the comments below one of the answers:
 
@@ -162,7 +162,7 @@ The question I asked involves a command called `umask` which isn't super-importa
   <img src="/assets/images/why-cant-a-file-creator-execute-the-file.png" width="60%" alt="The answer to my question about why a file's creator can't execute their own file without first `chmod`ing it."  style="border: 1px solid black; padding: 0.5em">
 </p>
 
-Because [UNIX is multi-user in nature](https://archive.ph/EVocS), it needs to account for the scenario where a user gains access to a system that they shouldn't have access to, and writes a malicious script that they then try to execute.  Because they don't have permission to execute the script without authorization from the system's administrator, they are prevented from doing so.  This, in a nutshell, is why we have to `chmod` our scripts every time.
+Because [UNIX is multi-user in nature](https://web.archive.org/web/20230331054614/https://en.wikipedia.org/wiki/Multi-user_software){:target="_blank" rel="noopener"}, it needs to account for the scenario where a user gains access to a system that they shouldn't have access to, and writes a malicious script that they then try to execute.  Because they don't have permission to execute the script without authorization from the system's administrator, they are prevented from doing so.  This, in a nutshell, is why we have to `chmod` our scripts every time.
 
 #### Experiment- analyzing a file's permissions
 
@@ -177,7 +177,7 @@ $ ls -l foo
 -rw-r--r--  1 myusername  staff  0 Mar  2 11:24 foo
 ```
 
-The key here is the `-rw-r--r--` section.  According to [this source](https://archive.ph/PYAv0), the first `-` means that what we're looking at are *file* permissions, not *directory* permissions.  If we're looking at directory permissions, the `-` is replaced with a `d`.
+The key here is the `-rw-r--r--` section.  According to [this source](https://web.archive.org/web/20221006191132/https://mason.gmu.edu/~montecin/UNIXpermiss.htm){:target="_blank" rel="noopener"}, the first `-` means that what we're looking at are *file* permissions, not *directory* permissions.  If we're looking at directory permissions, the `-` is replaced with a `d`.
 
 Characters 2-4 are for the first permissions category (i.e. the file creator).  Characters 5-7 are for users in the same user group as the file's creator, and characters 8-10 are for everyone else.  In each of these bunches of 3 characters, `r` means that group can read the file, `w` means they can write to it, and `x` means they can execute it.
 
@@ -209,7 +209,7 @@ Let's go back to the `/usr/bin/env` command in our shebang, and specifically to 
 /bin
 ```
 
-As you may have guessed, the `PATH` string is a list of directories on your computer, concatenated together into a single string with the `:` character used as a delimiter.  This delimiter is also called an "internal field separator", and [UNIX refers to it by the environment variable `IFS`](https://web.archive.org/web/20220715010436/https://www.baeldung.com/linux/ifs-shell-variable).
+As you may have guessed, the `PATH` string is a list of directories on your computer, concatenated together into a single string with the `:` character used as a delimiter.  This delimiter is also called an "internal field separator", and [UNIX refers to it by the environment variable `IFS`](https://web.archive.org/web/20220715010436/https://www.baeldung.com/linux/ifs-shell-variable){:target="_blank" rel="noopener"}.
 
 UNIX splits the `PATH` string using `IFS` as that delimiter when you type a command into the terminal.  If and when UNIX finds an executable file named `ruby` in one of those directories, it will stop checking the list of directories from `PATH`, and attempt to run that executable along with whatever flags or arguments were passed to it.
 

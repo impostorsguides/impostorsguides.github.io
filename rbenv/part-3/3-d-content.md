@@ -51,7 +51,7 @@ This is the first time I've seen an exclamation inside a square-bracket or doubl
 
 So `! expression` is true if `expression` is false.
 
-What does "-o" do?  I don't see anything in the `man test` page for a flag called `-o`.  [StackOverflow to the rescue](https://archive.ph/DcMdD):
+What does "-o" do?  I don't see anything in the `man test` page for a flag called `-o`.  [StackOverflow to the rescue](https://web.archive.org/web/20230408143552/https://stackoverflow.com/questions/5897760/what-does-flags-o-and-l-means-in-bash){:target="_blank" rel="noopener"}:
 
 ```
 -o : True if shell option "OPTIONNAME" is enabled.
@@ -82,13 +82,13 @@ The option that we set/unset must be one of certain values that are recognized b
 
 When we put all the above knowledge together, we see that the first thing this script does is check whether the 'interactive' option is set.  If it's not, we immediately return out of the script.
 
-What is the 'interactive' option, you ask?  [The GNU docs](https://web.archive.org/web/20220727100637/https://www.gnu.org/software/bash/manual/html_node/What-is-an-Interactive-Shell_003f.html) give us an answer:
+What is the 'interactive' option, you ask?  [The GNU docs](https://web.archive.org/web/20220727100637/https://www.gnu.org/software/bash/manual/html_node/What-is-an-Interactive-Shell_003f.html){:target="_blank" rel="noopener"} give us an answer:
 
 ```
 An interactive shell generally reads from and writes to a user's terminal.
 ```
 
-And StackOverflow [fills in some of the gaps](https://web.archive.org/web/20220423122639/https://unix.stackexchange.com/questions/50665/what-is-the-difference-between-interactive-shells-login-shells-non-login-shell) in the above answer:
+And StackOverflow [fills in some of the gaps](https://web.archive.org/web/20220423122639/https://unix.stackexchange.com/questions/50665/what-is-the-difference-between-interactive-shells-login-shells-non-login-shell){:target="_blank" rel="noopener"} in the above answer:
 
 ```
 Interactive: As the term implies: Interactive means that the commands are run with user-interaction from keyboard. E.g. the shell can prompt the user to enter input.
@@ -121,7 +121,7 @@ The text that looks most relevant is:
 Control the editor's completion behavior according to the supplied set of options.  Various editing commands, notably expand-or-complete-word, usually bound to tab, will attempt to complete a word typed by the user, while others, notably delete-char-or-list, usually bound to ^D in EMACS editing mode, list the possibilities; compctl controls what those possibilities are.  They may for example be filenames (the most common case, and hence the default), shell variables, or words from a user-specified list.
 ```
 
-OK, so `compctl` appears to help the user alter the behavior of the shell's completion behavior.  But what are shell completions, in layman's terms?  [This blog post](https://web.archive.org/web/20220611155916/https://scriptingosx.com/2019/07/moving-to-zsh-part-5-completions/) appears to be the best answer:
+OK, so `compctl` appears to help the user alter the behavior of the shell's completion behavior.  But what are shell completions, in layman's terms?  [This blog post](https://web.archive.org/web/20220611155916/https://scriptingosx.com/2019/07/moving-to-zsh-part-5-completions/){:target="_blank" rel="noopener"} appears to be the best answer:
 
 <p style="text-align: center">
   <img src="/assets/images/blog-article-on-completions.png" width="70%" alt="blog article on tab completions"  style="border: 1px solid black; padding: 0.5em">
@@ -145,7 +145,7 @@ OK, so `compctl -K _rbenv rbenv` calls the `_rbenv` function.  Since it starts w
 
 SIDE RANT- it would be nicer if the man page was explicit about what happens when the name *does* start with an underscore, instead of just leaving us to guess that's what happens.  Otherwise, how would we know that the # of args passed is zero, and not 1 (or 3)?  Luckily we can guess with confidence that it's zero, since we have code for the `_rbenv` function and can see that its signature takes zero args, but if we didn't have that then we'd be screwed.  This is frustrating for me because it's another example of the user interface of computers being unfriendly to beginners, and it's one reason why it has taken me this long to feel confident spelunking on my own. </endrant>
 
-Unfortunately, I had to resort to watching [a Youtube video](https://www.youtube.com/watch?v=BHxaUP0kz9w&ab_channel=DevInsideYou).  I say "unfortunately" because, as useful as they sometimes are, they aren't archivable for posterity in the same way that text pages are with services like archive.org and others.  It would be cool if they were archivable in this way, but videos take up a lot of space on a hard drive, and archiving all the world's videos would be prohibitively expensive.  So hopefully the above video link is still available at the time you're reading this.  It was a great video, made by [a guy named Vlad](https://www.linkedin.com/in/agilesteel/?originalSubdomain=ge) who has a channel called [DevInsideYou](https://devinsideyou.com/).  Although Vlad is a Scala developer and his videos have a distinct Scala bent to them, that didn't interfere with me learning from them at all.
+Unfortunately, I had to resort to watching [a Youtube video](https://www.youtube.com/watch?v=BHxaUP0kz9w&ab_channel=DevInsideYou){:target="_blank" rel="noopener"}.  I say "unfortunately" because, as useful as they sometimes are, they aren't archivable for posterity in the same way that text pages are with services like archive.org and others.  It would be cool if they were archivable in this way, but videos take up a lot of space on a hard drive, and archiving all the world's videos would be prohibitively expensive.  So hopefully the above video link is still available at the time you're reading this.  It was a great video, made by [a guy named Vlad](https://www.linkedin.com/in/agilesteel/?originalSubdomain=ge){:target="_blank" rel="noopener"} who has a channel called [DevInsideYou](https://devinsideyou.com/){:target="_blank" rel="noopener"}.  Although Vlad is a Scala developer and his videos have a distinct Scala bent to them, that didn't interfere with me learning from them at all.
 
 Just in case it's no longer available, I'll summarize what I learned below:
 
@@ -158,7 +158,7 @@ Just in case it's no longer available, I'll summarize what I learned below:
  - There's also `$FPATH` (i.e. all caps) which looks much more like your standard `$PATH` variable (with directories delimited by `:`).
  - If zsh doesn't have a certain completion, there are various ways to get what you need (plugins, write them yourself, etc.), but at the end of the day, they're going to need to live in one of the directories of your `$fpath`.
 
-The video also has links to [the section of the zsh docs related to completions](https://zsh.sourceforge.io/Doc/Release/Completion-System.html#Completion-System), and a Github repo containing [a README on how to write your own completions](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org).
+The video also has links to [the section of the zsh docs related to completions](https://zsh.sourceforge.io/Doc/Release/Completion-System.html#Completion-System){:target="_blank" rel="noopener"}, and a Github repo containing [a README on how to write your own completions](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org){:target="_blank" rel="noopener"}.
 
 After reading a bit of the 2nd link, I feel like I can make an educated guess of what `compctl -K _rbenv rbenv` does: it tells the shell that, when trying to autocomplete `rbenv` in the terminal, we first call the `_rbenv` shell function.  That function will set the value of a `reply` shell variable equal to an array of... something (we'll dig into that next).  What I'm confused about is, why does `reply` appear to be a local shell variable, and not an environment variable which would be available outside this script?
 
@@ -182,7 +182,7 @@ So how do you make a variable local to just its own function scope?  That's what
 ```
   local words completions
 ```
-According to [Linuxtopia](https://web.archive.org/web/20220628155250/https://www.linuxtopia.org/online_books/advanced_bash_scripting_guide/localvar.html), "A variable declared as local is one that is visible only within the block of code in which it appears. It has local "scope". In a function, a local variable has meaning only within that function block."
+According to [Linuxtopia](https://web.archive.org/web/20220628155250/https://www.linuxtopia.org/online_books/advanced_bash_scripting_guide/localvar.html){:target="_blank" rel="noopener"}, "A variable declared as local is one that is visible only within the block of code in which it appears. It has local "scope". In a function, a local variable has meaning only within that function block."
 
 We confirm this when I update my script to make `bar` local:
 
@@ -216,7 +216,7 @@ Checking the `help` page for `read`, we see:
 
 So where do we "read one line" *from*?  Is it from the argument of the function (of which there are none, in our case), from some environment or shell variable whose name is known by people with more experience than me, or somewhere else entirely that I can't even think of because I don't know what I don't know?
 
-Another resource, [LinuxHunt](https://web.archive.org/web/20220629000155/https://linuxhint.com/bash_read_command/), helps us out:
+Another resource, [LinuxHunt](https://web.archive.org/web/20220629000155/https://linuxhint.com/bash_read_command/){:target="_blank" rel="noopener"}, helps us out:
 
 ```
 Read is a bash builtin command that reads the contents of a line into a variable. It allows for word splitting that is tied to the special shell variable IFS. It is primarily used for catching user input but can be used to implement functions taking input from standard input.
@@ -252,7 +252,7 @@ Richie
 Your name is Richie.
 ```
 
-Lastly, a site called [ComputerHope](https://archive.ph/NDo7d) tells us:
+Lastly, a site called [ComputerHope](https://web.archive.org/web/20221001174841/https://www.computerhope.com/unix/bash/read.htm){:target="_blank" rel="noopener"} tells us:
 
 <p style="text-align: center">
   <img src="/assets/images/computerhope-read-command.png" width="70%" alt="Description of the `read` command from ComputerHope"  style="border: 1px solid black; padding: 0.5em">
@@ -416,7 +416,7 @@ Still no luck.
 
 I kind of feel like I'm throwing spaghetti at a wall here.  This is where my tendency to give up starts to kick in.  However, I'm writing all this down in order to force myself to power through those moments.  I feel like I have to keep going, but I remember it's OK to take a break until tomorrow if I need to.
 
-I remember [the video I watched yesterday](https://www.youtube.com/watch?v=BHxaUP0kz9w&ab_channel=DevInsideYou).  And I remember that one of the links in the description was a link to the official ZSH docs, specifically [the section on tab completions](https://web.archive.org/web/20220807190213/https://zsh.sourceforge.io/Doc/Release/Completion-System.html).
+I remember [the video I watched yesterday](https://www.youtube.com/watch?v=BHxaUP0kz9w&ab_channel=DevInsideYou){:target="_blank" rel="noopener"}.  And I remember that one of the links in the description was a link to the official ZSH docs, specifically [the section on tab completions](https://web.archive.org/web/20220807190213/https://zsh.sourceforge.io/Doc/Release/Completion-System.html){:target="_blank" rel="noopener"}.
 
 This line of the docs stands out:
 
@@ -475,7 +475,7 @@ The above results in the expected autocomplete behavior when I type in "foobar" 
   <img src="/assets/images/results-of-tab-completion.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-I discovered the above by re-examining the code in the rbenv repo's "libexec/rbenv-init" file, which does something similar [here](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-init#L99).  Although simply typing `echo "source $filename"` won't by itself source the given $filename (it just prints "source $filename" to your screen), running `eval `echo "source baz/buss"`` does in fact source the file.  And the code inside `rbenv-init` is meant to be wrapped inside a call to `eval`.  In fact, if you try to just run `rbenv init` in your terminal, you're given the following instructions:
+I discovered the above by re-examining the code in the rbenv repo's "libexec/rbenv-init" file, which does something similar [here](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-init#L99){:target="_blank" rel="noopener"}.  Although simply typing `echo "source $filename"` won't by itself source the given $filename (it just prints "source $filename" to your screen), running `eval `echo "source baz/buss"`` does in fact source the file.  And the code inside `rbenv-init` is meant to be wrapped inside a call to `eval`.  In fact, if you try to just run `rbenv init` in your terminal, you're given the following instructions:
 
 ```
 $ rbenv init
@@ -494,7 +494,7 @@ Let's move on to the next line of code:
 ```
   if [ "${#words}" -eq 2 ]; then
 ```
-Here we see the `${...}` parameter expansion syntax again.  I look up [the docs for parameter expansion](https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html) again, and search the page for the `#` string, and I see the following:
+Here we see the `${...}` parameter expansion syntax again.  I look up [the docs for parameter expansion](https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"} again, and search the page for the `#` string, and I see the following:
 
 <p style="text-align: center">
   <img src="/assets/images/param-expansion-docs-2.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -525,13 +525,13 @@ Then what?  Next line of code is:
 completions="$(rbenv commands)"
 ```
 
-Looks like we're setting the value of the `completions` variable equal to "$(rbenv commands)".  But I notice something subtle here- we're using parentheses, not curly braces here.  I don't remember seeing this so far.  What's the difference?  Is this still considered parameter expansion?  I search [the parameter expansion docs](https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html) for "$(", but don't find anything.  I Google "dollar sign plus parens zsh" and find [a useful StackOverflow answer](https://web.archive.org/web/20220720215040/https://stackoverflow.com/questions/17984958/what-does-it-mean-in-shell-when-we-put-a-command-inside-dollar-sign-and-parenthe):
+Looks like we're setting the value of the `completions` variable equal to "$(rbenv commands)".  But I notice something subtle here- we're using parentheses, not curly braces here.  I don't remember seeing this so far.  What's the difference?  Is this still considered parameter expansion?  I search [the parameter expansion docs](https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"} for "$(", but don't find anything.  I Google "dollar sign plus parens zsh" and find [a useful StackOverflow answer](https://web.archive.org/web/20220720215040/https://stackoverflow.com/questions/17984958/what-does-it-mean-in-shell-when-we-put-a-command-inside-dollar-sign-and-parenthe){:target="_blank" rel="noopener"}:
 
 ```
 Usage of the `$` like `${HOME}` gives the value of `HOME`. Usage of the `$` like `$(echo foo)` means run whatever is inside the parentheses in a subshell and return that as the value. In my example, you would get `foo` since `echo` will write `foo` to standard out
 ```
 
-Short and sweet.  So in our case, we're storing the return value of `rbenv commands` as the contents of the `completions` local variable.  Does it store the contents as a string, or as an array?  To answer this, I need to know how to print a variable's type in the terminal.  StackOverflow [to the rescue](https://web.archive.org/web/20220714213343/https://unix.stackexchange.com/questions/269825/how-can-i-get-a-variables-datatype-in-zsh):
+Short and sweet.  So in our case, we're storing the return value of `rbenv commands` as the contents of the `completions` local variable.  Does it store the contents as a string, or as an array?  To answer this, I need to know how to print a variable's type in the terminal.  StackOverflow [to the rescue](https://web.archive.org/web/20220714213343/https://unix.stackexchange.com/questions/269825/how-can-i-get-a-variables-datatype-in-zsh){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/how-to-print-a-variables-type.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="how to print a variable's type">
@@ -555,7 +555,7 @@ At this point, I'm wondering why `2` is the magic number that we're checking aga
 
 To answer this, I want to print out the value of the local variable `words` (as well as its length) to the screen when I try to tab-complete using the `rbenv` command.  But to do this, I have to actually go into my local `rbenv` installation and edit its code.  Exciting, right?
 
-Since I don't know where that code lives, I have to find where it was installed.  I know I installed `rbenv` using `homebrew`, so I Google "homebrew where is package installed".  [The first link](https://web.archive.org/web/20220827131359/https://mkyong.com/mac/where-does-homebrew-install-packages-on-mac/) tells me to check in `/usr/local/Cellar`.  I do so, and I find the directory `/usr/local/Cellar/rbenv/1.2.0/` which includes the `completions` directory and the `rbenv.zsh` file I've been reading in Github.  I open it up and it looks the same as what I've seen so far:
+Since I don't know where that code lives, I have to find where it was installed.  I know I installed `rbenv` using `homebrew`, so I Google "homebrew where is package installed".  [The first link](https://web.archive.org/web/20220827131359/https://mkyong.com/mac/where-does-homebrew-install-packages-on-mac/){:target="_blank" rel="noopener"} tells me to check in `/usr/local/Cellar`.  I do so, and I find the directory `/usr/local/Cellar/rbenv/1.2.0/` which includes the `completions` directory and the `rbenv.zsh` file I've been reading in Github.  I open it up and it looks the same as what I've seen so far:
 
 ```
 if [[ ! -o interactive ]]; then
@@ -723,7 +723,7 @@ foo
 
 At first this was only mildly surprising, but it kinda started to gnaw at me.  This is actually kind of a big difference between programming in my terminal and in literally every other language I've ever worked with.  I could just let this go, but I decide to spike on figuring out what the deal is here.
 
-And I'm glad I did, because [this StackOverflow answer](https://web.archive.org/web/20220818031527/https://stackoverflow.com/questions/50427449/behavior-of-arrays-in-bash-scripting-and-zsh-shell-start-index-0-or-1) made me do a double-take:
+And I'm glad I did, because [this StackOverflow answer](https://web.archive.org/web/20220818031527/https://stackoverflow.com/questions/50427449/behavior-of-arrays-in-bash-scripting-and-zsh-shell-start-index-0-or-1){:target="_blank" rel="noopener"} made me do a double-take:
 
 <p style="text-align: center">
   <img src="/assets/images/so-answer-50427449.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="StackOverflow answer on array access in different shells">
@@ -763,7 +763,7 @@ rbenv[0]
 rbenv[1]
 rbenv[2]
 ```
-Well, OK.  So that didn't work as expected- for example, it printed `rbenv[1]` instead of the value stored at the corresponding array position.  I Google "accessing an array in bash", and [it turns out](https://web.archive.org/web/20211201072516/https://tecadmin.net/working-with-array-bash-script/) I just needed to wrap `words[...]` inside curly braces:
+Well, OK.  So that didn't work as expected- for example, it printed `rbenv[1]` instead of the value stored at the corresponding array position.  I Google "accessing an array in bash", and [it turns out](https://web.archive.org/web/20211201072516/https://tecadmin.net/working-with-array-bash-script/){:target="_blank" rel="noopener"} I just needed to wrap `words[...]` inside curly braces:
 
 <p style="text-align: center">
   <img src="/assets/images/creating-bash-array.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="Creating an array in bash">
@@ -792,7 +792,7 @@ foo
 bar
 ```
 
-Hmmm, OK so according to [this link](https://web.archive.org/web/20170309012959/http://askubuntu.com/questions/705126/is-there-a-way-to-specify-a-certain-range-of-numbers-using-array-in-a-script), the way I'm accessing a range of values in the bash script needs tweaking.  I change the syntax to look like this:
+Hmmm, OK so according to [this link](https://web.archive.org/web/20170309012959/http://askubuntu.com/questions/705126/is-there-a-way-to-specify-a-certain-range-of-numbers-using-array-in-a-script){:target="_blank" rel="noopener"}, the way I'm accessing a range of values in the bash script needs tweaking.  I change the syntax to look like this:
 
 ```
 #!/usr/bin/env bash
@@ -817,7 +817,7 @@ bar
 
 OK, so lines 5 thru 7 worked, but line 4 caused an error (`-2: substring expression < 0`).  So we can't use negative numbers to access a substring in bash?
 
-[It looks like you can](https://web.archive.org/web/20211219125555/https://unix.stackexchange.com/questions/198787/is-there-a-way-of-reading-the-last-element-of-an-array-with-bash), but only with bash v4.1 or newer.  If I want to do something similar in earlier versions (like v3.2.57,  aka the version on my machine), I need to do something like this:
+[It looks like you can](https://web.archive.org/web/20211219125555/https://unix.stackexchange.com/questions/198787/is-there-a-way-of-reading-the-last-element-of-an-array-with-bash){:target="_blank" rel="noopener"}, but only with bash v4.1 or newer.  If I want to do something similar in earlier versions (like v3.2.57,  aka the version on my machine), I need to do something like this:
 
 ```
 echo "${words[@]:2:${#words} - 2}"
@@ -851,7 +851,7 @@ $ KSH_ARRAYS=true ./foo
 words[1]: rbenv
 ```
 
-So that didn't work.  After I Googled around a bit for "KSH_ARRAYS", I learned that [KSH_ARRAYS is a zsh option](http://bolyai.cs.elte.hu/zsh-manual/zsh_16.html), not an environment variable.  I then Googled "how to set zsh options", [I learned](https://archive.ph/QGwEP) that you have to use the `setopt` command to set an option, and `unsetopt` to unset it.  I update the script as follows:
+So that didn't work.  After I Googled around a bit for "KSH_ARRAYS", I learned that [KSH_ARRAYS is a zsh option](http://bolyai.cs.elte.hu/zsh-manual/zsh_16.html){:target="_blank" rel="noopener"}, not an environment variable.  I then Googled "how to set zsh options", [I learned](https://web.archive.org/web/20220813020657/https://scriptingosx.com/2019/06/moving-to-zsh-part-3-shell-options/){:target="_blank" rel="noopener"} that you have to use the `setopt` command to set an option, and `unsetopt` to unset it.  I update the script as follows:
 
 ```
 #!/usr/bin/env zsh
@@ -906,7 +906,7 @@ Should I make a PR to override it just inside this script to ensure the user's l
 
 Well, I'd have to store the user's current value for that option, then unset it.  Then the script would continue running as per usual.  Then after the script runs, I'd have to set the option back to its original value.
 
-If I can figure out how to do the above, it seems pretty straightforward.  But has this already been thought of and/or tried?  I check the RBENV repo's history for both `KSH_ARRAYS` and `ksharrays` (since [I read that](https://archive.ph/QGwEP) "The labels of the options are case insensitive and any underscores in the label are ignored" by the zsh interpreter).  In both cases, I don't see any history:
+If I can figure out how to do the above, it seems pretty straightforward.  But has this already been thought of and/or tried?  I check the RBENV repo's history for both `KSH_ARRAYS` and `ksharrays` (since [I read that](https://web.archive.org/web/20220813020657/https://scriptingosx.com/2019/06/moving-to-zsh-part-3-shell-options/){:target="_blank" rel="noopener"} "The labels of the options are case insensitive and any underscores in the label are ignored" by the zsh interpreter).  In both cases, I don't see any history:
 
 <p style="text-align: center">
   <img src="/assets/images/ksh-arrays-history-in-github.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="Searching for `KSH_ARRAYS` history in RBENV's Github repo">
@@ -930,17 +930,17 @@ However when I set the option in the terminal via `setopt ksharrays` and run thi
 
 I also try adding `setopt ksharrays` to both `~/.zshrc` and `~/.zshenv`, and confirming that the `setopt` took effect by running `setopt` without args in my terminal, but no dice.
 
-[I post a question](https://unix.stackexchange.com/questions/715638/zsh-why-isnt-my-script-reading-my-option-setting) on StackExchange, and wait for an answer.  In the meantime, I know there must be a difference between my experiment script and the rbenv completion script, because they're behaving in different ways.  My script is not respecting the `ksharrays` option that I'm setting unless it's set directly in the script, while the `echo` statements that I added to the completion script change their output depending on whether `ksharrays` is `set` or `unset`.  So I continue to believe that a PR to the `rbenv` repo is still needed.
+[I post a question](https://web.archive.org/web/20230408141508/https://unix.stackexchange.com/questions/715638/zsh-why-isnt-my-script-reading-my-option-setting){:target="_blank" rel="noopener"} on StackExchange, and wait for an answer.  In the meantime, I know there must be a difference between my experiment script and the rbenv completion script, because they're behaving in different ways.  My script is not respecting the `ksharrays` option that I'm setting unless it's set directly in the script, while the `echo` statements that I added to the completion script change their output depending on whether `ksharrays` is `set` or `unset`.  So I continue to believe that a PR to the `rbenv` repo is still needed.
 
-Eventually, a StackExchange user [replies to my question](https://unix.stackexchange.com/a/715678/142469) with an answer.  TL;DR- running a shell script from inside your terminal doesn't cause your terminal's zsh options to carry over into the executed shell script.  However, if you've previously defined a tab-complete function via a file that's been `source`'ed, the shell options which are included in the scope of the function aren't picked up until the function is called from your terminal, which (in the case of tab-complete) is when you type in your command and hit tab.
+Eventually, a StackExchange user [replies to my question](https://unix.stackexchange.com/a/715678/142469){:target="_blank" rel="noopener"} with an answer.  TL;DR- running a shell script from inside your terminal doesn't cause your terminal's zsh options to carry over into the executed shell script.  However, if you've previously defined a tab-complete function via a file that's been `source`'ed, the shell options which are included in the scope of the function aren't picked up until the function is called from your terminal, which (in the case of tab-complete) is when you type in your command and hit tab.
 
-I create a PR (which may or may not even be merged) to prevent a zsh user's errant `KSH_ARRAYS` option from affecting the tab-complete.  PR [here](https://github.com/rbenv/rbenv/pull/1422).
+I create a PR (which may or may not even be merged) to prevent a zsh user's errant `KSH_ARRAYS` option from affecting the tab-complete.  PR [here](https://github.com/rbenv/rbenv/pull/1422){:target="_blank" rel="noopener"}.
 
 Honestly, the more I think about this, the more I doubt the RBENV maintainers will give the thumbs-up to my PR.  The whole thing is predicated on the idea that a greater-than-zero number of people will override their `KSH_ARRAYS` option in zsh.  But if no one in the 10+ year history of RBENV has submitted a Github issue about this, it's probably an incredibly small value-add, if it adds value at all.  This PR is purely speculative in nature until someone actually runs into a problem in the wild, therefore the PR could be a solution in search of a problem.
 
 I still want to keep the PR open, because I do think this process has been an educational experience and I'd like that education to continue in the form of feedback from the maintainers.
 
-However, according to [this link](https://web.archive.org/web/20220512071954/https://blog.mads-hartmann.com/2017/08/06/writing-zsh-completion-scripts.html), the canonical way of setting up a tab completion is to create a file whose directory is one of those listed in `$fpath`.  Right now, it looks like RBENV uses a different approach, i.e. it has pre-existing files in the `completions` directory which include a call to `compctl -K`, and it runs `source` on those files when `rbenv init` is run.  Does it make sense to change the approach to turning on these tab-completions to be more in-line with shell conventions?  For example, for the `zsh` shell, those files could be in a directory which is not initially included in `$fpath`.  When `rbenv init` is run, the code could add the directory to `$fpath`.
+However, according to [this link](https://web.archive.org/web/20220512071954/https://blog.mads-hartmann.com/2017/08/06/writing-zsh-completion-scripts.html){:target="_blank" rel="noopener"}, the canonical way of setting up a tab completion is to create a file whose directory is one of those listed in `$fpath`.  Right now, it looks like RBENV uses a different approach, i.e. it has pre-existing files in the `completions` directory which include a call to `compctl -K`, and it runs `source` on those files when `rbenv init` is run.  Does it make sense to change the approach to turning on these tab-completions to be more in-line with shell conventions?  For example, for the `zsh` shell, those files could be in a directory which is not initially included in `$fpath`.  When `rbenv init` is run, the code could add the directory to `$fpath`.
 
 Maybe, but I'll save the above idea for another day.
 
@@ -954,7 +954,7 @@ Clearly we're setting a (non-local) variable named `reply) equal to `("${(ps:\n:
 
 It looks similar to the `(t)` syntax, which I've encountered before.  For example, if you want to get the type of the `completions` variable in a parameter expansion, you'd do `${(t)completions}`.
 
-Probably the easiest thing to do first is to `echo` it out and read the output, but I want to get good at finding things in the docs.  Let's start with that, and then print stuff to the terminal if I get stuck.  I find [the docs page](https://zsh.sourceforge.io/Doc/Release/Expansion.html) for "Parameter Expansion", and search for `ps:\n`.  I see the following:
+Probably the easiest thing to do first is to `echo` it out and read the output, but I want to get good at finding things in the docs.  Let's start with that, and then print stuff to the terminal if I get stuck.  I find [the docs page](https://web.archive.org/web/20230320043037/https://zsh.sourceforge.io/Doc/Release/Expansion.html){:target="_blank" rel="noopener"} for "Parameter Expansion", and search for `ps:\n`.  I see the following:
 
 > f
 >

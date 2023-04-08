@@ -1,6 +1,6 @@
 First the tests:
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-name.bats)
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-name.bats){:target="_blank" rel="noopener"}
 
 After the `bats` shebang and the loading of `test_helper`, the first block of code is:
 
@@ -21,7 +21,7 @@ setup() {
 }
 ```
 
-Here we just make and navigate into our test directory.  This `setup` function is called by the BATS test runner, in [this file](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test).
+Here we just make and navigate into our test directory.  This `setup` function is called by the BATS test runner, in [this file](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test){:target="_blank" rel="noopener"}.
 
 Next block of code is the first test:
 
@@ -44,7 +44,7 @@ Next test:
 }
 ```
 
-Here we check that if the user specifically sets their `RBENV_VERSION` env var to “system”, the command will use that as the version name.  I skipped ahead to the program code for a minute, and it looks like when we get to [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L18), we'll see that when the user's `RBENV_VERSION` env var is either empty or set to “system”, the program prints “system” and exits.  These two scenarios are covered by the previous two tests we just looked at.
+Here we check that if the user specifically sets their `RBENV_VERSION` env var to “system”, the command will use that as the version name.  I skipped ahead to the program code for a minute, and it looks like when we get to [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L18){:target="_blank" rel="noopener"}, we'll see that when the user's `RBENV_VERSION` env var is either empty or set to “system”, the program prints “system” and exits.  These two scenarios are covered by the previous two tests we just looked at.
 
 Next test:
 
@@ -59,7 +59,7 @@ Next test:
 }
 ```
 
-Here we create two Ruby versions with our helper method, and then create a hook file for the `version-name` command named `test.bash`.  Inside that hook file, we simply set the `RBENV_VERSION` env var to the 2nd version number that we created, “1.9.3”.  We then run the `version-name` command, specifying the *first* version number that we created.  We assert that the `version-name` command prints the version name from the hook we created.  This implies that the logic to `source` the hook files (which lives [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L14)) overwrites any env vars passed to the command.
+Here we create two Ruby versions with our helper method, and then create a hook file for the `version-name` command named `test.bash`.  Inside that hook file, we simply set the `RBENV_VERSION` env var to the 2nd version number that we created, “1.9.3”.  We then run the `version-name` command, specifying the *first* version number that we created.  We assert that the `version-name` command prints the version name from the hook we created.  This implies that the logic to `source` the hook files (which lives [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L14){:target="_blank" rel="noopener"}) overwrites any env vars passed to the command.
 
 Next test:
 
@@ -149,7 +149,7 @@ As setup steps, we “install” Ruby v1.8.7 in RBENV's “versions/” director
 
 Onto the code itself:
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name){:target="_blank" rel="noopener"}
 
 As per usual:
 
@@ -200,7 +200,7 @@ if [ -z "$RBENV_VERSION" ] || [ "$RBENV_VERSION" = "system" ]; then
 fi
 ```
 
-Here we check whether a) our `RBENV_VERSION` variable is empty (or if its value is the `true` boolean, as per the default value in [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L8)), or b) whether its value is set to “system”.  If either of these conditions are true, we simply print the string “system” and then exit the `version-name` command.
+Here we check whether a) our `RBENV_VERSION` variable is empty (or if its value is the `true` boolean, as per the default value in [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L8){:target="_blank" rel="noopener"}), or b) whether its value is set to “system”.  If either of these conditions are true, we simply print the string “system” and then exit the `version-name` command.
 
 Next block of code:
 

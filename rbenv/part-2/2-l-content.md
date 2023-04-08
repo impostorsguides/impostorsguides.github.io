@@ -6,7 +6,7 @@ You're still free to set different versions inside a local Ruby project director
 
 Let's check out the spec file first, this time.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/global.bats)
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/global.bats){:target="_blank" rel="noopener"}
 
 After the `bats` shebang and the loading of `test_helper`, the first test is:
 
@@ -64,7 +64,7 @@ This is the test which covers the sad path of the “global” command.  If we h
 
 Having read through the command's test file, let's move on to the file for the command itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-global)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-global){:target="_blank" rel="noopener"}
 
 First few lines of code are boilerplate at this point:
 

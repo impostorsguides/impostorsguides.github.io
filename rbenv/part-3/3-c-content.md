@@ -6,7 +6,7 @@ The `bin/` directory seems super-simple- it just contains one file in it called 
 
 I've heard of this type of file before, but it's one of those things that I'm not sure I could explain to someone if they asked me about it.  My best definition is that it's a file that, instead of containing its own data, points to another file which contains the data in question.  That's about all I'm comfortable saying without starting to trip on my words lol.  Let's start Googling.
 
-From [this Wikipedia page](https://web.archive.org/web/20220817180854/https://en.wikipedia.org/wiki/Symbolic_link), I get the following information:
+From [this Wikipedia page](https://web.archive.org/web/20220817180854/https://en.wikipedia.org/wiki/Symbolic_link){:target="_blank" rel="noopener"}, I get the following information:
 
  - A symbolic link (also symlink or soft link) is a file whose purpose is to point to a file or directory (called the "target") by specifying a path thereto.
 
@@ -40,7 +40,7 @@ There's not much discussion here, or even a PR description.  That's unfortunate-
 
 One thing to note is that this PR was merged on Aug 2, 2011.  So at the date of this writing, it's over 11 years old.  Not immediately relevant, just something I'm noticing now.
 
-Given there's no description, I'm guessing it must be self-evident to the authors and repo maintainers why this change was necessary.  There must be something about the term "libexec" that communicates that knowledge.  Maybe it's an industry standard directory name or something?  I Google around a bit and find [a StackOverflow post](https://unix.stackexchange.com/questions/312146/what-is-the-purpose-of-usr-libexec) about `/usr/libexec`:
+Given there's no description, I'm guessing it must be self-evident to the authors and repo maintainers why this change was necessary.  There must be something about the term "libexec" that communicates that knowledge.  Maybe it's an industry standard directory name or something?  I Google around a bit and find [a StackOverflow post](https://unix.stackexchange.com/questions/312146/what-is-the-purpose-of-usr-libexec){:target="_blank" rel="noopener"} about `/usr/libexec`:
 
 <p style="text-align: center">
   <img src="/assets/images/so-question-312146.png" width="70%" alt="StackOverflow question about /usr/libexec"  style="border: 1px solid black; padding: 0.5em">
@@ -48,7 +48,7 @@ Given there's no description, I'm guessing it must be self-evident to the author
 
 Note: "FHS" stands for "Filesystem Hierarchy Standard".  Looks like it's one of many standards implemented by the Linux Foundation.
 
-The [answer](https://unix.stackexchange.com/a/386015/142469) I found seems pretty clear as well:
+The [answer](https://unix.stackexchange.com/a/386015/142469){:target="_blank" rel="noopener"} I found seems pretty clear as well:
 
 <p style="text-align: center">
   <img src="/assets/images/so-answer-386015.png" width="70%" alt="Answer to StackOverflow question about /usr/libexec"  style="border: 1px solid black; padding: 0.5em">
@@ -56,7 +56,7 @@ The [answer](https://unix.stackexchange.com/a/386015/142469) I found seems prett
 
 OK, so the name `/libexec` communicates that the files in the directory are meant to be executed by another program, not directly by the user.  It appears that the main benefit `/libexec` confers is not that it *prevents* a user from accessing a given executable, but that it *communicates* that it's a bad idea for the user to do so.  It's the equivalent of making a method "private" in Ruby.  You can still access it by calling `.send`, but you could be shooting yourself in the foot by doing so.
 
-Just for the sake of thoroughness, I [search](https://github.com/rbenv/rbenv/search?o=asc&q=libexec&s=created&type=issues) for `libexec` in the `rbenv` Github repo, to see if there are any other issues which reference it.  There are... quite a few:
+Just for the sake of thoroughness, I [search](https://github.com/rbenv/rbenv/search?o=asc&q=libexec&s=created&type=issues){:target="_blank" rel="noopener"} for `libexec` in the `rbenv` Github repo, to see if there are any other issues which reference it.  There are... quite a few:
 
 <p style="text-align: center">
   <img src="/assets/images/search-results-for-libexec.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="Searching for 'libexec' in the Github repo">
@@ -74,7 +74,7 @@ This appears to be the directory containing all the individual commands that RBE
 
 I notice there are two entries in "Wikis".  I check those but they don't contain an immediate explanation of what `libexec` is for.  I check the titles of the 17 commits, but nothing stands out there either.  I think I'm OK with concluding that the reason for the symlink file is the reason I mentioned above- it's to communicate that people shouldn't depend on or execute the executable files directly, but rather they should rely on the main `rbenv` command to do it for them.  Note to reader- if you know better than I do here, please let me know *how you reached that conclusion* so I can update this document (and so I can learn something as well).
 
-While I was on the subject, I was also curious what the `/bin/` folder is for.  [Another StackOverflow answer](https://askubuntu.com/questions/138547/how-to-understand-the-ubuntu-file-system-layout) pointed me (once again) to the Filesystem Hierarchy Standard.  Seems like a standard which affects quite a few topics that I've encountered so far.
+While I was on the subject, I was also curious what the `/bin/` folder is for.  [Another StackOverflow answer](https://askubuntu.com/questions/138547/how-to-understand-the-ubuntu-file-system-layout){:target="_blank" rel="noopener"} pointed me (once again) to the Filesystem Hierarchy Standard.  Seems like a standard which affects quite a few topics that I've encountered so far.
 
 <p style="text-align: center">
   <img src="/assets/images/so-answer-for-system-layout.png" width="70%" alt="StackOverflow answer on what the bin/ folder is for"  style="border: 1px solid black; padding: 0.5em">

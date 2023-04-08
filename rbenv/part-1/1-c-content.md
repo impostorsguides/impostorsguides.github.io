@@ -90,9 +90,9 @@ I interpret this to mean that POSIX defines the standards that determine how use
 
 ### Experiment- which shell are you using?
 
-I'm typing this on a 2019 Macbook Pro, [which ships with `zsh` as its default shell](https://archive.ph/QGwEP).  Your default shell might be the same as mine, or it might `bash` or another shell.
+I'm typing this on a 2019 Macbook Pro, [which ships with `zsh` as its default shell](https://web.archive.org/web/20221205115311/https://scriptingosx.com/2019/06/moving-to-zsh-part-3-shell-options/){:target="_blank" rel="noopener"}.  Your default shell might be the same as mine, or it might `bash` or another shell.
 
-To find out what shell we're using, we can open the terminal and type the `echo` command, passing [`"$0"`](https://archive.ph/PIQ25) as a parameter:
+To find out what shell we're using, we can open the terminal and type the `echo` command, passing [`"$0"`](https://web.archive.org/web/20230124040420/https://linuxhint.com/0-bash-script/){:target="_blank" rel="noopener"} as a parameter:
 
 ```
 $ echo "$0"
@@ -151,7 +151,7 @@ bash-3.2$ echo "$SHELL"
 /bin/zsh
 ```
 
-That's because [`$SHELL` returns the current user's login shell](https://unix.stackexchange.com/a/669344/142469), **not** the shell that the user is currently using.  But if you are currently inside your default shell anyway (which you likely will be in most cases), using `$SHELL` should be fine.
+That's because [`$SHELL` returns the current user's login shell](https://unix.stackexchange.com/a/669344/142469){:target="_blank" rel="noopener"}, **not** the shell that the user is currently using.  But if you are currently inside your default shell anyway (which you likely will be in most cases), using `$SHELL` should be fine.
 
 ### Making `help` easier to work with in `zsh`
 

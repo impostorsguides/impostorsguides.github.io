@@ -1,6 +1,6 @@
 We'll cover the tests first, and the code afterward.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/commands.bats)
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/commands.bats){:target="_blank" rel="noopener"}
 
 After the `bats` shebang and the loading of `test_helper`, the first test is:
 
@@ -16,7 +16,7 @@ After the `bats` shebang and the loading of `test_helper`, the first test is:
 }
 ```
 
-This is the happy-path test, covering [this `for` loop](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L27).  The test runs the regular `rbenv-commands` command, asserts that it was successful, and asserts that certain commands are listed among the output printed to STDOUT.
+This is the happy-path test, covering [this `for` loop](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L27){:target="_blank" rel="noopener"}.  The test runs the regular `rbenv-commands` command, asserts that it was successful, and asserts that certain commands are listed among the output printed to STDOUT.
 
 We also explicitly assert that the line “sh-shell” does *not* appear in the output.  We want to ensure that the “shell” command is presented to the user when they run `rbenv commands`, but that command's logic lives in a file named `rbenv-sh-shell` (because the path it takes during execution branches depending on which shell program the user is running), and when we scrape the list of command files in order to generate the output of `rbenv commands`, we want to strip out the `sh-` prefix since the user is not meant to type `rbenv sh-shell` when they run this command.
 
@@ -31,7 +31,7 @@ Next test:
 }
 ```
 
-This test covers [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L15), as well as the 4-line block of code from lines 30-33 (starting [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L30)).  We run the same command as before, but we pass the “--sh” flag.  This time we assert that commands with no “sh-” prefix in their filenames (such as the “init” command) are excluded from the printed output, and commands *with* that prefix (such as “shell”) are included.
+This test covers [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L15){:target="_blank" rel="noopener"}, as well as the 4-line block of code from lines 30-33 (starting [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L30){:target="_blank" rel="noopener"}).  We run the same command as before, but we pass the “--sh” flag.  This time we assert that commands with no “sh-” prefix in their filenames (such as the “init” command) are excluded from the printed output, and commands *with* that prefix (such as “shell”) are included.
 
 Next test:
 
@@ -62,11 +62,11 @@ Last test for this command:
 }
 ```
 
-This test covers [this 4-line block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L18-L21), as well as [this 4-line block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L34-L37).  It's the inverse of the "commands --sh" test, in that we expect commands whose files do *not* contain the “sh-” prefix in their name to be printed to STDOUT, and we explicitly expect commands which *do* contain that prefix in their filenames to be excluded from the output.
+This test covers [this 4-line block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L18-L21), as well as [this 4-line block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L34-L37){:target="_blank" rel="noopener"}.  It's the inverse of the "commands --sh" test, in that we expect commands whose files do *not* contain the “sh-” prefix in their name to be printed to STDOUT, and we explicitly expect commands which *do* contain that prefix in their filenames to be excluded from the output.
 
 With the tests for this command out of the way, let's move on to the code for the command itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands){:target="_blank" rel="noopener"}
 
 First few lines:
 
@@ -109,13 +109,13 @@ fi
 
 If the user has typed `rbenv commands --sh`, we set the `sh` variable to 1.  Otherwise, if the user has typed in `--no-sh`, we set the `nosh` variable to 1.  `sh` is used later if we just want to see the commands `shell` and `rehash`, and `nosh` is used if we want to see all commands except those two.
 
-This might be a good point at which to investigate why `shell` and `rehash` are treated differently from the other commands.  I look for the git commit which introduced this code.  There are a few SHAs mentioned in the `git blame` for the above lines of code.  I pick the oldest one: `5a4bee6e`.  [The PR containing this commit](https://github.com/rbenv/rbenv/pull/57) has the following description:
+This might be a good point at which to investigate why `shell` and `rehash` are treated differently from the other commands.  I look for the git commit which introduced this code.  There are a few SHAs mentioned in the `git blame` for the above lines of code.  I pick the oldest one: `5a4bee6e`.  [The PR containing this commit](https://github.com/rbenv/rbenv/pull/57){:target="_blank" rel="noopener"} has the following description:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-14mar2023-828am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-After reading and re-reading this a few times, I think I have an idea of what's going on.  It seems like the original purpose of the `sh-` prefix was to allow developers to add their own custom shell commands?  And the reason they needed a special prefix was because those commands needed to be called by `eval` [here](https://github.com/rbenv/rbenv/pull/57/files#diff-fde6791214061a6ba8c036bfa0a278968bf11ceab83070561591834ee1befd6eR78), instead of by `command` [here](https://github.com/rbenv/rbenv/pull/57/files#diff-fde6791214061a6ba8c036bfa0a278968bf11ceab83070561591834ee1befd6eR80).  This was so that the special commands would be run in a scope which would allow them to modify environment variables (which they may want or need to do).
+After reading and re-reading this a few times, I think I have an idea of what's going on.  It seems like the original purpose of the `sh-` prefix was to allow developers to add their own custom shell commands?  And the reason they needed a special prefix was because those commands needed to be called by `eval` [here](https://github.com/rbenv/rbenv/pull/57/files#diff-fde6791214061a6ba8c036bfa0a278968bf11ceab83070561591834ee1befd6eR78){:target="_blank" rel="noopener"}, instead of by `command` [here](https://github.com/rbenv/rbenv/pull/57/files#diff-fde6791214061a6ba8c036bfa0a278968bf11ceab83070561591834ee1befd6eR80){:target="_blank" rel="noopener"}.  This was so that the special commands would be run in a scope which would allow them to modify environment variables (which they may want or need to do).
 
 But we already saw when we looked at `rbenv-init` that there is a whole process for including the folders in the `/plugins` directory.  Does that mean the `--sh` and `--no-sh` flags are now superfluous?  Still not sure.
 
@@ -214,7 +214,7 @@ Next lines:
 ```
       command="${command##*rbenv-}"
 ```
-This line takes the value of `command` defined in the inner `for` loop (i.e. `/usr/local/Cellar/rbenv/1.2.0/libexec/rbenv-completions`) and changes it to just the value after the last hyphen (i.e. `commands`).  According to [StackExchange](https://archive.ph/UgqfS), the `##` tells the shell to remove the longest-possible match of the subsequent pattern, in this case `*rbenv-`.  The `*` means that the pattern can be expanded to include any text ending in `rbenv-`.  So the shell removes the `rbenv-` text, *plus* everything before it (i.e. `/usr/local/Cellar/rbenv/1.2.0/libexec/`).
+This line takes the value of `command` defined in the inner `for` loop (i.e. `/usr/local/Cellar/rbenv/1.2.0/libexec/rbenv-completions`) and changes it to just the value after the last hyphen (i.e. `commands`).  According to [StackExchange](https://unix.stackexchange.com/questions/669013/difference-between-parameterword-and-parameterword){:target="_blank" rel="noopener"}, the `##` tells the shell to remove the longest-possible match of the subsequent pattern, in this case `*rbenv-`.  The `*` means that the pattern can be expanded to include any text ending in `rbenv-`.  So the shell removes the `rbenv-` text, *plus* everything before it (i.e. `/usr/local/Cellar/rbenv/1.2.0/libexec/`).
 
 Next lines:
 
@@ -251,13 +251,13 @@ If the user didn't pass either the `--sh` or the `--no-sh` flag, then we want to
 
 (stopping here for the day; 31137 words)
 
-While I was reading through the code yesterday, I noticed that the `rbenv-commands` file has a corresponding test file called `commands.bats`.  I had never heard of the `.bats` extension before, so I decided to Google it.  Nothing came up on Google's page 1 when I tried “bats file extension”, but when I Googled “how to run bats test”, the first result was [this Github repo](https://github.com/sstephenson/bats), which I noticed was maintained by [Github user Sam Stephenson](https://github.com/sstephenson), the same person who I've seen author many commits in the RBENV repo.  In fact, I suspect he is the original author of RBENV, though I haven't bothered to research that (TO-DO- actually do that).
+While I was reading through the code yesterday, I noticed that the `rbenv-commands` file has a corresponding test file called `commands.bats`.  I had never heard of the `.bats` extension before, so I decided to Google it.  Nothing came up on Google's page 1 when I tried “bats file extension”, but when I Googled “how to run bats test”, the first result was [this Github repo](https://github.com/sstephenson/bats){:target="_blank" rel="noopener"}, which I noticed was maintained by [Github user Sam Stephenson](https://github.com/sstephenson){:target="_blank" rel="noopener"}, the same person who I've seen author many commits in the RBENV repo.  In fact, I suspect he is the original author of RBENV, though I haven't bothered to research that (TO-DO- actually do that).
 
 The `bats` repo is archived, meaning there won't be further updates to it, but I still want to see if the code works and can be used to run tests in the `rbenv` repo.  I'd be surprised if it didn't, since RBENV is still maintained and therefore still needs a way to run its own tests.
 
-I follow the installation instructions [here](https://github.com/sstephenson).  I get tripped up a little, because I initially try to run the `./install.sh /usr/local` command without running `sudo` and get `Permission denied`.  I then try to re-run it with `sudo` as per the instructions, but I get `file exists`.  I figure out that this is because the install script is trying to create a file that already exists (hence the error), so I comment out that line of code and re-run with `sudo`, and it's all good.
+I follow the installation instructions [here](https://github.com/sstephenson/bats#installing-bats-from-source){:target="_blank" rel="noopener"}.  I get tripped up a little, because I initially try to run the `./install.sh /usr/local` command without running `sudo` and get `Permission denied`.  I then try to re-run it with `sudo` as per the instructions, but I get `file exists`.  I figure out that this is because the install script is trying to create a file that already exists (hence the error), so I comment out that line of code and re-run with `sudo`, and it's all good.
 
-I then go back into back into the `rbenv` directory and look at [the test script](https://github.com/rbenv/rbenv/blob/baf7656d2f1570a3b2d5a7e70d5bfcc52fe0428a/test/commands.bats) more closely.  I see that, instead of a `bash` shebang, it uses a `bats` shebang.  This means that, now that I have `bats` installed in my `$PATH`, running the script should Just Work.  I run the following from within my `~/Workspace/OpenSource/rbenv/test` directory:
+I then go back into back into the `rbenv` directory and look at [the test script](https://github.com/rbenv/rbenv/blob/baf7656d2f1570a3b2d5a7e70d5bfcc52fe0428a/test/commands.bats){:target="_blank" rel="noopener"} more closely.  I see that, instead of a `bash` shebang, it uses a `bats` shebang.  This means that, now that I have `bats` installed in my `$PATH`, running the script should Just Work.  I run the following from within my `~/Workspace/OpenSource/rbenv/test` directory:
 
 ```
 $ ./commands.bats
@@ -293,7 +293,7 @@ I notice the `/rbenv/test/test` filepath, which I'm not surprised doesn't exist.
 
 Awesome, now I have a complete suite of running tests!
 
-So now that these specs are running, what do they actually do?  Reading the tests for a piece of code you're studying is often a great source of documentation.  And the BATS repo has [helpful documentation](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/README.md#writing-tests) on the commands it offers and the API it exposes.
+So now that these specs are running, what do they actually do?  Reading the tests for a piece of code you're studying is often a great source of documentation.  And the BATS repo has [helpful documentation](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/README.md#writing-tests){:target="_blank" rel="noopener"} on the commands it offers and the API it exposes.
 
 Let's look at the `commands.bats` spec:
 
@@ -301,7 +301,7 @@ Let's look at the `commands.bats` spec:
 load test_helper
 ```
 
-Without getting too in-the-weeds, the `load` command comes from the BATS repo.  Here's [the docs on that command](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/README.md#load-share-common-code).  The above line of code loads a file called `test_helper` in the `rbenv` repo, which defines functions like `assert_success` and `assert_line` which make our `commands.bats` file easier to read and write.
+Without getting too in-the-weeds, the `load` command comes from the BATS repo.  Here's [the docs on that command](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/README.md#load-share-common-code){:target="_blank" rel="noopener"}.  The above line of code loads a file called `test_helper` in the `rbenv` repo, which defines functions like `assert_success` and `assert_line` which make our `commands.bats` file easier to read and write.
 
 The syntax is pretty readable, IMHO.  The first spec looks like this:
 
@@ -364,6 +364,6 @@ Pretty straightforward- we've previously tested `rbenv commands` *with* the `--s
 
 From now on, when I analyze a command, I'll first analyze the spec file so that we can see what's tested.  I'll then analyze the command itself, so we can recall the spec file and see whether any functionality is missing tests.  If so, that could be a good candidate for a PR to the RBENV repo.
 
-That said, a quick glance at the `/test` folder shows that [not all commands have specs](https://github.com/rbenv/rbenv/tree/baf7656d2f1570a3b2d5a7e70d5bfcc52fe0428a/test).  For example, the next command that I'm due to examine (`rbenv-completions`) does not have a corresponding `completions.bats` file.  Nor do the `rbenv root` or `rbenv whence` commands, apparently.  Writing some could potentially be an interesting exercise.  We'll cross that bridge when we get to it.
+That said, a quick glance at the `/test` folder shows that [not all commands have specs](https://github.com/rbenv/rbenv/tree/baf7656d2f1570a3b2d5a7e70d5bfcc52fe0428a/test){:target="_blank" rel="noopener"}.  For example, the next command that I'm due to examine (`rbenv-completions`) does not have a corresponding `completions.bats` file.  Nor do the `rbenv root` or `rbenv whence` commands, apparently.  Writing some could potentially be an interesting exercise.  We'll cross that bridge when we get to it.
 
 (stopping here for the day; 32154 words)

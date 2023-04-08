@@ -1,6 +1,6 @@
 
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/configure)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/configure){:target="_blank" rel="noopener"}
 
 First block of code:
 
@@ -49,7 +49,7 @@ fi
 
 If the value of the `CC` environment variable is empty, then we execute the code inside the block.  The first thing inside that block is another `if` check, this time to see whether `type -p gcc` returns anything.  We recognize `type -p` as a way to check whether a path to the named program exists, which by implication tells us whether that program is installed on the machine.  So we check whether `gcc` is installed on the machine.  If it is, we do one thing.  If it's not, we do another.
 
-What is `gcc`?  According to [GNU's homepage](https://web.archive.org/web/20221119003936/https://gcc.gnu.org/), GCC stands for "GNU Compiler Collection".  The page goes on to say that "GCC was originally written as the compiler for the GNU operating system."  It doesn't say that original mission has changed, so I'm guessing this is still true.
+What is `gcc`?  According to [GNU's homepage](https://web.archive.org/web/20221119003936/https://gcc.gnu.org/){:target="_blank" rel="noopener"}, GCC stands for "GNU Compiler Collection".  The page goes on to say that "GCC was originally written as the compiler for the GNU operating system."  It doesn't say that original mission has changed, so I'm guessing this is still true.
 
 So if the GNU compiler exists on the user's machine, then we set the `CC` variable equal to the string "gcc".  Otherwise, we echo a warning string to STDERR, and we set `CC` equal to the string "cc".  I'm a bit curious where "gcc" is not used, and I know I'll have to Google for this if I want an answer to this question.  But I suspect it'll be easier to ask Google where "gcc" *is* used, rather than where it's *not* used.  So I Google "where is gcc used", and I see the following without even clicking through to the result:
 
@@ -302,15 +302,15 @@ More good news- the beginning of the file is a comments section describing what 
 
 In addition to the description of what this file does, I see it's also authored by someone named Chet Ramey, and is part of the Free Software foundation.  There's also the comment that "This file is part of GNU Bash, the Bourne Again Shell".  All this makes me wonder whether this script was copied from somewhere else, and included here.
 
-I search for the commit which introduced this file, and I find it [here](https://github.com/rbenv/rbenv/pull/528/commits/8facb3b3a790fd275a4e8d5f4de474bbd837c040), along with this description:
+I search for the commit which introduced this file, and I find it [here](https://github.com/rbenv/rbenv/pull/528/commits/8facb3b3a790fd275a4e8d5f4de474bbd837c040){:target="_blank" rel="noopener"}, along with this description:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-147pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
-Looks like the file was borrowed from the bash source code.  I was actually curious about whether these files were different, so I found [the location of the source code](https://ftp.gnu.org/gnu/bash/) on GNU's website, searched for "bash-3.2.48", and downloaded the ".tar.gz" compressed file.  I unzipped it and found the "shobj-conf" file, and ran `sha256sum <path/to/file>` on it.  I then did the same with the file inside RBENV, to see if the two files generated the same checksum.  Turns out they don't, however I suspect it's because one of the files has some indentation that the other does not.  I can't prove this without diffing each file line-by-line, and that seems like overkill for this question.
+Looks like the file was borrowed from the bash source code.  I was actually curious about whether these files were different, so I found [the location of the source code](https://ftp.gnu.org/gnu/bash/){:target="_blank" rel="noopener"} on GNU's website, searched for "bash-3.2.48", and downloaded the ".tar.gz" compressed file.  I unzipped it and found the "shobj-conf" file, and ran `sha256sum <path/to/file>` on it.  I then did the same with the file inside RBENV, to see if the two files generated the same checksum.  Turns out they don't, however I suspect it's because one of the files has some indentation that the other does not.  I can't prove this without diffing each file line-by-line, and that seems like overkill for this question.
 
-One of the things I was wondering is what each of these environment variables does, what each one is responsible for.  While Googling for "shopj-conf", I came across [this link](https://web.archive.org/web/20220716090040/https://tiswww.case.edu/php/chet/readline/README), which references some (but not all) of the names used for our env vars:
+One of the things I was wondering is what each of these environment variables does, what each one is responsible for.  While Googling for "shopj-conf", I came across [this link](https://web.archive.org/web/20220716090040/https://tiswww.case.edu/php/chet/readline/README){:target="_blank" rel="noopener"}, which references some (but not all) of the names used for our env vars:
 
 ```
 In the stanza for your operating system-compiler pair, you will need to
@@ -403,7 +403,7 @@ The variables whose names match (along with their definitions from the above lin
 ```
 
 
-So the RBENV version mentions every variable which [the README file](https://tiswww.case.edu/php/chet/readline/README) mentions, but it also mentions some variables which aren't in the README:
+So the RBENV version mentions every variable which [the README file](https://tiswww.case.edu/php/chet/readline/README){:target="_blank" rel="noopener"} mentions, but it also mentions some variables which aren't in the README:
 
  - SHOBJ_XLDFLAGS
  - SHOBJ_LIBS
@@ -450,7 +450,7 @@ Let's take the first of the `sed` commands as an example:
   s#@CC@#${CC}#
 ```
 
-By the way- I think each of these lines (which I've been referring to as "commands" until now) are actually called "scripts" [by those who know](https://web.archive.org/web/20220611195519/https://www.gnu.org/software/sed/manual/html_node/sed-script-overview.html).  To optimize for correctness, I'll switch to using this same terminology from now on.
+By the way- I think each of these lines (which I've been referring to as "commands" until now) are actually called "scripts" [by those who know](https://web.archive.org/web/20220611195519/https://www.gnu.org/software/sed/manual/html_node/sed-script-overview.html){:target="_blank" rel="noopener"}.  To optimize for correctness, I'll switch to using this same terminology from now on.
 
 This first script looks to me like a search-and-replace operation.  It starts with the "s" character, and contains a snippet of syntax which I know exists in "Makefile.in" (i.e. `@CC@`), followed by what looks like parameter expansion in bash (i.e. `${CC}`).  However, I would expect a search-and-replace `sed` operation to use the forward-slash character to delimit the "s", input line, and output line, as follows:
 
@@ -460,7 +460,7 @@ This first script looks to me like a search-and-replace operation.  It starts wi
 
 Is the "#" character just syntactic sugar for "/"?  Or is there a semantic difference between how the two characters work in `sed`?  Or am I totally wrong about the intent of the script, i.e. it's not doing search-and-replace at all?
 
-To try and answer this question, I construct a [minimum-viable example](https://stackoverflow.com/help/minimal-reproducible-example) as follows:
+To try and answer this question, I construct a [minimum-viable example](https://stackoverflow.com/help/minimal-reproducible-example){:target="_blank" rel="noopener"} as follows:
 
  - I create a simple textfile named "foo.txt", which looks as follows:
 
@@ -495,9 +495,9 @@ baz
 Yep, same result!  It's always possible that there are other effects taking place under-the-hood, which are not observable in this simple example.  But it looks like, whatever else may be happening, we've proved that the result to STDOUT is the same for both commands.  At least in this case.
 
 
-Prior to trying this experiment, I looked for documentation to answer this question, but didn't find any.  I looked [here](https://web.archive.org/web/20221117074804/https://www.gnu.org/software/sed/manual/sed.html) (in GNU's main `sed` reference), and also [here](https://web.archive.org/web/20220912050851/https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html) (in the specific section on the "s" command in `sed`).  In both cases, all results when `grep`'ing for the "#" character resulted in either a line of comment, a shebang, or some other irrelevant result.  I was unable to find any content related specifically to the replacement of "/" with "#" in a `sed` command.  Unfortunate!
+Prior to trying this experiment, I looked for documentation to answer this question, but didn't find any.  I looked [here](https://web.archive.org/web/20221117074804/https://www.gnu.org/software/sed/manual/sed.html){:target="_blank" rel="noopener"} (in GNU's main `sed` reference), and also [here](https://web.archive.org/web/20220912050851/https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html){:target="_blank" rel="noopener"} (in the specific section on the "s" command in `sed`).  In both cases, all results when `grep`'ing for the "#" character resulted in either a line of comment, a shebang, or some other irrelevant result.  I was unable to find any content related specifically to the replacement of "/" with "#" in a `sed` command.  Unfortunate!
 
-However, I do find [this StackOverflow post](https://web.archive.org/web/20230319165757/https://unix.stackexchange.com/questions/389537/how-to-use-a-hash-as-a-delimiter-for-sed), and one of its answers refers to an entry in `sed`'s `man` page.  I look up that `man` page and search for "#", and find the following:
+However, I do find [this StackOverflow post](https://web.archive.org/web/20230319165757/https://unix.stackexchange.com/questions/389537/how-to-use-a-hash-as-a-delimiter-for-sed){:target="_blank" rel="noopener"}, and one of its answers refers to an entry in `sed`'s `man` page.  I look up that `man` page and search for "#", and find the following:
 
 ```
 EXAMPLES

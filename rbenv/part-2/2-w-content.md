@@ -1,6 +1,6 @@
 Test file comes first:
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-file.bats)
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-file.bats){:target="_blank" rel="noopener"}
 
 After the `bats` shebang and the import of `test_helper`, the first block of code is:
 
@@ -148,7 +148,7 @@ Speaking of “no meaningful output”, that's a bit of a bummer.  If an error o
 
 Anyway, on to the code itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-file)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-file){:target="_blank" rel="noopener"}
 
 Let's get the repetitive stuff over with:
 
@@ -219,9 +219,9 @@ False
 
 (stopping here for the day; 70012 words)
 
-In my opinion, the documentation on regular expressions in bash is lacking.  The closest things I can find to “official documentation” in Google are [an HTML version](https://web.archive.org/web/20220923034514/https://man7.org/linux/man-pages/man7/regex.7.html) of the `man` page on regular expressions, and [the bash reference manual](https://web.archive.org/web/20221012211520/https://www.gnu.org/software/bash/manual/bash.html), which contains information on regexes but it's inter-mingled with a ton of other info that the reader must wade through.  The first link has zero examples (wtf!!!); it's just a wall of text.  It reads like the author thinks documentation is an after-thought, a waste of time.  I'm sorry, but it does.  I'm struggling to relate to the kind of mentality that sees a man page like this and says “It's perfect, ship it as-is.”  The 2nd link, thankfully, at least has a few examples scattered throughout.  But there's no dedicated “Regex” section demarcated by its own heading, and the examples don't contain the exhaustive set of bash regex features.  Regular expressions are already one of the most inscrutable features in programming.  One would think the authors of the feature would err on the side of clarity and exhaustiveness when trying to document said feature.
+In my opinion, the documentation on regular expressions in bash is lacking.  The closest things I can find to “official documentation” in Google are [an HTML version](https://web.archive.org/web/20220923034514/https://man7.org/linux/man-pages/man7/regex.7.html){:target="_blank" rel="noopener"} of the `man` page on regular expressions, and [the bash reference manual](https://web.archive.org/web/20221012211520/https://www.gnu.org/software/bash/manual/bash.html){:target="_blank" rel="noopener"}, which contains information on regexes but it's inter-mingled with a ton of other info that the reader must wade through.  The first link has zero examples (wtf!!!); it's just a wall of text.  It reads like the author thinks documentation is an after-thought, a waste of time.  I'm sorry, but it does.  I'm struggling to relate to the kind of mentality that sees a man page like this and says “It's perfect, ship it as-is.”  The 2nd link, thankfully, at least has a few examples scattered throughout.  But there's no dedicated “Regex” section demarcated by its own heading, and the examples don't contain the exhaustive set of bash regex features.  Regular expressions are already one of the most inscrutable features in programming.  One would think the authors of the feature would err on the side of clarity and exhaustiveness when trying to document said feature.
 
-Eventually I did find [this link](https://web.archive.org/web/20220923033933/https://www.gnu.org/software/grep/manual/html_node/Regular-Expressions.html), also from GNU.org, but it's part of the `man` entry for the `grep` command.  It's unexpected that what appears to be the canonical reference on bash regexes is located inside the docs for a specific command, when there are many commands which use regexes.
+Eventually I did find [this link](https://web.archive.org/web/20220923033933/https://www.gnu.org/software/grep/manual/html_node/Regular-Expressions.html){:target="_blank" rel="noopener"}, also from GNU.org, but it's part of the `man` entry for the `grep` command.  It's unexpected that what appears to be the canonical reference on bash regexes is located inside the docs for a specific command, when there are many commands which use regexes.
 
 Rather than continue to bang my head against the wall in search of documentation that clearly doesn't want to be found, I decide to infer what the regex does through its behavior.  I add some `echo` statements to the function and paste the updated function into my terminal:
 

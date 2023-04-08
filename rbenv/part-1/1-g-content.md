@@ -18,7 +18,7 @@ Running `man test` and searching for the `-f` string reveals the following:
 
 So our case statement matches if the arg *could be* a filepath, and we further check this by using `[ -f "$arg" ]` to verify that it *actually is* a filepath.
 
-FWIW, I'm guessing they say "regular file" here in order to distinguish from other types of files which are mentioned in other flag descriptions, such as "block special file" for the `-b` flag, and "character special file" for the `-c` flag.  I didn't spend too much time researching these special file types, because it doesn't look especially relevant to our goal here.  If you're curious about that, I found [this StackOverflow post](https://archive.ph/GVuaN) which appears to contain the answer.
+FWIW, I'm guessing they say "regular file" here in order to distinguish from other types of files which are mentioned in other flag descriptions, such as "block special file" for the `-b` flag, and "character special file" for the `-c` flag.  I didn't spend too much time researching these special file types, because it doesn't look especially relevant to our goal here.  If you're curious about that, I found [this StackOverflow post](https://web.archive.org/web/20220712131700/http://unix.stackexchange.com/questions/60034/what-are-character-special-and-block-special-files-in-a-unix-system){:target="_blank" rel="noopener"} which appears to contain the answer.
 
 To test whether the `-f` flag behaves the way I think it does, I update my `foo` script to look like the following:
 
@@ -132,9 +132,9 @@ Here we see that the purpose of our case statement is to set the `RBENV_DIR` env
 
 ### What does the `RBENV_DIR` env var do?
 
-To answer this question, I search for it in the `rbenv` codebase on my local machine (which I've downloaded from [the Github repo](https://github.com/rbenv/rbenv/tree/c4395e58201966d9f90c12bd6b7342e389e7a4cb)).
+To answer this question, I search for it in the `rbenv` codebase on my local machine (which I've downloaded from [the Github repo](https://github.com/rbenv/rbenv/tree/c4395e58201966d9f90c12bd6b7342e389e7a4cb){:target="_blank" rel="noopener"}).
 
-Note that I search using the `ag` command, which you can learn how to install [here](https://github.com/ggreer/the_silver_searcher).  Your computer will likely ship with the `grep` command, but `ag` is *much* faster.
+Note that I search using the `ag` command, which you can learn how to install [here](https://github.com/ggreer/the_silver_searcher){:target="_blank" rel="noopener"}.  Your computer will likely ship with the `grep` command, but `ag` is *much* faster.
 
 When I run this search, I see multiple references to it in various code files:
 
@@ -158,7 +158,7 @@ But what is the `export` keyword at the start of `export RBENV_DIR="${arg%/*}"`?
 
 The assignment statement `export FOO='bar'` creates a variable named `FOO` and sets its value to `bar`, **but** it does something else as well.  We've already seen variables declared earlier, i.e. `program="${0##*/}"`.  What does the use of `export` buy us?
 
-[It turns out](https://web.archive.org/web/20220713174024/https://www.baeldung.com/linux/bash-variables-export) there are two kinds of variables in a bash script: a shell variable and an environment variable.  When we created the `program` variable, that was an example of creating a **shell** variable.  Shell variables are only accessible from within the shell they're created in.  Environment variables, on the other hand, are accessible from within child shells created by the parent shell.
+[It turns out](https://web.archive.org/web/20220713174024/https://www.baeldung.com/linux/bash-variables-export){:target="_blank" rel="noopener"} there are two kinds of variables in a bash script: a shell variable and an environment variable.  When we created the `program` variable, that was an example of creating a **shell** variable.  Shell variables are only accessible from within the shell they're created in.  Environment variables, on the other hand, are accessible from within child shells created by the parent shell.
 
 The blog post link above gives two examples, one demonstrating access of an environment variable from a child shell, and the other of accessing a shell variable from a child shell.  We can do an experiment in our terminal to see for ourselves.
 
@@ -219,7 +219,7 @@ $ echo $bar
 /foo/bar
 ```
 
-So `"${arg%/*}"` takes the argument, and trims off the last `/` character and everything after it.  This aligns with something I found earlier, in [the GNU docs](https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html):
+So `"${arg%/*}"` takes the argument, and trims off the last `/` character and everything after it.  This aligns with something I found earlier, in [the GNU docs](https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/gnu-docs-param-expansion.png" width="70%" alt="GNU docs for parameter expansion" style="border: 1px solid black; padding: 0.5em">

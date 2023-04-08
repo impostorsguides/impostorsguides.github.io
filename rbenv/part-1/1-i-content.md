@@ -9,7 +9,7 @@ In order to find the PR that introduced the if-block, I need the SHA for the com
 
 However, since the shims are all the same, I bet there's a great chance that the shim code lives in a single file somewhere in the RBENV codebase, and is just copy-pasted into a new file whenever a new gem is installed.
 
-I need to search the RBENV codebase for that code, so I pick a line from the if-block.  The line that I pick is one which I think will not be too common in the codebase, and therefore, it will have a high signal-to-noise ratio in my search results.  Then I use [the `ag` tool](https://github.com/ggreer/the_silver_searcher) to find its location:
+I need to search the RBENV codebase for that code, so I pick a line from the if-block.  The line that I pick is one which I think will not be too common in the codebase, and therefore, it will have a high signal-to-noise ratio in my search results.  Then I use [the `ag` tool](https://github.com/ggreer/the_silver_searcher){:target="_blank" rel="noopener"} to find its location:
 
 <p style="text-align: center">
   <img src="/assets/images/ag-program-equals.png" width="70%" alt="searching or the shim code">
@@ -23,7 +23,7 @@ The only result I get is from a file named `libexec/rbenv-rehash`, on line 64.  
 
 Looks like it lives inside a function called `create_prototype_shim`.  Seems like we're on the right track!
 
-Now that we know where in the RBENV codebase the if-block comes from, let's look at the git history for that file.  I copy the filepath for `rbenv-rehash` and run `git blame` on it (docs on this command [here](https://archive.ph/iSiLS)):
+Now that we know where in the RBENV codebase the if-block comes from, let's look at the git history for that file.  I copy the filepath for `rbenv-rehash` and run `git blame` on it (docs on this command [here](https://web.archive.org/web/20230327142152/https://git-scm.com/docs/git-blame){:target="_blank" rel="noopener"}):
 
 <p style="text-align: center">
   <img src="/assets/images/git-blame-rbenv-rehash.png" width="70%" alt="output of the `git blame` command for the `libexec/rbenv-rehash` file">
@@ -53,7 +53,7 @@ Reconstructing the commit message (which was cut off due to length), we can see 
 When the ruby shim is invoked with a script, set RBENV_DIR to the script's dirname
 ```
 
-This definitely sounds like we're on the right track.  Let's also check [the issue link](https://github.com/rbenv/rbenv/pull/299):
+This definitely sounds like we're on the right track.  Let's also check [the issue link](https://github.com/rbenv/rbenv/pull/299){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/rbenv-issue-page.png" width="50%" alt="The newer Github issue related to the PR which introduced this if-block." style="border: 1px solid black; padding: 0.5em">
@@ -90,7 +90,7 @@ I'm taken to a search results page, which (among other things) indicates that Gi
   <img src="/assets/images/search-results-for-ruby-local-exec.png" width="70%" alt="Github Search results for the string 'ruby-local-exec'." style="border: 1px solid black; padding: 0.5em">
 </p>
 
-From there, I see a list of git commits, along with their commit messages.  The commit labeled "Add experimental `ruby-local-exec`" [looks promising](https://github.com/rbenv/rbenv/commit/1411fa5a1624ca5eeb5582897373c58a715fe2d2), so I click on that:
+From there, I see a list of git commits, along with their commit messages.  The commit labeled "Add experimental `ruby-local-exec`" [looks promising](https://github.com/rbenv/rbenv/commit/1411fa5a1624ca5eeb5582897373c58a715fe2d2){:target="_blank" rel="noopener"}, so I click on that:
 
 <p style="text-align: center">
   <img src="/assets/images/search-results-for-ruby-local-exec-2.png" width="70%" alt="Github Search results for the string 'ruby-local-exec'." style="border: 1px solid black; padding: 0.5em">
@@ -147,7 +147,7 @@ $ pwd
 
 And it *almost* looks like we're doing parameter expansion again, except this time the syntax uses parentheses instead of curly braces.  Is that what this is?
 
-I Google "bash difference between brackets and parentheses", and the first link I get is [this StackOverflow post](https://archive.ph/3IjOm) with this answer:
+I Google "bash difference between brackets and parentheses", and the first link I get is [this StackOverflow post](https://web.archive.org/web/20220703173254/https://unix.stackexchange.com/questions/267660/difference-between-parentheses-and-braces-in-terminal){:target="_blank" rel="noopener"} with this answer:
 
 <p style="text-align: center">
   <img src="/assets/images/parens-in-bash.png" width="70%" alt="What is the difference between curly braces and parentheses in bash?" style="border: 1px solid black; padding: 0.5em">
@@ -155,13 +155,13 @@ I Google "bash difference between brackets and parentheses", and the first link 
 
 OK, so "Parentheses cause the commands to be run in a subshell."  What's a subshell?
 
-I Google "what is a subshell bash" and get [this link](https://archive.ph/7mszR):
+I Google "what is a subshell bash" and get [this link](https://web.archive.org/web/20221209023619/https://en.wikiversity.org/wiki/Bash_programming/Subshells){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/what-are-subshells.png" width="70%" alt="What are subshells in bash?" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-So the code `cwd="$(pwd)"` creates a subshell, runs the `pwd` command inside that subshell, and stores the output of the command inside a new variable named `cwd`.  I subsequently learned that this is also known as ["command substitution"](https://www.gnu.org/software/bash/manual/html_node/Command-Substitution.html).
+So the code `cwd="$(pwd)"` creates a subshell, runs the `pwd` command inside that subshell, and stores the output of the command inside a new variable named `cwd`.  I subsequently learned that this is also known as ["command substitution"](https://web.archive.org/web/20230331064238/https://www.gnu.org/software/bash/manual/html_node/Command-Substitution.html){:target="_blank" rel="noopener"}.
 
 ```
 dirname="${1%/*}"
@@ -341,17 +341,17 @@ OK, so that's the answer to our first question, about what `ruby-local-exec` doe
 
 ### Why did the core team replace `ruby-local-exec`?
 
-For this, we'll have to search for discussions amongst the core team (in the form of comments and issues on Github pages) which relate to this file.  I don't remember [our original Github issue page](https://github.com/rbenv/rbenv/pull/299) containing any of those discussions, but I do remember that there was a link to a previous discussion:
+For this, we'll have to search for discussions amongst the core team (in the form of comments and issues on Github pages) which relate to this file.  I don't remember [our original Github issue page](https://github.com/rbenv/rbenv/pull/299){:target="_blank" rel="noopener"} containing any of those discussions, but I do remember that there was a link to a previous discussion:
 
 <p style="text-align: center">
   <img src="/assets/images/see-previous-discussion.png" width="70%" alt="Link to an earlier discussion about ruby-local-exec." style="border: 1px solid black; padding: 0.5em">
 </p>
 
-Clicking this link, I'm taken to [the page for an earlier PR](https://github.com/rbenv/rbenv/pull/298), one that was apparently closed.  The IDs of the 2 PRs are sequential (the IDs are 298 for the cloed one and 299 for the merged one), and their intent is identical, so it's a safe bet that the earlier one was closed in favor of the later one.
+Clicking this link, I'm taken to [the page for an earlier PR](https://github.com/rbenv/rbenv/pull/298){:target="_blank" rel="noopener"}, one that was apparently closed.  The IDs of the 2 PRs are sequential (the IDs are 298 for the cloed one and 299 for the merged one), and their intent is identical, so it's a safe bet that the earlier one was closed in favor of the later one.
 
 ### Why the switch from `.rbenv-version` to `.ruby-version`?
 
-This PR's discussion references a file named `.rbenv-version`, which is of course different from the `.ruby-version` file we've previously discussed.  My guess is that, at some point, the RBENV core team switched from a naming convention of `.rbenv-version` to `.ruby-version`, in order to be slightly more inter-operable with other Ruby version managers.  A quick Github search in the RBENV repo for `".rbenv-version" ".ruby-version"` (so that I can find PRs which contain both terms) yields 8 results, of which [this PR](https://github.com/rbenv/rbenv/pull/302) is one.  This quote in particular stands out among the comments:
+This PR's discussion references a file named `.rbenv-version`, which is of course different from the `.ruby-version` file we've previously discussed.  My guess is that, at some point, the RBENV core team switched from a naming convention of `.rbenv-version` to `.ruby-version`, in order to be slightly more inter-operable with other Ruby version managers.  A quick Github search in the RBENV repo for `".rbenv-version" ".ruby-version"` (so that I can find PRs which contain both terms) yields 8 results, of which [this PR](https://github.com/rbenv/rbenv/pull/302){:target="_blank" rel="noopener"} is one.  This quote in particular stands out among the comments:
 
 <p style="text-align: center">
   <img src="/assets/images/switch-rbenv-version-to-ruby-version.png" width="70%" alt="Comments discussing the support of the '.ruby-version' filename over '.rbenv-version'." style="border: 1px solid black; padding: 0.5em">
@@ -461,16 +461,16 @@ total 0
 
 This implies that the `foo/bar` file did not inherit its permissions from its parent directory, and that the ChatGPT statement was incorrect.
 
-For added confirmation, I Googled `do unix files inherit the permissions of a directory`, and got [this link](https://archive.ph/uQX9j#selection-1631.0-1645.117) as the first result:
+For added confirmation, I Googled `do unix files inherit the permissions of a directory`, and got [this link](https://web.archive.org/web/20230219234547/https://info.nrao.edu/computing/guide/file-access-and-archiving/unix-file-permissions){:target="_blank" rel="noopener"} as the first result:
 
 <p style="text-align: center">
-  <img src="/assets/images/file-permissions-inheritance-in-unix-1.png" width="70%" alt="Confirming that ChatGPT was not, in fact, correct about UNIX file permissions inheritance.">
+  <img src="/assets/images/file-permissions-inheritance-in-unix-1.png" width="90%" alt="Confirming that ChatGPT was not, in fact, correct about UNIX file permissions inheritance.">
 </p>
 
-This is confirmed by [this StackOverflow post](https://archive.ph/SFV8x):
+This is confirmed by [this StackOverflow post](https://web.archive.org/web/20230129173431/https://superuser.com/questions/264383/how-to-set-file-permissions-so-that-new-files-inherit-same-permissions){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
-  <img src="/assets/images/file-permissions-inheritance-in-unix-2.png" width="50%" alt="More confirmation that ChatGPT was not, in fact, correct about UNIX file permissions inheritance.">
+  <img src="/assets/images/file-permissions-inheritance-in-unix-2.png" width="80%" alt="More confirmation that ChatGPT was not, in fact, correct about UNIX file permissions inheritance.">
 </p>
 
 So lesson learned- we can't trust ChatGPT implicitly.
@@ -479,7 +479,7 @@ So lesson learned- we can't trust ChatGPT implicitly.
 
 Prior to this change, did RBENV use the Ruby version in the directory from which it was run, *regardless* of what the Ruby version was in the target directory?  To find out, roll back my RBENV and do an experiment.
 
-I `cd` into my RBENV **installation directory** (i.e. `~/.rbenv`), and verify that it is a git repository by running `ls -la` and searching for the `.git` hidden directory.  Then I get the commit SHA from [this link](https://github.com/rbenv/rbenv/pull/299), which I see is SHA `e0b8938fef05dd6d08322e113015c51e79c70291`.  I then run `git checkout e0b8938fef05dd6d08322e113015c51e79c70291` to roll back my installed version to the commit which introduced this change.
+I `cd` into my RBENV **installation directory** (i.e. `~/.rbenv`), and verify that it is a git repository by running `ls -la` and searching for the `.git` hidden directory.  Then I get the commit SHA from [this link](https://github.com/rbenv/rbenv/pull/299){:target="_blank" rel="noopener"}, which I see is SHA `e0b8938fef05dd6d08322e113015c51e79c70291`.  I then run `git checkout e0b8938fef05dd6d08322e113015c51e79c70291` to roll back my installed version to the commit which introduced this change.
 
 Next, in my scratch directory (`~/Workspace/OpenSource`), **I open a new terminal tab**.  This way I'm still in my same directory, but opening the new tab caused my `~/.zshrc` (where I invoke `rbenv init`) to be re-run.  This ensures I'm now using the version of RBENV that I just checked out (i.e. the version corresponding to SHA `e0b8938fef05dd6d08322e113015c51e79c70291`).
 
@@ -492,7 +492,7 @@ ruby_version = `rbenv version`
 puts "Ruby version: #{ruby_version}"
 ```
 
-The `\`` backtick symbols surrounding `rbenv version` mean that we will run the `rbenv version` terminal command, and store the results in the variable named `ruby_version`.  This process is sometimes called [shelling out](https://stackoverflow.com/a/28655406/2143275) to a sub-process.
+The `\`` backtick symbols surrounding `rbenv version` mean that we will run the `rbenv version` terminal command, and store the results in the variable named `ruby_version`.  This process is sometimes called [shelling out](https://stackoverflow.com/a/28655406/2143275){:target="_blank" rel="noopener"} to a sub-process.
 
 I then copy the above `script` file from `foo/` into `bar/`, so an identical file exists in each new directory.  When I run `./script` from within `foo/`, followed by `../bar/script` (also from within `foo/`), I see:
 
@@ -533,7 +533,7 @@ This time, the version numbers are the same- `2.7.5`!  Also, the source of the v
 
 ### Please don't do what I did here
 
-While searching Github for answers to the above, I actually came across [a post of mine](https://github.com/rbenv/rbenv/issues/1173) on this same repository from 2019, where I asked this exact same question!
+While searching Github for answers to the above, I actually came across [a post of mine](https://github.com/rbenv/rbenv/issues/1173){:target="_blank" rel="noopener"} on this same repository from 2019, where I asked this exact same question!
 
 I only vaguely remember posting this, but I remember the person who answered me was much nicer and more detailed in his answer than he needed to be.  In retrospect, I'm a bit embarrassed that I posted this question instead of searching through the git history.  If everyone did what I did, open-source maintainers would be overwhelmed and would never get anything done.  I definitely don't recommend that you do what I did- instead, learn from my mistakes.  Github is not a 2nd StackOverflow.
 

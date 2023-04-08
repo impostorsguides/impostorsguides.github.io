@@ -1,6 +1,6 @@
 Once again, let's start with the command's test file.  It's a good habit to get into.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/hooks.bats)
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/hooks.bats){:target="_blank" rel="noopener"}
 
 After the `bats` shebang and the `test_helper` load, the first spec is:
 
@@ -47,7 +47,7 @@ Lastly, we assert that the command executed successfully, and that the output co
 
 #### Sidebar: `create_hook()`
 
-That `create_hook` helper method comes from [the `test_helper` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash) that we loaded at the start of this test file, and it looks like this:
+That `create_hook` helper method comes from [the `test_helper` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash){:target="_blank" rel="noopener"} that we loaded at the start of this test file, and it looks like this:
 
 ```
 create_hook() {
@@ -117,7 +117,7 @@ So the `0` in `! -t 0` represents a file descriptor.  And this condition says "e
 
 That... sounds strange to me.  What kind of logic would we want to execute only if file descriptor 0 is *not* open?  And what are file descriptors again?  I've heard the term before, but I forget what they are.
 
-According to [RedHat](https://web.archive.org/web/20220405071108/https://www.redhat.com/sysadmin/more-stupid-bash-tricks):
+According to [RedHat](https://web.archive.org/web/20220405071108/https://www.redhat.com/sysadmin/more-stupid-bash-tricks){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-14mar2023-857am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -155,7 +155,7 @@ Unsure of how to get back to my terminal prompt, I hit "Ctrl-C":
   <img src="/assets/images/screenshot-14mar2023-901am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-This is the standard way to kill a process in a Unix terminal according to [this StackExchange post](https://web.archive.org/web/20220606161921/https://superuser.com/questions/103909/how-to-stop-a-process-in-terminal).
+This is the standard way to kill a process in a Unix terminal according to [this StackExchange post](https://web.archive.org/web/20220606161921/https://superuser.com/questions/103909/how-to-stop-a-process-in-terminal){:target="_blank" rel="noopener"}.
 
 I'm unsure if the `foo` file was created successfully, since I would think there's a chance that hitting "Ctrl-C" would cause the process to be terminated before it reached the file creation step.  I run an `ls`, and in fact I do see the file was created:
 
@@ -175,13 +175,13 @@ baz
 buzz
 ```
 
-Cool, so far so good.  I'm still a tad confused on why Ctrl-C didn't cause my experiment to go awry, so I Google "how to terminate cat command" and get [this link](https://web.archive.org/web/20220712202816/https://www.baeldung.com/linux/cat-writing-file) as the first result:
+Cool, so far so good.  I'm still a tad confused on why Ctrl-C didn't cause my experiment to go awry, so I Google "how to terminate cat command" and get [this link](https://web.archive.org/web/20220712202816/https://www.baeldung.com/linux/cat-writing-file){:target="_blank" rel="noopener"} as the first result:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-14mar2023-902am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-Ah OK, so technically we should have run "Ctrl-D" to terminate our terminal input, not Ctrl-C.  I Google "difference between ctrl-c and ctrl-d" and get [this link](https://web.archive.org/web/20220902171324/https://superuser.com/questions/169051/whats-the-difference-between-c-and-d-for-unix-mac-os-x-terminal) as the first result:
+Ah OK, so technically we should have run "Ctrl-D" to terminate our terminal input, not Ctrl-C.  I Google "difference between ctrl-c and ctrl-d" and get [this link](https://web.archive.org/web/20220902171324/https://superuser.com/questions/169051/whats-the-difference-between-c-and-d-for-unix-mac-os-x-terminal){:target="_blank" rel="noopener"} as the first result:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-14mar2023-903am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -195,7 +195,7 @@ Now that we know how `cat` works in general with respect to STDIN, I'm curious h
   <img src="/assets/images/screenshot-14mar2023-904am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-The 3rd result in the above screenshot is for the test file `test/version-name.bats`.  On [this line of code](https://github.com/rbenv/rbenv/blob/d604acb78aeba583be95f08d45eeae430372beb9/test/version-name.bats#L34), I see:
+The 3rd result in the above screenshot is for the test file `test/version-name.bats`.  On [this line of code](https://github.com/rbenv/rbenv/blob/d604acb78aeba583be95f08d45eeae430372beb9/test/version-name.bats#L34){:target="_blank" rel="noopener"}, I see:
 
 ```
 create_hook version-name hello.bash <<SH
@@ -241,7 +241,7 @@ So there's something about a heredoc that makes it work similarly to a pipe?
 
 (stopping here for the day; 45692 words)
 
-[According to the Linux Documentation Project](https://web.archive.org/web/20220824230428/https://tldp.org/LDP/abs/html/here-docs.html), a heredoc's job is to redirect its text to an interactive program (such as `cat`).  The link contains multiple examples of how this is done, such as:
+[According to the Linux Documentation Project](https://web.archive.org/web/20220824230428/https://tldp.org/LDP/abs/html/here-docs.html){:target="_blank" rel="noopener"}, a heredoc's job is to redirect its text to an interactive program (such as `cat`).  The link contains multiple examples of how this is done, such as:
 
 ```
 COMMAND <<InputComesFromHERE
@@ -283,7 +283,7 @@ baz
 END
 ```
 
-Here we create a function called `make_file`, which calls the `cat` command and sends its output to a new file, whose name is specified as the first argument.  We then call our new function, passing it a heredoc and the name of the new file.  I know, the syntax is weird and makes it look like the name of the new file is part of the heredoc text.  That's just the way the syntax is.  More info and examples [here](https://web.archive.org/web/20220926191746/https://linuxize.com/post/bash-heredoc/).
+Here we create a function called `make_file`, which calls the `cat` command and sends its output to a new file, whose name is specified as the first argument.  We then call our new function, passing it a heredoc and the name of the new file.  I know, the syntax is weird and makes it look like the name of the new file is part of the heredoc text.  That's just the way the syntax is.  More info and examples [here](https://web.archive.org/web/20220926191746/https://linuxize.com/post/bash-heredoc/){:target="_blank" rel="noopener"}.
 
 ```
 $ cat new_file.txt
@@ -319,7 +319,7 @@ We create a directory using the first arg to the function.
 We create a file within that directory using the 2nd arg to the function.
 If STDIN is not part of a terminal (i.e. if we're using a heredoc), we set the contents of the new file equal to the text from the heredoc.
 
-As a wrap-up, I take a look at [the PR](https://web.archive.org/web/20201029234547/https://github.com/rbenv/rbenv/pull/852) which introduced the `[ ! -t 0]` conditional check, and I see a conversation between Mislav and Jason which largely confirms our conclusions about why the code is structured the way that it is:
+As a wrap-up, I take a look at [the PR](https://web.archive.org/web/20201029234547/https://github.com/rbenv/rbenv/pull/852){:target="_blank" rel="noopener"} which introduced the `[ ! -t 0]` conditional check, and I see a conversation between Mislav and Jason which largely confirms our conclusions about why the code is structured the way that it is:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-14mar2023-910am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -364,7 +364,7 @@ Next test:
 }
 ```
 
-Here we create a hook for `rbenv exec` in the `rbenv.d` subdirectory of `RBENV_TEST_DIR`.  We also create a directory whose name is the value of the `$HOME` environment variable.  That value is set [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L19):
+Here we create a hook for `rbenv exec` in the `rbenv.d` subdirectory of `RBENV_TEST_DIR`.  We also create a directory whose name is the value of the `$HOME` environment variable.  That value is set [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L19){:target="_blank" rel="noopener"}:
 
 ```
 export HOME="${RBENV_TEST_DIR}/home"
@@ -403,7 +403,7 @@ QUESTION- I see here that we created `bright.sh`, and it appears to be a valid h
 
 Moving on to the command file itself, `libexec/rbenv-hooks`.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-hooks)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-hooks){:target="_blank" rel="noopener"}
 
 By now, this first block of code is standard boilerplate for us:
 
@@ -464,7 +464,7 @@ Checking for the presence of RBENV_NATIVE_EXT
   fi
 ```
 
-This block of code `echo`s an error message to STDERR and returns a non-zero result if the `RBENV_NATIVE_EXT` contains a value.  I wondered why this was needed, so I searched the Github repo for this variable name.  I found [the following PR](https://web.archive.org/web/20220722202956/https://github.com/rbenv/rbenv/pull/528):
+This block of code `echo`s an error message to STDERR and returns a non-zero result if the `RBENV_NATIVE_EXT` contains a value.  I wondered why this was needed, so I searched the Github repo for this variable name.  I found [the following PR](https://web.archive.org/web/20220722202956/https://github.com/rbenv/rbenv/pull/528){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-14mar2023-919am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -531,7 +531,7 @@ Next line of code:
 IFS=: hook_paths=($RBENV_HOOK_PATH)
 ```
 
-We've seen something similar before, when examining the `rbenv-commands` file.  Here we're setting a new variable called `hook_paths` equal to an array created from splitting the string stored in `$RBENV_HOOK_PATH`, using `:` as the delimiter.  This is called "word splitting" in bash; more info [here](https://web.archive.org/web/20220713204204/https://www.gnu.org/software/bash/manual/html_node/Word-Splitting.html).  We'll end up with an array of individual directories, which we'll iterate over in the next block.  That next block is:
+We've seen something similar before, when examining the `rbenv-commands` file.  Here we're setting a new variable called `hook_paths` equal to an array created from splitting the string stored in `$RBENV_HOOK_PATH`, using `:` as the delimiter.  This is called "word splitting" in bash; more info [here](https://web.archive.org/web/20220713204204/https://www.gnu.org/software/bash/manual/html_node/Word-Splitting.html){:target="_blank" rel="noopener"}.  We'll end up with an array of individual directories, which we'll iterate over in the next block.  That next block is:
 
 ```
 shopt -s nullglob
@@ -543,7 +543,7 @@ done
 shopt -u nullglob
 ```
 
-We've seen `shopt -s nullglob` before, but as a reminder, [this StackExchange link](https://archive.ph/pAHiZ) says this command sets a shell option so that:
+We've seen `shopt -s nullglob` before, but as a reminder, [this StackExchange link](https://archive.ph/pAHiZ){:target="_blank" rel="noopener"} says this command sets a shell option so that:
 
 Filename globbing patterns that don't match any filenames are simply expanded to nothing rather than remaining unexpanded.
 
@@ -583,7 +583,7 @@ But I still don't understand what hooks *are*, or what they *do*.  I need an exa
 (stopping here for the day; 47818 words)
 
 
-The trouble is, there's no documentation on how hooks are used, and (so far, at least), the only command we've seen which takes advantage of hooks [simply `source`s the hook files related to that command](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-exec#L36):
+The trouble is, there's no documentation on how hooks are used, and (so far, at least), the only command we've seen which takes advantage of hooks [simply `source`s the hook files related to that command](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-exec#L36){:target="_blank" rel="noopener"}:
 
 ```
 IFS=$'\n' scripts=(`rbenv-hooks exec`)
@@ -608,7 +608,7 @@ All of this is just to say, I will try not to get my hopes up.  If I fail to fin
 
 But no one said this would be easy.  The key will be doing this in a methodical, systematic way.  The goal is to prevent myself from either a) missing some issues because I accidentally skipped over them, or b) re-reading issues that I've already eliminated.
 
-Reading through past Github issues is a difficult process to derive learnings and new knowledge from.  When reading code, if you don't understand a certain piece of syntax, you can always post a question on StackOverflow.  But there's no StackOverflow, Q&A site for questions like "Hey, what did you mean in your Github issue when [you said](https://github.com/rbenv/rbenv/issues/38) `...we will be supporting system wide installs via homebrew...`?"
+Reading through past Github issues is a difficult process to derive learnings and new knowledge from.  When reading code, if you don't understand a certain piece of syntax, you can always post a question on StackOverflow.  But there's no StackOverflow, Q&A site for questions like "Hey, what did you mean in your Github issue when [you said](https://github.com/rbenv/rbenv/issues/38){:target="_blank" rel="noopener"} `...we will be supporting system wide installs via homebrew...`?"
 
 I mean, to a certain extent, that Q&A site *is* Github itself, but that's not Github's primary intent.  I get the sense that the questions and answers posted on StackOverflow are meant to be just as relevant 10 years from now as they are today.  Also, SO is meant more for discrete questions with discrete answers.  In contrast, the discussions on Github are just that- discussions.  There's much more back-and-forth between contributors... (NOTE- how to finish this train of thought?)
 
@@ -616,7 +616,7 @@ At any rate, it's highly unlikely that anyone would reply to a question I posted
 
 Let's start with the 2 open issues.
 
-[The very first issue](https://github.com/rbenv/rbenv/issues/865), in fact, tangentially mentions the `rbenv-env` plugin.  Googling for "rbenv-env", I find [this Github repo](https://github.com/ianheggie/rbenv-env).  Does this codebase contain logic which could illuminate how hooks are used?
+[The very first issue](https://github.com/rbenv/rbenv/issues/865){:target="_blank" rel="noopener"}, in fact, tangentially mentions the `rbenv-env` plugin.  Googling for "rbenv-env", I find [this Github repo](https://github.com/ianheggie/rbenv-env){:target="_blank" rel="noopener"}.  Does this codebase contain logic which could illuminate how hooks are used?
 
 The README on the repo's homepage shows a pretty straightforward installation process: just run this one line of code:
 
@@ -689,7 +689,7 @@ While thinking about `rbenv hooks` I realized there's a common stumbling block w
 
 Think about some of the basic questions I've encountered and answered so far, over the course of this project.  For example: "I don't know what the syntax `[ ... ]` is in `bash`."  That's a question I had at the beginning of this project.  And it was relatively straightforward to answer, just by Googling "square brackets bash".  I get my answer from StackOverflow, I know a little bit more about bash than I did a minute ago, and it's now relatively easier to read the script in front of me.
 
-But what about when the question is not so straightforward?  What about when I have multiple questions, and they're all unrelated to each other?  What about when I have one question which depends on the answer to another question, for example the questions I had about the commands passed to `awk` when I was examining the `rbenv-help` command?  In that case, I wanted to know a) was I right in thinking that these are 3 separate commands being passed to `awk`, b) if so, what each of those commands were doing?  In that case, I was also confused about c) what the `END` syntax meant, and d) where the values for local variables like `usage` and `summary` were being initialized (i.e. what is going on [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L66) with the `usage = usage...` syntax?).
+But what about when the question is not so straightforward?  What about when I have multiple questions, and they're all unrelated to each other?  What about when I have one question which depends on the answer to another question, for example the questions I had about the commands passed to `awk` when I was examining the `rbenv-help` command?  In that case, I wanted to know a) was I right in thinking that these are 3 separate commands being passed to `awk`, b) if so, what each of those commands were doing?  In that case, I was also confused about c) what the `END` syntax meant, and d) where the values for local variables like `usage` and `summary` were being initialized (i.e. what is going on [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L66){:target="_blank" rel="noopener"} with the `usage = usage...` syntax?).
 
 In a way, it's similar to how cryptography works.  Stay with me, here.  It's relatively easy, given two prime numbers, to multiply them together and get a result.  But if all you have is the result, and you want the two prime numbers, that's a much more difficult problem (intentionally so, in the case of crypto).  2nd-order confusion is like that.  If you're looking at a non-trivial piece of code and don't know where to begin understanding it, one reason might be because you have multiple 1st-order questions and the confusion around each of them is compounding exponentially, leaving you with no idea where to start Googling.
 

@@ -1,6 +1,6 @@
 Before reading the code for each command, we'll start by looking at the command's tests.  In the spirit of ["tests as executable documentation"](https://web.archive.org/web/20230321145910/https://subscription.packtpub.com/book/application-development/9781788836111/1/ch01lvl1sec13/executable-documentation){:target="_blank" rel="noopener"}, reading the tests first should give us a sense of what the expected behavior is.  The headers for the `Tests` and `Code` section are also links to the code we'll be looking at.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats)
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats){:target="_blank" rel="noopener"}
 
 The first line of code is:
 
@@ -8,11 +8,11 @@ The first line of code is:
 #!/usr/bin/env bats
 ```
 
-This is a shebang, but it's not a `bash` shebang.  Instead, it's a `bats` shebang.  [`bats` is a test-runner program](https://github.com/sstephenson/bats) that Sam Stephenson (the original author of RBENV) wrote, and it's used here as RBENV's test framework.  But it's not RBENV-specific; you could technically use it to test any shell script.
+This is a shebang, but it's not a `bash` shebang.  Instead, it's a `bats` shebang.  [`bats` is a test-runner program](https://github.com/sstephenson/bats){:target="_blank" rel="noopener"} that Sam Stephenson (the original author of RBENV) wrote, and it's used here as RBENV's test framework.  But it's not RBENV-specific; you could technically use it to test any shell script.
 
 ### Experiment: running the BATS tests
 
-To run these tests, we'll need to install `bats` first.  The installation instructions are [here](https://github.com/sstephenson/bats#installing-bats-from-source).  Once that's done, we can navigate to the home directory of our cloned RBENV codebase, and run the following:
+To run these tests, we'll need to install `bats` first.  The installation instructions are [here](https://github.com/sstephenson/bats#installing-bats-from-source){:target="_blank" rel="noopener"}.  Once that's done, we can navigate to the home directory of our cloned RBENV codebase, and run the following:
 
 ```
 $ bats ./test/rbenv.bats
@@ -44,13 +44,13 @@ Next line of code:
 load test_helper
 ```
 
-This `load` method comes from [this line of code](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test#L32) in `bats`.  Here we're loading a helper file called `test_helper`, which lives [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash).
+This `load` method comes from [this line of code](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test#L32){:target="_blank" rel="noopener"} in `bats`.  Here we're loading a helper file called `test_helper`, which lives [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash){:target="_blank" rel="noopener"}.
 
 Loading `test_helper` does lots of things for us that help our tests run as expected, such as:
 
-- [updating the value of `PATH`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L22) to include the `rbenv` commands that we want to test,
-- `export`ing the environment variables that we'll need, [such as `RBENV_ROOT`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L18)
-- [giving us access to helper functions](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L45) that let us run those commands and assert that the results succeeded or failed.
+- [updating the value of `PATH`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L22){:target="_blank" rel="noopener"} to include the `rbenv` commands that we want to test,
+- `export`ing the environment variables that we'll need, [such as `RBENV_ROOT`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L18){:target="_blank" rel="noopener"}
+- [giving us access to helper functions](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L45){:target="_blank" rel="noopener"} that let us run those commands and assert that the results succeeded or failed.
 
 The next block of code is also our first test:
 
@@ -64,9 +64,9 @@ The next block of code is also our first test:
 
 ### Annotations and Regexes
 
-The first thing I notice is the `@test` snippet.  I'm not sure what Sam Stephenson would call this, but I would call it an "annotation", because I have a bit of experience with the Java language and the Java community [uses similar syntax](https://web.archive.org/web/20230309020001/https://en.wikipedia.org/wiki/Java_annotation), which they also refer to as annotations.
+The first thing I notice is the `@test` snippet.  I'm not sure what Sam Stephenson would call this, but I would call it an "annotation", because I have a bit of experience with the Java language and the Java community [uses similar syntax](https://web.archive.org/web/20230309020001/https://en.wikipedia.org/wiki/Java_annotation){:target="_blank" rel="noopener"}, which they also refer to as annotations.
 
-Annotations are used as metadata, to help BATS identify which code represents tests that should be run.  If we search the BATS codebase for the string `@test` and look through the results, eventually we find [this line of code](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-preprocess#L34).  This is a regular expression (or a regex for short).  If you aren't familiar with regexes, they're a very powerful tool for finding and parsing strings.  See [here](https://web.archive.org/web/20221024181745/https://linuxtechlab.com/bash-scripting-learn-use-regex-basics/) for more information.
+Annotations are used as metadata, to help BATS identify which code represents tests that should be run.  If we search the BATS codebase for the string `@test` and look through the results, eventually we find [this line of code](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-preprocess#L34){:target="_blank" rel="noopener"}.  This is a regular expression (or a regex for short).  If you aren't familiar with regexes, they're a very powerful tool for finding and parsing strings.  See [here](https://web.archive.org/web/20221024181745/https://linuxtechlab.com/bash-scripting-learn-use-regex-basics/){:target="_blank" rel="noopener"} for more information.
 
 This isn't a walk-through of the BATS codebase so I want to keep this part short, but essentially what's happening here is we're providing a pattern for `bash` to use when searching for lines of code.  `bash` will read each line of code in a test file (for example, `test/rbenv.bats`) and see if it matches the pattern.  If it does, we know we've found a test.  The pattern includes the string `@test`, which is why each of the tests in our file start with `@test`.
 
@@ -74,7 +74,7 @@ This isn't a walk-through of the BATS codebase so I want to keep this part short
 
 Back to our test block.  Here we're verifying that an attempt to run `rbenv` without any arguments will fail:
 
- - We use `test_helper`'s [`run` command](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test#L50) to execute the `rbenv` command without any arguments or flags.
+ - We use `test_helper`'s [`run` command](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test#L50){:target="_blank" rel="noopener"} to execute the `rbenv` command without any arguments or flags.
  - Then we call `test_helper`'s `assert_failure` function, which checks to make sure the last command which was run (i.e. `run rbenv`) had a non-zero exit code.
  - If this is true (i.e. if something went wrong), the test passes.  If not, the test fails.
 
@@ -141,7 +141,7 @@ $ bats foo.bats
 
 Hmm I'm missing the `assert_success` command, which I know exists because we can see it further down in `tests/rbenv.bats`.  Where is that method in the codebase?
 
-I search the `bats` Github repo, thinking it would be there, but it's not.  I then search the RBENV repo, and I find it [here](https://github.com/rbenv/rbenv/blob/117a38157537eeb59d73bf8a958363688fdf6383/test/test_helper.bash), inside `test_helper.bash`.
+I search the `bats` Github repo, thinking it would be there, but it's not.  I then search the RBENV repo, and I find it [here](https://github.com/rbenv/rbenv/blob/117a38157537eeb59d73bf8a958363688fdf6383/test/test_helper.bash){:target="_blank" rel="noopener"}, inside `test_helper.bash`.
 
 OK, so we need to load `test_helper`, just like the other tests do.  I update the test file to look like the following:
 
@@ -363,7 +363,7 @@ Next test:
 }
 ```
 
-Here we're testing the same [block of logic](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L61) as the last test, but this time we're testing a different edge case.
+Here we're testing the same [block of logic](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L61){:target="_blank" rel="noopener"} as the last test, but this time we're testing a different edge case.
 
 Inside that block's `else` branch, we try to `cd` into the directory specified by `RBENV_DIR`.  As of this point, the value of `RBENV_DIR` is not known to be a valid directory, so this may or may not work.
 
@@ -547,9 +547,9 @@ Here we do the following:
 
 This test covers the block of code [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81-L91){:target="_blank" rel="noopener"}.  We can see that the order of the above directories matches the order in which they're added to `RBENV_HOOK_PATH` by the code:
 
- - [This line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81) adds `${RBENV_ROOT}/rbenv.d` to the front of `RBENV_HOOK_PATH`.  It would also add any previously-set value of `RBENV_HOOK_PATH` before `${RBENV_ROOT}/rbenv.d` if we had previously set such a value, but we didn't in this test.
- - [This block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L82-L85) adds `${BATS_TEST_DIRNAME%/*}/rbenv.d` to `RBENV_HOOK_PATH`.
- - Lastly, [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L86) adds `/usr/local/etc/rbenv.d`, `/etc/rbenv.d`, and `/usr/lib/rbenv/hooks` to `RBENV_HOOK_PATH`.
+ - [This line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81){:target="_blank" rel="noopener"} adds `${RBENV_ROOT}/rbenv.d` to the front of `RBENV_HOOK_PATH`.  It would also add any previously-set value of `RBENV_HOOK_PATH` before `${RBENV_ROOT}/rbenv.d` if we had previously set such a value, but we didn't in this test.
+ - [This block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L82-L85){:target="_blank" rel="noopener"} adds `${BATS_TEST_DIRNAME%/*}/rbenv.d` to `RBENV_HOOK_PATH`.
+ - Lastly, [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L86){:target="_blank" rel="noopener"} adds `/usr/local/etc/rbenv.d`, `/etc/rbenv.d`, and `/usr/lib/rbenv/hooks` to `RBENV_HOOK_PATH`.
 
 That's all for the `rbenv` command's tests.  Let's move onto the code.
 
@@ -709,7 +709,7 @@ The article mentions that, by setting an environment variable called `PS4` equal
 
 So what is PS4, and what does it do?
 
-I try `man PS4` but get no answer.  I Google "PS4 bash", and I open up [the first result I see](https://web.archive.org/web/20230304080135/https://www.thegeekstuff.com/2008/09/bash-shell-take-control-of-ps1-ps2-ps3-ps4-and-prompt_command/).  It mentions not only PS4, but also PS1, PS2, and PS3.  I scroll down to the section on PS4 and I see:
+I try `man PS4` but get no answer.  I Google "PS4 bash", and I open up [the first result I see](https://web.archive.org/web/20230304080135/https://www.thegeekstuff.com/2008/09/bash-shell-take-control-of-ps1-ps2-ps3-ps4-and-prompt_command/){:target="_blank" rel="noopener"}.  It mentions not only PS4, but also PS1, PS2, and PS3.  I scroll down to the section on PS4 and I see:
 
 > PS4 – Used by "set -x" to prefix tracing output
 >
@@ -862,7 +862,7 @@ Although we haven't yet reached these lines of code and don't yet know what they
 
 ### Aside- what is `xtrace`?
 
-I kept noticing the phrase `xtrace` being thrown around on some of the links I encountered while trying to solve the above.  I Googled "what is xtrace bash", and found [this link](https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_02_03.html), which says:
+I kept noticing the phrase `xtrace` being thrown around on some of the links I encountered while trying to solve the above.  I Googled "what is xtrace bash", and found [this link](https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_02_03.html){:target="_blank" rel="noopener"}, which says:
 
 <p style="text-align: center">
   <img src="/assets/images/stackoverflow-answer-12mar2023-138pm.png" width="100%" style="border: 1px solid black; padding: 0.5em" alt="StackOverflow answer about `xtrace`">
@@ -1013,7 +1013,7 @@ I like that this person explains how it's possible (but clunky) to use `>` to re
 
 So what exactly is the output that we're reirecting to `stderr`?  Let's move on to the code inside the curlies.
 
-First question- what does `$#` evaluate to?  According to [StackOverflow](https://web.archive.org/web/20211120050118/https://askubuntu.com/questions/939620/what-does-mean-in-bash):
+First question- what does `$#` evaluate to?  According to [StackOverflow](https://web.archive.org/web/20211120050118/https://askubuntu.com/questions/939620/what-does-mean-in-bash){:target="_blank" rel="noopener"}:
 
 > `echo $#` outputs the number of positional parameters of your script.
 
@@ -1255,7 +1255,7 @@ This actually answers my first three questions:
     - The link mentions that this could be useful if you have a script which shares the same name as a builtin command, and which is located in one of your $PATH directories.
     - Normally, the shell would check for builtin commands first, and only search in $PATH if no builtins were found.
     - You can ensure your shell won't find any builtin command by disabling the builtin using the `enable` command.
-    - [Here's a link explaining more](https://archive.ph/C6kZc), from O'Reilly's Bash Cookbook.
+    - [Here's a link explaining more](https://web.archive.org/web/20230407091137/https://www.oreilly.com/library/view/bash-cookbook/0596526784/ch01s09.html){:target="_blank" rel="noopener"}, from O'Reilly's Bash Cookbook.
 
  - What does the `-f` flag do?
     - You would pass this flag if you want to change the source of your new command from its original source (the builtin) to a file whose path you specify after the `-f` flag.
@@ -1281,7 +1281,7 @@ TODO- add experiment on using `/dev/null`.
 
 Final question: what kind of file extension is `.dylib`, and what does that imply about the contents of the file?
 
-I Googled "what is dylib extension" and read a few different results ([here](https://web.archive.org/web/20211023152003/https://fileinfo.com/extension/dylib) and [here](https://web.archive.org/web/20211023142331/https://www.lifewire.com/dylib-file-2620908), in particular).  They tell me that:
+I Googled "what is dylib extension" and read a few different results ([here](https://web.archive.org/web/20211023152003/https://fileinfo.com/extension/dylib){:target="_blank" rel="noopener"} and [here](https://web.archive.org/web/20211023142331/https://www.lifewire.com/dylib-file-2620908){:target="_blank" rel="noopener"}, in particular).  They tell me that:
  - "dylib" is a contraction of "dynamic library", and that this means it's a library of code which can be loaded on-the-fly (aka "dynamically").
  - Loading things dynamically (as opposed to eagerly, when the shell or the application which relies on it is first booted up) means you can wait until you actually need the library before loading it.
  - This, in turn, means you're not taking up memory with code that you're not actually using yet.
@@ -1318,7 +1318,7 @@ DESCRIPTION
 
 The phrase "print the resolved path" is confusing to me.  In what sense is the path that the user provides "resolved"?  What would "unresolved" mean?
 
-I search for "what is realpath unix" and find [the internet equivalent of the same man page](https://web.archive.org/web/20220608150749/https://man7.org/linux/man-pages/man1/realpath.1.html).  But then I find [the `man(3)` page](https://web.archive.org/web/20220629161112/https://man7.org/linux/man-pages/man3/realpath.3.html) for a *function* named `realpath`.  Among other things, it says:
+I search for "what is realpath unix" and find [the internet equivalent of the same man page](https://web.archive.org/web/20220608150749/https://man7.org/linux/man-pages/man1/realpath.1.html){:target="_blank" rel="noopener"}.  But then I find [the `man(3)` page](https://web.archive.org/web/20220629161112/https://man7.org/linux/man-pages/man3/realpath.3.html){:target="_blank" rel="noopener"} for a *function* named `realpath`.  Among other things, it says:
 
 > realpath() expands all symbolic links and resolves references to `/./`, `/../` and extra `/` characters in the null-terminated string named by `path` to produce a canonicalized absolute pathname.
 
@@ -1378,7 +1378,7 @@ This output is organized into columns:
  - Column #4 is the line number in the file, and
  - Column #5 is the actual line of code itself.
 
-The code I'm trying to research is on [line 23 of the file](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv#L23), so I scan down to the right line number based on the values in column #4, and I see the following:
+The code I'm trying to research is on [line 23 of the file](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv#L23){:target="_blank" rel="noopener"}, so I scan down to the right line number based on the values in column #4, and I see the following:
 
 ```
 6e02b944 (Mislav Marohnić   2015-10-26 15:53:20 +0100  23) if enable -f "${BASH_SOURCE%/*}"/../libexec/rbenv-realpath.dylib realpath 2>/dev/null; then
@@ -1636,7 +1636,7 @@ Next line of code:
 
 So we're setting a variable called `READLINK` equal to...something.
 
-I decide to look up the commit which introduced this line of code.  I do my `git blame / git checkout` dance until [I find it in Github](https://github.com/rbenv/rbenv/commit/81bb14e181c556e599e20ca6fdc86fdb690b8995).  The commit message reads:
+I decide to look up the commit which introduced this line of code.  I do my `git blame / git checkout` dance until [I find it in Github](https://github.com/rbenv/rbenv/commit/81bb14e181c556e599e20ca6fdc86fdb690b8995){:target="_blank" rel="noopener"}.  The commit message reads:
 
 > `readlink` comes from GNU coreutils.  On systems without it, rbenv used to spin out of control when it didn't have `readlink` or `greadlink` available because it would re-exec the frontend script over and over instead of the worker script in libexec.
 
@@ -2741,7 +2741,7 @@ In an earlier `for` loop, we updated the `PATH` variable to include any executab
 
 Here, we appear to be telling RBENV which hooks the user has installed.  This is not so that we can run that hook's commands, but so that a hook's logic will be executed when we run an *RBENV* command.  By adding a path to `RBENV_HOOK_PATHS`, we give an RBENV command another directory to search through when that command executes its hooks.
 
-We're skipping ahead a bit, but [here is an example](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L12) of that process in action.  The `version-name` command calls `rbenv-hooks version-name`, which internally relies on the `RBENV_HOOKS_PATH` variable to print out a list of hooks for (in this case) the `version-name` command.  For each of those paths, we look for any `.bash` scripts, and then we run `source` on each of those scripts, so that those scripts are executed in our current shell environment.
+We're skipping ahead a bit, but [here is an example](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L12){:target="_blank" rel="noopener"} of that process in action.  The `version-name` command calls `rbenv-hooks version-name`, which internally relies on the `RBENV_HOOKS_PATH` variable to print out a list of hooks for (in this case) the `version-name` command.  For each of those paths, we look for any `.bash` scripts, and then we run `source` on each of those scripts, so that those scripts are executed in our current shell environment.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
@@ -2754,7 +2754,7 @@ export RBENV_HOOK_PATH
 
 This syntax is definitely parameter expansion, but I haven't seen the `#:` syntax before.  I don't know if `#:` is a specific command in parameter expansion (like `:+` or similar), or if `:` is a character that we're performing the `#` operation on.
 
-I search [the GNU docs](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html) for `#:`, since it looks like a specific kind of expansion pattern, but I don't see those two characters used together anywhere in the docs.  Maybe it's just the `#` pattern we've seen before, for instance when we saw `parameter#/*`?  In that case, we were removing any leading `/` character from the start of the parameter.  Maybe here we're doing the same, but with the `:` character instead?
+I search [the GNU docs](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"} for `#:`, since it looks like a specific kind of expansion pattern, but I don't see those two characters used together anywhere in the docs.  Maybe it's just the `#` pattern we've seen before, for instance when we saw `parameter#/*`?  In that case, we were removing any leading `/` character from the start of the parameter.  Maybe here we're doing the same, but with the `:` character instead?
 
 As an experiment, I update my test script to read as follows:
 

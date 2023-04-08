@@ -1,6 +1,6 @@
 As per usual, we'll look at the tests 1st and the code 2nd.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/completions.bats)
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/completions.bats){:target="_blank" rel="noopener"}
 
 After the `bats` shebang and the loading of `test_helper`, the first block of code is:
 
@@ -26,7 +26,7 @@ Next block of code is our first test:
 }
 ```
 
-This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-completions#L21).  We make a simple command file containing only the `bash` shebang and an `echo` statement.  Because the file doesn't include any completion comments, when the `completions` command is passed the name of our new file, it should only output the standard completions which are common to all files.  When we run the command, we assert that this is exactly what happens.
+This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-completions#L21){:target="_blank" rel="noopener"}.  We make a simple command file containing only the `bash` shebang and an `echo` statement.  Because the file doesn't include any completion comments, when the `completions` command is passed the name of our new file, it should only output the standard completions which are common to all files.  When we run the command, we assert that this is exactly what happens.
 
 Next test:
 
@@ -48,7 +48,7 @@ OUT
 }
 ```
 
-This test covers [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-completions#L23-L26).  We once again create a fake command named “hello”, this time containing the comment `# Provide rbenv completions` as well as some logic to conditionally print “hello” when the command is passed the “--complete” flag.  If that flag is not passed to our fake command, the exit code will be non-zero and the test will fail.  We then pass the name of the “hello” command to `rbenv completions`, and assert that a) the exit code is 0, and b) the printed output contains both the “hello” string and the “--help” completion that all commands have.
+This test covers [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-completions#L23-L26){:target="_blank" rel="noopener"}.  We once again create a fake command named “hello”, this time containing the comment `# Provide rbenv completions` as well as some logic to conditionally print “hello” when the command is passed the “--complete” flag.  If that flag is not passed to our fake command, the exit code will be non-zero and the test will fail.  We then pass the name of the “hello” command to `rbenv completions`, and assert that a) the exit code is 0, and b) the printed output contains both the “hello” string and the “--help” completion that all commands have.
 
 This test implies that, even though we don't explicitly pass the “--complete” flag to “rbenv completions hello”, something in the code still passes this flag anyway.  That logic is part of `rbenv completions`.  When the command file we create includes the comment `# Provide rbenv completions`, then running `rbenv completions` for that command causes the `completions` file to run that command and also pass it the “--complete” flag.
 
@@ -80,7 +80,7 @@ Now that we've finished the tests, let's move on to the code.
 
 (stopping here for the day; 95768 words)
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-completions)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-completions){:target="_blank" rel="noopener"}
 
 First few lines of code:
 
@@ -155,12 +155,12 @@ string or pattern to search for (i.e. `"^([#%]|--|//) provide rbenv completions"
 Here the `^` character means that the following characters should begin the string
 The `(...|...|...)` pattern means that we're looking for one of 3 possible patterns to start the string (the `|` syntax means “or”).  So “(#|-|/)” means “# or - or /”.
 The syntax [...] means “any one of the characters inside the square brackets.  So `[#%]` means “either # or %”.
-Source [here](https://tldp.org/LDP/abs/html/x17129.html).
+Source [here](https://tldp.org/LDP/abs/html/x17129.html){:target="_blank" rel="noopener"}.
 I'm guessing that we're using this particular regex, at the start of the string, because these are the various ways that a comment can be started in bash, zsh, fish, and any other shells that rbenv supports.
 The filepath that we're searching for this string.  In this case, it's the filepath we stored in `$COMMAND_PATH`.
 Lastly, we send the results to `/dev/null`.  We don't actually care what the results are, only whether or not there was a match.
 
-If there was a match, then we shift off the first argument from our list of arguments and run the command itself, passing it the `--complete` option that we've encountered before, for example [here](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-commands#L9).  This displays the possible completions just for that one command, then exits.
+If there was a match, then we shift off the first argument from our list of arguments and run the command itself, passing it the `--complete` option that we've encountered before, for example [here](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-commands#L9){:target="_blank" rel="noopener"}.  This displays the possible completions just for that one command, then exits.
 
 TODO- do an experiment which tests my theory about the above regex.
 

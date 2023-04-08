@@ -1,6 +1,6 @@
 As usual, tests first.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-file-read.bats)
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-file-read.bats){:target="_blank" rel="noopener"}
 
 After the `bats` shebang and the loading of `test_helper`, the first block of code is:
 
@@ -11,7 +11,7 @@ setup() {
 }
 ```
 
-This just makes a Ruby project directory and navigates into it.  By the way, we've seen this `setup` function before in other test files.  Apparently [this is a special `bats` function](https://github.com/sstephenson/bats#setup-and-teardown-pre--and-post-test-hooks), which gets called before each test case.  You can also define a `teardown` hook method, which gets called after each test case, though that isn't done in this specific test file.
+This just makes a Ruby project directory and navigates into it.  By the way, we've seen this `setup` function before in other test files.  Apparently [this is a special `bats` function](https://github.com/sstephenson/bats#setup-and-teardown-pre--and-post-test-hooks){:target="_blank" rel="noopener"}, which gets called before each test case.  You can also define a `teardown` hook method, which gets called after each test case, though that isn't done in this specific test file.
 
 Next block of code:
 
@@ -169,7 +169,7 @@ Here we assert that strings which would normally cause directory traversal to ha
 
 This test is a bit unexpected for me, since I would have assumed the only logic needed for this command would be related to trimming whitespace and extraneous characters or lines.  The only way I would expect a string like ".." to cause directory traversal in this case is if `version-file-read` takes the input argument and attempts to pass it to a command like `cd`.  I decide to look up the issue and/or commit which introduced this test.
 
-I find [this issue](https://github.com/rbenv/rbenv/issues/977) in the Github history, which describes a security vulnerability reported by another contributor.  It looks like an earlier version of RBENV included the possibility of using a version of Ruby other than that intended by the user, if a malicious person was somehow able to modify the victim's RBENV version file.  A description of the vulnerability from the issue:
+I find [this issue](https://github.com/rbenv/rbenv/issues/977){:target="_blank" rel="noopener"} in the Github history, which describes a security vulnerability reported by another contributor.  It looks like an earlier version of RBENV included the possibility of using a version of Ruby other than that intended by the user, if a malicious person was somehow able to modify the victim's RBENV version file.  A description of the vulnerability from the issue:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-17mar23-1055am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -193,7 +193,7 @@ This test was introduced in the same PR that introduced the previous test.  It a
 
 Onto the file itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-file-read)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-file-read){:target="_blank" rel="noopener"}
 
 The usual first block of code:
 
@@ -230,7 +230,7 @@ fi
 
 (stopping here for the day; 72302 words)
 
-First we test if the value stored in `VERSION_FILE` actually represents an existing file (this is what the `-s` flag does).  If so, we modify the value of the internal field separator to be its original value, plus something extra.  I was initially confused about what that "something extra" was, specifically the dollar sign followed by single-quotes.  I was under the impression that dollar signs were used for parameter or variable expansion, but that double-quotes were required for this (as well as either a variable or curly braces / parentheses).  I Googled "bash dollar sign plus single quote" and [this StackOverflow answer](https://web.archive.org/web/20220929180039/https://stackoverflow.com/questions/11966312/how-does-the-leading-dollar-sign-affect-single-quotes-in-bash) comes up as the first search result.  One of the comments underneath the question points to [a page of bash documentation](https://web.archive.org/web/20220614132338/https://www.gnu.org/software/bash/manual/html_node/ANSI_002dC-Quoting.html), and that page contains the following info:
+First we test if the value stored in `VERSION_FILE` actually represents an existing file (this is what the `-s` flag does).  If so, we modify the value of the internal field separator to be its original value, plus something extra.  I was initially confused about what that "something extra" was, specifically the dollar sign followed by single-quotes.  I was under the impression that dollar signs were used for parameter or variable expansion, but that double-quotes were required for this (as well as either a variable or curly braces / parentheses).  I Googled "bash dollar sign plus single quote" and [this StackOverflow answer](https://web.archive.org/web/20220929180039/https://stackoverflow.com/questions/11966312/how-does-the-leading-dollar-sign-affect-single-quotes-in-bash){:target="_blank" rel="noopener"} comes up as the first search result.  One of the comments underneath the question points to [a page of bash documentation](https://web.archive.org/web/20220614132338/https://www.gnu.org/software/bash/manual/html_node/ANSI_002dC-Quoting.html){:target="_blank" rel="noopener"}, and that page contains the following info:
 
 Words of the form $'string' are treated specially. The word expands to string, with backslash-escaped characters replaced as specified by the ANSI C standard. Backslash escape sequences, if present, are decoded as follows:
 
@@ -259,7 +259,7 @@ Here we read up to the first 1024 characters of the file.  According to `help re
 >
 > If the -r option is given, this signifies `raw' input, and backslash escaping is disabled.
 
-The `-d ""` syntax is a bit weird, and it took a lot of Googling before I could get my head around it.  What eventually worked was Googling `"read -d" plus IFS bash`, after which I found [this link](https://archive.ph/jWSEH) as the 2nd result:
+The `-d ""` syntax is a bit weird, and it took a lot of Googling before I could get my head around it.  What eventually worked was Googling `"read -d" plus IFS bash`, after which I found [this link](https://archive.ph/jWSEH){:target="_blank" rel="noopener"} as the 2nd result:
 
 > With `-d ''` it sets the delimiter to `'\0'` and makes `read` read the whole input in one instance, and not just a single line. `IFS=$'\n'` sets newline (`\n`) as the separator for each value. `__` is optional and gathers any extra input besides the first 3 lines.
 
@@ -267,7 +267,7 @@ I interpret this to mean that we read the whole contents of "$VERSION_FILE", not
 
 The "_" at the end is used to store any subsequent variables read by the `read` command after the first one, which is stored in a variable named `version`.  The use of the underscore character is a convention (at least in Ruby) to indicate that the variable is a throwaway value, and will not be used subsequently.
 
-Lastly, [this StackOverflow article](https://web.archive.org/web/20220804070349/https://superuser.com/questions/1022374/what-does-mean-in-the-context-of-a-shell-script) mentions the `|| :` syntax.  I found it when I Googled `bash "|| :"`.  Judging from the following answer, it appears that the intention of `|| :` is to prevent the `read` command from returning a non-successful exit code:
+Lastly, [this StackOverflow article](https://web.archive.org/web/20220804070349/https://superuser.com/questions/1022374/what-does-mean-in-the-context-of-a-shell-script){:target="_blank" rel="noopener"} mentions the `|| :` syntax.  I found it when I Googled `bash "|| :"`.  Judging from the following answer, it appears that the intention of `|| :` is to prevent the `read` command from returning a non-successful exit code:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-17mar23-1058am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -275,7 +275,7 @@ Lastly, [this StackOverflow article](https://web.archive.org/web/20220804070349/
 
 So to summarize the `read -d` line of code, we're taking the first non-whitespace line from the input file, trimming any whitespace from that line, trimming anything after the `IFS` value (which now includes the carriage return character in addition to whatever its previous value was), and storing it as the version number of record for the subsequent lines of code.
 
-As a follow-up, it looks like this `read -d` line of code was a refactor of the previous version of similar logic, which looked like this [according to Github](https://github.com/rbenv/rbenv/pull/1393/files):
+As a follow-up, it looks like this `read -d` line of code was a refactor of the previous version of similar logic, which looked like this [according to Github](https://github.com/rbenv/rbenv/pull/1393/files){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-17mar23-1100am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
@@ -291,7 +291,7 @@ So it looks like `read -d` was just a way to one-line some logic which previousl
 —------------
 Tangent: Trimming whitespace
 
-While Googling around, I also searched for `"-d" read bash`, and I got [this link](https://archive.ph/Xkto2) as the first result.  Among other things, it mentions:
+While Googling around, I also searched for `"-d" read bash`, and I got [this link](https://archive.ph/Xkto2){:target="_blank" rel="noopener"} as the first result.  Among other things, it mentions:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-17mar23-1102am.png" width="70%" style="border: 1px solid black; padding: 0.5em">

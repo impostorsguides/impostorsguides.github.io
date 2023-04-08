@@ -1,6 +1,6 @@
 As with the `rbenv` command, let's start by looking at this command's tests.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/init.bats)
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/init.bats){:target="_blank" rel="noopener"}
 
 After the `bats` shebang and the loading of the `test_helper` file, the first test is:
 
@@ -15,9 +15,9 @@ After the `bats` shebang and the loading of the `test_helper` file, the first te
 }
 ```
 
-Given what we know about the BATS library's API and the helper methods exposed by the `test_helper` file, this test is relatively easy to read.  We first perform some sanity-check assertions stating that the `${RBENV_ROOT}/shims` and `${RBENV_ROOT}/versions` directories do not exist.  We then run the command with the `-` flag ([if this flag is missing](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L46), then `rbenv init` prints out usage instructions and [exits with a failure return code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L83), which we'll see in the next section).  Lastly, we assert that the command ran successfully and that the two formerly-missing directories have been created.
+Given what we know about the BATS library's API and the helper methods exposed by the `test_helper` file, this test is relatively easy to read.  We first perform some sanity-check assertions stating that the `${RBENV_ROOT}/shims` and `${RBENV_ROOT}/versions` directories do not exist.  We then run the command with the `-` flag ([if this flag is missing](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L46){:target="_blank" rel="noopener"}, then `rbenv init` prints out usage instructions and [exits with a failure return code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L83){:target="_blank" rel="noopener"}, which we'll see in the next section).  Lastly, we assert that the command ran successfully and that the two formerly-missing directories have been created.
 
-I was curious why the default behavior (i.e. the behavior when no "-" flag is passed) is to exit with a non-success return code.  I looked up [the commit which introduced this flag](https://github.com/rbenv/rbenv/commit/4ee92fca43805a3d4a04f453e79a06e85b9810e9), however unfortunately it was added by the original author back when he was likely the only person maintaining the repo, and he didn't include an issue or a PR description other than the commit message itself.  This commit message doesn't reveal the author's intention, so it's anyone's guess as to why the change was introduced.
+I was curious why the default behavior (i.e. the behavior when no "-" flag is passed) is to exit with a non-success return code.  I looked up [the commit which introduced this flag](https://github.com/rbenv/rbenv/commit/4ee92fca43805a3d4a04f453e79a06e85b9810e9){:target="_blank" rel="noopener"}, however unfortunately it was added by the original author back when he was likely the only person maintaining the repo, and he didn't include an issue or a PR description other than the commit message itself.  This commit message doesn't reveal the author's intention, so it's anyone's guess as to why the change was introduced.
 
 Next test:
 
@@ -31,9 +31,9 @@ Next test:
 
 (stopping here for the day; 91710 words)
 
-This test covers [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L104).  If the value of a variable named `no_rehash` hasn't been set by the time we reach this block, then we print the string 'command rbenv rehash 2>/dev/null' to STDOUT.  This string looks like a command that you might type into your terminal, and in fact it is.  This particular command, `rbenv rehash`, is a command we'll get into down the road, but for now suffice it to say that "rehashing" means generating a new instance of the shim file that RBENV inserts between the user and the gem they're trying to run when they type a certain command.  Fun fact- when you try to run a program that's installed via "gem install", you're really running an RBENV file called a "shim" which tells RBENV to run that program for you, using your currently-installed Ruby version.  Shims are a big part of how RBENV does its job of cleanly managing your Ruby version.
+This test covers [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L104){:target="_blank" rel="noopener"}.  If the value of a variable named `no_rehash` hasn't been set by the time we reach this block, then we print the string 'command rbenv rehash 2>/dev/null' to STDOUT.  This string looks like a command that you might type into your terminal, and in fact it is.  This particular command, `rbenv rehash`, is a command we'll get into down the road, but for now suffice it to say that "rehashing" means generating a new instance of the shim file that RBENV inserts between the user and the gem they're trying to run when they type a certain command.  Fun fact- when you try to run a program that's installed via "gem install", you're really running an RBENV file called a "shim" which tells RBENV to run that program for you, using your currently-installed Ruby version.  Shims are a big part of how RBENV does its job of cleanly managing your Ruby version.
 
-When we start analyzing the command file, we'll see that these commands which are printed to STDOUT are actually captured by something called [command substitution](https://web.archive.org/web/20221010044921/https://www.gnu.org/software/bash/manual/html_node/Command-Substitution.html), and executed by `bash`.  So when we see an assertion that expects a certain string to be printed, and when that string looks like shell code, that's what's happening.
+When we start analyzing the command file, we'll see that these commands which are printed to STDOUT are actually captured by something called [command substitution](https://web.archive.org/web/20221010044921/https://www.gnu.org/software/bash/manual/html_node/Command-Substitution.html){:target="_blank" rel="noopener"}, and executed by `bash`.  So when we see an assertion that expects a certain string to be printed, and when that string looks like shell code, that's what's happening.
 
 Note that at the time of this writing, I'm still not sure why we print stringified versions of the commands to STDOUT, to be later evaluated by command substitution.  I suspect the same goal could have been accomplished by:
 
@@ -54,7 +54,7 @@ Next test:
 }
 ```
 
-This test covers the 4-line block of code starting [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L97).  We store the value of our root directory, and run `rbenv-init` while specifying `bash` as our shell.  We assert that the command completed successfully and that the line which `source`s the completion file is `echo`ed to the screen.  The completion files were some of the first files we covered in this document.
+This test covers the 4-line block of code starting [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L97){:target="_blank" rel="noopener"}.  We store the value of our root directory, and run `rbenv-init` while specifying `bash` as our shell.  We assert that the command completed successfully and that the line which `source`s the completion file is `echo`ed to the screen.  The completion files were some of the first files we covered in this document.
 
 Next test:
 
@@ -66,7 +66,7 @@ Next test:
 }
 ```
 
-This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L36) and the lines after it.  We purposely set the `SHELL` env var to be a falsy value, and run the command with no argument after the "-" character.  Because of these facts, initially the `$shell` variable inside our script is empty.  But after the relevant line of code, we've detected that our parent shell is `bash`, and we use that as the value for `$shell` from then on.  We can see this by adding a bunch of `echo` statements to this block of code, like so:
+This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L36){:target="_blank" rel="noopener"} and the lines after it.  We purposely set the `SHELL` env var to be a falsy value, and run the command with no argument after the "-" character.  Because of these facts, initially the `$shell` variable inside our script is empty.  But after the relevant line of code, we've detected that our parent shell is `bash`, and we use that as the value for `$shell` from then on.  We can see this by adding a bunch of `echo` statements to this block of code, like so:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-13mar2023-725am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -125,7 +125,7 @@ Next test:
 }
 ```
 
-This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L77), as well as [this one](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L83).  We specify `bash` as the shell type for `rbenv-init` and run it.  Because we didn't specify the "-" before the shell type, we find ourselves inside the `if` code of [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L46).  We assert that one of the lines of text printed to STDOUT contains the command that we need to add to our shell profile in order to enable shell integration (i.e. the `eval` command *with* the "-" hyphen included).
+This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L77){:target="_blank" rel="noopener"}, as well as [this one](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L83){:target="_blank" rel="noopener"}.  We specify `bash` as the shell type for `rbenv-init` and run it.  Because we didn't specify the "-" before the shell type, we find ourselves inside the `if` code of [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L46){:target="_blank" rel="noopener"}.  We assert that one of the lines of text printed to STDOUT contains the command that we need to add to our shell profile in order to enable shell integration (i.e. the `eval` command *with* the "-" hyphen included).
 
 Next test:
 
@@ -151,7 +151,7 @@ Next test:
 }
 ```
 
-This test appears to test [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L28), as well as [this block](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L104).  We run the `init` command, passing the "-" and "--no-rehash" flags.  We assert that a) the test was successful, and b) that the code to rehash RBENV's shims (`"rbenv rehash 2>/dev/null"`) does *not* get printed to STDOUT.
+This test appears to test [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L28){:target="_blank" rel="noopener"}, as well as [this block](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L104){:target="_blank" rel="noopener"}.  We run the `init` command, passing the "-" and "--no-rehash" flags.  We assert that a) the test was successful, and b) that the code to rehash RBENV's shims (`"rbenv rehash 2>/dev/null"`) does *not* get printed to STDOUT.
 
 Next test:
 
@@ -164,7 +164,7 @@ Next test:
 }
 ```
 
-This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L94).  We set `$PATH` to a known value, then run `init` with the arguments "-" and "bash".  We assert that the test was successful, and that the path was prepended with `{RBENV_ROOT}'/shims`.
+This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L94){:target="_blank" rel="noopener"}.  We set `$PATH` to a known value, then run `init` with the arguments "-" and "bash".  We assert that the test was successful, and that the path was prepended with `{RBENV_ROOT}'/shims`.
 
 Next test:
 
@@ -177,7 +177,7 @@ Next test:
 }
 ```
 
-This is a similar test to the previous one, except that it passes "fish" as an argument instead of "bash" (the line of code that's tested is [this one](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L90)).  We perform the same setup, and as before the assertion tests that the `PATH` env var is re-exported to include `{RBENV_ROOT}'/shims` before its original value.
+This is a similar test to the previous one, except that it passes "fish" as an argument instead of "bash" (the line of code that's tested is [this one](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L90){:target="_blank" rel="noopener"}).  We perform the same setup, and as before the assertion tests that the `PATH` env var is re-exported to include `{RBENV_ROOT}'/shims` before its original value.
 
 Next test:
 
@@ -194,7 +194,7 @@ This test asserts that, when the value of `PATH` already includes RBENV's `shims
 
 I was curious why we'd explicitly want to ensure that duplication within `PATH` is acceptable.  I would have thought that we'd want to actively *prevent* such duplication, since it makes `PATH` harder to read and debug.
 
-As it turns out, this test appears to cover a problem presented by some of RBENV's users [here](https://github.com/rbenv/rbenv/issues/369).  When certain users attempted to run the `tmux` command, their version of Ruby was changed unintentionally.  According to RBENV's core team, the reason for this was as follows:
+As it turns out, this test appears to cover a problem presented by some of RBENV's users [here](https://github.com/rbenv/rbenv/issues/369){:target="_blank" rel="noopener"}.  When certain users attempted to run the `tmux` command, their version of Ruby was changed unintentionally.  According to RBENV's core team, the reason for this was as follows:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-13mar2023-729am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -204,7 +204,7 @@ So by running `tmux`, the shell configuration files `.bashrc` or `.zshrc` get `s
 
 However, at the time of this bug, RBENV included a line of logic which prevented duplicate copies of the paths to its Ruby versions from being added to `$PATH`.  This was meant to avoid polluting `$PATH` with duplicate directory paths, for the reasons I mentioned earlier.
 
-By including this logic to prevent duplication, RBENV inadvertently contributed to the existence of this unexpected behavior for `tmux` users.  The core team appears to have decided that the best of several less-than-ideal solutions was to allow the `$PATH` duplication after all, since the existing logic was causing problems for too many users.  The PR to "revert back to simpler times" is located [here](https://github.com/rbenv/rbenv/commit/e2173df4aa91c8d365ca1596fb857fcac9fdd787).
+By including this logic to prevent duplication, RBENV inadvertently contributed to the existence of this unexpected behavior for `tmux` users.  The core team appears to have decided that the best of several less-than-ideal solutions was to allow the `$PATH` duplication after all, since the existing logic was causing problems for too many users.  The PR to "revert back to simpler times" is located [here](https://github.com/rbenv/rbenv/commit/e2173df4aa91c8d365ca1596fb857fcac9fdd787){:target="_blank" rel="noopener"}.
 
 Next test:
 
@@ -233,7 +233,7 @@ Next test:
 }
 ```
 
-This test covers [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L147).  It asserts that, when we run `rbenv init` for both the `bash` and `zsh` shells, the shell function that `rbenv init` helps create includes a certain `case` statement which determines which RBENV file to execute based on which RBENV command the user typed.
+This test covers [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L147){:target="_blank" rel="noopener"}.  It asserts that, when we run `rbenv init` for both the `bash` and `zsh` shells, the shell function that `rbenv init` helps create includes a certain `case` statement which determines which RBENV file to execute based on which RBENV command the user typed.
 
 Last test:
 
@@ -246,11 +246,11 @@ Last test:
 }
 ```
 
-This test covers the blocks of code [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L116) and [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L139), and covers the alternate path to the previous test.  When the user invokes `rbenv init` with `fish` as the shell argument instead of `bash` or `zsh`, we need very different syntax for our shell function.
+This test covers the blocks of code [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L116){:target="_blank" rel="noopener"} and [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L139){:target="_blank" rel="noopener"}, and covers the alternate path to the previous test.  When the user invokes `rbenv init` with `fish` as the shell argument instead of `bash` or `zsh`, we need very different syntax for our shell function.
 
 Now that the tests are done, let's look at the code:
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init){:target="_blank" rel="noopener"}
 
 First few lines of code are:
 
@@ -298,7 +298,7 @@ zsh
 
 I think resolving my confusion here would involve doing a Github history dive.  Again, I don't want to get too sidetracked here, so I timebox it for 10 minutes.
 
-I find [the PR which introduced the code](https://github.com/rbenv/rbenv/pull/822).  It doesn't contain any comments around this section of the diff, but it does contain a comment that catches my eye:
+I find [the PR which introduced the code](https://github.com/rbenv/rbenv/pull/822){:target="_blank" rel="noopener"}.  It doesn't contain any comments around this section of the diff, but it does contain a comment that catches my eye:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-13mar2023-732am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -306,7 +306,7 @@ I find [the PR which introduced the code](https://github.com/rbenv/rbenv/pull/82
 
 I've never heard of "magic comments" before.  Does this imply that this comment isn't *just* a comment, but is in fact picked up by an interpreter too?
 
-After a quick search of the codebase for "provide rbenv completions", it looks like [the answer is yes](https://github.com/rbenv/rbenv/blob/d604acb78aeba583be95f08d45eeae430372beb9/libexec/rbenv-completions#L23).  I don't want to get too in the weeds now, so I add it to my list of questions to answer later.
+After a quick search of the codebase for "provide rbenv completions", it looks like [the answer is yes](https://github.com/rbenv/rbenv/blob/d604acb78aeba583be95f08d45eeae430372beb9/libexec/rbenv-completions#L23){:target="_blank" rel="noopener"}.  I don't want to get too in the weeds now, so I add it to my list of questions to answer later.
 
 But I still have my larger question of why we're `echo`ing the names of different shells here, along with the `--no-rehash` flag and the `-` symbol.
 
@@ -435,7 +435,7 @@ I see that line 126 only "echo"s, it doesn't "exec".  The conditional seems to b
 
 Success- we see the "end of rbenv file" tracer!
 
-I also notice that we seem to go from the "rbenv-init" file, *back to* the "rbenv" file.  I see this because the 2nd tracer statement above is "inside rbenv-init, just before 'command rbenv'", then the 3rd tracer is "start of rbenv file".  I actually know why this is, because I read [a post on StackExchange](https://web.archive.org/web/20220203113040/https://askubuntu.com/questions/512770/what-is-use-of-command-command) earlier today which explains what the `command` command does:
+I also notice that we seem to go from the "rbenv-init" file, *back to* the "rbenv" file.  I see this because the 2nd tracer statement above is "inside rbenv-init, just before 'command rbenv'", then the 3rd tracer is "start of rbenv file".  I actually know why this is, because I read [a post on StackExchange](https://web.archive.org/web/20220203113040/https://askubuntu.com/questions/512770/what-is-use-of-command-command){:target="_blank" rel="noopener"} earlier today which explains what the `command` command does:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-13mar2023-751am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -680,7 +680,7 @@ fish )
 
 The first case branch is if our shell is "fish".  If it is, we `echo` a few commands to the script which calls `eval` on `rbenv init`.
 
-Both these commands use the "fish" shell's "set" command to set shell variables.  More info [here](https://fishshell.com/docs/current/cmds/set.html).  The "-g" flag makes the variable global, and the `-x` flag makes the variable available to child processes.  We're creating two such variables here: `PATH` and `RBENV_SHELL`.  Well, technically, we're *creating* one variable (`RBENV_SHELL`) and *resetting* another (`PATH`).  The latter already existed in our terminal; we're just pre-pending it with `${RBENV_ROOT}/shims'` so that the shims which RBENV creates will be findable by our terminal.
+Both these commands use the "fish" shell's "set" command to set shell variables.  More info [here](https://fishshell.com/docs/current/cmds/set.html){:target="_blank" rel="noopener"}.  The "-g" flag makes the variable global, and the `-x` flag makes the variable available to child processes.  We're creating two such variables here: `PATH` and `RBENV_SHELL`.  Well, technically, we're *creating* one variable (`RBENV_SHELL`) and *resetting* another (`PATH`).  The latter already existed in our terminal; we're just pre-pending it with `${RBENV_ROOT}/shims'` so that the shims which RBENV creates will be findable by our terminal.
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-13mar2023-806am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -763,7 +763,7 @@ EOS
 
 If the user is using the "fish" shell, we create a multi-line string (also called a "here-string") using the `<<EOS` syntax to start the string, and the `EOS` syntax to end it.  Inside the here-string is where we begin creating a function named "rbenv" (we encountered this when we were dissecting the "rbenv" file).  We're creating a function inside a string because we then "cat" the string out to STDOUT, which is received by the `eval` caller of `rbenv init`.
 
-Since the "fish" shell operates so much differently from other shells, we need to do things a bit differently when defining the "rbenv" function in this shell environment.  We can refer back to the [Fish shell docs](https://web.archive.org/web/20220720181625/https://fishshell.com/docs/current/cmds/set.html), however I can already tell that I'll need the ability to test some of this "fish" syntax on my local machine.  For example, on these two lines:
+Since the "fish" shell operates so much differently from other shells, we need to do things a bit differently when defining the "rbenv" function in this shell environment.  We can refer back to the [Fish shell docs](https://web.archive.org/web/20220720181625/https://fishshell.com/docs/current/cmds/set.html){:target="_blank" rel="noopener"}, however I can already tell that I'll need the ability to test some of this "fish" syntax on my local machine.  For example, on these two lines:
 
 ```
   set command \$argv[1]
@@ -864,9 +864,9 @@ case "*"
 end
 ```
 
-I'll save you the drama of why this didn't work and the alternatives I tried, because I don't think it would be very educational to see my muddled thought process here.  In the end, I wrote a StackExchange question and got an answer [here](https://archive.ph/zKi7G).  TL;DR- I was getting confused about which parts of the syntax were being resolved by fish and which by bash, as well as when.  The answer appears to be that 1) bash constructs a string containing a function definition, resolving certain parameter expansions and variables along the way, and then 2) that string is evaluated by fish as a set of commands and a function definition.  I was unable to reproduce that behavior in the timebox I gave myself, but I'm relatively confident that this is what happens.
+I'll save you the drama of why this didn't work and the alternatives I tried, because I don't think it would be very educational to see my muddled thought process here.  In the end, I wrote a StackExchange question and got an answer [here](https://web.archive.org/web/20230407064428/https://unix.stackexchange.com/questions/716850/fish-shell-syntax-for-creating-a-switch-statement-which-checks-against-an-arra){:target="_blank" rel="noopener"}{:target="_blank" rel="noopener"}.  TL;DR- I was getting confused about which parts of the syntax were being resolved by fish and which by bash, as well as when.  The answer appears to be that 1) bash constructs a string containing a function definition, resolving certain parameter expansions and variables along the way, and then 2) that string is evaluated by fish as a set of commands and a function definition.  I was unable to reproduce that behavior in the timebox I gave myself, but I'm relatively confident that this is what happens.
 
-Side note: it's amazing who might answer you when you post a StackExchange question.  It turns out that the person who helped me out was [a well-known ethical hacker](https://web.archive.org/web/20220308002926/https://www.smh.com.au/technology/stephane-chazelas-the-man-who-found-the-webs-most-dangerous-internet-security-bug-20140926-10mixr.html) who helped find and fix a zero-day Bash exploit in millions of laptops, phones, and embedded devices around the world!
+Side note: it's amazing who might answer you when you post a StackExchange question.  It turns out that the person who helped me out was [a well-known ethical hacker](https://web.archive.org/web/20220308002926/https://www.smh.com.au/technology/stephane-chazelas-the-man-who-found-the-webs-most-dangerous-internet-security-bug-20140926-10mixr.html){:target="_blank" rel="noopener"} who helped find and fix a zero-day Bash exploit in millions of laptops, phones, and embedded devices around the world!
 
 On another note, I have to say I'm a bit disheartened that I was unable to understand the interplay of bash and fish well enough to reproduce a simplified test case for you here.  I would have considered that a mark not only of my success in teaching you something, but also in me having learned something.  To the extent that I'm unable to produce such test cases, I consider that a failure on my part.
 
@@ -946,7 +946,7 @@ I open up a fish shell and try to "eval" the output of this file.  I get the sam
   <img src="/assets/images/screenshot-13mar2023-820am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-I re-read [the fish docs on defining functions](https://fishshell.com/docs/current/cmds/function.html).  I see the following:
+I re-read [the fish docs on defining functions](https://fishshell.com/docs/current/cmds/function.html){:target="_blank" rel="noopener"}.  I see the following:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-13mar2023-821am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -1026,9 +1026,11 @@ I delete line 11...
   <img src="/assets/images/screenshot-13mar2023-831am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-I Google this error ("Missing end to balance this function definition"), and one of the first results is [this link](https://archive.ph/R1eVq), which contains an IRC discussion of someone experiencing the same error.  At one point, a participant in the discussion says "You're not using `eval` to load it, are you?", which catches my eye.  Am I not supposed to be loading the code with "eval"?
+TODO- replace this link from gitter.im.
 
-I Google "using eval to load code fish", and one of the first results that comes up is [a discussion in the "fish-shell" Github repo](https://github.com/fish-shell/fish-shell/issues/3993).  I see several people recommending that a piece of text be piped into "source" instead.  It appears that the fish shell prefers piping over the use of "eval".
+I Google this error ("Missing end to balance this function definition"), and one of the first results is [this link](https://archive.ph/R1eVq){:target="_blank" rel="noopener"}, which contains an IRC discussion of someone experiencing the same error.  At one point, a participant in the discussion says "You're not using `eval` to load it, are you?", which catches my eye.  Am I not supposed to be loading the code with "eval"?
+
+I Google "using eval to load code fish", and one of the first results that comes up is [a discussion in the "fish-shell" Github repo](https://github.com/fish-shell/fish-shell/issues/3993){:target="_blank" rel="noopener"}.  I see several people recommending that a piece of text be piped into "source" instead.  It appears that the fish shell prefers piping over the use of "eval".
 
 I re-write the function again:
 
@@ -1099,7 +1101,7 @@ I notice two things here:
 I didn't need any semi-colons in order for the case statement or the function to work, and
 Both the case statement and the function itself required separate "end" lines.
 
-I post [a StackExchange question](https://unix.stackexchange.com/questions/716957/fish-shell-whats-wrong-with-this-syntax), and eventually I get an answer: since my function is defined inside a string, my reference to $myVar should really be a reference to "\$myVar":
+I post [a StackExchange question](https://unix.stackexchange.com/questions/716957/fish-shell-whats-wrong-with-this-syntax){:target="_blank" rel="noopener"}, and eventually I get an answer: since my function is defined inside a string, my reference to $myVar should really be a reference to "\$myVar":
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-13mar2023-843am.png" width="50%" style="border: 1px solid black; padding: 0.5em">
@@ -1165,7 +1167,7 @@ EOS
   ;;
 ```
 
-This is the 2nd branch of our outer case statement (the one which checks which shell the user is using).  If the user is using the `ksh` shell (aka the Korn shell), we employ a similar strategy of starting to `cat` a function definition, but this time we don't close that definition (that comes later).  For now, we just declare a variable named `command`, which is scoped locally with respect to the "rbenv" function according to [the Korn shell docs](https://web.archive.org/web/20161203165249/https://docstore.mik.ua/orelly/unix3/korn/ch06_05.htm):
+This is the 2nd branch of our outer case statement (the one which checks which shell the user is using).  If the user is using the `ksh` shell (aka the Korn shell), we employ a similar strategy of starting to `cat` a function definition, but this time we don't close that definition (that comes later).  For now, we just declare a variable named `command`, which is scoped locally with respect to the "rbenv" function according to [the Korn shell docs](https://web.archive.org/web/20161203165249/https://docstore.mik.ua/orelly/unix3/korn/ch06_05.htm){:target="_blank" rel="noopener"}:
 
 > typeset without options has an important meaning: if a typeset statement is used inside a function definition, the variables involved all become local to that function (in addition to any properties they may take on as a result of typeset options).
 
@@ -1202,7 +1204,7 @@ cat <<EOS
 EOS
 ```
 
-Here we set the `IFS` variable (which stands for "internal field separator") to the pipe symbol "\|".  [We've covered this before](https://web.archive.org/web/20220715010436/https://www.baeldung.com/linux/ifs-shell-variable), but `IFS` is a special shell variable that determines how bash separates a string of characters into multiple strings.  For example, let's say we have a string `a|b|c|d|e`.  If `IFS` is set to the pipe character (as above), and if we pass our single string to a `for` loop, then bash will internally split our string into 5 strings ('a', 'b', 'c', 'd', and 'e') and iterate over each of them.
+Here we set the `IFS` variable (which stands for "internal field separator") to the pipe symbol "\|".  [We've covered this before](https://web.archive.org/web/20220715010436/https://www.baeldung.com/linux/ifs-shell-variable){:target="_blank" rel="noopener"}, but `IFS` is a special shell variable that determines how bash separates a string of characters into multiple strings.  For example, let's say we have a string `a|b|c|d|e`.  If `IFS` is set to the pipe character (as above), and if we pass our single string to a `for` loop, then bash will internally split our string into 5 strings ('a', 'b', 'c', 'd', and 'e') and iterate over each of them.
 
 The `cat << EOS` line of code starts a new heredoc, so that we can finish implementing our `rbenv` function.
 
@@ -1248,7 +1250,7 @@ bar
 
 It looks like we did indeed capture the first argument.  And if there is no first argument, the variable is empty.
 
-I decide to do a bit more Googling since I'm still not confident that I understand all the possible edge cases that I could test here.  I find [this StackExchange post](https://web.archive.org/web/20220531142657/https://unix.stackexchange.com/questions/338146/bash-defining-variables-with-var-number-default), which seems to say the same thing that the GNU docs said:
+I decide to do a bit more Googling since I'm still not confident that I understand all the possible edge cases that I could test here.  I find [this StackExchange post](https://web.archive.org/web/20220531142657/https://unix.stackexchange.com/questions/338146/bash-defining-variables-with-var-number-default){:target="_blank" rel="noopener"}, which seems to say the same thing that the GNU docs said:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-13mar2023-856am.png" width="90%" style="border: 1px solid black; padding: 0.5em">

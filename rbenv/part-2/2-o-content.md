@@ -7,7 +7,7 @@ I'm not yet familiar with the `rbenv-prefix` command, so I sneak a peak at the �
 ```
 In the happy-path, this command prints out the RBENV directory where a given Ruby version is installed.  Simple enough.  Let's look at the specs now.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/prefix.bats)
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/prefix.bats){:target="_blank" rel="noopener"}
 
 After the `bats` shebang and the loading of `test_helper`, the first spec is:
 
@@ -130,7 +130,7 @@ We then run the command `type -aP “$exe”` (which in the case of our spec, re
 If you remember from earlier in this project, we discovered that the `type` command returns a path to the executable file for the command you pass it.
 
 
-According to [GNU.org](https://web.archive.org/web/20220926111408/https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html), the `-a` flag tells `type` to return any and all such files, whereas leaving `-a` off returns a max of one result.
+According to [GNU.org](https://web.archive.org/web/20220926111408/https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html){:target="_blank" rel="noopener"}, the `-a` flag tells `type` to return any and all such files, whereas leaving `-a` off returns a max of one result.
 
 
 According to the same link, “The -P option forces a path search for each name, even if -t would not return 'file'.”  This appears to mean that passing `-P` allows `type` to resolve any symlinks to their corresponding files, instead of just returning the path to the symlink itself.
@@ -220,7 +220,7 @@ It may not be the author's intention, but the effect on newbies is that it reduc
 
 Having read through the spec file for the `prefix` command, let's turn to the command file itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-prefix)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-prefix){:target="_blank" rel="noopener"}
 
 After the first 4 things that we always see (`bash` shebang, “Usage” and “Summary” comments, the call to `set -e`, and the check for the `$RBENV_DEBUG` env var), the first block of code we see is:
 

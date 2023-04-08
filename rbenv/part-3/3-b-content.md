@@ -6,7 +6,7 @@ This directory has the following structure:
 
 The fact that this directory starts with a “.” tells me it has something to do with configuration.  And I happen to know that Github offers a feature called Workflows, so I'm pretty sure this is the directory to store configuration files for RBENV's Github Workflow setup.
 
-Looking more into Github's Workflows feature, I find [the docs page](https://web.archive.org/web/20220806092745/https://docs.github.com/en/actions/using-workflows):
+Looking more into Github's Workflows feature, I find [the docs page](https://web.archive.org/web/20220806092745/https://docs.github.com/en/actions/using-workflows){:target="_blank" rel="noopener"}:
 
 About workflows
 

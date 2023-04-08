@@ -1,6 +1,6 @@
 Now we move on to the `rbenv.d/` directory.  The first file we'll look at is inside `rbenv.d/exec/`, a `bash` script called `gem-rehash.bash`.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/rbenv.d/exec/gem-rehash.bash)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/rbenv.d/exec/gem-rehash.bash){:target="_blank" rel="noopener"}
 
 Since I notice that this is file ends in the ".bash" extension, I'm curious where and how the file gets executed.  So the first thing I do is search for the filename "gem-rehash" in the codebase, however I don't see any hard-coded references to this file anywhere in RBENV.
 
@@ -26,7 +26,7 @@ I search for "rbenv.d" in the code, and I find:
   <img src="/assets/images/screenshot-19mar2023-925am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
-2 files are ".bats" test files, 1 file is the "test_helper.bash" file, and the last result is the "libexec/rbenv" file.  That's the file which [adds the "rbenv.d" directory](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81) to the "RBENV_HOOK_PATH" environment variable.  Then later, the `rbenv-hooks` file uses `RBENV_HOOK_PATH` to [generate a list of hook files](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-hooks#L55), and then `rbenv-hooks` is subsequently called by multiple other commands ([`rbenv-exec`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L37), [`rbenv-rehash`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-rehash#L159), and others) to actually invoke / source those hook files.
+2 files are ".bats" test files, 1 file is the "test_helper.bash" file, and the last result is the "libexec/rbenv" file.  That's the file which [adds the "rbenv.d" directory](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81){:target="_blank" rel="noopener"} to the "RBENV_HOOK_PATH" environment variable.  Then later, the `rbenv-hooks` file uses `RBENV_HOOK_PATH` to [generate a list of hook files](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-hooks#L55){:target="_blank" rel="noopener"}, and then `rbenv-hooks` is subsequently called by multiple other commands ([`rbenv-exec`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L37){:target="_blank" rel="noopener"}, [`rbenv-rehash`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-rehash#L159){:target="_blank" rel="noopener"}, and others) to actually invoke / source those hook files.
 
 OK, so now that we know how this file is invoked, what does it do?
 
@@ -54,7 +54,7 @@ $ rbenv exec ruby -e '1+1'
 BASH_SOURCE: /Users/myusername/.rbenv/rbenv.d/exec/gem-rehash.bash
 ```
 
-So `BASH_SOURCE` is the name of the file we're running.  As a refresher on what the "%.bash" syntax is, I look up [the docs for bash parameter expansion](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html):
+So `BASH_SOURCE` is the name of the file we're running.  As a refresher on what the "%.bash" syntax is, I look up [the docs for bash parameter expansion](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"}:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-930am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -107,4 +107,4 @@ So before, the value of `RUBYLIB` was empty.  Afterwards, it's equal to `/Users/
 
 So that's it for this file.  Before closing the `gem-rehash.bash` file, I be sure to remove the two `echo` statements I added.
 
-The only other file in the `rbenv.d` directory is [this one](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/rbenv.d/exec/gem-rehash/rubygems_plugin.rb).
+The only other file in the `rbenv.d` directory is [this one](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/rbenv.d/exec/gem-rehash/rubygems_plugin.rb){:target="_blank" rel="noopener"}.

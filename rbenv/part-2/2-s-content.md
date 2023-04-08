@@ -1,6 +1,6 @@
 First the test file.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-file-write.bats)
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-file-write.bats){:target="_blank" rel="noopener"}
 
 After the `bats` shebang and the loading of `test_helper`, the first block of code is:
 
@@ -55,7 +55,7 @@ As a setup step, we create a fake Ruby installation for Ruby v1.8.7, and we asse
 
 That's all for the tests, now on to the code itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-file-write)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-file-write){:target="_blank" rel="noopener"}
 
 Let's get the following out of the way:
 
@@ -101,7 +101,7 @@ rbenv-prefix "$RBENV_VERSION" >/dev/null
 
 Here we validate that the Ruby version number that the user passed as argument #2 corresponds to a valid Ruby version that exists on the user's machine.  If not, we exit.
 
-I was curious whether this last statement was actually true or not.  I checked the `rbenv-prefix` command and saw [this block of code](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-prefix#L37) along with the `exit 1` statement on line 39, but I wasn't sure if the `rbenv-prefix` command executed by [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-file-write#L16) was running in a separate process or not, therefore I wasn't sure if that `exit 1` statement would cause just that process or the calling process which is running `rbenv-version-file-write` to be exited.
+I was curious whether this last statement was actually true or not.  I checked the `rbenv-prefix` command and saw [this block of code](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-prefix#L37){:target="_blank" rel="noopener"} along with the `exit 1` statement on line 39, but I wasn't sure if the `rbenv-prefix` command executed by [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-file-write#L16){:target="_blank" rel="noopener"} was running in a separate process or not, therefore I wasn't sure if that `exit 1` statement would cause just that process or the calling process which is running `rbenv-version-file-write` to be exited.
 
 So I did an experiment.  My hypothesis is that, if there is only a single process running both `rbenv-version-file-write` and `rbenv-prefix`, then the `exit 1` command will cause `rbenv-version-file-write` to exit, so no further code after line 16 of `version-file-write` should be executed.  So I placed the following `echo` statement on line 17 of `rbenv-version-file-write`:
 
@@ -115,7 +115,7 @@ I then ran `rbenv version file write foo bar`, knowing that `bar` is not a valid
   <img src="/assets/images/screenshot-17mar23-906am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-Sure enough, I see the expected error message from [this line of code](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-prefix#L38), but not the output of the `echo` statement I added.
+Sure enough, I see the expected error message from [this line of code](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-prefix#L38){:target="_blank" rel="noopener"}, but not the output of the `echo` statement I added.
 
 Note that I ran `ls -la` to verify that no version file named `foo` was created.
 

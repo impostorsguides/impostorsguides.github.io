@@ -24,9 +24,9 @@ Anyone who **doesn't** like a lot of hand-holding.  I err on the side of over-ex
 
 The programming community could stand to be a more welcoming place for beginners.  Greybeards always tell newbies to "read the fucking manual", but "the manual" is quite often written for people who are already experts, or at least it appears written that way to those same newbies.
 
-"The Impostor's Guide To Programming" is an attempt to fix that.  [Chip and Dan Heath's amazing book "Made To Stick"](https://www.amazon.com/Made-Stick-Ideas-Survive-Others-ebook/dp/B000N2HCKQ/) talks about "The Curse of Knowledge" and how experts often don't realize that they're talking over the heads of more novice practicioners.  This site attempts to swing the pendulum in the opposite direction, erring on the side of too much hand-holding.  It makes the assumption that, when faced between the dual risks of annoying a more seasoned engineer vs. mystifying a more novice one, the latter is the greater sin.
+"The Impostor's Guide To Programming" is an attempt to fix that.  [Chip and Dan Heath's amazing book "Made To Stick"](https://www.amazon.com/Made-Stick-Ideas-Survive-Others-ebook/dp/B000N2HCKQ/){:target="_blank" rel="noopener"} talks about "The Curse of Knowledge" and how experts often don't realize that they're talking over the heads of more novice practicioners.  This site attempts to swing the pendulum in the opposite direction, erring on the side of too much hand-holding.  It makes the assumption that, when faced between the dual risks of annoying a more seasoned engineer vs. mystifying a more novice one, the latter is the greater sin.
 
-I'm a journeyman engineer myself, and I may have gotten some things wrong in these posts.  If you spot an error and want to help fix it, feel free to reach out [here](https://twitter.com/impostorsguides) (for now).  You can also use the same link to reach out with general questions or comments.
+I'm a journeyman engineer myself, and I may have gotten some things wrong in these posts.  If you spot an error and want to help fix it, feel free to reach out [here](https://twitter.com/impostorsguides){:target="_blank" rel="noopener"} (for now).  You can also use the same link to reach out with general questions or comments.
 
 ## Why the focus on Ruby and Rubyists?
 
@@ -34,7 +34,7 @@ I mostly work with Ruby in my day job.  I got my start in Ruby, at a bootcamp (R
 
 ## What prior knowledge do you need to follow this?
 
- - You need to know how to use `git`.  If you don't yet know this crucial tool, a good free resource is [the "Pro Git" book](https://git-scm.com/book/en/v2), a free, comprehensive book available entirely online.
+ - You need to know how to use `git`.  If you don't yet know this crucial tool, a good free resource is [the "Pro Git" book](https://git-scm.com/book/en/v2){:target="_blank" rel="noopener"}, a free, comprehensive book available entirely online.
  - You need very basic knowledge of how to navigate in a terminal.  You should be familiar with `cd`, `ls`, `pwd`, and similarly elementary commands.
  - You need some basic programming knowledge, such as familiarity with if-blocks, case statements, what variables are, etc.
 
@@ -51,7 +51,7 @@ I mostly work with Ruby in my day job.  I got my start in Ruby, at a bootcamp (R
 
 I use internet-archived links whenever possible, so you can see what I saw at the time I encountered the pages that I reference.
 
-My first choice for these archived links is usually [The Wayback Machine](https://www.archive.org/), since they don't obfuscate the links and you can see what link you'll be visiting.  Occasionally, that wasn't possible:
+My first choice for these archived links is usually [The Wayback Machine](https://www.archive.org/){:target="_blank" rel="noopener"}, since they don't obfuscate the links and you can see what link you'll be visiting.  Occasionally, that wasn't possible:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1134am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
@@ -59,9 +59,11 @@ My first choice for these archived links is usually [The Wayback Machine](https:
 
 In these cases, I use Archive.ph instead.  I'm looking for a back-up archiver which doesn't obfuscate links, and would appreciate any suggestions.
 
+Also occasionally, I have no choice but to link to a Youtube video.  These links aren't archivable, as far as I know, so I link to the original and pray that the video stays up forever.
+
 ## If you like what you read
 
-Please consider sharing it on [Hacker News](https://news.ycombinator.com/) or your social media.  It helps me reach more newbie developers.
+Please consider sharing it on [Hacker News](https://news.ycombinator.com/){:target="_blank" rel="noopener"} or your social media.  It helps me reach more newbie developers.
 
 And / or sign up below to hear when I post something new:
 

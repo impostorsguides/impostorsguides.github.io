@@ -1,4 +1,4 @@
-Having finished reading [the code for RBENV's shims](https://docs.google.com/document/d/1xG_UdRde-lPnQI7ETjOHPwN1hGu0KqtBRrdCLBGJoU8/edit), we need to decide what's next.  [RBENV's README on Github](https://github.com/rbenv/rbenv/tree/c4395e58201966d9f90c12bd6b7342e389e7a4cb/) could help inform that decision.
+Having finished reading [the code for RBENV's shims](https://docs.google.com/document/d/1xG_UdRde-lPnQI7ETjOHPwN1hGu0KqtBRrdCLBGJoU8/edit), we need to decide what's next.  [RBENV's README on Github](https://github.com/rbenv/rbenv/tree/c4395e58201966d9f90c12bd6b7342e389e7a4cb/){:target="_blank" rel="noopener"} could help inform that decision.
 
 A couple possibilities stand out:
 

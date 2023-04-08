@@ -1,8 +1,8 @@
 The next file inside `src/` is `bash.h`.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/bash.h)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/bash.h){:target="_blank" rel="noopener"}
 
-So I happen to know from my limited previous experience with C that a ".h" file is a header file.  I look up [the GCC docs on header files](https://web.archive.org/web/20220930083359/https://gcc.gnu.org/onlinedocs/cpp/Header-Files.html), and read the first few paragraphs:
+So I happen to know from my limited previous experience with C that a ".h" file is a header file.  I look up [the GCC docs on header files](https://web.archive.org/web/20220930083359/https://gcc.gnu.org/onlinedocs/cpp/Header-Files.html){:target="_blank" rel="noopener"}, and read the first few paragraphs:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1039am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
@@ -25,7 +25,7 @@ Are these what we mean by "C declarations" and "macro definitions"?
 
 (stopping here; 3238 words)
 
-I Google "why does C use header files" and I find [this StackOverflow post](https://archive.ph/FoOOP), which is much clearer.  The first answer I read talks about the benefits of avoiding problems with functions which call each other:
+I Google "why does C use header files" and I find [this StackOverflow post](https://web.archive.org/web/20230309171546/https://stackoverflow.com/questions/19089686/why-do-we-include-header-files-in-c){:target="_blank" rel="noopener"}, which is much clearer.  The first answer I read talks about the benefits of avoiding problems with functions which call each other:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1040am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -50,15 +50,15 @@ OK, I'm feeling pretty good about my understanding of what header files are and 
 #endif
 ```
 
-Again from my very brief prior experience with C, I know that the above code means "if the constant __BASH_H__ isn't defined, then define it".  [Here is some documentation](https://web.archive.org/web/20220130091704/https://www.cprogramming.com/reference/preprocessor/ifndef.html) on `ifndef` and how/why it's used:
+Again from my very brief prior experience with C, I know that the above code means "if the constant __BASH_H__ isn't defined, then define it".  [Here is some documentation](https://web.archive.org/web/20220130091704/https://www.cprogramming.com/reference/preprocessor/ifndef.html){:target="_blank" rel="noopener"} on `ifndef` and how/why it's used:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1044am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
-The last sentence appears to be what's happening here- we're avoiding the problem of double-inclusion by wrapping the main body of the header file inside an `ifndef` + `endif` block.  I subsequently confirmed this via a question I asked [here](https://unix.stackexchange.com/questions/726043/what-is-the-purpose-of-defining-a-preprocessor-macro-like-bash-h-that-is-onl), in StackExchange.
+The last sentence appears to be what's happening here- we're avoiding the problem of double-inclusion by wrapping the main body of the header file inside an `ifndef` + `endif` block.  I subsequently confirmed this via a question I asked [here](https://unix.stackexchange.com/questions/726043/what-is-the-purpose-of-defining-a-preprocessor-macro-like-bash-h-that-is-onl){:target="_blank" rel="noopener"}, in StackExchange.
 
-Side note- although this website is called "cprogramming.com", it is not considered official C-language documentation.  That's just the website name chosen by the website's admins.  It looks like [there is no official online version of C documentation](https://web.archive.org/web/20220826163755/https://stackoverflow.com/questions/4233925/is-there-something-like-the-official-c-documentation); the closest thing to official docs is a PDF version of the C99 standard.
+Side note- although this website is called "cprogramming.com", it is not considered official C-language documentation.  That's just the website name chosen by the website's admins.  It looks like [there is no official online version of C documentation](https://web.archive.org/web/20220826163755/https://stackoverflow.com/questions/4233925/is-there-something-like-the-official-c-documentation){:target="_blank" rel="noopener"}; the closest thing to official docs is a PDF version of the C99 standard.
 
 Next block of code:
 
@@ -68,7 +68,7 @@ Next block of code:
 #define EX_USAGE 258
 ```
 
-These are more [macro definitions](https://web.archive.org/web/20221014055515/https://gcc.gnu.org/onlinedocs/cpp/Object-like-Macros.html).  I was curious where the variables defined by these macros are used, so I searched the codebase for them.  Looks like they're all used in `realpath.c`:
+These are more [macro definitions](https://web.archive.org/web/20221014055515/https://gcc.gnu.org/onlinedocs/cpp/Object-like-Macros.html){:target="_blank" rel="noopener"}.  I was curious where the variables defined by these macros are used, so I searched the codebase for them.  Looks like they're all used in `realpath.c`:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1046am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
@@ -93,7 +93,7 @@ typedef struct word_desc {
 } WORD_DESC;
 ```
 
-I've seen this syntax before, in a previous attempt to learn C, but I need a refresher.  I Google "what is typedef struct c", and find [this page](https://web.archive.org/web/20221106164811/https://www.educative.io/answers/how-to-use-the-typedef-struct-in-c) (I started by searching directly on [gcc.gnu.org/](https://gcc.gnu.org/), but couldn't quickly find anything relevant).  Here's a before-and-after example of how `typedef struct` is used in C:
+I've seen this syntax before, in a previous attempt to learn C, but I need a refresher.  I Google "what is typedef struct c", and find [this page](https://web.archive.org/web/20221106164811/https://www.educative.io/answers/how-to-use-the-typedef-struct-in-c){:target="_blank" rel="noopener"} (I started by searching directly on [gcc.gnu.org/](https://gcc.gnu.org/){:target="_blank" rel="noopener"}, but couldn't quickly find anything relevant).  Here's a before-and-after example of how `typedef struct` is used in C:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1048am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -146,7 +146,7 @@ typedef int sh_builtin_func_t(WORD_LIST *);
 
 (stopping here; 3870 words)
 
-This code was confusing to me at first.  I see the use of `typedef` again, but it looks different from when it was used with a struct.  Here we're using it with the keywords `int` and what looks like a function call (`sh_builtin_func_t(WORD_LIST *)`).  I Google "typedef function" and, after reading through a few dead-end pages, I found [this page](https://archive.ph/hxAry), which includes the following example code and description:
+This code was confusing to me at first.  I see the use of `typedef` again, but it looks different from when it was used with a struct.  Here we're using it with the keywords `int` and what looks like a function call (`sh_builtin_func_t(WORD_LIST *)`).  I Google "typedef function" and, after reading through a few dead-end pages, I found [this page](https://web.archive.org/web/20230408150124/https://www.includehelp.com/c/typedef-function-pointer.aspx){:target="_blank" rel="noopener"}, which includes the following example code and description:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1050am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -154,7 +154,7 @@ This code was confusing to me at first.  I see the use of `typedef` again, but i
 
 We can see `typedef int function(int a, int b);` in the middle of the screenshot, and then `int callfunction(function* p, int a, int b)` after that.  So a function named `callfunction` is defined, which takes as parameters a function and two `int` values.  And since any function which takes in two `int` params can be passed to `callFunction`, we need to define an abstract interface first, which we do using the `typedef` line.
 
-In the case of [our code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/bash.h), it looks like we define a similar abstract interface on [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/bash.h#L20).  In our case, we're defining the abstract interface named `sh_builtin_func_t`, which is subsequently used in the `builtin` struct at the end of the file.  Any function which takes in a `WORD_LIST` type and returns an `int` type would be an acceptable concrete implementation of this abstract `sh_builtin_func_t` function interface.
+In the case of [our code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/bash.h), it looks like we define a similar abstract interface on [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/bash.h#L20){:target="_blank" rel="noopener"}.  In our case, we're defining the abstract interface named `sh_builtin_func_t`, which is subsequently used in the `builtin` struct at the end of the file.  Any function which takes in a `WORD_LIST` type and returns an `int` type would be an acceptable concrete implementation of this abstract `sh_builtin_func_t` function interface.
 
 Last block of code:
 
@@ -178,22 +178,22 @@ A `long_doc` property (of type char*, aka a string; also, this is constant, so i
 A `short_doc` property (of type char*, aka a string; also, this is constant, so it can't be changed)
 An `unused` property (of type char*, aka a string)
 
-After a `grep` for this `builtin` struct, I find that it's used [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/realpath.c#L36), in `realpath.c`.  We'll examine *how* it's used when we get to that file.
+After a `grep` for this `builtin` struct, I find that it's used [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/realpath.c#L36){:target="_blank" rel="noopener"}, in `realpath.c`.  We'll examine *how* it's used when we get to that file.
 
 OK, so I get how the `.h` and `.c` files fit in with each other and what they seem to be doing, but where does their end result actually get *used*?
 
-I look up the Github history of these files, and find [this commit](https://github.com/rbenv/rbenv/pull/528/commits/16c7eb41354c3c1ca5fca08bd0501568fa2b5212), which includes the original addition of the Makefile.  It references the `CC` variable that we saw defined earlier, which makes me think that running `make` will somehow run `gcc`, which will somehow be smart enough to bundle all the `.c` and `.h` files together and somehow produce the `rbenv-realpath.dylib` file which [this line of code](https://github.com/rbenv/rbenv/pull/528/commits/16c7eb41354c3c1ca5fca08bd0501568fa2b5212#diff-8703c70480cf5f0844a451d59abf7264a126d154a1c420d878f1c6f8d495762aR22) then maps into a new definition of the `realpath` command, via the `enable` builtin?  There's a lot of [unknown unknowns](https://web.archive.org/web/20220331220222/https://medium.com/the-world-in-the-future/known-knowns-unknown-knowns-and-unknown-unknowns-b35013fb350d) here, but I feel like I'm at least directionally correct in the above.  If I want to firm up my understanding a bit more, I think the next step is to research how a Makefile works.
+I look up the Github history of these files, and find [this commit](https://github.com/rbenv/rbenv/pull/528/commits/16c7eb41354c3c1ca5fca08bd0501568fa2b5212){:target="_blank" rel="noopener"}, which includes the original addition of the Makefile.  It references the `CC` variable that we saw defined earlier, which makes me think that running `make` will somehow run `gcc`, which will somehow be smart enough to bundle all the `.c` and `.h` files together and somehow produce the `rbenv-realpath.dylib` file which [this line of code](https://github.com/rbenv/rbenv/pull/528/commits/16c7eb41354c3c1ca5fca08bd0501568fa2b5212#diff-8703c70480cf5f0844a451d59abf7264a126d154a1c420d878f1c6f8d495762aR22) then maps into a new definition of the `realpath` command, via the `enable` builtin?  There's a lot of [unknown unknowns](https://web.archive.org/web/20220331220222/https://medium.com/the-world-in-the-future/known-knowns-unknown-knowns-and-unknown-unknowns-b35013fb350d) here, but I feel like I'm at least directionally correct in the above.  If I want to firm up my understanding a bit more, I think the next step is to research how a Makefile works.
 
 (stopping here; 4380 words)
 
-Learning Makefiles was a bit of an arduous process.  It involved a lot of reading and tutorial completion; it wasn't nearly as simple as looking up a simple answer on StackOverflow.  First I read [this tutorial](https://web.archive.org/web/20221120141457/https://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/), which was a good and (thankfully) brief step-by-step introduction.  My take-aways from this page were:
+Learning Makefiles was a bit of an arduous process.  It involved a lot of reading and tutorial completion; it wasn't nearly as simple as looking up a simple answer on StackOverflow.  First I read [this tutorial](https://web.archive.org/web/20221120141457/https://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/){:target="_blank" rel="noopener"}, which was a good and (thankfully) brief step-by-step introduction.  My take-aways from this page were:
 
  - "Makefiles are a simple way to organize code compilation."
  - "(The non-Makefile) approach to compilation has two downfalls. First, if you lose the compile command or switch computers you have to retype it from scratch, which is inefficient at best. Second, if you are only making changes to one .c file, recompiling all of them every time is also time-consuming and inefficient."
  - "`make` with no arguments executes the first rule in the file."
  - "...by putting the list of files on which the command depends on the first line after the :, `make` knows that the rule needs to be executed if any of those files change."
 
-Next I check out [this tutorial](https://web.archive.org/web/20221126125539/https://makefiletutorial.com/), which is more comprehensive.  My take-aways from this one were:
+Next I check out [this tutorial](https://web.archive.org/web/20221126125539/https://makefiletutorial.com/){:target="_blank" rel="noopener"}, which is more comprehensive.  My take-aways from this one were:
 
  - "Makefiles are used to help decide which parts of a large program need to be recompiled."
  - "In the vast majority of cases, C or C++ files are compiled."
@@ -212,7 +212,7 @@ Next I check out [this tutorial](https://web.archive.org/web/20221126125539/http
  - The prerequisites are also file names, separated by spaces. These files need to exist before the commands for the target are run. These are also called dependencies.
  - If no dependencies / prerequisites are specified, then running `make` more than once will *not* result in that rule being re-run, even if the rule's associated file should be re-compiled.
 
-The previous link also contains [an embedded Youtube video](https://www.youtube.com/watch?v=zeEMISsjO38&ab_channel=ChaseLambert), from which I learned the following:
+The previous link also contains [an embedded Youtube video](https://www.youtube.com/watch?v=zeEMISsjO38&ab_channel=ChaseLambert){:target="_blank" rel="noopener"}, from which I learned the following:
 
  - The dependencies referenced to the right of a ":" symbol correspond to rule names further down (i.e. names to the left of subsequent ":" symbols).
  - `make` checks whether files need to be re-compiled by checking the `updated_at` timestamps of the generated files as well as the dependencies of those files.  If dependency timestamps are all older the target timestamps, no re-compilation will happen when `make` is re-run.
@@ -227,13 +227,13 @@ After reading the above, I've learned a lot.  One last thing I want to learn is 
   <img src="/assets/images/screenshot-19mar2023-1056am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
-My first thought was that this rule creates a hidden dotfile named "c.o".  But when I ran `make` and did an `ls -la` search for any dotfiles, I didn't find any, so I concluded that this is not correct.  I then Googled 'makefile ".c.o:"', and found [a useful result](https://archive.ph/K1xVd) right away:
+My first thought was that this rule creates a hidden dotfile named "c.o".  But when I ran `make` and did an `ls -la` search for any dotfiles, I didn't find any, so I concluded that this is not correct.  I then Googled 'makefile ".c.o:"', and found [a useful result](https://web.archive.org/web/20230402082435/https://stackoverflow.com/questions/9233447/what-is-the-makefile-target-c-o-for){:target="_blank" rel="noopener"} right away:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1057am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
-I see the link to the documentation on [old-fashioned suffix rules](https://www.gnu.org/software/make/manual/make.html#Suffix-Rules), so I go there:
+I see the link to the documentation on [old-fashioned suffix rules](https://www.gnu.org/software/make/manual/make.html#Suffix-Rules){:target="_blank" rel="noopener"}, so I go there:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1058am.png" width="80%" style="border: 1px solid black; padding: 0.5em">
@@ -315,7 +315,7 @@ NOTE- ignore the `total 72` vs `total 80` here.  We did not add 8 new files.  Th
 
 > The listing of a directory's contents is preceded by a labeled total number of blocks used in the file system by the files which are listed as the directory's contents
 
-For more info on blocks, see [this page from O'Reilly](https://web.archive.org/web/20230319141339/https://www.oreilly.com/library/view/managing-raid-on/9780596802035/ch06s01s01.html).
+For more info on blocks, see [this page from O'Reilly](https://web.archive.org/web/20230319141339/https://www.oreilly.com/library/view/managing-raid-on/9780596802035/ch06s01s01.html){:target="_blank" rel="noopener"}.
 
 Looks like only `realpath.o` was created, at least in this directory.  I do note that the 2nd rule specifies `../libexec/rbenv-realpath.dylib` as the target file, so I'm guessing that was created.  I run `ls -la ../libexec` to see whether it's there or not:
 
@@ -405,7 +405,7 @@ gcc -fno-common     -c -o realpath.o realpath.c
 
 I'm unable to find a `man` page for `gcc` on my local machine (I get "No manual entry for gcc" as an error when I run `man gcc`), so I have to Google around for what each of these things does.  As far as I can tell, the components of this command are as follows:
 
-  - `gcc` is what `SHOBJ_CC` resolves to.  It's initially [set here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/configure#L6) as the variable `CC`, and is passed to `shobj-conf` [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/configure#L34).  It doesn't get modified in `shobj-conf` (at least, not on my machine), and so it ends up as its original value when it's run as a command by `make`.
+  - `gcc` is what `SHOBJ_CC` resolves to.  It's initially [set here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/configure#L6){:target="_blank" rel="noopener"} as the variable `CC`, and is passed to `shobj-conf` [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/configure#L34){:target="_blank" rel="noopener"}.  It doesn't get modified in `shobj-conf` (at least, not on my machine), and so it ends up as its original value when it's run as a command by `make`.
   - The `-fno-common` flag comes from `SHOBJ_CFLAGS`.  According to `gcc –help`, it tells gcc to `(c)ompile common globals like normal definitions`.  See below for a brief tangent.
     - TODO- explain what the implications of "compile common globals like normal definitions" means.
   - TODO- explain what the `-fno-common` flag does.
@@ -424,16 +424,16 @@ gcc -dynamiclib -dynamic -undefined dynamic_lookup   -o ../libexec/rbenv-realpat
 Each of these components does something different:
 
  - `gcc` does the same thing as in the first `make` rule- it invokes the Gnu C Compiler.
- - `-dynamiclib`: according to [the gcc docs](https://web.archive.org/web/20221117171743/https://gcc.gnu.org/onlinedocs/gcc/Darwin-Options.html), "When passed this option, GCC produces a dynamic library instead of an executable when linking, using the Darwin libtool command."  I'll explain more in the tangent below on dynamic libraries.
+ - `-dynamiclib`: according to [the gcc docs](https://web.archive.org/web/20221117171743/https://gcc.gnu.org/onlinedocs/gcc/Darwin-Options.html){:target="_blank" rel="noopener"}, "When passed this option, GCC produces a dynamic library instead of an executable when linking, using the Darwin libtool command."  I'll explain more in the tangent below on dynamic libraries.
  - `-dynamic`: I'm not sure what this does, actually.  I see a reference to it in the same gcc docs, but at the very bottom with no explanation on what it does.  TODO- figure out how this is different from the `-dynamiclib` flag.
- - `-undefined`: to be honest, at first this looked to me like a mistake, similar to the times when I've seen a `null` value be passed into a string-interpolation in JS and end up being resolved to the string "undefined".  That's not the case here, since it's explicitly set to this value [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/shobj-conf#L207), inside the file "shobj-conf".  However, I'm not sure what its purpose is.  TODO- figure out what the "undefined" flag does.
+ - `-undefined`: to be honest, at first this looked to me like a mistake, similar to the times when I've seen a `null` value be passed into a string-interpolation in JS and end up being resolved to the string "undefined".  That's not the case here, since it's explicitly set to this value [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/shobj-conf#L207){:target="_blank" rel="noopener"}, inside the file "shobj-conf".  However, I'm not sure what its purpose is.  TODO- figure out what the "undefined" flag does.
  - `dynamic_lookup`: not sure what this does either.  TODO- figure out what "dynamic_lookup" does.
  - `-o ../libexec/rbenv-realpath.dylib`: this means that the output of the `gcc` command should be the file "../libexec/rbenv-realpath.dylib".
  - `realpath.o`: this is the input file for the `gcc` common here.
 
 So while we can't be sure what precisely this command is doing (since we don't know what all the flags do), we can make a guess.  Taken together, it appears that we are compiling "realpath.o" into a dynamic library named "../libexec/rbenv-realpath.dylib".
 
-UPDATE: after substantial searching, I Google the phrase "dynamic_lookup gcc", and I find [the following search result](https://github.com/ziglang/zig/issues/8016):
+UPDATE: after substantial searching, I Google the phrase "dynamic_lookup gcc", and I find [the following search result](https://github.com/ziglang/zig/issues/8016){:target="_blank" rel="noopener"}:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1129am.png" width="80%" style="border: 1px solid black; padding: 0.5em">
@@ -443,12 +443,12 @@ UPDATE: after substantial searching, I Google the phrase "dynamic_lookup gcc", a
 
 I read this to mean that the flag is "-undefined" with a flag parameter of "dynamic_lookup", and that this combo tells `gcc` what to do when it finds an unresolved symbol.  An example of an unresolved symbol is (I think?) is when a variable is mentioned in the code which hasn't yet been defined.  Since the whole purpose of what we're doing here is to build a dynamic library (our faster, more performant "realpath" function), part of doing so is telling the code compiler what to do when it finds references to variables or functions that it doesn't recognize.
 
-I do think it's a little weird that "-undefined dynamic_lookup" doesn't seem to be documented in the gcc docs anywhere.  Am I going crazy, or is it really and truly undocumented?  I write [a StackOverflow question](https://stackoverflow.com/questions/74667414/gcc-what-does-undefined-dynamic-lookup-do) about it.  Eventually, someone responds that they *do* have a `man` entry for gcc, and that when they search for "undefined", it says:
+I do think it's a little weird that "-undefined dynamic_lookup" doesn't seem to be documented in the gcc docs anywhere.  Am I going crazy, or is it really and truly undocumented?  I write [a StackOverflow question](https://stackoverflow.com/questions/74667414/gcc-what-does-undefined-dynamic-lookup-do){:target="_blank" rel="noopener"} about it.  Eventually, someone responds that they *do* have a `man` entry for gcc, and that when they search for "undefined", it says:
 
 ```
 -undefined ... These options are passed to the Darwin linker.  The Darwin linker man page describes them in detail.
 ```
-I look up [the "Darwin linker man page"](https://archive.ph/1IB29) online, and I find the following:
+I look up [the "Darwin linker man page"](https://archive.ph/1IB29){:target="_blank" rel="noopener"} online, and I find the following:
 
 -undefined <treatment>
 Specifies how undefined symbols are to be treated. Options are: error, warning, suppress, or dynamic_lookup.  The default is error.
@@ -459,7 +459,7 @@ Great, mystery solved.  It looks like the docs confirm the info we found in the 
 
 So why does the answerer have a `man` page for `gcc` on their machine, but I don't have one on mine?
 
-I Google `"No manual entry for gcc"`, and find [this StackOverflow post](https://web.archive.org/web/20160317092220/https://stackoverflow.com/questions/23684642/how-to-fix-no-manual-entry-for-gcc):
+I Google `"No manual entry for gcc"`, and find [this StackOverflow post](https://web.archive.org/web/20160317092220/https://stackoverflow.com/questions/23684642/how-to-fix-no-manual-entry-for-gcc){:target="_blank" rel="noopener"}:
 
 ```
 gcc isn't installed anymore by Xcode, it really installs clang and calls it gcc
@@ -503,13 +503,13 @@ lrwxr-xr-x  1 myusername  admin  38 Dec  3 10:35 /usr/local/bin/gcc-ranlib-12 ->
 
 So Homebrew names this executable `gcc-12`, not `gcc`.  Why is that?  If the package name is `gcc`, I would expect there to be a `gcc` executable in `/usr/bin/local` as well.  Is that an unreasonable expectation?
 
-I type up [another StackOverflow question](https://archive.ph/zjyCg) and wait for an answer.
+I type up [another StackOverflow question](https://stackoverflow.com/questions/74668303/why-does-brew-install-gcc-result-in-the-executable-being-named-gcc-12-not){:target="_blank" rel="noopener"} and wait for an answer.
 
 The next day, I realize that the name of the executable, and therefore the name of the command I have to type into my terminal, is probably due to decisions made by the authors of the Homebrew formula.  I think it'd be a worthwhile exercise to put together a "Hello world" Homebrew package, to see how they're made (and therefore the best practices around naming the executables), but that seems like a separate project that would distract me from my current mission.  I capture it in my list of to-do's, and I decide to table that for another day.
 
 ### Tangent- Dynamic libraries
 
-When I read the sentence "GCC produces a dynamic library instead of an executable...", I was curious what the difference is between dynamic libraries and executables.  I found [this link](https://web.archive.org/web/20220906073706/https://www.internalpointers.com/post/journey-across-static-dynamic-libraries), which says the following:
+When I read the sentence "GCC produces a dynamic library instead of an executable...", I was curious what the difference is between dynamic libraries and executables.  I found [this link](https://web.archive.org/web/20220906073706/https://www.internalpointers.com/post/journey-across-static-dynamic-libraries){:target="_blank" rel="noopener"}, which says the following:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1136am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
@@ -530,7 +530,7 @@ clean:
 	rm -f *.o ../libexec/*.dylib
 ```
 
-This rule seems pretty straightforward, and we can find info on it in [the Make manual](https://web.archive.org/web/20220828164404/https://www.gnu.org/software/make/manual/html_node/Cleanup.html):
+This rule seems pretty straightforward, and we can find info on it in [the Make manual](https://web.archive.org/web/20220828164404/https://www.gnu.org/software/make/manual/html_node/Cleanup.html){:target="_blank" rel="noopener"}:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1138am.png" width="90%" style="border: 1px solid black; padding: 0.5em">

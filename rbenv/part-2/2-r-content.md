@@ -1,6 +1,6 @@
 As usual, let's first look at the tests.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/shell.bats)
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/shell.bats){:target="_blank" rel="noopener"}
 
 After the shebang and the loading of `test_helper`, the first spec is:
 
@@ -221,9 +221,9 @@ We could write:
 
 I just added the above test into the spec file and ran the full file, and everything passed.
 
-And it seems like the user needs shell integration enabled in order to use `rbenv shell` anyway, so there's no harm in refactoring the tests to all resemble the 2nd one.  I submit [a Github issue](https://github.com/rbenv/rbenv/issues/1455) to check whether the core team would find this useful.
+And it seems like the user needs shell integration enabled in order to use `rbenv shell` anyway, so there's no harm in refactoring the tests to all resemble the 2nd one.  I submit [a Github issue](https://github.com/rbenv/rbenv/issues/1455){:target="_blank" rel="noopener"} to check whether the core team would find this useful.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-sh-shell)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-sh-shell){:target="_blank" rel="noopener"}
 
 Now for the file itself.
 
@@ -326,7 +326,7 @@ fi
 
 If the first argument to `rbenv shell` (which we stored in the variable `version`) was actually *not* a version number, but rather the flag "--unset", that means the user wants to unset the Ruby version for this shell.  In that case, how we do that depends on which shell they're using.  In either case, we first save their current version in a new shell variable for posterity before deleting the old value.
 
-If they're using the fish shell, we use the `set -gu` command to save away that old value.  According to [the fish docs](https://web.archive.org/web/20221009140752/https://fishshell.com/docs/current/cmds/set.html), the `-g` flag "Causes the specified shell variable to be given a global scope. Global variables don't disappear and are available to all functions running in the same shell. They can even be modified."  And the `-u` flag "Causes the specified shell variable to NOT be exported to child processes."  According to [the PR which introduced these flags](https://github.com/rbenv/rbenv/commit/c4d97ad3927c2670d293ac8910ff2bbcd05a06c7), these flags somehow help ensure that `RBENV_VERSION_OLD` is never exported.  If this is our goal, I'm not sure what is accomplished via the one-two punch of a) giving the variable global scope, and b) making it unavailable to child processes.  Maybe this will become clearer as I read the script.
+If they're using the fish shell, we use the `set -gu` command to save away that old value.  According to [the fish docs](https://web.archive.org/web/20221009140752/https://fishshell.com/docs/current/cmds/set.html){:target="_blank" rel="noopener"}, the `-g` flag "Causes the specified shell variable to be given a global scope. Global variables don't disappear and are available to all functions running in the same shell. They can even be modified."  And the `-u` flag "Causes the specified shell variable to NOT be exported to child processes."  According to [the PR which introduced these flags](https://github.com/rbenv/rbenv/commit/c4d97ad3927c2670d293ac8910ff2bbcd05a06c7){:target="_blank" rel="noopener"}, these flags somehow help ensure that `RBENV_VERSION_OLD` is never exported.  If this is our goal, I'm not sure what is accomplished via the one-two punch of a) giving the variable global scope, and b) making it unavailable to child processes.  Maybe this will become clearer as I read the script.
 
 However, if we assume that the fish and non-fish versions of this case statement behave in the exact same way (which I don't know enough to say for sure yet but which seems reasonable), then we could look at the next branch of the case statement to give us a clue about that unclear fish logic:
 
@@ -389,15 +389,15 @@ EOS
     ;;
 ```
 
-We're `cat`'ing a here-doc string containing a bunch of commands which will be evaluated by the shell function.  [The fish docs](https://web.archive.org/web/20221009140752/https://fishshell.com/docs/current/cmds/set.html) tell us that `set -q` is how we test whether a variable has been defined.  There's no output, but the exit code is the number of variables passed to `set -q` which were undefined.  So since we only passed one variable to `set -q`, i.e. `RBENV_VERSION_OLD`, our exit code is 0 if `RBENV_VERSION_OLD` is defined and 1 if it is undefined.
+We're `cat`'ing a here-doc string containing a bunch of commands which will be evaluated by the shell function.  [The fish docs](https://web.archive.org/web/20221009140752/https://fishshell.com/docs/current/cmds/set.html){:target="_blank" rel="noopener"} tell us that `set -q` is how we test whether a variable has been defined.  There's no output, but the exit code is the number of variables passed to `set -q` which were undefined.  So since we only passed one variable to `set -q`, i.e. `RBENV_VERSION_OLD`, our exit code is 0 if `RBENV_VERSION_OLD` is defined and 1 if it is undefined.
 
-If our exit code is 1, according to [fish's `if` docs](https://web.archive.org/web/20221009122727/https://fishshell.com/docs/current/cmds/if.html), we'll execute the `else` branch, which just prints an error message to STDERR.  I was confused by the inclusion of `false` on the next line, since by now I've learned that bash doesn't have true "return values" the way that Ruby does; it only has exit statuses.  After Googling around a bit for "bash booleans", I found [this StackOverflow link](https://web.archive.org/web/20221010223229/https://stackoverflow.com/questions/2953646/how-can-i-declare-and-use-boolean-variables-in-a-shell-script) which explains:
+If our exit code is 1, according to [fish's `if` docs](https://web.archive.org/web/20221009122727/https://fishshell.com/docs/current/cmds/if.html){:target="_blank" rel="noopener"}, we'll execute the `else` branch, which just prints an error message to STDERR.  I was confused by the inclusion of `false` on the next line, since by now I've learned that bash doesn't have true "return values" the way that Ruby does; it only has exit statuses.  After Googling around a bit for "bash booleans", I found [this StackOverflow link](https://web.archive.org/web/20221010223229/https://stackoverflow.com/questions/2953646/how-can-i-declare-and-use-boolean-variables-in-a-shell-script){:target="_blank" rel="noopener"} which explains:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-17mar23-851am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-So here we're using `false` to send a command to the shell to exit with a non-zero return status.  The above SO answer is for bash, but [it appears to work the same way in fish](https://fishshell.com/docs/current/cmds/false.html#cmd-false).
+So here we're using `false` to send a command to the shell to exit with a non-zero return status.  The above SO answer is for bash, but [it appears to work the same way in fish](https://fishshell.com/docs/current/cmds/false.html#cmd-false){:target="_blank" rel="noopener"}.
 
 Back to the first of our `if` statements.  If `RBENV_VERSION_OLD` is set and our exit code is 0, then we execute the logic inside this `if` statement.  That logic is:
 
@@ -454,9 +454,9 @@ Let's look at the first `if` condition:
 if [ -n "\${RBENV_VERSION_OLD+x}" ]; then
 ```
 
-According to [StackOverflow](https://web.archive.org/web/20190823232017/https://stackoverflow.com/questions/46891981/what-does-argumentx-mean-in-bash), the point of the `+x` in the parameter expansion is to "deterimine(s) if a variable ARGUMENT is set to any value (empty or non-empty) or not."  Similar to the fish script, we're just querying if the variable has been set, even if it's just to the empty string.  We could just use the simpler `if [ -n "${RBENV_VERSION_OLD}" ]` (and in fact we do exactly that on the next line), but that test would be falsy in the case where `RBENV_VERSION_OLD` is set to "", but we would want that case to be truthy, because we want the ability to have an `else` clause where we tell the user that the variable is unset.
+According to [StackOverflow](https://web.archive.org/web/20190823232017/https://stackoverflow.com/questions/46891981/what-does-argumentx-mean-in-bash){:target="_blank" rel="noopener"}, the point of the `+x` in the parameter expansion is to "deterimine(s) if a variable ARGUMENT is set to any value (empty or non-empty) or not."  Similar to the fish script, we're just querying if the variable has been set, even if it's just to the empty string.  We could just use the simpler `if [ -n "${RBENV_VERSION_OLD}" ]` (and in fact we do exactly that on the next line), but that test would be falsy in the case where `RBENV_VERSION_OLD` is set to "", but we would want that case to be truthy, because we want the ability to have an `else` clause where we tell the user that the variable is unset.
 
-It might be instructive to look at the commit which introduced this relatively more complicated conditional logic, to see if it used to be simpler (and if so, whether there's any context on why the additional complexity was needed).  I find [this commit](https://github.com/rbenv/rbenv/commit/c4d97ad3927c2670d293ac8910ff2bbcd05a06c7), which includes the following diff:
+It might be instructive to look at the commit which introduced this relatively more complicated conditional logic, to see if it used to be simpler (and if so, whether there's any context on why the additional complexity was needed).  I find [this commit](https://github.com/rbenv/rbenv/commit/c4d97ad3927c2670d293ac8910ff2bbcd05a06c7){:target="_blank" rel="noopener"}, which includes the following diff:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-17mar23-852am.png" width="90%" style="border: 1px solid black; padding: 0.5em">

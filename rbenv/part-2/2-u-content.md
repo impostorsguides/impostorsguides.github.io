@@ -1,6 +1,6 @@
-There's just one more file we have to examine before we can call it a day on the "libexec/" folder.  I see the "test/" directory has its own folder named "libexec", containing a command named `rbenv-echo`.  I `grep` for the usage of this command, and I only see one case, inside [the `rbenv.bats` spec file](https://github.com/rbenv/rbenv/blob/ed1a3a554585799cd0537c6a5678f6c793145b8e/test/rbenv.bats).  Let's look at the `rbenv-echo` command now.
+There's just one more file we have to examine before we can call it a day on the "libexec/" folder.  I see the "test/" directory has its own folder named "libexec", containing a command named `rbenv-echo`.  I `grep` for the usage of this command, and I only see one case, inside [the `rbenv.bats` spec file](https://github.com/rbenv/rbenv/blob/ed1a3a554585799cd0537c6a5678f6c793145b8e/test/rbenv.bats){:target="_blank" rel="noopener"}.  Let's look at the `rbenv-echo` command now.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/libexec/rbenv-echo)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/libexec/rbenv-echo){:target="_blank" rel="noopener"}
 
 ```
 #!/usr/bin/env bash
@@ -24,14 +24,14 @@ At any rate, what are we storing in "sep"?  The `bash` syntax is:
 "${1:2}"
 ```
 
-To see what happens here, I once again pull up [the GNU "Parameter Expansion" Docs](https://web.archive.org/web/20220905173558/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html), and search for the string "1:2".  No luck, so I search for "1:".  This time I find the following:
+To see what happens here, I once again pull up [the GNU "Parameter Expansion" Docs](https://web.archive.org/web/20220905173558/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"}, and search for the string "1:2".  No luck, so I search for "1:".  This time I find the following:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-17mar23-949am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
 
-I Google "set –", and I find [this StackExchange answer](https://web.archive.org/web/20221015064720/https://unix.stackexchange.com/questions/308260/what-does-set-do-in-this-dockerfile-entrypoint) which says that "set --" tells the shell to set everything after "--" as the positional arguments (i.e. the members of "$@").  So the line:
+I Google "set –", and I find [this StackExchange answer](https://web.archive.org/web/20221015064720/https://unix.stackexchange.com/questions/308260/what-does-set-do-in-this-dockerfile-entrypoint){:target="_blank" rel="noopener"} which says that "set --" tells the shell to set everything after "--" as the positional arguments (i.e. the members of "$@").  So the line:
 
 ```
 Set – 01234567890abcdefgh
@@ -80,7 +80,7 @@ I don't know what a "nameref" is, and therefore I don't know which of the "if" b
 
 OK, rant over.
 
-I Google "bash parameter expansion exclamation mark", and I find [another StackOverflow link](https://web.archive.org/web/20211211034729/https://unix.stackexchange.com/questions/41292/variable-substitution-with-an-exclamation-mark-in-bash), which contains the following clarification:
+I Google "bash parameter expansion exclamation mark", and I find [another StackOverflow link](https://web.archive.org/web/20211211034729/https://unix.stackexchange.com/questions/41292/variable-substitution-with-an-exclamation-mark-in-bash){:target="_blank" rel="noopener"}, which contains the following clarification:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-17mar23-952am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -106,7 +106,7 @@ SYNOPSIS
 DESCRIPTION
 The tr utility copies the standard input to the standard output with substitution or deletion of selected characters.
 
-Hoping for some example code, I Google "bash tr command" and find [this link](https://web.archive.org/web/20221029094817/https://linuxhint.com/bash_tr_command/) as the first result.  One of its examples of how to use `tr` is:
+Hoping for some example code, I Google "bash tr command" and find [this link](https://web.archive.org/web/20221029094817/https://linuxhint.com/bash_tr_command/){:target="_blank" rel="noopener"} as the first result.  One of its examples of how to use `tr` is:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-17mar23-954am.png" width="70%" style="border: 1px solid black; padding: 0.5em">

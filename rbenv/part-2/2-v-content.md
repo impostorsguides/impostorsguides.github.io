@@ -1,6 +1,6 @@
 Starting with the test file as usual.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version.bats)
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version.bats){:target="_blank" rel="noopener"}
 
 For our first block of code, first we have:
 
@@ -66,7 +66,7 @@ The line:
 cat > ".ruby-version" <<<"1.9.3"
 ```
 
-...says: "Read from STDIN and print what you receive to the file `.ruby-version`.  Oh, and also send the string "1.9.3" to STDIN."  The line `<<<"1.9.3"` is called a herestring, and is [a way of giving text to a program](https://web.archive.org/web/20220605071257/https://askubuntu.com/questions/678915/whats-the-difference-between-and-in-bash).
+...says: "Read from STDIN and print what you receive to the file `.ruby-version`.  Oh, and also send the string "1.9.3" to STDIN."  The line `<<<"1.9.3"` is called a herestring, and is [a way of giving text to a program](https://web.archive.org/web/20220605071257/https://askubuntu.com/questions/678915/whats-the-difference-between-and-in-bash){:target="_blank" rel="noopener"}.
 
 Final test:
 
@@ -96,11 +96,11 @@ I create this test and run it to see if it passes:
 }
 ```
 
-It does indeed pass!  I create [a PR to add this test](https://github.com/rbenv/rbenv/pull/1456), and am waiting for a response.
+It does indeed pass!  I create [a PR to add this test](https://github.com/rbenv/rbenv/pull/1456){:target="_blank" rel="noopener"}, and am waiting for a response.
 
 That's it for the test file.  Onto the code itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version)
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version){:target="_blank" rel="noopener"}
 
 First block of code:
 
