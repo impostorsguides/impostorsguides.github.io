@@ -98,7 +98,7 @@ Next test:
 }
 ```
 
-Here we create a `.ruby-version` file with one version of Ruby (`1.0-pre`), and create a fake “installed” version with a different version number (`1.2.3`).  As a sanity check, we run `rbenv local` once to confirm that it outputs the first version number.  We then run `rbenv local` a 2nd time, and this time we pass it the 2nd version number.  We then assert that the command exited successfully and that our the contents of our `.ruby-version` file changed from the 1st Ruby version to the 2nd one.
+Here we create a `.ruby-version` file with one version of Ruby (`1.0-pre`), and create a fake "installed" version with a different version number (`1.2.3`).  As a sanity check, we run `rbenv local` once to confirm that it outputs the first version number.  We then run `rbenv local` a 2nd time, and this time we pass it the 2nd version number.  We then assert that the command exited successfully and that our the contents of our `.ruby-version` file changed from the 1st Ruby version to the 2nd one.
 
 Last test:
 

@@ -33,7 +33,7 @@ Next block of code is the first test:
 }
 ```
 
-Here we test the case where the user hasn't installed any Ruby versions yet, and then we run the `version-name` command.  We assert that the command was successful and that the default “system” version of Ruby is printed as output.
+Here we test the case where the user hasn't installed any Ruby versions yet, and then we run the `version-name` command.  We assert that the command was successful and that the default "system" version of Ruby is printed as output.
 
 Next test:
 
@@ -44,7 +44,7 @@ Next test:
 }
 ```
 
-Here we check that if the user specifically sets their `RBENV_VERSION` env var to “system”, the command will use that as the version name.  I skipped ahead to the program code for a minute, and it looks like when we get to [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L18){:target="_blank" rel="noopener"}, we'll see that when the user's `RBENV_VERSION` env var is either empty or set to “system”, the program prints “system” and exits.  These two scenarios are covered by the previous two tests we just looked at.
+Here we check that if the user specifically sets their `RBENV_VERSION` env var to "system", the command will use that as the version name.  I skipped ahead to the program code for a minute, and it looks like when we get to [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L18){:target="_blank" rel="noopener"}, we'll see that when the user's `RBENV_VERSION` env var is either empty or set to "system", the program prints "system" and exits.  These two scenarios are covered by the previous two tests we just looked at.
 
 Next test:
 
@@ -59,7 +59,7 @@ Next test:
 }
 ```
 
-Here we create two Ruby versions with our helper method, and then create a hook file for the `version-name` command named `test.bash`.  Inside that hook file, we simply set the `RBENV_VERSION` env var to the 2nd version number that we created, “1.9.3”.  We then run the `version-name` command, specifying the *first* version number that we created.  We assert that the `version-name` command prints the version name from the hook we created.  This implies that the logic to `source` the hook files (which lives [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L14){:target="_blank" rel="noopener"}) overwrites any env vars passed to the command.
+Here we create two Ruby versions with our helper method, and then create a hook file for the `version-name` command named `test.bash`.  Inside that hook file, we simply set the `RBENV_VERSION` env var to the 2nd version number that we created, "1.9.3".  We then run the `version-name` command, specifying the *first* version number that we created.  We assert that the `version-name` command prints the version name from the hook we created.  This implies that the logic to `source` the hook files (which lives [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L14){:target="_blank" rel="noopener"}) overwrites any env vars passed to the command.
 
 Next test:
 
@@ -77,7 +77,7 @@ SH
 }
 ```
 
-Here we create a hook named `hello.bash` which contains several strings separated by tabs, spaces, and newlines.  The hook takes these strings and prints them out, using those separator characters to determine where to split them, and therefore where to concatenate them together delimited by the “:” character.  Lastly, the hook mimics the setting the value of an env var named `HELLO` to the value of those concatenated strings, `echo`ing out the command to set the env var.
+Here we create a hook named `hello.bash` which contains several strings separated by tabs, spaces, and newlines.  The hook takes these strings and prints them out, using those separator characters to determine where to split them, and therefore where to concatenate them together delimited by the ":" character.  Lastly, the hook mimics the setting the value of an env var named `HELLO` to the value of those concatenated strings, `echo`ing out the command to set the env var.
 
 We then set the internal field separator to contain the tab, space, and newline characters, and we run `version-name`.  We assert that the command was successful and that our `HELLO=...` command was `echo`'ed to the screen.
 
@@ -99,7 +99,7 @@ Next test:
 }
 ```
 
-Here we create two Ruby version installations, named “1.8.7” and “1.9.3”, and then create a local Ruby version file containing “1.8.7”.  When we run the `version-name` command, we assert that it was successful and that the version from our local version file was used.  We then run the command again, this time passing a value for our `RBENV_VERSION` env var.  We assert that the command was successful, but this time that the value we manually set for `RBENV_VERSION` was the value that was used as the command's output.
+Here we create two Ruby version installations, named "1.8.7" and "1.9.3", and then create a local Ruby version file containing "1.8.7".  When we run the `version-name` command, we assert that it was successful and that the version from our local version file was used.  We then run the command again, this time passing a value for our `RBENV_VERSION` env var.  We assert that the command was successful, but this time that the value we manually set for `RBENV_VERSION` was the value that was used as the command's output.
 
 Next test:
 
@@ -118,7 +118,7 @@ Next test:
 }
 ```
 
-Here we create two Ruby version installations, just as we did in the last test.  This time we create a global version file containing “1.8.7”.  We first assert that the `version-file` command defaults to using the global version file.  Then we create our local version file, just as we did in the last test.  When we run the command again, we now assert that it uses the local version file instead of the global file.
+Here we create two Ruby version installations, just as we did in the last test.  This time we create a global version file containing "1.8.7".  We first assert that the `version-file` command defaults to using the global version file.  Then we create our local version file, just as we did in the last test.  When we run the command again, we now assert that it uses the local version file instead of the global file.
 
 (stopping here for the day; 75095 words)
 
@@ -131,7 +131,7 @@ Next test:
 }
 ```
 
-This test explicitly avoids the setup step of creating an installed version directory inside RBENV's “versions/” parent directory.  This is so that we can test what happens when the user runs the command with a specified value set for `RBENV_VERSION`.  When this happens, we assert that an error is raised.
+This test explicitly avoids the setup step of creating an installed version directory inside RBENV's "versions/" parent directory.  This is so that we can test what happens when the user runs the command with a specified value set for `RBENV_VERSION`.  When this happens, we assert that an error is raised.
 
 Last test:
 
@@ -145,7 +145,7 @@ Last test:
 }
 ```
 
-As setup steps, we “install” Ruby v1.8.7 in RBENV's “versions/” directory, and create a local Ruby version file with the same version number inside.  We then run the `version-name` command and assert that a) it was successful, and b) that the expected version number was output.  This is the primary happy-path test for this command.
+As setup steps, we "install" Ruby v1.8.7 in RBENV's "versions/" directory, and create a local Ruby version file with the same version number inside.  We then run the `version-name` command and assert that a) it was successful, and b) that the expected version number was output.  This is the primary happy-path test for this command.
 
 Onto the code itself:
 
@@ -161,7 +161,7 @@ set -e
 ```
 
 `bash` shebang
-“Summary” comments
+"Summary" comments
 `set -e` to tell the shell to exit upon its first error
 `set -x` to tell the shell to print output in verbose mode, in this case only when the `RBENV_DEBUG` env var has been set.
 
@@ -200,7 +200,7 @@ if [ -z "$RBENV_VERSION" ] || [ "$RBENV_VERSION" = "system" ]; then
 fi
 ```
 
-Here we check whether a) our `RBENV_VERSION` variable is empty (or if its value is the `true` boolean, as per the default value in [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L8){:target="_blank" rel="noopener"}), or b) whether its value is set to “system”.  If either of these conditions are true, we simply print the string “system” and then exit the `version-name` command.
+Here we check whether a) our `RBENV_VERSION` variable is empty (or if its value is the `true` boolean, as per the default value in [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L8){:target="_blank" rel="noopener"}), or b) whether its value is set to "system".  If either of these conditions are true, we simply print the string "system" and then exit the `version-name` command.
 
 Next block of code:
 
@@ -211,7 +211,7 @@ version_exists() {
 }
 ```
 
-Here we define a helper function called `version_exists`, which takes a version number as an argument and returns a boolean corresponding to whether that version has been installed in RBENV's “versions/” directory.
+Here we define a helper function called `version_exists`, which takes a version number as an argument and returns a boolean corresponding to whether that version has been installed in RBENV's "versions/" directory.
 
 Last block of code:
 
@@ -226,8 +226,8 @@ else
 fi
 ```
 
-Once we have a version number (either from the value specified by the user via the `RBENV_VERSION` env var or from the `version-file-read` command), we invoke our `version_exists` helper method to check whether that version number is installed, assuming it is *not* prefixed with the string “ruby-”.  If it is installed, we echo it to the user.  If not, we next check whether that version number is installed, assuming it *does* include the “ruby-” prefix.  If it is installed, we print it to the screen with the prefix removed.  Lastly, if both of these checks fail, we print an error message specifying that the requested Ruby version was not found, as well as the source of the request for that particular version number (whether it was from an environment variable, a version file, etc.).  This origin comes from the `rbenv version-origin` command, which we'll look at in the next file.  Lastly, we exit with a non-zero return code.
+Once we have a version number (either from the value specified by the user via the `RBENV_VERSION` env var or from the `version-file-read` command), we invoke our `version_exists` helper method to check whether that version number is installed, assuming it is *not* prefixed with the string "ruby-".  If it is installed, we echo it to the user.  If not, we next check whether that version number is installed, assuming it *does* include the "ruby-" prefix.  If it is installed, we print it to the screen with the prefix removed.  Lastly, if both of these checks fail, we print an error message specifying that the requested Ruby version was not found, as well as the source of the request for that particular version number (whether it was from an environment variable, a version file, etc.).  This origin comes from the `rbenv version-origin` command, which we'll look at in the next file.  Lastly, we exit with a non-zero return code.
 
-More about the “ruby-” prefix- it's possible that the value of `RBENV_VERSION` looks something like “ruby-1.9.3”, and if this is the case then we want to remove the “ruby-” prefix before checking RBENV's “versions/” directory for this version number, since RBENV doesn't use that prefix when creating its Ruby version sub-directories.
+More about the "ruby-" prefix- it's possible that the value of `RBENV_VERSION` looks something like "ruby-1.9.3", and if this is the case then we want to remove the "ruby-" prefix before checking RBENV's "versions/" directory for this version number, since RBENV doesn't use that prefix when creating its Ruby version sub-directories.
 
 That's it for this file!  On to the next one.

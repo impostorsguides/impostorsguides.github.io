@@ -48,13 +48,13 @@ I look up [the first commit in this PR](https://github.com/rbenv/rbenv/pull/528/
 
 OK, so this is part of a strategy for making `rbenv` faster by making the `realpath` function faster.  I remember seeing references to the `.dylib` file mentioned here.  Those references were in several files that we inspected earlier, such as [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L23){:target="_blank" rel="noopener"} in the main `rbenv` file.  At the time I initially encountered this file extension, I remember looking for the referenced file and not finding it.  Possibly this was because I hadn't run the `make -C src` command that they mention here?
 
-I Google "Makefile.in”, and the first result that comes up is [this StackOverflow link](https://web.archive.org/web/20221010012118/https://stackoverflow.com/questions/2531827/what-are-makefile-am-and-makefile-in){:target="_blank" rel="noopener"}:
+I Google "Makefile.in", and the first result that comes up is [this StackOverflow link](https://web.archive.org/web/20221010012118/https://stackoverflow.com/questions/2531827/what-are-makefile-am-and-makefile-in){:target="_blank" rel="noopener"}:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1026am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
-This post says that “Makefile.in” is the input file used by a script named `configure` to generate a file named `Makefile`.
+This post says that "Makefile.in" is the input file used by a script named `configure` to generate a file named `Makefile`.
 
 This page also links to [a Wikipedia page](https://web.archive.org/web/20221113191726/https://en.wikipedia.org/wiki/Configure_script){:target="_blank" rel="noopener"} dealing with `configure` scripts:
 
@@ -62,7 +62,7 @@ This page also links to [a Wikipedia page](https://web.archive.org/web/202211131
   <img src="/assets/images/screenshot-19mar2023-1028am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
-This link mentions that the script's name (“configure”) is a convention that is used, and also that this script is usually a `bash` script.
+This link mentions that the script's name ("configure") is a convention that is used, and also that this script is usually a `bash` script.
 
 I try running the `configure` script:
 
@@ -70,7 +70,7 @@ I try running the `configure` script:
   <img src="/assets/images/screenshot-19mar2023-1029am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
-I now notice there is a new file named simply “Makefile” (no “.in” file extension).  This file didn't exist before, so it's safe to assume that running the `configure` script resulted in this file being built, as specified in the StackOverflow post.
+I now notice there is a new file named simply "Makefile" (no ".in" file extension).  This file didn't exist before, so it's safe to assume that running the `configure` script resulted in this file being built, as specified in the StackOverflow post.
 
 What does the new file look like?
 
@@ -88,8 +88,8 @@ The only difference appears to be that some values which start and end with `@` 
 
 But why not just include the `Makefile` directly?  Why go through the extra step of running the `configure` script?
 
-The Wikipedia page says that the purpose of a `configure` script is “...to aid in developing a program to be run on a wide number of different computers.”  So I'm guessing that the step of running `configure` is necessary because the output of that script can change, depending on the specific machine it is run on.
+The Wikipedia page says that the purpose of a `configure` script is "...to aid in developing a program to be run on a wide number of different computers."  So I'm guessing that the step of running `configure` is necessary because the output of that script can change, depending on the specific machine it is run on.
 
-OK, so we know from [the PR description](https://github.com/rbenv/rbenv/pull/528/commits/16c7eb41354c3c1ca5fca08bd0501568fa2b5212){:target="_blank" rel="noopener"} that we read that the purpose of the Makefile is to increase the speed of a function named “realpath()” (which is a performance bottleneck in RBENV).  How does it do that?
+OK, so we know from [the PR description](https://github.com/rbenv/rbenv/pull/528/commits/16c7eb41354c3c1ca5fca08bd0501568fa2b5212){:target="_blank" rel="noopener"} that we read that the purpose of the Makefile is to increase the speed of a function named "realpath()" (which is a performance bottleneck in RBENV).  How does it do that?
 
 Maybe inspecting the `configure` script is a good place to start.  It's a `bash` script, so I'm already familiar with the syntax.

@@ -70,7 +70,7 @@ fi
 This is old hat by now:
 
 The `bash` shebang
-The “Summary” and “Usage” comments
+The "Summary" and "Usage" comments
 `set -e` to exit after the first error
 Setting verbose mode when `RBENV_DEBUG` is passed.
 Completion instructions (only the `--short` argument is available for `rbenv shims`)

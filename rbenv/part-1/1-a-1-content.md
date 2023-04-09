@@ -79,7 +79,7 @@ A Ruby version manager like RBENV ensures that every time we work on a Ruby proj
 
 But wait.  A minute ago, we said:
 
-> Bundler provides “a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed.”
+> Bundler provides "a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed."
 
 This... sounds a lot like what I just said RBENV does.  So what's the difference between RBENV and Bundler?  Why do I need both?
 

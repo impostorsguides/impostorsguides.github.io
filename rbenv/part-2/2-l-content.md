@@ -48,7 +48,7 @@ Next test case:
 }
 ```
 
-This case tests what happens when “1.2.3” exists as one of the versions that RBENV has installed.  Here we see that part of the test setup is to create a subdirectory of “1.2.3” inside the *plural* `/versions` directory (*not* the singular `/version` directory).  We then run `rbenv global`, but this time we pass it an argument of `1.2.3` to *set* the global Ruby version (as opposed to the previous test, where we just called `rbenv global` by itself to *get* the current global version).  We finish up by running the getter command (`rbenv global`), asserting that a) the exit code was 0, and b) that “1.2.3” was printed to STDOUT.  This ensures that we didn't break the command by running the setter command first.  However, one thing I *think* is true is that this test doesn't actually ensure that the setter command was responsible for the current Ruby version being correct.  To do that, we'd first have to run an earlier `rbenv global` getter command and assert that the response was “system” or whatever we want the “before” version to be.  I'd argue that this is a worthy addition via a PR, but I'll save this for another time.
+This case tests what happens when "1.2.3" exists as one of the versions that RBENV has installed.  Here we see that part of the test setup is to create a subdirectory of "1.2.3" inside the *plural* `/versions` directory (*not* the singular `/version` directory).  We then run `rbenv global`, but this time we pass it an argument of `1.2.3` to *set* the global Ruby version (as opposed to the previous test, where we just called `rbenv global` by itself to *get* the current global version).  We finish up by running the getter command (`rbenv global`), asserting that a) the exit code was 0, and b) that "1.2.3" was printed to STDOUT.  This ensures that we didn't break the command by running the setter command first.  However, one thing I *think* is true is that this test doesn't actually ensure that the setter command was responsible for the current Ruby version being correct.  To do that, we'd first have to run an earlier `rbenv global` getter command and assert that the response was "system" or whatever we want the "before" version to be.  I'd argue that this is a worthy addition via a PR, but I'll save this for another time.
 
 The final test in this spec file is:
 
@@ -60,7 +60,7 @@ The final test in this spec file is:
 }
 ```
 
-This is the test which covers the sad path of the “global” command.  If we haven't installed v1.2.3 of Ruby using RBENV, then there will be no “1.2.3” subdirectory of `/versions`.  Therefore, running `rbenv global 1.2.3` should result in a non-zero exit code (which is verified by calling `assert_failure`, and the error message printed to STDOUT should indicate that the requested version is not yet installed.
+This is the test which covers the sad path of the "global" command.  If we haven't installed v1.2.3 of Ruby using RBENV, then there will be no "1.2.3" subdirectory of `/versions`.  Therefore, running `rbenv global 1.2.3` should result in a non-zero exit code (which is verified by calling `assert_failure`, and the error message printed to STDOUT should indicate that the requested version is not yet installed.
 
 Having read through the command's test file, let's move on to the file for the command itself.
 
@@ -87,7 +87,7 @@ set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 ```
 
-These are the standard shebang / usage comments / “exit upon first error” command / “verbose output if RBENV_DEBUG is set” command.
+These are the standard shebang / usage comments / "exit upon first error" command / "verbose output if RBENV_DEBUG is set" command.
 
 Next few lines of code:
 
@@ -99,7 +99,7 @@ if [ "$1" = "--complete" ]; then
 fi
 ```
 
-These are the possible code completions for the “global' command, which are printed if the user types `rbenv global --complete`.  We always output “system” as the first output, and we follow that with the output of `rbenv versions --bare`, which prints the non-system Ruby versions that the user has installed.
+These are the possible code completions for the "global' command, which are printed if the user types `rbenv global --complete`.  We always output "system" as the first output, and we follow that with the output of `rbenv versions --bare`, which prints the non-system Ruby versions that the user has installed.
 
 (stopping here for the day; 35691 words)
 
@@ -110,7 +110,7 @@ RBENV_VERSION="$1"
 RBENV_VERSION_FILE="${RBENV_ROOT}/version"
 ```
 
-Here we set a variable named `RBENV_VERSION` equal to the first argument from the command line (i.e. the “1.2.3” in `rbenv global 1.2.3`), and we set a variable named `RBENV_VERSION_FILE` equal to the “/version” subfolder of (in my case) “/Users/myusername/.rbenv”.
+Here we set a variable named `RBENV_VERSION` equal to the first argument from the command line (i.e. the "1.2.3" in `rbenv global 1.2.3`), and we set a variable named `RBENV_VERSION_FILE` equal to the "/version" subfolder of (in my case) "/Users/myusername/.rbenv".
 
 Next few lines of code:
 
@@ -124,6 +124,6 @@ fi
 
 If the user provided a number that they wanted to set their global Ruby version to, then we call the `rbenv-version-file-write` command, passing it the name of the version file and the version number.  The `rbenv-version-file-write` command is further down in the directory I'm examining, so I'll get to it at some point in the future.
 
-If the `if` conditional is false, that means the user didn't specify a version number that they want to set their global Ruby version to, implying they want to do a “get” operation instead of a “set” operation.  So we call `rbenv-version-file-read` instead of `rbenv-version-file-write`, passing it the `RBENV_VERSION_FILE` variable.  If that “read” operation fails, that implies there is no global Ruby version installed by RBENV, so we simply echo the string “system”.
+If the `if` conditional is false, that means the user didn't specify a version number that they want to set their global Ruby version to, implying they want to do a "get" operation instead of a "set" operation.  So we call `rbenv-version-file-read` instead of `rbenv-version-file-write`, passing it the `RBENV_VERSION_FILE` variable.  If that "read" operation fails, that implies there is no global Ruby version installed by RBENV, so we simply echo the string "system".
 
 That's it for this file.  On to the next one.

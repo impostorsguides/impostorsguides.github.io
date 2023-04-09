@@ -36,7 +36,7 @@ Next block of code (and first test):
 }
 ```
 
-Here we create the global “version” file using our `create_file` helper method (which populates that global version file with the string “system”), and run the command.  We then assert that the command was successful, and that the output was the path to the version file we just created.
+Here we create the global "version" file using our `create_file` helper method (which populates that global version file with the string "system"), and run the command.  We then assert that the command was successful, and that the output was the path to the version file we just created.
 
 From this, we can deduce that the purpose of the `rbenv version-file` command is to return the path to the file which sets the current Ruby version.
 
@@ -144,7 +144,7 @@ Last test:
 
 Here we test the sad-path case where we haven't created a local *or* a global Ruby version file.  We simply run the command without any setup steps, and assert that the command failed and that there was no meaningful output.
 
-Speaking of “no meaningful output”, that's a bit of a bummer.  If an error occurred, *shouldn't* there be a helpful error message so the user can take corrective action?  That could be a good candidate for a future PR.
+Speaking of "no meaningful output", that's a bit of a bummer.  If an error occurred, *shouldn't* there be a helpful error message so the user can take corrective action?  That could be a good candidate for a future PR.
 
 Anyway, on to the code itself.
 
@@ -161,9 +161,9 @@ set -e
 ```
 
 `bash` shebang
-“Usage” + “Summary” info
+"Usage" + "Summary" info
 `set -e` to tell the shell to exit immediately when it encounters an error
-Set the shell's “verbose” mode when the `RBENV_DEBUG` env var is set
+Set the shell's "verbose" mode when the `RBENV_DEBUG` env var is set
 
 Next block of code:
 
@@ -200,7 +200,7 @@ We then create a `while` loop:
   done
 ```
 
-The condition for this loop is “Does the local `root` variable match this regular expression?”, which is then negated to mean “Does the local `root` variable *not* match this regular expression?”.  However, I find the meaning of the regular expression hard to deduce.  From the context, I had guessed that the intention of the `while` loop was to keep checking progressively higher parent directories until a `.ruby-version` file was found, stopping at the machine's root directory of “/” if nothing was found.  However, I just tried an experiment where I tested the condition at my machine's root directory, and I found it was still `false`:
+The condition for this loop is "Does the local `root` variable match this regular expression?", which is then negated to mean "Does the local `root` variable *not* match this regular expression?".  However, I find the meaning of the regular expression hard to deduce.  From the context, I had guessed that the intention of the `while` loop was to keep checking progressively higher parent directories until a `.ruby-version` file was found, stopping at the machine's root directory of "/" if nothing was found.  However, I just tried an experiment where I tested the condition at my machine's root directory, and I found it was still `false`:
 
 ```
 $ is_foo ()
@@ -219,7 +219,7 @@ False
 
 (stopping here for the day; 70012 words)
 
-In my opinion, the documentation on regular expressions in bash is lacking.  The closest things I can find to “official documentation” in Google are [an HTML version](https://web.archive.org/web/20220923034514/https://man7.org/linux/man-pages/man7/regex.7.html){:target="_blank" rel="noopener"} of the `man` page on regular expressions, and [the bash reference manual](https://web.archive.org/web/20221012211520/https://www.gnu.org/software/bash/manual/bash.html){:target="_blank" rel="noopener"}, which contains information on regexes but it's inter-mingled with a ton of other info that the reader must wade through.  The first link has zero examples (wtf!!!); it's just a wall of text.  It reads like the author thinks documentation is an after-thought, a waste of time.  I'm sorry, but it does.  I'm struggling to relate to the kind of mentality that sees a man page like this and says “It's perfect, ship it as-is.”  The 2nd link, thankfully, at least has a few examples scattered throughout.  But there's no dedicated “Regex” section demarcated by its own heading, and the examples don't contain the exhaustive set of bash regex features.  Regular expressions are already one of the most inscrutable features in programming.  One would think the authors of the feature would err on the side of clarity and exhaustiveness when trying to document said feature.
+In my opinion, the documentation on regular expressions in bash is lacking.  The closest things I can find to "official documentation" in Google are [an HTML version](https://web.archive.org/web/20220923034514/https://man7.org/linux/man-pages/man7/regex.7.html){:target="_blank" rel="noopener"} of the `man` page on regular expressions, and [the bash reference manual](https://web.archive.org/web/20221012211520/https://www.gnu.org/software/bash/manual/bash.html){:target="_blank" rel="noopener"}, which contains information on regexes but it's inter-mingled with a ton of other info that the reader must wade through.  The first link has zero examples (wtf!!!); it's just a wall of text.  It reads like the author thinks documentation is an after-thought, a waste of time.  I'm sorry, but it does.  I'm struggling to relate to the kind of mentality that sees a man page like this and says "It's perfect, ship it as-is."  The 2nd link, thankfully, at least has a few examples scattered throughout.  But there's no dedicated "Regex" section demarcated by its own heading, and the examples don't contain the exhaustive set of bash regex features.  Regular expressions are already one of the most inscrutable features in programming.  One would think the authors of the feature would err on the side of clarity and exhaustiveness when trying to document said feature.
 
 Eventually I did find [this link](https://web.archive.org/web/20220923033933/https://www.gnu.org/software/grep/manual/html_node/Regular-Expressions.html){:target="_blank" rel="noopener"}, also from GNU.org, but it's part of the `man` entry for the `grep` command.  It's unexpected that what appears to be the canonical reference on bash regexes is located inside the docs for a specific command, when there are many commands which use regexes.
 
@@ -277,7 +277,7 @@ root: /Users/myusername/Workspace/OpenSource/impostorsguides.github.io
 bash-3.2$
 ```
 
-We can see what happens here in the happy-path, when there *is* a `.ruby-version` file somewhere in the directory hierarchy- we progressively navigate up one directory at a time until we find what we're looking for, and then we echo the path to the version file.  This “navigating up one directory at a time” is accomplished by the `while` loop, in conjunction with the line `root="${root%/*}"`, which sets `root` equal to its previous value, minus the final forward-slash character and anything after it.
+We can see what happens here in the happy-path, when there *is* a `.ruby-version` file somewhere in the directory hierarchy- we progressively navigate up one directory at a time until we find what we're looking for, and then we echo the path to the version file.  This "navigating up one directory at a time" is accomplished by the `while` loop, in conjunction with the line `root="${root%/*}"`, which sets `root` equal to its previous value, minus the final forward-slash character and anything after it.
 
 So again, that's the happy-path.  I then navigate to `~/Workspace/OpenSource`, where I know there is no `.ruby-version` file (and where I suspect there is no such file in any of the parent directories), and run the same command again:
 
@@ -294,7 +294,7 @@ final root:
 bash-3.2$
 ```
 
-Here we see the same behavior happening (root is set to its previous value, minus the final `/` and everything after it).  But when there's nothing left to shave off (i.e. we're already as high as we can go in the directory structure), we have to exit out of the while loop, or else we'll be stuck in an infinite loop.  I think we can therefore conclude that this is the intent of the condition in the `while` loop- to exit out when we're already as high as we can go (i.e. when we've shaved off the last of the “forward-slash plus text” blocks and now have an empty string).
+Here we see the same behavior happening (root is set to its previous value, minus the final `/` and everything after it).  But when there's nothing left to shave off (i.e. we're already as high as we can go in the directory structure), we have to exit out of the while loop, or else we'll be stuck in an infinite loop.  I think we can therefore conclude that this is the intent of the condition in the `while` loop- to exit out when we're already as high as we can go (i.e. when we've shaved off the last of the "forward-slash plus text" blocks and now have an empty string).
 
 So even though I can't explicitly state what each character in the above regex does, we were still able to deduce its overall meaning, which is valuable in itself.
 

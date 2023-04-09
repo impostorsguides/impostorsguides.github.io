@@ -6,7 +6,7 @@ A couple possibilities stand out:
 
 > Through a process called rehashing, rbenv maintains shims in that directory to match every Ruby command across every installed version of Ruby...
 
-This brings up a good question- we've already looked at the shim file itself, but where did that shim file come from?  It sounds like that's part of the “rehashing” process described here, but how does that process work?
+This brings up a good question- we've already looked at the shim file itself, but where did that shim file come from?  It sounds like that's part of the "rehashing" process described here, but how does that process work?
 
 From the README:
 

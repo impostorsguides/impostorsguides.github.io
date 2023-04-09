@@ -48,9 +48,9 @@ OUT
 }
 ```
 
-This test covers [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-completions#L23-L26){:target="_blank" rel="noopener"}.  We once again create a fake command named “hello”, this time containing the comment `# Provide rbenv completions` as well as some logic to conditionally print “hello” when the command is passed the “--complete” flag.  If that flag is not passed to our fake command, the exit code will be non-zero and the test will fail.  We then pass the name of the “hello” command to `rbenv completions`, and assert that a) the exit code is 0, and b) the printed output contains both the “hello” string and the “--help” completion that all commands have.
+This test covers [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-completions#L23-L26){:target="_blank" rel="noopener"}.  We once again create a fake command named "hello", this time containing the comment `# Provide rbenv completions` as well as some logic to conditionally print "hello" when the command is passed the "--complete" flag.  If that flag is not passed to our fake command, the exit code will be non-zero and the test will fail.  We then pass the name of the "hello" command to `rbenv completions`, and assert that a) the exit code is 0, and b) the printed output contains both the "hello" string and the "--help" completion that all commands have.
 
-This test implies that, even though we don't explicitly pass the “--complete” flag to “rbenv completions hello”, something in the code still passes this flag anyway.  That logic is part of `rbenv completions`.  When the command file we create includes the comment `# Provide rbenv completions`, then running `rbenv completions` for that command causes the `completions` file to run that command and also pass it the “--complete” flag.
+This test implies that, even though we don't explicitly pass the "--complete" flag to "rbenv completions hello", something in the code still passes this flag anyway.  That logic is part of `rbenv completions`.  When the command file we create includes the comment `# Provide rbenv completions`, then running `rbenv completions` for that command causes the `completions` file to run that command and also pass it the "--complete" flag.
 
 Next test:
 
@@ -74,7 +74,7 @@ OUT
 }
 ```
 
-We have a test which is very similar to the one before.  We create a fake command file named `rbenv-hello` which contains a bash script with completions logic.  The logic tests for the presence of the “--complete” flag, and responds accordingly.  The difference is, this script prints out each argument passed to `rbenv-hello`, instead of just printing out “hello”.  We run the `rbenv completions` command for “hello”, passing two additional args, and assert that those two args are printed to STDOUT, in addition to the “--help” flag.
+We have a test which is very similar to the one before.  We create a fake command file named `rbenv-hello` which contains a bash script with completions logic.  The logic tests for the presence of the "--complete" flag, and responds accordingly.  The difference is, this script prints out each argument passed to `rbenv-hello`, instead of just printing out "hello".  We run the `rbenv completions` command for "hello", passing two additional args, and assert that those two args are printed to STDOUT, in addition to the "--help" flag.
 
 Now that we've finished the tests, let's move on to the code.
 
@@ -97,7 +97,7 @@ No surprises here:
 A `bash` shebang
 Some usage comments
 Telling bash to exit on the first error
-Setting “verbose” mode (at least, that's what I call it) if the user has set the `RBENV_DEBUG` environment variable
+Setting "verbose" mode (at least, that's what I call it) if the user has set the `RBENV_DEBUG` environment variable
 
 Next few lines of code:
 
@@ -108,7 +108,7 @@ if [ -z "$COMMAND" ]; then
   exit 1
 fi
 ```
-Here we store the user's first argument to “completions” in a variable named `COMMAND`.  If that variable is empty (i.e. if the user just typed `rbenv completions` without any further argument), then we print the usage instructions for this command (taken from the `rbenv help` command) and exit with an error code of 1.
+Here we store the user's first argument to "completions" in a variable named `COMMAND`.  If that variable is empty (i.e. if the user just typed `rbenv completions` without any further argument), then we print the usage instructions for this command (taken from the `rbenv help` command) and exit with an error code of 1.
 
 Next few lines of code:
 
@@ -119,7 +119,7 @@ if [ "$COMMAND" = "--complete" ]; then
 fi
 ```
 
-If the user typed `rbenv completions --complete`, then they want to know what arguments are possible to pass to `rbenv completions`.  Since the purpose of `rbenv completions` is to tell the user which arguments are possible for which rbenv commands, that means it's possible to pass any valid rbenv command to “rbenv completions”.  So if the user types `rbenv completions --complete`, we print out all valid rbenv commands.
+If the user typed `rbenv completions --complete`, then they want to know what arguments are possible to pass to `rbenv completions`.  Since the purpose of `rbenv completions` is to tell the user which arguments are possible for which rbenv commands, that means it's possible to pass any valid rbenv command to "rbenv completions".  So if the user types `rbenv completions --complete`, we print out all valid rbenv commands.
 
 Next line of code:
 
@@ -127,7 +127,7 @@ Next line of code:
 COMMAND_PATH="$(command -v "rbenv-$COMMAND" || command -v "rbenv-sh-$COMMAND")"
 ```
 
-Here we store the full filename of the command the user is entering.  For example, if the user typed `rbenv commands global`, Then we'd store the value “rbenv-global” in `COMMAND_PATH`.  If the user types `rbenv completions shell`, we'd store `rbenv-sh-shell` in `COMMAND_PATH`.
+Here we store the full filename of the command the user is entering.  For example, if the user typed `rbenv commands global`, Then we'd store the value "rbenv-global" in `COMMAND_PATH`.  If the user types `rbenv completions shell`, we'd store `rbenv-sh-shell` in `COMMAND_PATH`.
 
 Next line of code:
 
@@ -153,8 +153,8 @@ The `-i` flag tells us to ignore case sensitivity
 The `-E` flag tells `grep` that we'll be passing a regular expression pattern, instead of a plain string
 string or pattern to search for (i.e. `"^([#%]|--|//) provide rbenv completions"`)
 Here the `^` character means that the following characters should begin the string
-The `(...|...|...)` pattern means that we're looking for one of 3 possible patterns to start the string (the `|` syntax means “or”).  So “(#|-|/)” means “# or - or /”.
-The syntax [...] means “any one of the characters inside the square brackets.  So `[#%]` means “either # or %”.
+The `(...|...|...)` pattern means that we're looking for one of 3 possible patterns to start the string (the `|` syntax means "or").  So "(#|-|/)" means "# or - or /".
+The syntax [...] means "any one of the characters inside the square brackets.  So `[#%]` means "either # or %".
 Source [here](https://tldp.org/LDP/abs/html/x17129.html){:target="_blank" rel="noopener"}.
 I'm guessing that we're using this particular regex, at the start of the string, because these are the various ways that a comment can be started in bash, zsh, fish, and any other shells that rbenv supports.
 The filepath that we're searching for this string.  In this case, it's the filepath we stored in `$COMMAND_PATH`.

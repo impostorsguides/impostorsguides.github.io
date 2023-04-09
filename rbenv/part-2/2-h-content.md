@@ -18,7 +18,7 @@ After the `bats` shebang and the loading of `test_helper`, the first test is:
 
 This is the happy-path test, covering [this `for` loop](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L27){:target="_blank" rel="noopener"}.  The test runs the regular `rbenv-commands` command, asserts that it was successful, and asserts that certain commands are listed among the output printed to STDOUT.
 
-We also explicitly assert that the line “sh-shell” does *not* appear in the output.  We want to ensure that the “shell” command is presented to the user when they run `rbenv commands`, but that command's logic lives in a file named `rbenv-sh-shell` (because the path it takes during execution branches depending on which shell program the user is running), and when we scrape the list of command files in order to generate the output of `rbenv commands`, we want to strip out the `sh-` prefix since the user is not meant to type `rbenv sh-shell` when they run this command.
+We also explicitly assert that the line "sh-shell" does *not* appear in the output.  We want to ensure that the "shell" command is presented to the user when they run `rbenv commands`, but that command's logic lives in a file named `rbenv-sh-shell` (because the path it takes during execution branches depending on which shell program the user is running), and when we scrape the list of command files in order to generate the output of `rbenv commands`, we want to strip out the `sh-` prefix since the user is not meant to type `rbenv sh-shell` when they run this command.
 
 Next test:
 
@@ -31,7 +31,7 @@ Next test:
 }
 ```
 
-This test covers [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L15){:target="_blank" rel="noopener"}, as well as the 4-line block of code from lines 30-33 (starting [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L30){:target="_blank" rel="noopener"}).  We run the same command as before, but we pass the “--sh” flag.  This time we assert that commands with no “sh-” prefix in their filenames (such as the “init” command) are excluded from the printed output, and commands *with* that prefix (such as “shell”) are included.
+This test covers [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L15){:target="_blank" rel="noopener"}, as well as the 4-line block of code from lines 30-33 (starting [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L30){:target="_blank" rel="noopener"}).  We run the same command as before, but we pass the "--sh" flag.  This time we assert that commands with no "sh-" prefix in their filenames (such as the "init" command) are excluded from the printed output, and commands *with* that prefix (such as "shell") are included.
 
 Next test:
 
@@ -49,7 +49,7 @@ Next test:
 }
 ```
 
-To set up this test, we make a directory whose name includes a space character, and we make an executable command within that directory called “rbenv-sh-hello”.  We then add that directory name to our `$PATH` environment variable.  When we run the `commands` command, we pass the “--sh” flag.  We assert that the command was successful, and that the “sh-” prefix was removed from the command name before it was printed to STDOUT.
+To set up this test, we make a directory whose name includes a space character, and we make an executable command within that directory called "rbenv-sh-hello".  We then add that directory name to our `$PATH` environment variable.  When we run the `commands` command, we pass the "--sh" flag.  We assert that the command was successful, and that the "sh-" prefix was removed from the command name before it was printed to STDOUT.
 
 Last test for this command:
 
@@ -62,7 +62,7 @@ Last test for this command:
 }
 ```
 
-This test covers [this 4-line block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L18-L21), as well as [this 4-line block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L34-L37){:target="_blank" rel="noopener"}.  It's the inverse of the "commands --sh" test, in that we expect commands whose files do *not* contain the “sh-” prefix in their name to be printed to STDOUT, and we explicitly expect commands which *do* contain that prefix in their filenames to be excluded from the output.
+This test covers [this 4-line block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L18-L21), as well as [this 4-line block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L34-L37){:target="_blank" rel="noopener"}.  It's the inverse of the "commands --sh" test, in that we expect commands whose files do *not* contain the "sh-" prefix in their name to be printed to STDOUT, and we explicitly expect commands which *do* contain that prefix in their filenames to be excluded from the output.
 
 With the tests for this command out of the way, let's move on to the code for the command itself.
 
@@ -139,7 +139,7 @@ IFS=: paths=($PATH)
 echo "size of PATH: ${#paths}"
 ```
 
-We first echo the size of the un-split “$PATH” variable.  Remember, the `#` char inside the parameter expansion, before your parameter, tells bash to expand the expansion to the size of the parameter.  Since `PATH` is a single long string here, the size will be the # of characters in the string.  Then we create a new variable, `paths`, which is the PATH string split into an array according to the delimiter we set.  We then echo the size of that new variable.  When we run this script, we get:
+We first echo the size of the un-split "$PATH" variable.  Remember, the `#` char inside the parameter expansion, before your parameter, tells bash to expand the expansion to the size of the parameter.  Since `PATH` is a single long string here, the size will be the # of characters in the string.  Then we create a new variable, `paths`, which is the PATH string split into an array according to the delimiter we set.  We then echo the size of that new variable.  When we run this script, we get:
 
 ```
 $ ./foo
@@ -192,7 +192,7 @@ Next lines of code:
 For each of the `path`s in our outer `for` loop, we look for any file beginning with `rbenv-`, and we assume it's a command.
 
  - I tested this by doing the following:
- - I made a directory in my Home directory called “~/foo”.
+ - I made a directory in my Home directory called "~/foo".
  - I added this directory to my PATH (`PATH=~/foo:$PATH`).
  - I added a file inside ~/foo called `rbenv-foo`, which looks like this:
 
@@ -203,7 +203,7 @@ echo "Foo!"
 ```
  - I ran `chmod +x ~/foo/rbenv-foo` to make sure it was executable.
  - I ran `rbenv commands` and verified that `foo` was one of the commands listed.
- - I ran `rbenv foo` and saw “Foo!” printed out to my screen:
+ - I ran `rbenv foo` and saw "Foo!" printed out to my screen:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-14mar2023-835am.png" width="50%" style="border: 1px solid black; padding: 0.5em">
@@ -251,7 +251,7 @@ If the user didn't pass either the `--sh` or the `--no-sh` flag, then we want to
 
 (stopping here for the day; 31137 words)
 
-While I was reading through the code yesterday, I noticed that the `rbenv-commands` file has a corresponding test file called `commands.bats`.  I had never heard of the `.bats` extension before, so I decided to Google it.  Nothing came up on Google's page 1 when I tried “bats file extension”, but when I Googled “how to run bats test”, the first result was [this Github repo](https://github.com/sstephenson/bats){:target="_blank" rel="noopener"}, which I noticed was maintained by [Github user Sam Stephenson](https://github.com/sstephenson){:target="_blank" rel="noopener"}, the same person who I've seen author many commits in the RBENV repo.  In fact, I suspect he is the original author of RBENV, though I haven't bothered to research that (TO-DO- actually do that).
+While I was reading through the code yesterday, I noticed that the `rbenv-commands` file has a corresponding test file called `commands.bats`.  I had never heard of the `.bats` extension before, so I decided to Google it.  Nothing came up on Google's page 1 when I tried "bats file extension", but when I Googled "how to run bats test", the first result was [this Github repo](https://github.com/sstephenson/bats){:target="_blank" rel="noopener"}, which I noticed was maintained by [Github user Sam Stephenson](https://github.com/sstephenson){:target="_blank" rel="noopener"}, the same person who I've seen author many commits in the RBENV repo.  In fact, I suspect he is the original author of RBENV, though I haven't bothered to research that (TO-DO- actually do that).
 
 The `bats` repo is archived, meaning there won't be further updates to it, but I still want to see if the code works and can be used to run tests in the `rbenv` repo.  I'd be surprised if it didn't, since RBENV is still maintained and therefore still needs a way to run its own tests.
 
@@ -317,7 +317,7 @@ The syntax is pretty readable, IMHO.  The first spec looks like this:
 }
 ```
 
-According to the BATS docs, the `run` command runs the `rbenv-commands` file (which it will have access to by the time it reaches this scope), and saves certain results of that command (such as the exit status and the output to STDOUT).  This is what allows us to run the helper functions that we got from the test_helper file.  Here we assert that the exit status was 0 (`assert_success`), and that the output contained the lines “init”, “rehash”, “shell”, and “echo”, and did *not* contain the line “sh-shell”.  There are way more commands in the output of “rbenv commands” than just the 4 that we assert against (ex. “hooks”, “global”, “version”, etc.), so it's possible that this test could stand to be improved.  But it's also possible that the authors felt that testing for a subset of commands was sufficient.
+According to the BATS docs, the `run` command runs the `rbenv-commands` file (which it will have access to by the time it reaches this scope), and saves certain results of that command (such as the exit status and the output to STDOUT).  This is what allows us to run the helper functions that we got from the test_helper file.  Here we assert that the exit status was 0 (`assert_success`), and that the output contained the lines "init", "rehash", "shell", and "echo", and did *not* contain the line "sh-shell".  There are way more commands in the output of "rbenv commands" than just the 4 that we assert against (ex. "hooks", "global", "version", etc.), so it's possible that this test could stand to be improved.  But it's also possible that the authors felt that testing for a subset of commands was sufficient.
 
 The next test is:
 
@@ -330,7 +330,7 @@ The next test is:
 }
 ```
 
-Here we run `rbenv commands` with the `–sh` flag, assert that the exit code was 0, assert that the output included “shell”, and assert that the output did NOT include “init”.
+Here we run `rbenv commands` with the `–sh` flag, assert that the exit code was 0, assert that the output included "shell", and assert that the output did NOT include "init".
 
 Next test is:
 

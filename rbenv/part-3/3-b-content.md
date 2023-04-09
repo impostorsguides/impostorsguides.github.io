@@ -4,7 +4,7 @@ This directory has the following structure:
   <img src="/assets/images/github-workflows-dir-structure.png" width="70%" alt="The directory structure of .github/workflows"  style="border: 1px solid black; padding: 0.5em">
 </p>
 
-The fact that this directory starts with a “.” tells me it has something to do with configuration.  And I happen to know that Github offers a feature called Workflows, so I'm pretty sure this is the directory to store configuration files for RBENV's Github Workflow setup.
+The fact that this directory starts with a "." tells me it has something to do with configuration.  And I happen to know that Github offers a feature called Workflows, so I'm pretty sure this is the directory to store configuration files for RBENV's Github Workflow setup.
 
 Looking more into Github's Workflows feature, I find [the docs page](https://web.archive.org/web/20220806092745/https://docs.github.com/en/actions/using-workflows){:target="_blank" rel="noopener"}:
 

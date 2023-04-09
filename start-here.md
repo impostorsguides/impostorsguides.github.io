@@ -8,7 +8,7 @@ permalink: /start-here/
 
 ## What is "The Impostor's Guide To Programming"?
 
-It's “David and Goliath” on Github.
+It's "David and Goliath" on Github.
 
 The goal is to help a newbie programmer grok an unfamiliar, inscrutable codebase, one line of code at a time.
 
@@ -66,13 +66,13 @@ Open-source code is a great learning resource.  There are engineers and develope
 
 ## OK, but why blog about it?
 
-### To “Learn By Teaching”
+### To "Learn By Teaching"
 
 A great way to learn is to teach what you know.  It's the Feynman Technique.  If I find myself unable to communicate my understanding of something, it means I don't understand it well enough.  When that happens, I'll know where to refocus my efforts.
 
 ### To Keep Myself Consistent
 
-By writing everyday, I'll be able to document the progress I'm making.  It's the “don't break the chain” productivity trick- small efforts multiplied over time will result in huge leaps in knowledge.
+By writing everyday, I'll be able to document the progress I'm making.  It's the "don't break the chain" productivity trick- small efforts multiplied over time will result in huge leaps in knowledge.
 
 ### To Get Feedback
 
@@ -82,13 +82,13 @@ Inevitably, some of the stuff I write here will be wrong.  If you notice that's 
 
 I plan to keep track of the open questions I have, and the problems I'm unable to solve on my own.  If someone else knows how to answer those questions, they can feel free to submit a solution.  Turning this into a collaboration between multiple engineers would mean that we can help fill in each others' knowledge gaps.
 
-### To “Send The Elevator Back Down”
+### To "Send The Elevator Back Down"
 
 I started coding in late 2012 - early 2013, at Dev Bootcamp in Chicago.  So many teachers, mentors, and fellow students helped me out along the way.  I would have given up if not for them.  The least I can do now is pay it forward to those in the same position I was in at that point.
 
 ### To Make The Learning Resource I Wish I'd Had
 
-There are some learning resources that speak my language, like the Michael Hartl tutorial (“build an X from scratch” is very much my speed).  But I find other docs and resources to be maddeningly abstract.  They're often written by people suffering from the Curse of Knowledge, people who have long since forgotten what it's like to be a beginner.  I don't think it's productive to tell newbies to “read the fucking manual” when the manual often isn't written with newbies in mind, i.e. without examples, with jargon that goes undefined, etc.
+There are some learning resources that speak my language, like the Michael Hartl tutorial ("build an X from scratch" is very much my speed).  But I find other docs and resources to be maddeningly abstract.  They're often written by people suffering from the Curse of Knowledge, people who have long since forgotten what it's like to be a beginner.  I don't think it's productive to tell newbies to "read the fucking manual" when the manual often isn't written with newbies in mind, i.e. without examples, with jargon that goes undefined, etc.
 
 I love newbies and I never want to lose touch with what it was like to be one.  This is my attempt to offer today's noobs a learning resource that speaks to them at their level.
 
@@ -110,7 +110,7 @@ I find I learn best from people who talk through their thought process, so I try
 
 Doing so helps me spot holes in my own logic.  And on a good day, that thought process leads me to the correct answer.
 
-I also experiment, often.  If I think a certain thing is taking place within a section of code, I try to reproduce that behavior on my own, using a “minimally-reproducible example”.  If the experiment behaves the way I hypothesized it should, then I consider the experiment a success.  If not, then it forces me to ask why not.
+I also experiment, often.  If I think a certain thing is taking place within a section of code, I try to reproduce that behavior on my own, using a "minimally-reproducible example".  If the experiment behaves the way I hypothesized it should, then I consider the experiment a success.  If not, then it forces me to ask why not.
 
 Oftentimes this process works great.  Sometimes it gets messy.
 

@@ -1,4 +1,4 @@
-At last, we come to the final line of code in the shim:
+We've arrived at the final line of code in the shim:
 
 ```
 exec "/usr/local/bin/rbenv" exec "$program" "$@"
@@ -16,10 +16,15 @@ exec [ -cl ] [ -a argv0 ] [ command [ arg ... ] ]
        shell executes it, and exits when the command is complete.
 ```
 
-OK, so we're *replacing the current shell* with the command that we're running, "rather than forking".  What does that mean?  I Google "what is exec in bash", and one of the first links I find is from [ComputerHope](https://web.archive.org/web/20230323171516/https://www.computerhope.com/unix/bash/exec.htm){:target="_blank" rel="noopener"}:
+SO we're *replacing the current shell* with the command that we're running, "rather than forking".  What does that mean?  I Google "what is exec in bash", and one of the first links I find is from [ComputerHope](https://web.archive.org/web/20230323171516/https://www.computerhope.com/unix/bash/exec.htm){:target="_blank" rel="noopener"}:
+
+<center style="margin-bottom: 3em">
+  <a target="_blank" href="/assets/images/what-is-exec.png" >
+    <img src="/assets/images/what-is-exec.png" width="90%" alt="What is the `exec` bash command?" style="border: 1px solid black; padding: 0.5em">
+  </a>
+</center>
 
 <p style="text-align: center">
-  <img src="/assets/images/what-is-exec.png" width="70%" alt="What is the `exec` bash command?" style="border: 1px solid black; padding: 0.5em">
 </p>
 
 To be honest, that explanation creates more questions for me than it answers, including:
@@ -30,10 +35,15 @@ To be honest, that explanation creates more questions for me than it answers, in
 
 ## What is a process?
 
-I Google "what is a process in unix" and find a few answers.  The first one is from [TechTarget.com](https://web.archive.org/web/20230306013812/https://www.techtarget.com/whatis/definition/process){:target="_blank" rel="noopener"}:
+I Google "what is a process in unix" and the first result is from [TechTarget.com](https://web.archive.org/web/20230306013812/https://www.techtarget.com/whatis/definition/process){:target="_blank" rel="noopener"}:
+
+<center style="margin-bottom: 3em">
+  <a target="_blank" href="/assets/images/what-is-a-process.png">
+    <img src="/assets/images/what-is-a-process.png" width="90%" alt="What is a process in UNIX?" style="border: 1px solid black; padding: 0.5em">
+  </a>
+</center>
 
 <p style="text-align: center">
-  <img src="/assets/images/what-is-a-process.png" width="70%" alt="What is a process in UNIX?" style="border: 1px solid black; padding: 0.5em">
 </p>
 
 So from this definition, we learned that:
@@ -43,36 +53,42 @@ So from this definition, we learned that:
  - The child process shares resources with the parent process.  I'm not yet sure what resources they mean.
  - If the parent process dies, the child process also dies.
 
-Another useful link comes from [TheUnixSchool.com](https://web.archive.org/web/20221005124821/https://www.theunixschool.com/2012/09/what-is-process-in-unix-linux.html){:target="_blank" rel="noopener"}:
+Another useful search result comes from [TheUnixSchool.com](https://web.archive.org/web/20221005124821/https://www.theunixschool.com/2012/09/what-is-process-in-unix-linux.html){:target="_blank" rel="noopener"}:
 
-<p style="text-align: center">
-  <img src="/assets/images/what-is-a-process-2.png" width="70%" alt="What is a process in UNIX?" style="border: 1px solid black; padding: 0.5em">
-</p>
+<center style="margin-bottom: 3em">
+  <a target="_blank" href="/assets/images/what-is-a-process-2.png">
+    <img src="/assets/images/what-is-a-process-2.png" width="90%" alt="What is a process in UNIX?" style="border: 1px solid black; padding: 0.5em">
+  </a>
+</center>
 
 From this link, we additionally learned that:
 
  - A process has properties associated with it, such as a PID, a PPID, etc.
  - `ps` is a command we can use to see which processes are currently running.
 
-OK, I guess this helps somewhat.  But what's the difference between `exec`ing and `fork`ing?
+OK, I guess this helps somewhat.  But we still have question #2 to contend with.
+
+## What's the difference between `exec`ing and `fork`ing?
 
 [This StackOverflow answer](https://stackoverflow.com/a/1653415/2143275){:target="_blank" rel="noopener"} is a bit long, but it addresses this question:
 
-<p style="text-align: center">
-  <img src="/assets/images/fork-vs-exec.png" width="70%" alt="What's the difference between `fork` and `exec`?" style="border: 1px solid black; padding: 0.5em">
-</p>
+<center style="margin-bottom: 3em">
+  <a target="_blank" href="/assets/images/fork-vs-exec.png">
+    <img src="/assets/images/fork-vs-exec.png" width="90%" alt="What's the difference between `fork` and `exec`?" style="border: 1px solid black; padding: 0.5em">
+  </a>
+</center>
+
+The example they give for `fork`ing (rather than `exec`ing) is a web server that needs one process to spin off and handle a request that the server receives, while the parent thread continues to listen for new requests in a separate process.
 
 It appears that, if you know the parent process will be done after running the child process, then `exec` is the way to go because you can re-use the parent's process ID instead of creating a new one.  On the other hand, if the parent still has work to do after the child finishes executing, then `fork` is the way to go.
 
-One use case they give for `fork`ing (rather than `exec`ing) is a web server that needs one process to spin off and handle a request that the server receives, while the parent thread continues to listen for new requests in a separate process.
-
-### Experiment- messing around with `exec`
+#### Experiment- messing around with `exec`
 
 Directly in my terminal, I run:
 
 ```
-$ exec "/usr/bin/env" ruby -e "puts 5"
-5
+$ exec ruby -e "puts 5+5"
+10
 
 [Process completed]
 ```
@@ -91,7 +107,7 @@ echo "PID of foo: $$"
 ./bar
 ```
 
-I `chmod` the above script to be executable, and I then create a script named `./bar` (also `chmod`'ed) which reads as follows:
+I `chmod` the above script to be executable.  Then I create a 2nd script, named `./bar` (also `chmod`'ed), which reads as follows:
 
 ```
 #!/usr/bin/env bash
@@ -129,7 +145,8 @@ PID of bar: 58695
 
 Now the PIDs are the same!  This tells me that the `foo` process did indeed get **replaced** by the `bar` process.
 
-## Back to the line of code
+
+## Using `exec` in the RBENV shim
 
 So that's what the shell builtin `exec` command does.  But the line of code we're looking at is:
 
@@ -139,7 +156,7 @@ exec "/usr/local/bin/rbenv" exec ...
 
 This means we're running the builtin `exec` command, and *passing it* the `rbenv exec` command.  What does `rbenv exec` do?
 
-For now, and to avoid having to dive into other files in the RBENV codebase, I just check whether `rbenv exec` accepts a `--help` command:
+To avoid getting ahead of ourselves by looking at the `rbenv-exec` file, for now I just check whether `rbenv exec` accepts a `--help` command:
 
 ```
 $ rbenv exec --help
@@ -155,12 +172,17 @@ is equivalent to:
   PATH="$RBENV_ROOT/versions/1.9.3-p327/bin:$PATH" bundle install
 ```
 
-In other words, `rbenv exec` ensures that, when UNIX is checking `PATH` for a directory containing the command we entered, the first directory it finds is the one containing the version of Ruby you have set as your current version.  So the chain of events here is:
+In other words, `rbenv exec` ensures that, when UNIX is checking `PATH` for a directory containing the command we entered, the first directory it finds is the one containing the version of Ruby you have set as your current version.
+
+So the chain of events here is:
 
  - We call our program (i.e. `bundle` from the command line).
  - That call gets intercepted by the shim file.
+ - The shim file sets a value for `RBENV_ROOT`, as well as (sometimes) the value for `RBENV_DIR` (if the file you're running contains a path, i.e. `path/to/file.rb`)
  - The shim file calls `rbenv exec` to ensure that the version of Ruby we want to use is the first version that UNIX finds in our `PATH`.
 
-**This is the heart of how RBENV ensures a clean separation of Ruby versions**- it stores them in separate folders, uses shims to intercept calls to Ruby programs, looks for your program in in the folder for your currently-selected Ruby version, and then executes *that* installation of your program.
+Based on steps 3 and 4, we can deduce that `rbenv exec` (or a sub-program it calls) relies on the values of `RBENV_ROOT` and possibly `RBENV_DIR` being set, and that those are critical to how RBENV determines which Ruby version to use.
 
-But wait- why do we need the `ruby`-specific if block in *every* shim, regardless of whether it's a `ruby` shim or not?
+But wait- why do we need the Ruby-specific `if`-block in *every* shim, regardless of whether it's a `ruby` shim or not?
+
+That's next.
