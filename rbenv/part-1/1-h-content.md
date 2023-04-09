@@ -183,6 +183,6 @@ So the chain of events here is:
 
 Based on steps 3 and 4, we can deduce that `rbenv exec` (or a sub-program it calls) relies on the values of `RBENV_ROOT` and possibly `RBENV_DIR` being set, and that those are critical to how RBENV determines which Ruby version to use.
 
-But wait- why do we need the Ruby-specific `if`-block in *every* shim, regardless of whether it's a `ruby` shim or not?
+But wait- why do we need the Ruby-specific `if`-block in *every* shim, regardless of whether it's a `ruby` shim or not?  We stated earlier that this `if`-block takes up over 2/3 of the lines of code in this file, and that's a clue that it must be pretty important.  But why is that so?
 
-That's next.
+We'll answer this question next.

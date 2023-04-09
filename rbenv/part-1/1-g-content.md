@@ -234,7 +234,7 @@ In the meantime, what do the contents of the `RBENV_DIR` variable look like?  To
 
 It looks like more parameter expansion, but the `%/*` syntax looks new.  Let's try an experiment.
 
-### Experiment- diving deeper into parameter expansion
+### Experiment- diving deeper into parameter expansion {#diving-deeper-into-parameter-expansion}
 
 I type the following directly in my `foo` script:
 
