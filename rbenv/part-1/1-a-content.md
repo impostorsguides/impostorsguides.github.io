@@ -10,13 +10,13 @@
 
 This is the question which set me off on this entire project.
 
-For those unfamiliar with this command, it comes from the [Bundler library](https://bundler.io/){:target="_blank" rel="noopener"}.  Bundler provides "a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed", according to its website.  `bundle install` is one of the most common commands we find ourselves typing in Ruby.
+For those unfamiliar with this command, it comes from the [Bundler library](https://bundler.io/){:target="_blank" rel="noopener"}.  Bundler provides "a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed", according to its website.  Professionally, I work on a large Rails codebase with many contributors, and `bundle install` is one of the most common commands I find myself typing in that codebase.
 
-I was frustrated that I didn't know how this command worked under-the-hood.  Since I'm a big believer that ["The best way to learn something is to explain it to someone else"](https://ideas.time.com/2011/11/30/the-protege-effect/){:target="_blank" rel="noopener"}, I decided to go down the rabbit hole.
+I was frustrated that I didn't know how this command worked under-the-hood.  Since I'm a big believer that ["The best way to learn something is to explain it to someone else"](https://ideas.time.com/2011/11/30/the-protege-effect/){:target="_blank" rel="noopener"}, I decided to blog about what I was learning, as I learned it.
 
-**The bad news is, I didn't learn about `bundle` as part of this deep-dive.**  Note that I intend to repeat this process with the `bundle` command in a future post.
+**The bad news is, I didn't learn about `bundle` as part of this deep-dive.**  I intend to repeat this process with the `bundle` command in a future post.
 
-The good news is, I ended up learning about the Ruby version manager known as RBENV, a.k.a. the code which gets executed **before we even get to `bundle`**.  Along the way, I learned a lot about `bash` scripting and the command line.
+The good news is, I ended up learning about the Ruby version manager known as RBENV, a.k.a. the code which gets executed **before my machine even reaches the `bundle` command**.  (If you use RBENV as your Ruby version manager, the same can be said about your machine.)  Along the way, I learned a lot about `bash` scripting and the command line.
 
 Here's how I did it.
 

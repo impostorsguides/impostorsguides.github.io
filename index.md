@@ -26,6 +26,12 @@ Greybeards always tell newbies to "read the f'ing manual", but I contend that "t
 
 "The Impostor's Guide To Programming" is an attempt to fix that.  The goal of this site is to swing the pendulum in the opposite direction, erring on the side of **too much hand-holding**.  It makes the assumption that, when faced between the dual risks of annoying a more seasoned engineer vs. mystifying a more novice one, the latter is the greater sin.
 
+Earlier I said:
+
+> If you've ever said to yourself "Maybe an engineering manager or a staff engineer could grok that, but I'd never be able to", this site is for you.
+
+Speaking personally, I remember saying this to myself with the Bundle and RBENV codebases, which is why I'm starting with RBENV.
+
 ## Warning
 
 These posts represent my best understanding of the domain at the time I wrote them.  That said, I'm a journeyman engineer myself, and I guarantee you there are errors within these posts.  This project started out as an attempt to level myself up by "teaching what I've learned", and that will largely continue to be the case going forward.

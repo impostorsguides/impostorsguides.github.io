@@ -181,7 +181,7 @@ So the chain of events here is:
  - The shim file sets a value for `RBENV_ROOT`, as well as (sometimes) the value for `RBENV_DIR` (if the file you're running contains a path, i.e. `path/to/file.rb`)
  - The shim file calls `rbenv exec` to ensure that the version of Ruby we want to use is the first version that UNIX finds in our `PATH`.
 
-Based on steps 3 and 4, we can deduce that `rbenv exec` (or a sub-program it calls) relies on the values of `RBENV_ROOT` and possibly `RBENV_DIR` being set, and that those are critical to how RBENV determines which Ruby version to use.
+Based on steps 3 and 4, we can deduce that `rbenv exec` (or a sub-program it calls) relies on the values of `RBENV_ROOT` and possibly `RBENV_DIR` being set, and that those are important to how RBENV determines which Ruby version to use.
 
 But wait- why do we need the Ruby-specific `if`-block in *every* shim, regardless of whether it's a `ruby` shim or not?  We stated earlier that this `if`-block takes up over 2/3 of the lines of code in this file, and that's a clue that it must be pretty important.  But why is that so?
 

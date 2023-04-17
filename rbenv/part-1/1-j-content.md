@@ -32,7 +32,6 @@ We covered a lot in this series, including:
  - The `exec` and `fork` commands, and when to use each one
  - What a "process" is
  - How to use Github and the repository's git history to figure out *why* the code is [the way that it is](https://www.youtube.com/watch?v=QXe1PkslirY){:target="_blank" rel="noopener"}.
- - What command substitution is and how to use it
 
 And possibly more, as well.  I lost count lol.
 
