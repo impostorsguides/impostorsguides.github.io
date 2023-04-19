@@ -1,14 +1,13 @@
-We've walked through all the code in the shim file, and can (hopefully) explain what it does.  But there's an order-of-magnitude difference between knowing what a piece of code does vs. knowing how and why it got to that point.  I feel like reaching this 2nd level will give me greater confidence in my abilities as an engineer.
+We've walked through all the code in the shim file, and can explain what it does.  But there's an order-of-magnitude difference between knowing what a piece of code does, vs. knowing how and why it got to that point.  Reading the repo's git history is one way to reach that 2nd level of understanding.
 
-We can't hope to answer this question for every line of code in the RBENV codebase (unless we're prepared to read its entire `git` history).  But we can at least try to answer a question we asked earlier, i.e. why there's a need for this `if`-block which takes up 2/3 of the code in the shim file.
+I'm not proposing that we read the **entire** git history of this repo (although the more of it we read, the more context we'd have).  But we can read enough of it to answer the question we asked earlier, i.e. why there's a need for this `if`-block which takes up 2/3 of the code in the shim file.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Here's our working knowledge of what the `if`-block does:
 
  - The first clause of the `case` statement (i.e. the `-e* | -- ) break ;;`) is a guard clause which bails out of the `for`-loop early.  If one of these two patterns is found, we can assume the remaining args don't matter for the purposes of the shim.
- - We know that any arg **other than** `*/*` is simply ignored by this `if`-block, since there is no `* )` default clause in the case statement.
- - So the clause which seems to be doing most of the heavy lifting is this one:
+ - The clause which seems to be doing most of the heavy lifting is this one:
 
 ```
 */* )
@@ -19,7 +18,9 @@ Here's our working knowledge of what the `if`-block does:
     ;;
 ```
 
-This part of the `case` statement is only triggered if the arg includes a `/`.  For example, if it takes the form of `path/to/filename`.  We further know this case statement is concerned with filenames, because it performs the check `if [ -f "$arg" ]; then` to see if the arg corresponds to a file.
+- Any other arg is simply ignored by this `if`-block, since there is no `* )` default clause in the case statement.
+
+The 2nd clause is only triggered if the arg includes a `/`.  For example, if it takes the form of `path/to/filename`.  We further know this case statement is concerned with filenames, because it performs the check `if [ -f "$arg" ]; then` to see if the arg corresponds to a file.
 
 But why do we care whether we have a `path/to/` before `filename`?
 
@@ -31,7 +32,7 @@ Let's find the PR which added the `if`-block, and see if it confirms our theory.
 
 ### Quick note- `.ruby-version` vs. `.rbenv-version`
 
-As mentioned, RBENV sometimes uses on a file called `.ruby-version` to do its job.  However, when we dig into the history of the `if`-block, we'll be looking at an earlier version of RBENV in which it instead used a file called `.rbenv-version`.  This file performed the same function, but the filename made it harder for folks who used RBENV to collaborate with folks who used other Ruby version managers.  Because of this, the core team subsequently switched from using `.rbenv-version` to `.ruby-version`.  So if you see me referring to both filenames and get confused, just know that they had the same purpose.
+As mentioned, RBENV sometimes uses on a file called `.ruby-version` to do its job.  However, when we dig into the history of the `if`-block, we'll be looking at an earlier version of RBENV in which it instead used a file called `.rbenv-version`.  This file performed the same function, but [per this comment thread](https://github.com/rbenv/rbenv/pull/302#issuecomment-11785236){:target="_blank" rel="noopener"}, the filename made it harder for folks who used RBENV to collaborate with folks who used other Ruby version managers.  Because of this, the core team subsequently switched from using `.rbenv-version` to `.ruby-version`.  So if you see me referring to both filenames and get confused, just know that they had the same purpose.
 
 ## Using git and Github to find where a change was introduced
 
@@ -49,7 +50,7 @@ $ git blame /Users/myusername/.rbenv/shims/ruby
 fatal: no such path 'shims/ruby' in HEAD
 ```
 
- That's because the shim files are included in the `.gitignore` file for `~/.rbenv`, meaning they're not part of a git repo (and hence don't have their own SHA).  We can confirm this by looking at RBENV's `.gitignore` file:
+ That's because the shim files are included in the `.gitignore` file for `~/.rbenv`, meaning they're not part of a git repo (and hence don't have their own SHA).  We can confirm this by looking at RBENV's [`.gitignore` file](https://git-scm.com/docs/gitignore){:target="_blank" rel="noopener"}:
 
 ```
 $ vim ~/.rbenv/.gitignore
@@ -68,7 +69,7 @@ $ vim ~/.rbenv/.gitignore
 
 RBENV doesn't track the contents of the `shims/` directory because each user's machine will have a different set of Ruby gems installed, meaning the filenames inside each user's `shims/` directory will be different.
 
-However, since the shims all have the same exact code, I'd bet that the shim code lives in a single file somewhere in the RBENV codebase, and is just copy-pasted into a new file by RBENV logic somewhere, whenever a new gem is installed.
+However, since the shims all have the same exact code, I'd bet that there's a "shim factory" somewhere in the RBENV codebase, which auto-generates a new file whenever a new gem is installed.
 
 We can search the RBENV codebase for the code from the `if`-block, but first we need to pick which line of code to search for.  I pick a line which I suspect will not be too common in the codebase, giving us a high signal-to-noise ratio in the search results.  Then I use [the `ag` tool](https://github.com/ggreer/the_silver_searcher){:target="_blank" rel="noopener"} to find its location:
 
@@ -87,7 +88,7 @@ Looks like there is only one search result, in a file named `libexec/rbenv-rehas
   </a>
 </center>
 
-It lives inside a function called `create_prototype_shim`.  Feels like we're on the right track!
+It lives inside a function called `create_prototype_shim`.  That sounds a lot like the "shim factory" we hypothesized!
 
 Now that we know where in the RBENV codebase the `if`-block comes from, let's look at the git history for **that** file.  I copy the filepath for `rbenv-rehash` and run `git blame` on it (docs on this command [here](https://web.archive.org/web/20230327142152/https://git-scm.com/docs/git-blame){:target="_blank" rel="noopener"}):
 
@@ -114,7 +115,7 @@ This is a lot of info.  Let's break down what we're looking at, using line 64 as
 
 As I mentioned, what we care about is the left-most column.  It contains the first 8 characters of the commit's unique identifier (also called a SHA) which introduced each line of code.  This isn't the full SHA, just a snippet, but it's almost certainly long enough to make any collisions with other commits unlikely.
 
-I notice that the SHA (`283e67b5`) is the same for the entire `if`-block.  That's lucky for us- it means that this code was all added to the repo at the same time, and gives me more confidence that this is the SHA we want.  If there were many different SHAs, each with different commit dates, it would be more of a slog to search each one until we found the PR we want.
+Notice that the SHA (`283e67b5`) is the same for the entire `if`-block.  That's lucky for us- it means that this code was all added to the repo at the same time, and gives me more confidence that this is the SHA we want.  If there were many different SHAs, each with different commit dates, it would be more of a slog to search each one until we found the PR we want.
 
 I open my web browser and go to Github, where I paste the SHA value I copied from `git blame` into the search bar on the top-left and select "In this repository":
 
@@ -193,7 +194,13 @@ I get the impression that, at the time this conversation took place, this was no
 
 My plan is to create two directories with different local Ruby versions, as well as a 3rd Ruby version set globally (i.e. for all other directories except for these two new ones) to avoid conflicts with the versions in these 2 directories.  Then I'll test which version of Ruby is picked up by RBENV inside each directory.
 
-First, I make sure that the version of RBENV that I'm running is the one just **after** the `if`-block was added:
+First, I make sure that the version of RBENV that I'm running matches the last of the commits in the PR which added the `if`-block:
+
+<center style="margin-bottom: 3em">
+  <a target="_blank" href="/assets/images/screenshot-19apr2023-1005am.png">
+    <img src="/assets/images/screenshot-19apr2023-1005am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
+  </a>
+</center>
 
 ```
 $ cd ~/.rbenv
@@ -289,9 +296,15 @@ This is what I'd expect based on reading the core team's PR conversation: each f
 
 Next, I check out the version of the RBENV code just **before** the `if`-block was introduced:
 
+<center style="margin-bottom: 3em">
+  <a target="_blank" href="/assets/images/screenshot-19apr2023-1009am.png">
+    <img src="/assets/images/screenshot-19apr2023-1009am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
+  </a>
+</center>
+
 ```
 $ cd ~/.rbenv
-$ git co c3fe192243bff9a00866d81af38d9012bfba419a
+$ git co 6c1fb9ffd062ff04607d2e0f486067eaf6e48d1e~
 $ git co just-before-if-block
 ```
 
@@ -313,9 +326,13 @@ export RBENV_ROOT="/Users/myusername/.rbenv"
 exec rbenv exec "${0##*/}" "$@"
 ```
 
+We see the `if`-block is gone.  That's what we want.
+
 Now, back in my `bar/` directory, I re-run both `bar.rb` and `../foo/foo.rb`:
 
 ```
+$ cd ~/Workspace/OpenSource/bar
+
 $ ruby bar.rb
 
 2.7.5
@@ -325,9 +342,9 @@ $ ruby ../foo/foo.rb
 2.7.5
 ```
 
-With the `if`-block removed, we now see that the Ruby version for `foo` does not reflect the version number specified in its `.rbenv-version` file if we run `foo.rb` from within the `bar/` directory.
+With the `if`-block removed, we now see that the Ruby version for `foo` does **not** reflect the version number specified in its `.rbenv-version` file if we run `foo.rb` from within the `bar/` directory.
 
-But if we `cd` from `bar/` into its sibling `foo/` and run `foo.rb`, it changes back to `3.0.0`:
+But if we `cd` from `bar/` into its sibling `foo/` and run `foo.rb`, it changes back to the version we expect, `3.0.0`:
 
 ```
 $ cd ../foo
@@ -336,7 +353,7 @@ $ ruby foo.rb
 3.0.0
 ```
 
-So we can see that one of the things that the `if`-block does is help pin the Ruby version of a file we run based on the `.rbenv-version` file in the same directory.
+So we can see that one of the things that the `if`-block does is help pin the Ruby version of a file we run based on the `.rbenv-version` file in the same directory.  Judging by [the conversation in the PR](https://github.com/rbenv/rbenv/pull/298#issuecomment-11699902){:target="_blank" rel="noopener"}, this seems to be what the core team intended.  On a personal level, it's also what I as a user would expect the behavior to be, so I can understand why they did what they did.
 
 Before moving on, I make sure to clean up the mess I made:
 
