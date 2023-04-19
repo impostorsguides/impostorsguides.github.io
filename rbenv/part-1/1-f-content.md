@@ -68,7 +68,7 @@ baz
 buzz
 ```
 
-They print on separate lines this time, because now we're iterating over them with the `for` loop instead of printing them all at once via `$@`.
+They print on separate lines this time, because now we're iterating over them with the `for` loop and making a separate call to `echo` for each arg, instead of printing them all at once via `$@`.
 
 And finally, testing whether we can eliminate `in "$@"`:
 
@@ -195,7 +195,7 @@ From these snippets and from the article as a whole, my takeaways are:
 
  - Otherwise, the return status is the [exit status](https://web.archive.org/web/20220806222213/https://linuxize.com/post/bash-exit/){:target="_blank" rel="noopener"} of the executed commands (aka the clause).
 
-The only thing new here, IMHO, is the syntax.  In general, these rules all appear to match how case statements work in Ruby and other languages I've worked with.
+The only thing new here, at least for me, is the syntax.  In general, these rules all appear to match how case statements work in Ruby and other languages I've worked with.
 
 ### Experiment- building a simple `case` statement
 
@@ -235,7 +235,7 @@ $ ./foo 1
 1
 ```
 
-Lastly, I add a few non-default conditions:
+Next, I add a few non-default conditions:
 
 ```
 #!/usr/bin/env bash
@@ -314,7 +314,7 @@ Either four or five
 
 No surprises so far- all the examples worked the way I'd expect.  Interestingly, when I remove the quotes from around the numbers in the case statements, the script continues to function as normal.
 
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+## Pattern-matching in case statements
 
 Next line of code:
 
@@ -323,15 +323,23 @@ Next line of code:
     ...
 ```
 
-## Pattern-matching in case statements
+In the earlier list of bullet points, I mentioned:
 
-The earlier bullet points also explain the syntax of this first clause of the case statement.
+> A pattern can have [special characters](https://web.archive.org/web/20220820011901/https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html){:target="_blank" rel="noopener"}.
 
-We see two patterns (`-e` and `--`), separated by the `|` character, then terminated by the `)` character, as mentioned in bullet points 2 and 3 above.  If the current arg in the iteration matches either pattern, we exit the `for` loop (i.e. we `break`).  Otherwise, we fall through and check the next clause in the case statement.
+This explains the syntax of the first clause of the shim's case statement.
 
-Because of point #8 above, I suspect that any text starting with `-e` would fit the `-e*` pattern.  To prove it, I perform an experiment.
+We see two patterns (`-e*` and `--`), separated by the `|` character, then terminated by the `)` character, as mentioned in bullet points 2 and 3 above.  If the current arg in the iteration matches either pattern, we exit the `for` loop (i.e. we `break`).  Otherwise, we fall through and check the next clause in the case statement.
 
-#### Experiment- the `-e*` flag in a case statement
+In the above link, the `*` symbol is listed as one of the "special characters" available in `bash` pattern matching:
+
+> *
+>
+> Matches any string, including the null string...
+
+This makes me suspect that any text starting with `-e` (followed by zero or more characters) would fit the `-e*` pattern.  To prove it, I perform an experiment.
+
+### Experiment- the `-e*` flag in a case statement
 
 I write the following script:
 
@@ -350,7 +358,11 @@ done
 echo "Outside the for loop"
 ```
 
-This is a simplified version of the original case statement.  It iterates over the args, and if an arg matches `-e*`, we echo a test string ("Pattern matched; exiting...") and break out of the loop.  Otherwise, we just echo the arg itself and keep iterating.  When we're done with all the args in the loop, we echo "Outside the for loop" to indicate that the script is finished.
+This is a simplified version of the original case statement.  It iterates over the list of args, and does the following:
+
+ - if an arg matches `-e*`, we echo a test string ("Pattern matched on arg ___; exiting...", where `___` is the value of the argument) and break out of the loop.
+ - Otherwise, we just echo the arg itself and keep iterating until we've handled all the arguments.
+ - When we're done with the `for`-loop, we echo "Outside the for loop" to indicate that the script is finished.
 
 I then run the following:
 
@@ -362,13 +374,18 @@ Pattern matched on arg -ebaz; exiting...
 Outside the for loop
 ```
 
-So we printed our first arg, and then "Pattern matched on arg -ebaz; exiting...", then we did **not** print the third arg (`buzz`).  This is because "-ebaz" starts with "-e", which matched the `break` condition of `-e*`.  Lastly, we printed "Outside the for loop" to prove that `break`ing doesn't result in an exit of the entire script.  Based on this result, I think we can safely say that we were correct, and the `-e*` flag returns true if a given string starts with `-e`, regardless of what follows after.
+So we printed our first arg, and then "Pattern matched on arg -ebaz; exiting...", then we did **not** print the third arg (`buzz`).  This is because "-ebaz" starts with "-e", which matched the `break` condition of `-e*`.  Lastly, we printed "Outside the for loop" to prove that `break`ing only terminates the iterations of the `for`-loop, as opposed to the entire script.
+
+Based on this result, I think we can safely say that we were correct, and the `-e*` flag returns true if a given string starts with `-e`, regardless of what follows after.
+
+### What does the `-e` flag do?
 
 We know that this flag is for the `ruby` command because the case statement clause is located inside the aforementioned `if` check in the shim:
 
 ```
 if [ "$program" = "ruby" ]; then
 ...
+fi
 ```
 
 So to figure out what the `-e` flag actually does, I just ran `ruby –help` and searched for the `-e` entry.
@@ -391,7 +408,9 @@ Hello
 
 So passing Ruby code directly to the `ruby` interpreter in your terminal (via the `-e` flag) is one of the two scenarios which will cause `rbenv` to assume that any **subsequent** args are meant to be positional args, not flags to the `ruby` command itself.
 
-Regarding the 2nd pattern (`--`), I've seen it used in terminal commands before but I doubt I could explain its purpose.  StackOverflow [saves the day again](https://web.archive.org/web/20220623104640/https://unix.stackexchange.com/questions/11376/what-does-double-dash-mean){:target="_blank" rel="noopener"}:
+Regarding the 2nd pattern (`--`), I've seen it used in terminal commands before but I doubt I could explain its purpose.
+
+What does `--` actually signify?  StackOverflow [saves the day again](https://web.archive.org/web/20220623104640/https://unix.stackexchange.com/questions/11376/what-does-double-dash-mean){:target="_blank" rel="noopener"}:
 
 <center style="margin-bottom: 3em">
   <a target="_blank" href="/assets/images/double-dash.png">
@@ -403,10 +422,9 @@ I think this means that everything before `--` is meant to be a flag, and everyt
 
 We can deduce something from this clause and the conditions it matches (`-e*` or `--`).  And that is that both of these conditions, in their own way, are meant to signify that everything else which comes afterward is an argument that tells the `ruby` command **what** to process, **not** a flag which tells the script **how** to process it.
 
-If we don't match either of these two conditions, it's probably a safe bet that the argument we've passed still represent our attempt to tell `ruby` how to process something.  That leads us to our next block of code:
-
 ## Setting `RBENV_DIR`
 
+Next block of code:
 
 ```
     */* )
@@ -415,11 +433,11 @@ If we don't match either of these two conditions, it's probably a safe bet that 
 
 ```
 
-Judging by the `)` terminator character and the `;;` a few lines down, we can see that this is another clause of our case statement, and that `*/*` is a pattern that the case statement will match against.
+Judging by the `)` terminator character and the `;;` a few lines down, we can see that this is a new clause of our case statement, and that `*/*` is a pattern that the case statement will match against.
 
-One difference I notice is that the `*/* )` pattern here doesn't exactly match the `* )` pattern in the example code we read earlier.
+One difference I notice is that this is **not** the same as a "catch-all" default case, because the `*/* )` pattern here doesn't exactly match the `* )` pattern in the example code we read earlier.
 
-It looks like our pattern here searches for a forward-slash, surrounded on either side with zero or more arbitrary characters.  The one thing I can think of which would match that pattern is a file path.  Let's check that with an experiment.
+Instead, it looks like this pattern searches for a forward-slash, surrounded on either side with zero or more arbitrary characters.  The one thing I can think of which would match that pattern is a file path.  Let's check that with an experiment.
 
 #### Experiment: matching the `*/*` pattern
 
@@ -454,15 +472,15 @@ match: /
 not a match:
 ```
 
-I have the following patterns:
+I send my `./foo` script the following arguments:
 
- - 3 patterns with no forward slashes (just 3 random numbers)
- - 4 patterns containing a forward slash:
-    - one with characters both before and after
-    - one with a character to the right of the slash
-    - one with a character to the left of the slash, and
-    - one with no characters before or after
- - an empty string
+ - 3 arguments with no forward slashes (just 3 random numbers, `1`, `2`, and `3`).
+ - 4 arguments containing a forward slash:
+    - one with characters both before and after, `a/b`
+    - one with a character to the right of the slash, `/b`
+    - one with a character to the left of the slash, `a/`
+    - one with no characters before or after, `/`
+ - an empty string, `''`
 
 When I run the script:
 
@@ -473,7 +491,5 @@ When I run the script:
 So yes, it appears to be looking for strings which match the `/` symbol with zero or more characters of text on either side.
 
 But just because it *looks* like a valid filepath, doesn't mean it *is* one.  So how do we know it's a file?
-
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 We'll answer that question on the next page.
