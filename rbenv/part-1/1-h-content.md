@@ -82,7 +82,7 @@ The example they give for `fork`ing (rather than `exec`ing) is a web server that
 
 It appears that, if you know the parent process will be done after running the child process, then `exec` is the way to go because you can re-use the parent's process ID instead of creating a new one.  On the other hand, if the parent still has work to do after the child finishes executing, then `fork` is the way to go.
 
-#### Experiment- messing around with `exec`
+### Experiment- messing around with `exec`
 
 Directly in my terminal, I run:
 
@@ -154,7 +154,9 @@ So that's what the shell builtin `exec` command does.  But the line of code we'r
 exec "/usr/local/bin/rbenv" exec ...
 ```
 
-This means we're running the builtin `exec` command, and *passing it* the `rbenv exec` command.  What does `rbenv exec` do?
+This means we're running the builtin `exec` command, and *passing it* the `"/usr/local/bin/rbenv" exec` command.  What does `"/usr/local/bin/rbenv" exec` do?
+
+To simplify things a bit, it helps to know that `"/usr/local/bin/rbenv" exec` is the same as running `rbenv exec`, albeit the version of `rbenv` which lives in the `/usr/local/bin/` directory.  And to simplify things even further, it helps to know that running `rbenv exec` in your terminal will, eventually, run the `libexec/rbenv-exec` file.  The only reason I know this is because, at the time I'm writing this, I've already read through the codebase.
 
 To avoid getting ahead of ourselves by looking at the `rbenv-exec` file, for now I just check whether `rbenv exec` accepts a `--help` command:
 
@@ -174,7 +176,9 @@ is equivalent to:
 
 In other words, `rbenv exec` ensures that, when UNIX is checking `PATH` for a directory containing the command we entered, the first directory it finds is the one containing the version of Ruby you have set as your current version.
 
-So the chain of events here is:
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+To summarize what the entire shim does, the chain of events is:
 
  - We call our program (i.e. `bundle` from the command line).
  - That call gets intercepted by the shim file.
