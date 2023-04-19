@@ -39,7 +39,7 @@ If we keep scrolling down the `man` page, we'll also see:
  - examples of how to use the `ls` command
  - various other bits of information which aren't immediately relevant to us now
 
-If you're not familiar with `man` pages, I recommend at least skimming the page for `ls`.
+If you're not familiar with `man` pages, I recommend running `man ls` in your terminal, and skimming the results.
 
 ### Looking up the `man` page for `set`
 
@@ -51,28 +51,23 @@ Let's try looking up the above `set` command in its `man` page.  I type `man set
   </a>
 </p>
 
-This `man` page looks a bit different.  If we read it closely, we see that it doesn't describe the `set` command itself:
+This `man` page looks a bit different.  It doesn't mention the command name (`set`) in the top-left corner, the way the `man ls` results did.  Instead we just see the word `BUILTIN`.
 
- - We don't see the `set` command specifically mentioned at the top, the way we did with `ls`.  Instead, we see "BUILTIN" at the top-left.
- - We see a synopsis and description, but they don't appear to be those of the `set` command.
-
-At first glance, this appears to be an explanation of what a [builtin command](https://web.archive.org/web/20230226091101/https://www.gnu.org/software/bash/manual/html_node/Shell-Builtin-Commands.html){:target="_blank" rel="noopener"} is in UNIX, not an explanation of the command we're interested in.  As it turns out, depending on the command you give it, sometimes `man` will give you documentation on that command (like it did with `ls`), while other times, it returns the above.
+As it turns out, depending on the command you give it, sometimes `man` will give you documentation on that command (like it did with `ls`), while other times, it returns the above- an explanation of what a [builtin command](https://web.archive.org/web/20230226091101/https://www.gnu.org/software/bash/manual/html_node/Shell-Builtin-Commands.html){:target="_blank" rel="noopener"} is in UNIX.
 
 So when does it give you one result, vs. the other?
 
 I found an answer [here](https://unix.stackexchange.com/questions/167004/why-dont-shell-builtins-have-proper-man-pages){:target="_blank" rel="noopener"}.  The gist of it is that `man` pages are provided only for commands which come from UNIX.  But `bash` is not UNIX.  UNIX is the operating system, and `bash` is the application we're using to interact with the operating system (aka [the "shell"](https://web.archive.org/web/20220601094544/https://www.pcmag.com/encyclopedia/term/shell){:target="_blank" rel="noopener"} which surrounds the operating system).
 
-The `set` command is a builtin program provided by `bash`, not [an external command](https://web.archive.org/web/20220709025237/https://www.geeksforgeeks.org/internal-and-external-commands-in-linux/){:target="_blank" rel="noopener"} provided by UNIX.  It would be a bad idea to comingle the docs for each shell's commands in the same folder that we use to include the manuals for the operating system's commands.  So shell authors keep the docs for their commands separate.  We can use the `help` command to look up the docs.  More on that in a minute.
+The `set` command is a builtin program provided by `bash`, not [an external command](https://web.archive.org/web/20220709025237/https://www.geeksforgeeks.org/internal-and-external-commands-in-linux/){:target="_blank" rel="noopener"} provided by UNIX.  Shell authors keep the docs for their commands separate from the docs for OS commands because comingling them together in the same folder would lead to user confusion about whether a given program was a builtin or an external command.
+
+To look up docs on builtin commands, we can use the `help` command.  More on that in a minute.
 
 ## What are shells?
 
 Here's [an article from PCMag](https://web.archive.org/web/20220601094544/https://www.pcmag.com/encyclopedia/term/shell){:target="_blank" rel="noopener"}, which describes a shell as "The outer layer of an operating system, otherwise known as the user interface."  If we think of the shell of an egg as being its "outer layer", then this word choice starts to make sense.
 
 There are many examples of shell programs- others include `zsh`, `fish`, `ksh`, etc.  Later on, we'll actually encounter some of these other shells again, when we dive into specific `rbenv` commands.
-
-Further down in the PCMag article, we read:
-
-  > "The term (shell) originally referred to the software that processed the commands typed into the Unix operating system. For example, the Bourne shell was the original Unix command line processor, and C shell and Korn shell were developed later."
 
 Wait, but... if there are multiple different kinds of shell programs, doesn't that create a sort of "Wild West" situation where everyone implements commands in their own way?  Is there some sort of industry standard that all shells have to adhere to, to prevent chaos?
 
@@ -165,7 +160,7 @@ In a regular `bash` (i.e. not `zsh`) terminal, typing `help set` offers an expla
 
 However, when I try to type `help set` into `zsh`, I see that `General Commands Manual` for builtin commands, which I don't find particularly helpful.  I'd rather see information on the specific command I type in.
 
-I could configure my laptop to make `bash` the default shell for my machine.  Then I'd be able to type `help set` and see what I'm looking for.  However, I'm a creature of habit, and over time I've gotten used to the `zsh` interface.  I don't feel like changing the default shell would be worth the effort.
+I could configure my laptop to make `bash` the default shell for my machine.  Then I'd be able to type `help set` and see what I'm looking for.  However, I'm a creature of habit, and over time I've gotten used to `zsh`.  I don't feel like changing the default shell would be worth the effort.
 
 After some Googling around, I found [this StackOverflow question](https://superuser.com/questions/1563825/is-there-a-zsh-equivalent-to-the-bash-help-builtin){:target="_blank" rel="noopener"}, with [this answer](https://superuser.com/a/1563859/300277){:target="_blank" rel="noopener"} describing how to make the `help` output more helpful:
 
@@ -179,10 +174,8 @@ It appears to be telling me to:
 
  - [unalias](https://web.archive.org/web/20230405124404/https://ss64.com/osx/alias-zsh.html){:target="_blank" rel="noopener"} the current definition of the `run-help` command ([which is aliased to `man` by default in `zsh`](https://web.archive.org/web/20230403130053/https://wiki.archlinux.org/title/zsh){:target="_blank" rel="noopener"})
  - [autoload](https://stackoverflow.com/a/63661686/2143275){:target="_blank" rel="noopener"} a new implementation of the `run-help` command
- - reset [`HELPDIR`](https://web.archive.org/web/20230320043124/https://zsh.sourceforge.io/Doc/Release/User-Contributions.html){:target="_blank" rel="noopener"} ("The HELPDIR parameter tells run-help where to look for the help files.")
+ - set a new value for [`HELPDIR`](https://web.archive.org/web/20230320043124/https://zsh.sourceforge.io/Doc/Release/User-Contributions.html){:target="_blank" rel="noopener"} ("The HELPDIR parameter tells run-help where to look for the help files.")
  - create an alias for our new `run-help` command, called `help`
-
-In other words, we load `run-help` into our shell, specify the directory where the docs for the `zsh` commands can be found, and alias the `help` command to this `run-help` command (so that we can just type `help` instead of the full `run-help`).
 
 This all sounds fine, so I add the code from StackOverflow into my `~/.zshrc` file:
 
@@ -199,7 +192,7 @@ This all sounds fine, so I add the code from StackOverflow into my `~/.zshrc` fi
 
 I then run `source ~/.zshrc` to reload the file into memory.
 
-### What is a `.zshrc` file?
+### What is a `.rc` file?
 
 When you open a new terminal tab or window in `zsh`, one of the first things that happens is that `zsh` runs [a few setup scripts](https://web.archive.org/web/20230317222607/https://zsh.sourceforge.io/Intro/intro_3.html){:target="_blank" rel="noopener"}.  One of these setup scripts is called `.zshrc`.  This file is where you'd put configuration options that you'd want to run on every new terminal tab or window.  This includes our `help` configuration, so that's why we add that code in `.zshrc`.
 
@@ -223,7 +216,11 @@ From the first paragraph, I see the following:
 
 > Set  the options for the shell and/or set the positional parameters, or declare and set an array.
 
-So we're setting "options".  But "options" is pretty vague.  What are options in a terminal?  I Google "shell options", and one of the first results is [this link](https://web.archive.org/web/20230315104403/https://tldp.org/LDP/abs/html/options.html){:target="_blank" rel="noopener"} from The Linux Documentation Project:
+So we're setting "options".  But "options" is pretty vague.  What are options in a terminal?
+
+## Shell Options
+
+I Google "shell options", and one of the first results is [this link](https://web.archive.org/web/20230315104403/https://tldp.org/LDP/abs/html/options.html){:target="_blank" rel="noopener"} from The Linux Documentation Project:
 
 > Options are settings that change shell and/or script behavior.
 >
@@ -279,7 +276,7 @@ Back to `set -e`.  It sounds like, if you add `set -e` to your bash script and a
 
 OK, but... why do I need `set -e` for that?
 
-When I write a Ruby script and an error occurs, it exits immediately.  Is the helpfile implying that a program would just continue executing if you *leave out* `set -e` and an error occurs?
+When I write a Ruby script and an error occurs, the interpreter exits immediately.  Is the helpfile implying that a `bash` program would just continue executing if you *leave out* `set -e` and an error occurs?
 
 Let's try an experiment to figure out whether that's the case.
 
