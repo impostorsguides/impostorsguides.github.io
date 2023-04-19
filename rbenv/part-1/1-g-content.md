@@ -25,7 +25,7 @@ FWIW, I'm guessing the man page says "regular file" here in order to distinguish
  - "block special file" for the `-b` flag, and
  - "character special file" for the `-c` flag.
 
- I didn't spend too much time researching these special file types, because it doesn't look especially relevant to our goal here.  If you're curious about that, I found [this StackOverflow post](https://web.archive.org/web/20220712131700/http://unix.stackexchange.com/questions/60034/what-are-character-special-and-block-special-files-in-a-unix-system){:target="_blank" rel="noopener"} which appears to contain the answer.
+ I didn't research these other file types because it didn't look relevant to our goal here.  If you're curious about them, I found [this StackOverflow post](https://web.archive.org/web/20220712131700/http://unix.stackexchange.com/questions/60034/what-are-character-special-and-block-special-files-in-a-unix-system){:target="_blank" rel="noopener"} which appears to contain the answer.  If I'm wrong, and they are relevant to this code, [let me know](https://twitter.com/impostorsguides){:target="_blank" rel="noopener"}!
 
 To test whether the `-f` flag behaves the way I think it does, I update my `foo` script from earlier to look like the following:
 
@@ -35,7 +35,7 @@ To test whether the `-f` flag behaves the way I think it does, I update my `foo`
 for arg; do
   case "$arg" in
     */* )
-      echo "match: $arg";
+      echo "could be a filepath: $arg";
       if [ -f "$arg" ]; then
         echo "is definitely a filepath";
       else
@@ -46,16 +46,17 @@ for arg; do
       echo "not a match: $arg";
     ;;
   esac
+  echo "------"
 done
 ```
 
-Then I run:
+Then I create an empty file named `bar` in my current directory:
 
 ```
-$ echo "bar" > bar
+$ touch bar
 ```
 
-I run this command so that I have a file in my directory called `./bar`.
+I do this so that I have a file in my directory that will return true for the test `[ -f "./bar" ]`.
 
 Lastly, I run the following:
 
@@ -63,20 +64,30 @@ Lastly, I run the following:
 $ ./foo 1 2 3 a/b /b a/ / '' ./bar foo
 
 not a match: 1
+------
 not a match: 2
+------
 not a match: 3
-match: a/b
+------
+could be a filepath: a/b
 turns out, is not a filepath
-match: /b
+------
+could be a filepath: /b
 turns out, is not a filepath
-match: a/
+------
+could be a filepath: a/
 turns out, is not a filepath
-match: /
+------
+could be a filepath: /
 turns out, is not a filepath
+------
 not a match:
-match: ./bar
+------
+could be a filepath: ./bar
 is definitely a filepath
+------
 not a match: foo
+------
 ```
 
 As expected, the arguments which are known to *not* match a file in my current directory (i.e. `a/b`, `/b`, `a/`, and `/`) result in the output `turns out, is not a filepath`.  My `./bar` argument, which is known to match a file, results in the output `is definitely a filepath`.
@@ -89,15 +100,47 @@ This is an important but subtle question, and relates to the overall purpose of 
 
 Let's try an experiment which should tell us whether this is in fact happening with the shim for the `ruby` command.
 
-#### Experiment- are we skipping potentially valid filepaths?
+### Experiment- are we skipping potentially valid filepaths?
 
-I update the shim for my `ruby` command (which I find using the command `which ruby`) to look like the following.  Newly-added lines are indicated with comments in blue at the right of the screenshot:
+I find the filepath for the `ruby` shim, using the `which` command, and open it using my `vim` editor:
 
-<center style="margin-bottom: 3em">
-  <a target="_blank" href="/assets/images/new-ruby-shim.png">
-    <img src="/assets/images/new-ruby-shim.png" width="90%" alt="shim for `ruby` command with echo statements">
-  </a>
-</center>
+```
+$ which ruby
+
+/Users/myusername/.rbenv/shims/ruby
+
+$ vim /Users/myusername/.rbenv/shims/ruby
+```
+
+Then I update the shim to look like the following:
+
+```
+#!/usr/bin/env bash
+set -e
+[ -n "$RBENV_DEBUG" ] && set -x
+
+program="${0##*/}"
+if [ "$program" = "ruby" ]; then
+  for arg; do
+    echo "arg: $arg"                                  # new code
+    case "$arg" in
+    -e* | -- ) break ;;
+    */* )
+      echo "arg matches */*: $arg"                    # new code
+      if [ -f "$arg" ]; then
+        echo "about to set RBENV_DIR for arg $arg"    # new code
+        export RBENV_DIR="${arg%/*}"
+        break
+      fi
+      ;;
+    esac
+    echo "-----"                                      # new code
+  done
+fi
+
+export RBENV_ROOT="/Users/richiethomas/.rbenv"
+exec "/usr/local/bin/rbenv" exec "$program" "$@"
+```
 
 I then make a new file called `bar.rb`, which just contains the following:
 
@@ -126,15 +169,17 @@ about to set RBENV_DIR for arg ./bar.rb
 10
 ```
 
-Judging by the fact that we see `about to set RBENV_DIR...` in the 2nd test case but not the first, we can say that calling `ruby ./bar.rb` definitely causes additional code to be executed in our shim, above and beyond what gets executed when we only call `ruby bar.rb`.
+We see `about to set RBENV_DIR...` in the 2nd test case, but not the first.
+
+Based on this, we can say that calling `ruby ./bar.rb` definitely causes additional code to be executed in our shim, above and beyond what gets executed when we only call `ruby bar.rb`.
 
 Does this matter?
 
-The answer to that is tied to the reason why this clause of the case statement is here.  We'll see what that is in the next section.
+The answer to that is tied to the reason why this clause of the case statement is here.  Later on, we'll see what that is.
 
 Before I move on, I make sure to delete the modifications I made to my `ruby` shim file.
 
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+## The `RBENV_DIR` environment variable
 
 Next 2 lines of code are:
 
@@ -143,11 +188,7 @@ export RBENV_DIR="${arg%/*}"
 break
 ```
 
-Here we see that the purpose of our case statement is to set the `RBENV_DIR` environment variable.
-
-## The `RBENV_DIR` environment variable
-
-What does this env var do?
+Here we see that the purpose of our case statement is to set the `RBENV_DIR` environment variable.  But what does this env var do?
 
 To answer this question, I search for it in the `rbenv` codebase on my local machine (which I've downloaded from [the Github repo](https://github.com/rbenv/rbenv/tree/c4395e58201966d9f90c12bd6b7342e389e7a4cb){:target="_blank" rel="noopener"}).
 
@@ -171,23 +212,29 @@ Sure enough, I find that it contains the following table:
   </a>
 </center>
 
-So the intention is for `RBENV_DIR` to control where `rbenv` looks for your `.ruby-version` file.
+So `RBENV_DIR` controls where RBENV looks for your `.ruby-version` file.
 
-I happen to know from being a long-time RBENV user that the `.ruby-version` file is one way that RBENV uses to detect which Ruby version you want to use.  It's quite common, when running a Ruby file that depends on a specific Ruby version, to include a `.ruby-version` file with that specific version in the same directory as the executed file.  From there, RBENV reads that file and uses that version of Ruby to run your file or project.
+Again from reading [the README file](https://web.archive.org/web/20230413141208/https://github.com/rbenv/rbenv){:target="_blank" rel="noopener"}, we see that the `.ruby-version` file is one way that RBENV uses to detect which Ruby version you want to use:
+
+> ...rbenv scans the current project directory for a file named .ruby-version. If found, that file determines the version of Ruby that should be used within that directory.
+
+So here we're setting the `RBENV_DIR` variable, in order to tell RBENV where it can find the `.ruby-version` file.
 
 But what is the `export` keyword at the start of `export RBENV_DIR="${arg%/*}"`?
 
 ## `export` statements
 
-We've already seen variables declared earlier, i.e. `program="${0##*/}"`.  The assignment statement `export FOO='bar'` creates a variable named `FOO` and sets its value to `bar`, **but** it does something else as well.
+We've already seen an example of how variables are assigned in `bash`, i.e. `program="${0##*/}"`.  An assignment statement like `export FOO='bar'` is similar, in that creates a variable named `FOO` and sets its value to `bar`, **but** the use of `export` means it's doing something else as well.
 
-What does the use of `export` buy us?
+What does `export FOO='bar'` do that `FOO='bar'` doesn't do?
 
-It turns out there are two kinds of variables in a bash script: shell variables, and environment variables.  When we created the `program` variable, that was an example of creating a **shell** variable.
+It turns out there are two kinds of variables in a bash script: shell variables, and environment variables.  Adding `export` in front of an assignment statement is what transforms a **shell** variable assignment into an **environment** variable assignment.
 
-Shell variables are only accessible from within the shell they're created in.  Environment variables, on the other hand, are accessible from within child shells created by the parent shell.
+When we created the `program` variable, that was an example of creating a shell variable.  With this assignment operation `export RBENV_DIR=...`, we're creating an environment variable.
 
-[This blog post](https://web.archive.org/web/20220713174024/https://www.baeldung.com/linux/bash-variables-export){:target="_blank" rel="noopener"} gives two examples, one demonstrating access of an environment variable from a child shell, and the other of accessing a shell variable from a child shell.  To see this for ourselves, we can do an experiment mimicking these examples in our terminal.
+The difference between the two is that shell variables are only accessible from within the shell they're created in.  Environment variables, on the other hand, are also accessible from within child shells created by the parent shell.
+
+[This blog post](https://web.archive.org/web/20220713174024/https://www.baeldung.com/linux/bash-variables-export){:target="_blank" rel="noopener"} gives two examples, one demonstrating access of an environment variable from a child shell, and the other of (attempting to) access a shell variable from a child shell.  To see this for ourselves, we can do an experiment mimicking these examples in our terminal.
 
 ### Experiment- environment vs shell variables
 
@@ -205,7 +252,13 @@ Here is my environment variable
 $ echo $MYVAR2
 
 Here is my shell variable
+```
 
+So far, so good.  Both the shell variable and the environment variable printed successfully.
+
+Now we open up a new shell **from within our existing shell**, and try again:
+
+```
 $ bash    # Open a new child shell
 
 bash $ echo $MYVAR1
@@ -222,9 +275,7 @@ So our current line of code creates an environment variable called `RBENV_DIR`, 
 
 The short answer is that the child shell is used by RBENV to detect which Ruby version is the right one, and then run the original command corresponding to the shim that's being executed (i.e. `bundle` or whatever).
 
-A deeper answer would require an explanation of how the RBENV codebase works as a whole, which is beyond the scope of this post.  But if you want to know more, I've already written a 500-page deep-dive into the codebase, written in the same format as this guide (with experiments, beginner-friendly explanations, etc).  Sign up below to get notified when I post it.
-
-{% include convert_kit_2.html %}
+A deeper answer would require an explanation of how the RBENV codebase works as a whole, which is beyond the scope of this post.  However, I've already written a deeper dive into the codebase, with experiments, beginner-friendly explanations, etc. similar to this series.  Let me know [via Twitter](https://twitter.com/impostorsguides){:target="_blank" rel="noopener"} or via email (`impostorsguides at gmail dot com`) if you would find that valuable.  If enough people are interested, I'll post it.
 
 In the meantime, what do the contents of the `RBENV_DIR` variable look like?  To answer that, we have to know what the following resolves to:
 
@@ -236,12 +287,14 @@ It looks like more parameter expansion, but the `%/*` syntax looks new.  Let's t
 
 ### Experiment- diving deeper into parameter expansion {#diving-deeper-into-parameter-expansion}
 
-I type the following directly in my `foo` script:
+I replace my `foo` script with the following:
 
 ```
-$ myArg="/foo/bar/baz"
-$ bar="${myArg%/*}"
-$ echo $bar
+#!/usr/bin/env bash
+
+myArg="/foo/bar/baz"
+bar="${myArg%/*}"
+echo $bar
 ```
 
 When I run the script, I get:
@@ -274,7 +327,7 @@ With the above reminder, we now know enough to piece together what this line of 
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
-While we're summing things up, let's have another look at the entire `if` block:
+While we're at it, let's summarize what the entire `if` block does:
 
 ```
 if [ "$program" = "ruby" ]; then
@@ -292,12 +345,14 @@ if [ "$program" = "ruby" ]; then
 fi
 ```
 
-Summing up what all this does:
+Putting together everything we've learned:
 
  - If the command you're running is the `ruby` command:
  - RBENV will iterate over each of the arguments you passed to `ruby`
     - If the arg is `--` or if it starts with `-e`, it will immediately stop checking the remaining args, and proceed to running the code outside the case statement (what that code does is TBD).
-    - If the argument contains a `/` character, RBENV will check to see if that argument corresponds to a valid filepath.  If it does, it will grab the file's parent directory and use that to (later on) check which Ruby version to use.
+    - If the argument contains a `/` character, RBENV will check to see if that argument corresponds to a valid filepath.
+      - If it does correspond to a valid filepath, the shim will store the file's parent directory in an environment variable.
+      - At some future place in the code, RBENV will use this environment variable to decide which Ruby version to use.
     - If the argument matches neither of these cases, it's ignored for the purposes of the `for` loop.
 
 ## Setting `RBENV_ROOT`
@@ -308,12 +363,12 @@ The next line of code is pretty straight-forward, so we'll quickly knock it out 
 export RBENV_ROOT="/Users/myusername/.rbenv"
 ```
 
-This line of code just sets a 2nd environment variable named `RBENV_ROOT`.  In my case, the value to which it gets set is the `.rbenv` hidden directory inside my home directory, aka `/Users/myusername/.rbenv`.
+This line of code just sets a 2nd environment variable named `RBENV_ROOT`.
 
 Referring back to the `README.md` file we just read, we see that this env var "Defines the directory under which Ruby versions and shims reside."  Given this is an env var and not a shell var, we can assume that this variable will be used by a child process.
 
+In my case, the value to which this env var gets set is the `.rbenv` hidden directory inside my home directory, aka `/Users/myusername/.rbenv`.
+
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
-You could be forgiven for having some unanswered questions in your head right now above the above.  We only have one more line of code to go before understanding each of these lines by themselves.  From there, we can start putting together what the shim as a whole does.
-
-Let's move on to that last line of code now.
+You could be forgiven for having some unanswered questions in your head right now.  But we only have one more line of code to go before we're done with our line-by-line examination of the shim, so let's try to power through to the end of the file.  Once we're done, we can start putting together what the shim as a whole does.
