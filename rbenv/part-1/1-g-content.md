@@ -138,7 +138,7 @@ if [ "$program" = "ruby" ]; then
   done
 fi
 
-export RBENV_ROOT="/Users/richiethomas/.rbenv"
+export RBENV_ROOT="/Users/myusername/.rbenv"
 exec "/usr/local/bin/rbenv" exec "$program" "$@"
 ```
 
