@@ -8,7 +8,7 @@ What do those brackets mean?
 
 ## Tests and conditions
 
-I run `man [` in the terminal and I see the following:
+While I'm not sure this will work, I run `man [` in the terminal.  Luckily it succeeds, and I see the following:
 
 ```
 TEST(1)                                                              General Commands Manual                                                             TEST(1)
@@ -25,11 +25,11 @@ DESCRIPTION
      expression, test also returns 1 (false).
 ```
 
-OK, so `[ ... ]` is how `bash` does conditional logic.  Also, it looks like `test` are synonyms as far as `bash` is concerned.
+OK, so `[ ... ]` is how `bash` denotes conditional logic.  Also, it looks like `[ ... ]` and `test` are synonyms as far as `bash` is concerned.
 
-Let's run an experiment to see how that works.
+Let's run an experiment to see how this syntax works.
 
-### Experiment- `[` and `test`
+### Experiment- `[ ... ]` and `test`
 
 I create a file named `./foo` containing the following:
 
@@ -108,13 +108,13 @@ $ ./foo
 False
 ```
 
-So as expected, we were successfully able to get `test` and `[ ... ]` to produce the same results.
+So as expected, we saw that `test` and `[ ... ]` produce the same results.
 
 Now what about that -n flag?
 
 ## Passing flags to `[`
 
-If we're looking for docs on a flag that we're supposed to pass to a certain command, we can usually find those docs inside the docs for the command itself. In this case, I search for `-n` in the `man` page for `test`:
+When looking for docs on a certain flag for a command, we can usually just read the docs for the command itself. In this case, I search for `-n` in the `man` page for `test`:
 
 <p style="text-align: center">
   <img src="/assets/images/man-test-n.png" width="70%" alt="Documentation for the `test` command's `-n` flag">
@@ -129,7 +129,7 @@ Let's see if `-n` behaves the way we expect.
 First I run the following directly in my terminal tab:
 
 ```
-$ export FOO='foo'
+$ FOO='foo'
 
 $ [ -n "$FOO" ] && echo "Hi"
 
@@ -175,11 +175,11 @@ In this case, [this StackOverflow post](https://web.archive.org/web/202304061616
 
 OK great.  So when I don't use double-quotes, the script thinks I'm just running `[ -n ]`, which the interpreter interprets as an operand of length 2, which is why it returns true.  This is true whether I'm running `[ -n ]` or `[ -n $BAR ]`.
 
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+## Single- vs. Double-quotes
 
 Another question about the bracket syntax: what would happen if I used single-quotes instead of double-quotes?  Does that matter?  Time for another experiment.
 
-#### Experiment- single- vs. double-quotes
+### Experiment- single- vs. double-quotes
 
 Since I've already defined my `FOO` variable in my terminal tab, I type the following in the same tab:
 
@@ -207,7 +207,7 @@ $FOO
 
 So when using single-quotes instead of double-quotes, the shell doesn't expand the variable into its underlying value.  It just treats the variable name as a string literal, and in this case we echo that string to the terminal.
 
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+## Verbose Mode
 
 Returning back to the line of code:
 
@@ -218,8 +218,6 @@ Returning back to the line of code:
 If the `[ -n "$RBENV_DEBUG" ]` condition returns true, the `&&` syntax ensures that we then execute the 2nd half of this line of code: `set -x`.  If that condition returns false, we exit early and don't evaluate `set -x`.
 
 We know about `set` already, but what does the `-x` flag do?
-
-## Verbose Mode
 
 I Google "set -x bash" and find [this StackOverflow post](https://stackoverflow.com/questions/36273665/what-does-set-x-do){:target="_blank" rel="noopener"}, with an answer that says:
 
