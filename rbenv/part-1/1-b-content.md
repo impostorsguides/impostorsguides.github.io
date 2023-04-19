@@ -29,11 +29,11 @@ PWD=/Users/myusername/Workspace/OpenSource
 
 The benefit of using the `/usr/bin/env bash` shebang instead of `/usr/bin/bash` is that the former will likely work on more peoples' machines than the latter.  This is because one of the environment variables that `/usr/bin/env` loads is the `$PATH` env var (as we can see above in the output of the `env` command).
 
-If we use the `/usr/bin/bash` shebang, then whoever runs our script **must** have `bash` installed in their `/usr/bin/` directory.  But that's not a safe bet.  For example, my `bash` executable is installed at `/bin/bash`, with no `/usr/` prefix.  If we load `PATH` into our environment via the `/usr/bin/env bash` shebang, then UNIX will search through all the directories in `PATH` until it finds `bash`, so we have more changes to find the `bash` executable.
+If we use the `/usr/bin/bash` shebang, then whoever runs our script **must** have `bash` installed in their `/usr/bin/` directory.  But that's not a safe bet.  For example, my `bash` executable is installed at `/bin/bash`, with no `/usr/` prefix.  If we load `PATH` into our environment via the `/usr/bin/env bash` shebang, then UNIX will search through all the directories in `PATH` until it finds `bash`.  More directories in our `$PATH` means more chances to find a working `bash` executable.
 
-More info on the differences between the two types of shebangs, including some *downsides* of using `/usr/bin/env bash`, can be found [here](https://web.archive.org/web/20230326212656/https://www.baeldung.com/linux/bash-shebang-lines){:target="_blank" rel="noopener"} and [here](https://web.archive.org/web/20230316084258/https://stackoverflow.com/questions/16365130/what-is-the-difference-between-usr-bin-env-bash-and-usr-bin-bash){:target="_blank" rel="noopener"}.
+The links [here](https://web.archive.org/web/20230326212656/https://www.baeldung.com/linux/bash-shebang-lines){:target="_blank" rel="noopener"} and [here](https://web.archive.org/web/20230316084258/https://stackoverflow.com/questions/16365130/what-is-the-difference-between-usr-bin-env-bash-and-usr-bin-bash){:target="_blank" rel="noopener"} contain additional info on the differences between the two types of shebangs, including some cases where you might **not** want to use `/usr/bin/env bash`.
 
-### Why use a shebang?
+### Why do we need any shebang at all?
 
 Hypothetically, we *could* leave the shebang out from this file.  But **somehow** we have to tell UNIX which program to use when running the file.  If we don't do so in the file itself (i.e. by using a shebang), we'd have to do so when we type the command into the terminal.  So instead of typing `bundle install` in the command line, we'd have to type the following every time:
 
@@ -122,7 +122,7 @@ I update my script so that the shebang is on line 2 instead of line 1:
 puts "Hello world"
 ```
 
-When I run it, I once again see:
+Note the single empty line above the shebang.  When I run the file, I once again see:
 
 ```
 $ ./foo
@@ -146,11 +146,17 @@ Which had [this answer](https://superuser.com/a/885285){:target="_blank" rel="no
   <img src="/assets/images/file-extension-not-used.png" width="70%" alt="File extensions aren't used when the terminal tries to interpret a file."  style="border: 1px solid black; padding: 0.5em">
 </p>
 
-This got me wondering *why* a terminal doesn't use file extensions.  So [I posted a question on StackOverflow](https://superuser.com/questions/1771550/why-do-unix-terminals-use-shebangs-instead-of-file-extensions-when-deciding-how){:target="_blank" rel="noopener"}.
+This got me wondering *why* a terminal doesn't use file extensions.  So I posted a question on StackOverflow (subsequently closed) on StackOverflow (click to expand):
 
-From the comments, it looks like this is one big difference between Windows and UNIX.  The former takes the approach of using the file extension to determine which program to use when executing a given file, in a part of the OS called (I think?) the file association registry.  This means Windows application developers have to tell the OS which file extensions their application can open.  The benefit of this is, no shebang in the file itself.
+<center style="margin-bottom: 3em">
+  <a target="_blank" href="/assets/images/screenshot-17mar2023-228pm.png">
+    <img src="/assets/images/screenshot-17mar2023-228pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
+  </a>
+</center>
 
-UNIX, on the other hand, has no such registry.  This means that the author of a file (rather than the author of an application) gets to decide how to open their file.  Different philosophies, different trade-offs.
+From the comments, it looks like this is one big difference between Windows and UNIX.  The former takes the approach of [using the file extension to determine which program](https://superuser.com/questions/266268/where-in-the-registry-does-windows-store-with-which-program-to-open-certain-file){:target="_blank" rel="noopener"} to use when executing a given file.  This means Windows application developers have to tell the OS which file extensions their application can open.  The benefit of this is, no shebang in the file itself.
+
+UNIX, on the other hand, doesn't use such registry, at least not when directly running scripts from the terminal.  This means that the author of a file (rather than the author of an application) gets to decide how to open their file.  Different philosophies, different trade-offs.
 
 ## File Permissions
 
@@ -177,9 +183,9 @@ $ ls -l foo
 -rw-r--r--  1 myusername  staff  0 Mar  2 11:24 foo
 ```
 
-The key here is the `-rw-r--r--` section.  According to [this source](https://web.archive.org/web/20221006191132/https://mason.gmu.edu/~montecin/UNIXpermiss.htm){:target="_blank" rel="noopener"}, the first `-` means that what we're looking at are *file* permissions, not *directory* permissions.  If we're looking at directory permissions, the `-` is replaced with a `d`.
+The key here is the `-rw-r--r--` section.  According to [this source](https://web.archive.org/web/20221006191132/https://mason.gmu.edu/~montecin/UNIXpermiss.htm){:target="_blank" rel="noopener"}, the first `-` means that what we're looking at are *file* permissions, not *directory* permissions.  If we were looking at directory permissions, the leading `-` would be replaced with a `d`.
 
-Characters 2-4 are for the first permissions category (i.e. the file creator).  Characters 5-7 are for users in the same user group as the file's creator, and characters 8-10 are for everyone else.  In each of these bunches of 3 characters, `r` means that group can read the file, `w` means they can write to it, and `x` means they can execute it.
+Characters 2-4 are for the first permissions category (i.e. the file creator).  Characters 5-7 are for users in the same [user group](https://web.archive.org/web/20211206154949/https://docs.oracle.com/cd/E19120-01/open.solaris/819-2379/userconcept-35906/index.html){:target="_blank" rel="noopener"} as the file's creator, and characters 8-10 are for everyone else.  In each of these bunches of 3 characters, `r` means that group can read the file, `w` means they can write to it, and `x` means they can execute it.
 
 Let's run `chmod +x foo` and then re-run `ls -l foo`:
 
@@ -209,9 +215,7 @@ Let's go back to the `/usr/bin/env` command in our shebang, and specifically to 
 /bin
 ```
 
-As you may have guessed, the `PATH` string is a list of directories on your computer, concatenated together into a single string with the `:` character used as a delimiter.  This delimiter is also called an "internal field separator", and [UNIX refers to it by the environment variable `IFS`](https://web.archive.org/web/20220715010436/https://www.baeldung.com/linux/ifs-shell-variable){:target="_blank" rel="noopener"}.
-
-UNIX splits the `PATH` string using `IFS` as that delimiter when you type a command into the terminal.  If and when UNIX finds an executable file named `ruby` in one of those directories, it will stop checking the list of directories from `PATH`, and attempt to run that executable along with whatever flags or arguments were passed to it.
+The directories in the `PATH` string are concatenated together into a single string, with the `:` character used as a delimiter.  This delimiter is also called an ["internal field separator"](https://web.archive.org/web/20220715010436/https://www.baeldung.com/linux/ifs-shell-variable){:target="_blank" rel="noopener"}, and UNIX refers to it by the environment variable `IFS`.
 
 The `IFS` link above contains an experiment, which I've modified slightly below so we can see an example of this env var and its usage.
 
