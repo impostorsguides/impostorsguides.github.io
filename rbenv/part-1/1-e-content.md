@@ -54,14 +54,16 @@ But what is this weird syntax which evaluates to the name of the program?  After
   <img src="/assets/images/param-expansion-example-1.png" width="80%" alt="parameter expansion- first example" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-The answer says we're dealing with something called "parameter expansion".  They claim that:
+The answer says we're dealing with something called "parameter expansion", and works as follows:
 
  - `$0` will evaluate to the path of the file that we're executing, and that
  - we can modify it by the use of `#` and `*/` inside the curly braces.
 
-We actually saw `$0` before, when we were testing out the name of our shell.  Let's test how `$0` is affected by this parameter expansion syntax.
+We actually saw `$0` before, when we were testing out the name of our shell.  In that case, `$0` evaluated to `zsh` or `bash` depending on which shell we were running the script from.
 
-### Experiment- messing around with parameter expansion
+Let's test how `$0` is affected by this parameter expansion syntax.
+
+### Experiment- reproducing the effects of parameter expansion
 
 I create a directory named `foo/bar/`, containing a file named `baz`, and `chmod` the file so it will execute:
 
@@ -118,7 +120,7 @@ baz
 
 So without the `##*/` syntax, we get `./foo/bar/baz` as our output.  **With** this new syntax, we get just `baz` as the output.  Therefore, adding `##*/` inside the curly braces had the effect of removing the leading `./foo/bar/` from `./foo/bar/baz`.
 
-Out of curiosity, what happens when I remove one of the two "#" symbols?
+Out of curiosity, what happens when I remove 1 of the 2 "#" symbols?
 
 ```
 #!/usr/bin/env bash
@@ -140,13 +142,11 @@ This is expected.  The StackOverflow answer mentions that including only one `#`
 
 So one `#` will cause `./` to be removed, while two `##` will cause `./foo/foo/` to be removed.
 
-That's pretty much all there is to cover for this line of code.  Before moving on, I Google around a bit and find [this link](https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"}, which looks like good documentation for me to bookmark and refer back to later, if I need to.
-
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
-
-Next line of code.
+Before moving on, I Google around a bit and find [this link](https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"}, which looks like good documentation for me to bookmark and refer back to later, if I need to.
 
 ## `if`-blocks
+
+Next line of code.
 
 ```
 if [ "$program" = "ruby" ]; then
@@ -160,6 +160,29 @@ fi
  - `fi` is just the way to close an `if` statement in `bash`.
 
 So the purpose of this `if` check is to ensure the subsequent code only gets executed if the user typed `ruby` into the terminal as the program name.  Otherwise, nothing inside the `if` block gets executed.
+
+One thing I notice in this `if` check is the use of single-equals as a comparison check.  In Ruby, single-equals are used for assignments, and double-equals are used for comparisons.  This doesn't appear to be the case in `bash`, based on the way this code appears.
+
+I Google "double vs single equals bash", and the first result that appears is [this StackOverflow post](https://unix.stackexchange.com/questions/72039/whats-the-difference-between-single-and-double-equal-signs-in-shell-compari){:target="_blank" rel="noopener"}.  I learn that the following are all equivalent in `bash`:
+
+```
+test "$a" =  "$b"
+   [ "$a" =  "$b" ]
+  [[ "$a" =  "$b" ]]
+test "$a" == "$b"
+   [ "$a" == "$b" ]
+  [[ "$a" == "$b" ]]
+```
+
+## Single- vs. Double-brackets
+
+I notice that some of the above cases use single-brackets (`[ ... ]`), and some use double-brackets (`[[ ... ]]`).  I'm curious if there's any meaningful difference between these two, so I Google "single vs double-brackets bash".
+
+[The first result I find](https://unix.stackexchange.com/questions/49007/when-should-i-use-vs-in-bash-single-vs-double-brackets){:target="_blank" rel="noopener"} tells me that `[ ... ]` is part of the POSIX standard, and is therefore more portable to other shells.  On the other hand, while `[[ ... ]]` is *not* POSIX-compliant (it is used by `bash` and a few other shells such as `zsh` and `ksh`, but not by *all* shells), it uses syntax which is considered safer and cleaner.
+
+The advice seems to be, if you're writing scripts specifically for `bash`, use `[[ ... ]]`.  But if you need a guarantee that your script will work with any POSIX-compliant shell, you should use `[ ... ]` instead.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 We'll examine the code inside the `if` block next.
 
