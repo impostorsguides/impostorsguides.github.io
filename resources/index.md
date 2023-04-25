@@ -52,7 +52,6 @@ path: resources
         {% endif %}
       {% endfor %}
     </ol>
-    <h3><a href="/rbenv/conclusion">Conclusion</a></h3>
-
   </ol>
+  <h3><a href="/rbenv/conclusion">Conclusion</a></h3>
 </ul>

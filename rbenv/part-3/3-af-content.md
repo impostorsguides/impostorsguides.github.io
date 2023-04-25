@@ -1,3 +1,5 @@
+TODO: add deeper explanation of how to build your own builtin using the `enable -f` line [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L23){:target="_blank" rel="noopener"}.  Include a link to the tutorial on how to build a builtin [here](https://web.archive.org/web/20211018001106/https://blog.dario-hamidi.de/a/build-a-bash-builtin/){:target="_blank" rel="noopener"}.
+
 Now we move onto the `rbenv/src/` directory.
 
 First file: [`Makefile.in`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/Makefile.in){:target="_blank" rel="noopener"}.

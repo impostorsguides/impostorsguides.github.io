@@ -14,10 +14,10 @@ This is the shebang, which we're already familiar with from Part 1.  This tells 
 The next line of code is:
 
 ```
-`set -e`
+set -e
 ```
 
-We recognize this line from Part 1 as well- it tells the interpreter to immediately exit with a non-zero status code as soon as the first error is raised (as opposed to continuing on executing the rest of the file).
+We've seen this line as well- it means we immediately exit with a non-zero status code as soon as an error is raised.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
@@ -29,15 +29,17 @@ if [ "$1" = "--debug" ]; then
 fi
 ```
 
-We recognize the `if` statement and the `[` syntax from Part 1- we're testing whether `$1` evaluates to the string "--debug".  I suspect that `$1` represents the first argument that gets passed to the command, but I'm not sure if the indexing is 0-based or 1-based.  A quick Google should leads me [here](https://web.archive.org/web/20211006091051/https://stackoverflow.com/questions/29258603/what-do-0-1-2-mean-in-shell-script){:target="_blank" rel="noopener"}:
+We recognize the `if` statement and the `[` syntax from earlier.  Here, we're testing whether `"$1"` evaluates to the string `--debug`.  I suspect that `$1` represents the first argument that gets passed to the command, but I'm not sure if the indexing is 0-based or 1-based.  A quick Google search leads me [here](https://web.archive.org/web/20211006091051/https://stackoverflow.com/questions/29258603/what-do-0-1-2-mean-in-shell-script){:target="_blank" rel="noopener"}:
 
 <p style="text-align: center">
   <img src="/assets/images/stackoverflow-answer-positional-arguments.png" width="90%" style="border: 1px solid black; padding: 0.5em" alt="StackOverflow answer about positional arguments">
 </p>
 
-My guess was correct.  Based on this, we can conclude that if the first argument is equal to "--debug", then... what?  Next line of code:
+My guess was correct.  Based on this, we can conclude that if the first argument is equal to "--debug", then... what?
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Next line of code:
 
 ```
   export RBENV_DEBUG=1
@@ -45,9 +47,7 @@ My guess was correct.  Based on this, we can conclude that if the first argument
 
 We recognize the `export` statement from Part 1.  We set `RBENV_DEBUG` equal to 1, and then export it.
 
-We know from [here](https://unix.stackexchange.com/a/28349/142469){:target="_blank" rel="noopener"} that an `export`ed variable is available in the same script, in a child script, and in a function which is called inside that same script, but not in another sibling script or in a parent process.
-
-[We also know](https://unix.stackexchange.com/a/27568/142469){:target="_blank" rel="noopener"} that the processes in which scripts run are organized like a tree, and that an environment variable which is set in process `A` will be accessible in process `A`'s script and in any child processes, but not in any parent processes.
+We know from [here](https://unix.stackexchange.com/a/28349/142469){:target="_blank" rel="noopener"} that an `export`ed variable is available in the same script, in a child script, and in a function which is called inside that same script, but not in the parent process or other sibling scripts called by that parent process.
 
 Next line of code.
 
@@ -57,7 +57,7 @@ Next line of code.
 shift
 ```
 
-What does `shift` do?  According to [the docs](https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_09_07.html){:target="_blank" rel="noopener"}, when called without params, it trims off the first arg from the array of args passed to the script:
+What does `shift` do?  According to [the docs](https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_09_07.html){:target="_blank" rel="noopener"}:
 
 > This command takes one argument, a number. The positional parameters are shifted to the left by this number, N. The positional parameters from N+1 to $# are renamed to variable names from $1 to $# - N+1.
 >
@@ -67,7 +67,7 @@ What does `shift` do?  According to [the docs](https://tldp.org/LDP/Bash-Beginne
 >
 > If N is not present, it is assumed to be 1.
 
-I did a test script to see how it works.
+Let's try it out for ourselves.
 
 ### Experiment- the `shift` command
 
@@ -87,6 +87,8 @@ shift
 echo "new arg length: $#"
 echo "new args: $@"
 ```
+
+`$#` evaluates to the number of positional arguments, and `$@` evaluates to the list of args.
 
 I run it, passing it the args `foo`, `bar`, and `baz`, and I get:
 
@@ -125,6 +127,7 @@ So if the length of `$RBENV_DEBUG` is non-zero (i.e. if we just set it), then ex
 
 ```
 # https://wiki-dev.bash-hackers.org/scripting/debuggingtips#making_xtrace_more_useful
+
 export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 set -x
 ```
@@ -187,7 +190,7 @@ $ ./foo
 +(./foo:3):
 ```
 
-So the `+(`, `:`, and `):` don't do anything special- they're literal characters which get printed directly to the screen.  That leaves `${BASH_SOURCE}`, which looks like it gets evaluated to `./foo`, and `${LINENO}`, which looks like it resolves to `3`.
+So the `+(`, `:`, and `):` don't do anything special- they're literal characters which get printed directly to the screen.  That leaves `${BASH_SOURCE}`, which looks like it gets evaluated to `./foo` (the name of my script file), and `${LINENO}`, which looks like it resolves to `3` (the line number that the `echo` command appears on, in my script).
 
 What about the 2nd half of `PS4`?
 
@@ -195,7 +198,7 @@ What about the 2nd half of `PS4`?
 ${FUNCNAME[0]:+${FUNCNAME[0]}(): }
 ```
 
-After Googling `FUNCNAME`, I find [the online `man` page entry](https://web.archive.org/web/20230322221925/https://www.man7.org/linux/man-pages/man1/bash.1.html){:target="_blank" rel="noopener"} for `FUNCNAME`:
+After Googling `FUNCNAME`, I find the online version of [its `man` page entry](https://web.archive.org/web/20230322221925/https://www.man7.org/linux/man-pages/man1/bash.1.html){:target="_blank" rel="noopener"}:
 
 ```
 FUNCNAME
@@ -212,7 +215,7 @@ FUNCNAME
 
 So `FUNCNAME` is an array variable.  That explains why we're invoking `FUNCNAME[0]` inside the parameter expansion syntax.  And it "contain(s) the names of all shell functions currently in the execution call stack."  Lastly, it "...exists only when a shell function is executing."
 
-So how can I reproduce this behavior?  Let's try another experiment.
+Can we reproduce this behavior?  Let's try another experiment.
 
 ### Experiment- attempting to print `FUNCNAME`
 
@@ -284,7 +287,17 @@ And that actually fits with what we were told by the article that was linked in 
 >
 > `+(somefile.bash:412): myfunc(): echo 'Hello world'`
 
-The `myfunc():` before `echo 'Hello world'` is our value of `FUNCNAME[0]` in the example.
+So the following...
+
+```
+${FUNCNAME[0]:+${FUNCNAME[0]}(): }
+```
+
+...means that if `FUNCNAME[0]` has a non-null value (i.e. if we're currently inside a function call), then we print the value of `FUNCNAME[0]` (i.e. the name of the current function) plus `():` appended to the end.
+
+The `myfunc():` before `echo 'Hello world'` is our value of `FUNCNAME[0]` in the example, plus `():` at the end.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Does all that pan out when we actually run `rbenv` with the `--debug` flag?  Let's try with `rbenv --debug version`:
 
@@ -310,15 +323,17 @@ Although we haven't yet reached these lines of code and don't yet know what they
 
 I kept noticing the phrase `xtrace` being thrown around on some of the links I encountered while trying to solve the above.  I Googled "what is xtrace bash", and found [this link](https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_02_03.html){:target="_blank" rel="noopener"}, which says:
 
-<p style="text-align: center">
-  <img src="/assets/images/stackoverflow-answer-12mar2023-138pm.png" width="100%" style="border: 1px solid black; padding: 0.5em" alt="StackOverflow answer about `xtrace`">
-</p>
+<center style="margin-bottom: 3em">
+  <a target="_blank" href="/assets/images/stackoverflow-answer-12mar2023-138pm.png">
+    <img src="/assets/images/stackoverflow-answer-12mar2023-138pm.png" width="100%" style="border: 1px solid black; padding: 0.5em" alt="StackOverflow answer about `xtrace`">
+  </a>
+</center>
 
 That's a lot, but the bottom table shows the short notation of `set -x` corresponds to the long notation of `set -o xtrace`, or "set the xtrace option".  So `xtrace` is the name of a mode in bash.
 
 And the cool thing is, you don't have to enable `set -x` only at the beginning of the script, like RBENV's code does.  According to the above link from TLDP, you can enable it and disable it anywhere you want in your code, as many times as you want.
 
-So if you're trying to debug something tricky and you want to avoid getting overloaded with `PS4` output for every line of your code, you can turn it on for just the buggy section of your code, and turn it off immediately after.  Sounds useful!
+So if you're trying to debug something tricky and you want to avoid getting overloaded with `PS4` output for every line of your code, you can turn it on for just the buggy section of your code, and turn it off immediately after.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
@@ -346,6 +361,76 @@ If we look for `RBENV_DEBUG` throughout the codebase, we can see it used in mult
   <img src="/assets/images/screenshot-24mar2023-623pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
-All of the line numbers are pretty low: I see lines 4, 5, 6, 11, 10, 4, etc.  So it looks like at the start of all these files, we check if `RBENV_DEBUG` has been set, and if it has, we invoke `xtrace` via the `set -x` command.  This implies that you can't just turn on `xtrace` in an entry script and expect it to remain on in any child scripts that the parent invokes.  Rather, you need to turn it on for each file that you expect to run.
+All of the line numbers are pretty low: I see lines 4, 5, 6, 11, 10, 4, etc.  So it looks like at the start of all these files, we check if `RBENV_DEBUG` has been set, and if it has, we invoke `xtrace` via the `set -x` command.
+
+This also implies that you can't just turn on `xtrace` in a parent script and expect it to remain on in the parent's child scripts.  Instead, you need to turn it on for each file that you expect to run.
+
+We can prove this with an experiment:
+
+### Experiment- does "xtrace" trickle down to child scripts?
+
+I make a script named `foo` which looks like so:
+
+```
+#!/usr/bin/env bash
+
+set -x
+
+echo "Inside foo"
+
+./bar
+```
+
+A simple bash script which turns on xtrace, prints a string, then calls a 2nd script, named `bar`.
+
+I create that 2nd script, which looks like this:
+
+```
+#!/usr/bin/env bash
+
+set -x
+
+echo "Inside bar"
+```
+
+`bar` does the same thing `foo` does, but it doesn't call a child script.
+
+When I run `foo`, I see the following:
+
+```
+$ ./foo
+
++ echo 'Inside foo'
+Inside foo
++ ./bar
++ echo 'Inside bar'
+Inside bar
+```
+
+We see xtrace statements print out for the `echo` statements inside **both** `foo` and `bar`.  Then, I remove the call to `set -x` in `bar`:
+
+```
+#!/usr/bin/env bash
+
+echo "Inside bar"
+```
+
+When I re-run `foo`, I now see the following:
+
+```
+$ ./foo
+
++ echo 'Inside foo'
+Inside foo
++ ./bar
+Inside bar
+```
+
+I no longer see the `xtrace` statement inside `bar` (`+ echo 'Inside bar'`).  I only see the *result* of the echo statement, which I would have seen either way.
+
+So the effects of `xtrace` do **not** automatically trickle down from parent to child scripts.  We have to manually call `set -x` for each new script we run.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Let's move on to the next line of code.
+
