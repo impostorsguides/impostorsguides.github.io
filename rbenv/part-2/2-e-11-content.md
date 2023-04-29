@@ -9,9 +9,9 @@ esac
 
 Here's where we get to the meat of this file.  We're grabbing the first argument sent to the `rbenv` command, and we're deciding what to do with it via a `case` statement.  Everything else we've done in this file, from loading plugins to setting up helper functions like `abort`, has led us to this point.  The internals of that case statement will dictate how RBENV responds to the command the user has entered.
 
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
-
 Let's take each branch of the `case` statement in turn:
+
+## Typing `rbenv` with no arguments
 
 ```
 "" )
@@ -22,13 +22,11 @@ Let's take each branch of the `case` statement in turn:
 ```
 
 
-We've seen the `)` closing parenthesis syntax before.  It denotes a specific case in the case statement.  If the value of `$command` matches our case, then we do what's in the curly braces, and we pipe that output to the `abort` command that we defined earlier in this file.
+The `"" )` syntax represents our first case in the case statement.  This branch of the case statement will execute if `$command` matches the empty string (i.e. if the user just types `rbenv` by itself, with no args).
 
-The `""` before the `)` character is the specific case we're dealing with.  This branch of the case statement will execute if `$command` matches the empty string (i.e. if the user just types `rbenv` by itself, with no args).  The code we execute in that scenario is that we call the `rbenv—version` and `rbenv-help` scripts.
+In that event, we call the `rbenv—version` and `rbenv-help` scripts.  The output of those commands is piped to the `abort` function, which will send the output to `stderr`.  It also returns a non-zero exit code, which implies that passing `""` to `rbenv` is a non-happy path.  We can assume this is also true any time we see the `abort` function.
 
-Again, the output of those two commands gets piped to the `abort` command, which will send the output to `stderr` and return a non-zero exit code, which implies that calling `rbenv` with no args is a failure mode of this command.
-
-If we go into our terminal and type `rbenv` with no args, we see this happen.  The version number prints out, followed by info on how the `rbenv` command is used (its syntax and its possible arguments).  If we then type `echo "$?"` immediately after that to print the last exit status, we see `1` print out.
+If we go into our terminal and type `rbenv` with no args, we see this happen:
 
 ```
 $ rbenv
@@ -57,9 +55,16 @@ $ echo "$?"
 1
 ```
 
+We see the following:
+
+ - The output of `rbenv --version` (aka the version number) prints out, followed by:
+ - The output of `rbenv help` (aka info on how the `rbenv` command is used, along with its syntax and its possible arguments).
+
+ If we then type `echo "$?"` immediately after that to print the last exit status, we see `1` print out.
+
 Pretty straight-forward.
 
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+## Typing `rbenv -v` or `rbenv --version`
 
 Next case branch is:
 
@@ -81,7 +86,7 @@ $ rbenv --version
 rbenv 1.2.0-16-gc4395e5
 ```
 
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+## Typing `rbenv -h` or `rbenv --help`
 
 Next case branch is:
 
@@ -114,9 +119,11 @@ See `rbenv help <command>' for information on a specific command.
 For full documentation, see: https://github.com/rbenv/rbenv#readme
 ```
 
-Again, no real surprises here.
+This is actually the same output we saw from typing `rbenv` with no arguments, except we don't see the version number here.
 
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+Again, no real surprises.
+
+## The default case
 
 Next up is:
 
@@ -125,17 +132,24 @@ Next up is:
 ...;;
 ```
 
-The `* )` line is the catch-all / default case branch.  Any `rbenv` command that wasn't captured by the previous branches will be captured by this branch.  How we handle that is determined by what's inside the branch, starting with the next line:
+The `* )` line is the catch-all / default case branch.  Any `rbenv` command that wasn't captured by the previous branches, including real commands (`rbenv version`, `rbenv local`, etc.), will be captured by this branch.
+
+How we handle the user's input is determined by what's inside the branch, starting with the next line.
+
+### Getting the filepath for the user's command
 
 ```
   command_path="$(command -v "rbenv-$command" || true)"
 ```
+
 Here we're declaring a variable called `command_path`, and setting its value equal to the result of a response from a command substitution.  That command substitution is **either**:
 
- - the result of `command -v "rbenv-$command"`, or (if that result is a falsy value)
+ - the result of `command -v "rbenv-$command"`, or (if there is no result)
  - the simple boolean value `true`.
 
-The value of the command substitution depends on what `command -v "rbenv-$command` evaluates to.  It's a bit confusing to parse because `command` is the name of a shell builtin, but `$command` is the name of a shell variable that we declared earlier.
+We saw the same `|| true` syntax [earlier in this file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L46){:target="_blank" rel="noopener"}.  It means that we don't want a failure of `command -v "rbenv-$command"` to trigger an exit of this script if it errors out.
+
+The value of the command substitution depends on what `command -v "rbenv-$command` evaluates to.  It might be a bit confusing to read, because `command` is the name of a shell builtin, but `$command` is the name of a shell variable that we declared earlier.
 
 If we run `help command` to see what this shell builtin does, we get:
 
@@ -151,21 +165,55 @@ command: command [-pVv] command [arg ...]
     The -V option produces a more verbose description.
 ```
 
-So calling `command ls` is the same as calling `ls`.  I could see this being useful if the command you want to run is stored in a variable, and is dynamically set.  For example:
+So calling `command ls` is the same as calling `ls`.  I could see this being useful if the command you want to run is stored in a variable or an argument, and therefore is set at runtime.  For example:
 
 ```
-$ myCommand="pwd"
+$ run_command() {
+  command "$1" "$2"
+}
 
-$ if [ "$myCommand" = "pwd" ]; then
-> command "$myCommand"
-> fi
+$ run_command pwd
 
-/Users/myusername/Workspace/OpenSource/rbenv
+/Users/myusername/.rbenv
+
+$ run_command ls -la
+
+total 80
+drwxr-xr-x  19 myusername  staff    608 Apr 25 11:22 .
+drwxr-x---+ 96 myusername  staff   3072 Apr 28 10:53 ..
+drwxr-xr-x  14 myusername  staff    448 Apr 27 10:56 .git
+drwxr-xr-x   3 myusername  staff     96 Apr 25 11:22 .github
+-rw-r--r--   1 myusername  staff     97 Apr 25 11:22 .gitignore
+-rw-r--r--   1 myusername  staff     35 Apr 25 11:22 .vimrc
+-rw-r--r--   1 myusername  staff   3390 Apr 25 11:22 CODE_OF_CONDUCT.md
+...
 ```
 
-As the `help` description mentions, adding the `-v` flag results in a printed description of the command you're running.  When I pass `-v` to `command ls` in my terminal, I see `/bin/ls` *instead of* the regular output of the `ls` command.  Therefore, the path to the `$command` will end up being the string that we store in the variable named `command_path`.
+As the `help` description mentions, adding the `-v` flag results in a printed description of the command you're running.  When I pass `-v` to `command ls` in my terminal, I see `/bin/ls` *instead of* the regular output of the `ls` command.
 
-That is, unless no such path exists, in which case we'll store the boolean `true` instead.  Recall from earlier that passing a boolean to a command substitution results in a response with a length of zero.
+So in our case, if we type `rbenv version` in our terminal, then this line of code will evaluate to:
+
+```
+command_path="$(command -v "rbenv-version" || true)"
+```
+
+Since [we loaded `libexec` into `$PATH` earlier](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L79){:target="_blank" rel="noopener"}, we're able to run the `rbenv-version` file as an executable, which means `command -v rbenv-version` will return `/Users/myusername/.rbenv/libexec/rbenv-version` on my machine, and this is the value that would be stored in `command_path`:
+
+```
+$ PATH="$(pwd)/libexec:$PATH"
+
+$ command -v rbenv-version
+
+/Users/myusername/.rbenv/libexec/rbenv-version
+```
+
+If we had typed `rbenv foobar` or another known-invalid command, then `command -v rbenv-foobar` would have returned nothing, in which case we would store the boolean value `true` in `command_path`:
+
+```
+$ command -v rbenv-foobar
+
+$
+```
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
@@ -177,9 +225,7 @@ if [ -z "$command_path" ]; then
 fi
 ```
 
-In other words, if the user's input doesn't correspond to an actual command path, then we execute the code inside this `if` block.
-
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+In other words, if there is no valid command path corresponding to the user's input, then we execute the code inside this `if` block.
 
 That code is:
 
@@ -191,7 +237,7 @@ else
 fi
 ```
 
-So if the user's input was the string "shell", then we abort with one error message ("shell integration not enabled. Run \`rbenv init' for instructions.").
+So if the user's input was the string "shell", then we abort with one error message (`shell integration not enabled. Run 'rbenv init' for instructions.`).
 
 We would reach this branch if we tried to run `rbenv shell` before adding `eval "$(rbenv init - bash)"` to our `~/.bashrc` config file (if we're using `bash` as a shell) or `eval "$(rbenv init - zsh)"` to our `~/.zshrc` file (if we're using `zsh` as a shell).  In this case, `$command_path` would be empty.
 
@@ -227,9 +273,7 @@ shift 1
 ```
 This just shifts the first argument off the list of `rbenv`'s arguments.  The argument we're removing was previously stored in the `command` variable, and we've already processed it so we don't need it anymore.
 
-TODO- edit the original explanation of the `shift` command to include what happens when you pass a param (like `1` here).
-
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+### Printing `help` instructions for the user's command
 
 Next line of code:
 
@@ -265,7 +309,7 @@ $ rbenv sh-shell --help
 rbenv help "sh-shell"
 ```
 
-Why would we print **this** to the screen?  At this point we know enough to tell the user which command they *should have* run.  Why don't we just run it for them and save them a step?
+Why would we print `rbenv help "sh-shell"` to the screen, instead of some user-friendly instructions?  At this point we know enough to tell the user which command they *should have* run.  Why don't we just run it for them and save them a step?
 
 I find [the PR which added this block of code](https://github.com/rbenv/rbenv/pull/914){:target="_blank" rel="noopener"} and read up on it.  Turns out the code used to look like this:
 
@@ -277,7 +321,9 @@ else
 fi
 ```
 
-This is much closer to what I'd expect.  But according to the PR description, this caused the `rbenv shell --help` command to trigger an error.  I check out the commit just before this PR was merged and try to reproduce the error:
+This is much closer to what I'd expect, because in both cases we're calling `exec`, as opposed to `echo` in the `if` branch and `exec` in the `else` branch.
+
+But according to the PR description, this caused the `rbenv shell --help` command to trigger an error.  I run `git checkout` on the commit just before this PR was merged (SHA is `9fdce5d069946417d481fd878c5c005db5b4539c`), and try to reproduce the error:
 
 ```
 $ rbenv shell --help
@@ -286,6 +332,8 @@ $ rbenv shell --help
 ```
 
 OK, so what caused this error?
+
+### Making use of `RBENV_DEBUG`
 
 I remember we have the ability to run in verbose mode by passing in the `RBENV_DEBUG` environment variable, so I try running `RBENV_DEBUG=1 rbenv shell --help`.  It results in a ton of output of course, and the last few lines of that output are:
 
@@ -320,25 +368,29 @@ version-name'.
 + [rbenv-help:126] echo
 ```
 
-The same lines of code are logged, but no `(eval):2` error at the end.  So I **think** the problem must be in the code that we're trying to `eval`, i.e. `exec rbenv-help "$command"`.
+The same lines of code are logged, but no `(eval):2` error at the end.  So I **think** the problem must be in the code that we're trying to `exec`, in the line `exec rbenv-help "$command"`.
 
 I wanted to see what exactly this code was.  So I added the following `echo` statement above it:
 
 ```
 if [ "$1" = --help ]; then
-  echo "$(rbenv-help "$command")" >&2
-  echo "----------" >&2
-  exec rbenv-help "$command"
-else
+    echo "Look here" >&2                     # added this line
+    echo "--------" >&2                      # added this line
+    echo "$(exec rbenv-help "$command")" >&2      # added this line
+    echo "--------" >&2                      # added this line
+    exec rbenv-help "$command"
+  else
 ```
 
-I'm capturing the output of the same command that we're trying to `exec`, sending it to `echo`, and redirecting `stdout` to `stderr` so that my `echo` statement won't interfere with anything else that's going on in the code.  I also `echo` a divider line, so we can know where my printed statements end and the code takes over again.
+I'm capturing the output of the same command that we're trying to run, sending it to `echo`, and redirecting `stdout` to `stderr` so that my `echo` statement won't be mis-interpreted as a command to run, by the caller of this code.  I also `echo` a divider line, so we can know where my printed statements end and the code takes over again.
 
 Here's the result when I run `rbenv shell --help`:
 
 ```
 $ rbenv shell --help
 
+Look here
+--------
 Usage: rbenv shell <version>
        rbenv shell --unset
 
@@ -349,21 +401,24 @@ application-specific versions and the global version.
 <version> should be a string matching a Ruby version known to rbenv.
 The special version string `system' will use your default system Ruby.
 Run `rbenv versions' for a list of available Ruby versions.
-----------
+--------
 (eval):2: parse error near `\n'
 ```
 
-OK, so we're trying to `exec` a printed set of usage instructions which are meant for humans to read (not for `bash` to run).  But this error only happened with `rbenv shell`, not with `rbenv version`.
+The result is a printed set of usage instructions which are meant for humans to read (not for `bash` to run), followed by the reported error.
 
-What if I capture the output from `rbenv version` instead?  Does it also print out usage instructions?
+But that's confusing to me, because no such error occurs when we run the same code for other commands, such as `rbenv version`.  When I run `rbenv version --help`, I see this:
 
 ```
 $ rbenv version --help
+Look here
+--------
 Usage: rbenv version
 
 Shows the currently selected Ruby version and how it was
 selected. To obtain only the version string, use `rbenv
 version-name'.
+--------
 Usage: rbenv version
 
 Shows the currently selected Ruby version and how it was
@@ -371,11 +426,13 @@ selected. To obtain only the version string, use `rbenv
 version-name'.
 ```
 
-Yep, `"$(rbenv-help $command)"` evaluates to the usage instructions for `version`, just like it did with `shell`.  So why is it trying to `eval` usage instructions for `shell`, but not `version`?  We know from [the PR diff](https://github.com/rbenv/rbenv/pull/914/files){:target="_blank" rel="noopener"} that the solution was to treat commands that are prefixed with `sh-` differently.  Where is this happening?
+We see the usage instructions printed a 2nd time, in addition to the first time that we expected, because that's what is supposed to happen instead of the `(eval):2` error.
 
-OK, I'll stop here and admit that I cheated a little.  I initially was stumped by this question, so I decided to punt on it for the time being and continued onward.  Then, months later when I was re-reading and editing this post, I went back with the knowledge I had gained reading the other files in this repo and leveraged that knowledge to deduce what is happening here.
+So why does this error only happen with `rbenv shell`, not with `rbenv version`?  Why is the code trying to `eval` usage instructions for `shell`, but not `version`?
 
-TL;DR- one of the things that RBENV does when you add that `eval "$(rbenv init -)"` string to your shell config is that it creates a shell function (also called `rbenv`).  When you run `rbenv` commands from inside your terminal, you're **not** running the `rbenv` bash script, at least not directly.  Instead, you're **actually** running *this shell function*, which in turn calls the `rbenv` shell script.  You can verify this by running `which rbenv` from your terminal:
+OK, I'll stop here and admit that I cheated a little.  I initially was stumped by this question, so I decided to punt on it for the time being and continued onward.  Then, months later when I was re-reading and editing this post, I leveraged the knowledge I had gained during those months to deduce what is happening here.
+
+TL;DR- one of the things that RBENV does when you add that `eval "$(rbenv init -)"` string to your shell config is that it creates a shell function (also called `rbenv`).  When you run `rbenv` commands from inside your terminal, you're **not** running the `rbenv` bash script, at least not directly.  Instead, you're **actually** running *this shell function*, which in turn calls the `rbenv` script.  You can verify this by running `which rbenv` from your terminal:
 
 ```
 $ which rbenv
@@ -394,19 +451,21 @@ rbenv () {
 }
 ```
 
-Instead of printing `path/to/file/rbenv.bash` or something similar, it prints out a complete shell function.  It's this shell function that gets defined by the `eval "$(rbenv init -)"` call in your shell config every time you open a new terminal tab.  Since UNIX will check for shell functions before it checks your `PATH` for any commands, this is the first implementation of the `rbenv` command that it finds, and so this is what gets run when you type `rbenv` into your terminal.
+Instead of printing `path/to/file/rbenv.bash` or something similar, it prints out a complete shell function.
 
-As part of its logic, the shell function executes [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L147-L152){:target="_blank" rel="noopener"}, which checks if the command that the user is running begins with `sh-`.  If it does, it runs `eval` plus the name of the command with its `sh-` prefix.  Otherwise, it runs the command via the `command` command (which we discussed earlier).
+This shell function gets defined by the `eval "$(rbenv init -)"` call in your shell config, each time you open a new terminal tab.  Since UNIX will check for shell functions before it checks your `PATH` for any commands, this is the first implementation of the `rbenv` command that it finds, and so this is what gets run when you type `rbenv` into your terminal.
+
+As part of its logic, the shell function executes [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L147-L152){:target="_blank" rel="noopener"}, which checks if the command that the user is running begins with `sh-`.  If it does, it runs `eval` plus the name of the command with its `sh-` prefix.  Otherwise, it runs the command via the `command` command (which we discussed earlier).  [This was also the case](https://github.com/rbenv/rbenv/blob/9fdce5d069946417d481fd878c5c005db5b4539c/libexec/rbenv-init#L151){:target="_blank" rel="noopener"} at the the time [the error was reported](https://github.com/rbenv/rbenv/pull/914){:target="_blank" rel="noopener"}.
 
 It's **this** call to `eval` that is erroring out.  We can prove that to ourselves by changing that block of code in `rbenv-init` to look like the following:
 
 ```
-set -e
+set -e                                        # I added this line
   case "\$command" in
   ${commands[*]})
-    echo 'just before eval' >&2
+    echo 'just before eval' >&2               # I added this line
     eval "\$(rbenv "sh-\$command" "\$@")"
-    echo 'just after eval' >&2
+    echo 'just after eval' >&2                # I added this line
     ;;
   *)
 ```
@@ -446,9 +505,90 @@ just before eval
 
 I see "just before eval", but **not** "just after eval".  Since we added the `set -e` option to our shell function, the code exited after the first error that it encountered.  Since we only saw the first of the two `echo` statements immediately before and after our call to `eval`, it **must** have been this call to `eval` which threw an error.
 
-Now it's starting to make sense why the PR author structured their code the way they did.  Since all `sh-` scripts will be treated the same way by this `case` statement,
+But I'm still wondering why commands prefixed with `sh-` use `eval`, while those without the prefix use `command`.  I decide to look up the command which introduced this `if/else` block.  After some digging, I find it [here](https://github.com/rbenv/rbenv/pull/57){:target="_blank" rel="noopener"}.  It says:
 
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+> Regular commands pass though as you'd expect. But special shell commands prefixed with sh- are called, but its result is evaled in the current shell allowing them to modify environment variables.
+
+OK, so the idea is to give the `sh-` commands the ability to modify environment variables.  I suspect that this wouldn't have been possible if we had used the same `command` strategy that non-`sh` commands are run with.  To test this, I run an experiment.
+
+### Experiment- can `command` set environment variables?
+
+I write a script named `sh-foo`, containing the following code:
+
+```
+#!/usr/bin/env bash
+
+echo "export FOO='foo bar baz'"
+```
+
+This script is designed to mimic the `sh-` scripts that are called using `eval`.
+
+I write a 2nd script named `bar`, containing the following code:
+
+```
+#!/usr/bin/env bash
+
+export BAR="bar bazz buzz"
+```
+
+This script is designed to mimic the non-`sh` scripts, which are called using `command`.
+
+In my terminal, I run the following:
+
+```
+$ echo "$FOO"
+
+$ PATH="$(pwd):$PATH"
+
+$ which sh-foo
+/Users/richiethomas/Workspace/OpenSource/impostorsguides.github.io/sh-foo
+
+$ eval `sh-foo`
+
+$ echo "$FOO"
+
+foo bar baz
+```
+
+We can see that running `sh-foo` via the `eval` command had the effect of setting a value for the `"$FOO"` env var, where there was no value beforehand.
+
+Next, I try running the `bar` script:
+
+```
+ $ echo "$BAR"
+
+$ which bar
+
+/Users/richiethomas/Workspace/OpenSource/impostorsguides.github.io/bar
+
+$ command bar
+
+$ echo "$BAR"
+
+$
+```
+
+This time, the environment variable was **not** set.  This proves that using `command` does not result in the setting of the environment variable.
+
+We'll see later on that scripts which are prefaced with `sh-` have the convention of `echo`ing lines of code to `stdout`.  Now we understand why this is the case- that output is executed by the caller using `eval`, because this is the only way for child scripts to affect the environment variables of a parent script.
+
+### Aside- backticks vs. command substitution
+
+FYI, [according to StackOverflow](https://web.archive.org/web/20230411191359/https://stackoverflow.com/questions/9405478/command-substitution-backticks-or-dollar-sign-paren-enclosed){:target="_blank" rel="noopener"}, the following syntax...
+
+```
+`sh-foo`
+```
+
+ ...is basically interchangeable with the syntax:
+
+ ```
+ "$(sh-foo)"
+ ```
+
+In other words, surrounding a command with backticks is the same as using the `"$(...)"` command substitution syntax.  I used backticks to keep my experiment code as similar as possible to the `eval` line of the `rbenv` shell function.
+
+## Happy path- executing a regular command
 
 Next (and final!) line of code in this file:
 

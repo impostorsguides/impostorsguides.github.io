@@ -1,3 +1,130 @@
+Next line of code is:
+
+```
+RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${RBENV_ROOT}/rbenv.d"
+```
+
+According to the README, `RBENV_HOOK_PATH` is a:
+
+```
+Colon-separated list of paths searched for rbenv hooks.
+```
+
+This code adds `${RBENV_ROOT}/rbenv.d` to the end of the current value of `RBENV_HOOK_PATH`, if any.  According to [the README file](https://github.com/rbenv/rbenv#environment-variables){:target="_blank" rel="noopener"}, `RBENV_HOOK_PATH` is the environment variable which controls where RBENV searches for [hooks](https://github.com/rbenv/rbenv/wiki/Authoring-plugins#rbenv-hooks){:target="_blank" rel="noopener"}.  Hooks are similar to plugins, in that they both update functionality within RBENV.  But they differ in that:
+
+- Plugins expose entirely new RBENV commands (i.e. `rbenv foo`).
+- Hooks modify existing commands.
+
+But what is `"${RBENV_ROOT}/rbenv.d"`?
+
+## Telling RubyGems to automatically generate shims
+
+I `cd` into my `~/.rbenv` directory and run `find . -name rbenv.d`.  I see the following:
+
+```
+$ cd ~/.rbenv
+
+$ find . -name rbenv.d
+
+./rbenv.d
+```
+
+I inspect it, and see that it's a directory, containing a directory named `exec`:
+
+```
+$ ls -la rbenv.d
+total 0
+drwxr-xr-x   3 myusername  staff   96 Sep  5 15:47 .
+drwxr-xr-x  15 myusername  staff  480 Sep  5 09:13 ..
+drwxr-xr-x   4 myusername  staff  128 Sep  4 10:13 exec
+```
+
+The `exec` directory, in turn contains the following:
+
+```
+$ ls -la rbenv.d/exec
+total 8
+drwxr-xr-x  4 myusername  staff  128 Sep  4 10:13 .
+drwxr-xr-x  3 myusername  staff   96 Sep  5 15:47 ..
+drwxr-xr-x  3 myusername  staff   96 Sep  4 10:13 gem-rehash
+-rw-r--r--  1 myusername  staff   47 Sep  4 10:13 gem-rehash.bash
+```
+And the `gem-rehash` directory contains the following:
+
+```
+$ ls -la rbenv.d/exec/gem-rehash
+total 8
+drwxr-xr-x  3 myusername  staff    96 Sep  4 10:13 .
+drwxr-xr-x  4 myusername  staff   128 Sep  4 10:13 ..
+-rw-r--r--  1 myusername  staff  1427 Sep  4 10:13 rubygems_plugin.rb
+```
+
+I Google "gem-rehash", and the first thing I find is [this deprecated Github repo](https://github.com/rbenv/rbenv-gem-rehash){:target="_blank" rel="noopener"}.  The description says:
+
+> Never run rbenv rehash again. This rbenv plugin automatically runs rbenv rehash every time you install or uninstall a gem.
+>
+> This plugin is deprecated since its behavior is now included in rbenv core.
+
+I notice that the deprecated repo contains:
+
+ - a file named `rubygems_plugin.rb`, just like our RBENV repo does.
+ - a file named `etc/rbenv.d/exec/~gem-rehash.bash`, which is very similar (but not identical) to the file that we saw in the RBENV repo above.
+
+In the `rbenv-gem-rehash` README file, I also see the following:
+
+> rbenv-gem-rehash consists of two parts: a RubyGems plugin and an rbenv plugin.
+>
+> The RubyGems plugin hooks into the gem install and gem uninstall commands to run rbenv rehash afterwards, ensuring newly installed gem executables are visible to rbenv.
+>
+> The rbenv plugin is responsible for making the RubyGems plugin visible to RubyGems. It hooks into the rbenv exec command that rbenv's shims use to invoke Ruby programs and configures the environment so that RubyGems can discover the plugin.
+
+Based on this, I think we can now determine the reason for this line of code:
+
+```
+RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${RBENV_ROOT}/rbenv.d"
+```
+
+We want RBENV to automatically re-run the `rbenv rehash` command every time we install a new Ruby gem.  The way we achieve this is by updating `RBENV_HOOK_PATH`, thereby hooking into the Rubygems `gem install` and `gem uninstall` commands.  RubyGems will then call [the `rubygems_plugin.rb` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/rbenv.d/exec/gem-rehash/rubygems_plugin.rb){:target="_blank" rel="noopener"}, which runs `rbenv rehash` for us.
+
+### The `.d` extension in `rbenv.d`
+
+The `.d` in `rbenv.d` looked funny to me.  It appears to be a file extension, but it's being used on a directory.  I Google `what does ".d" stand for bash`, and the first result I see is [this StackOverflow post](https://web.archive.org/web/20220619172419/https://unix.stackexchange.com/questions/4029/what-does-the-d-stand-for-in-directory-names){:target="_blank" rel="noopener"}:
+
+> The .d suffix here means directory. Of course, this would be unnecessary as Unix doesn't require a suffix to denote a file type but in that specific case, something was necessary to disambiguate the commands (/etc/init, /etc/rc0, /etc/rc1 and so on) and the directories they use (/etc/init.d, /etc/rc0.d, /etc/rc1.d, ...)
+>
+> This convention was introduced at least with Unix System V but possibly earlier.
+
+Another answer from that same post:
+
+> Generally when you see that *.d convention, it means "this is a directory holding a bunch of configuration fragments which will be merged together into configuration for some service."
+
+So the `.d` suffix means:
+
+- This is a directory containing configuration files.
+- These files are meant to be bundled up together into a single aggregate configuration file.
+- This file likely has the same name as the directory.
+
+Does this fit with what we see in the RBENV folders?  Let's check each of these points one-by-one.
+
+#### 1. Do the files within these directories count as configuration files?
+
+Recalling what we read in the README of the deprecated `rbenv-gem-rehash` package:
+
+> The RubyGems plugin hooks into the gem install and gem uninstall commands to run rbenv rehash afterwards, ensuring newly installed gem executables are visible to rbenv.
+>
+> The rbenv plugin is responsible for making the RubyGems plugin visible to RubyGems.
+
+In other words, the files inside `rbenv.d` help ensure that we can automatically run `rbenv rehash` whenever we install or uninstall Ruby gems.  That sounds more like configuration logic to me, rather than application logic.
+
+#### 2. Are the files in these directories being merged together somehow?
+
+Well, neither the RBENV nor the `rbenv-gem-rehash` READMEs mention any "merging of configuration files".  But our `for`-loop does add them to our `PATH` variable, which makes them available to be called later as commands.  This seems just as good as merging, since it achieves the same effect.
+
+#### 3. Is there a file with the same name as the `rbenv.d` directory?
+
+As a matter of fact, yes- it's the one we're currently reading!  One caveat, though- this file isn't located in the same directory as `rbenv.d`, so there's no risk of a naming collision.  My guess is that the `.d` suffix was added more out of convention than necessity.
+
+## Adding Hooks to RBENV
 
 Next block of code is:
 
@@ -8,17 +135,60 @@ if [ "${bin_path%/*}" != "$RBENV_ROOT" ]; then
 fi
 ```
 
-Based on the comment and the logic of the test in the `if` statement, we can conclude that `"${bin_path%/*}"` would equal `"$RBENV_ROOT"` if "rbenv was cloned to `RBENV_ROOT`".  But I'm not sure under what circumstances rbenv would be "cloned to `RBENV_ROOT`".
+We see we're adding another `rbenv.d` file to `RBENV_HOOK_PATH`.  But we only do this **if** `"${bin_path%/*}"` is not equal to `"$RBENV_ROOT"`.  We do this check because we just finished adding `${RBENV_ROOT}/rbenv.d` to `RBENV_HOOK_PATH` in the previous line of code:
 
-As you may recall, `bin_path` resolves to `/Users/myusername/.rbenv/libexec` on my machine, so `"${bin_path%/*}"` will resolve to `/Users/myusername/.rbenv` when the `%/*` bit of the parameter expansion does its job and removes the final `/` and anything after it.  When I add another `echo` statement here, I see that `RBENV_ROOT` resolves to the same path- `/Users/myusername/.rbenv`.  So these two paths are equal for me, and I won't reach the code inside the `if` check.
+```
+RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${RBENV_ROOT}/rbenv.d"
+```
 
-When *would* someone reach that code?  Apparently, when "rbenv was cloned to RBENV_ROOT".  I'm not sure what that means, but I know that `[ "${bin_path%/*}" != "$RBENV_ROOT" ]` would have to be false in order for us to reach that code.  And this test would be false if we passed in a different value for `RBENV_ROOT` when running our code, i.e. `RBENV_ROOT="~/my/other/directory/rbenv" rbenv version`.  You might do this if, for example, you pulled down the RBENV code from Github into a project directory, and wanted to run a command with `RBENV_ROOT` set to that directory.  But then why wouldn't `bin_path` *also* get updated?
+If `"${bin_path%/*}"` was equal to `"$RBENV_ROOT"`, we'd be adding the same path to `RBENV_HOOK_PATH` twice.  This could cause unexpected behavior later, when we actually execute the hook code.  We can prove this with an experiment.
 
-Taking a step back, I know that this `if` block was added as part of [this PR](https://github.com/rbenv/rbenv/pull/638){:target="_blank" rel="noopener"}, which was the PR responsible for bringing in the `gem-rehash` logic into RBENV core.  Therefore, we can probably assume that this logic was part of that effort.  So how does this `if` block fit into the effort to bring `gem-rehash` into core?
+### Experiment- breaking hook imports
 
-I don't see it.  I may have to punt on this question until later.
+I make a file called `rbenv.d/exec/foobar.bash`, which will serve as our dummy hook for this experiment. It contains the following:
 
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+```
+#!/usr/bin/env bash
+
+echo "Hello world"
+```
+
+Since our dummy hook is located in `rbenv.d/exec`, I need to run a command in my terminal which starts with `rbenv exec`.  I do the following:
+
+```
+$ rbenv exec ruby -e 'puts 5+5'
+
+Hello world
+10
+```
+
+So far, so good.  Our hook is getting registered by [this block of code](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-exec#L36){:target="_blank" rel="noopener"}, and the call to `source "$script"` is what causes our `foobar.bash` script to execute. This happens one time, because the parent directory of `foobar.bash` is only added to `RBENV_HOOK_PATH` once.
+
+Now, I comment out the `if` check:
+
+```
+RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${RBENV_ROOT}/rbenv.d"
+# if [ "${bin_path%/*}" != "$RBENV_ROOT" ]; then
+  # Add rbenv's own `rbenv.d` unless rbenv was cloned to RBENV_ROOT
+  RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${bin_path%/*}/rbenv.d"
+# fi
+```
+
+When I re-run the same command, this time I see the following:
+
+```
+$ rbenv exec ruby -e 'puts 5+5'
+
+Hello world
+Hello world
+10
+```
+
+Now we see that our hook is being run twice.
+
+With a relatively benign hook that just calls `echo`, this is no big deal. But if the logic were more substantial, this could lead to significant problems.
+
+## The Filesystem Hierarchy Standard
 
 Moving on to the next line of code:
 
@@ -36,7 +206,7 @@ For example, the two main directories we're using in this line of code are `/usr
     - `/usr/local/`- "Tertiary hierarchy for local data, specific to this host. Typically has further subdirectories (e.g., bin, lib, share)."
     - `/usr/lib/`- "Libraries for the binaries in /usr/bin and /usr/sbin."
 
-Honestly, the above is a bit too abstract for me.  I did find [this link](https://archive.is/hXKpL){:target="_blank" rel="noopener"} which has more concrete examples.  It mentions that it refers to the FHS for Linux, not for UNIX, but [this StackOverflow post](https://web.archive.org/web/20150928165243/http://unix.stackexchange.com/questions/98751/is-the-filesystem-hierarchy-standard-a-unix-standard-or-a-gnu-linux-standard/){:target="_blank" rel="noopener"} says that both Linux and UNIX follow the same FHS, so I think we're OK.  The site says these directories might contain the following types of files:
+[This link here](https://archive.is/hXKpL){:target="_blank" rel="noopener"} contains more concrete examples.  It mentions that it refers to the FHS for Linux, not for UNIX, but [this StackOverflow post](https://web.archive.org/web/20150928165243/http://unix.stackexchange.com/questions/98751/is-the-filesystem-hierarchy-standard-a-unix-standard-or-a-gnu-linux-standard/){:target="_blank" rel="noopener"} says that both Linux and UNIX follow the same FHS, so I think we're OK.  The site says these directories might contain the following types of files:
 
 #### /etc
 
@@ -74,11 +244,11 @@ for plugin_hook in "${RBENV_ROOT}/plugins/"*/etc/rbenv.d; do
 done
 ```
 
-In an earlier `for` loop, we updated the `PATH` variable to include any executables which were provided by any RBENV hooks that we've installed.  This was so that we could run that hook's commands from our terminal.
+Here, we appear to be telling RBENV which hooks the user has installed.  This is not so that we can run that hook's commands, but so that a hook's logic will be executed when we run certain *RBENV* commands.
 
-Here, we appear to be telling RBENV which hooks the user has installed.  This is not so that we can run that hook's commands, but so that a hook's logic will be executed when we run an *RBENV* command.  By adding a path to `RBENV_HOOK_PATHS`, we give an RBENV command another directory to search through when that command executes its hooks.
+We're skipping ahead a bit, but [here is an example](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L12){:target="_blank" rel="noopener"} of that process in action.  The `version-name` command calls `rbenv-hooks version-name`, which internally relies on the `RBENV_HOOKS_PATH` variable to print out a list of hooks for (in this case) the `version-name` command.
 
-We're skipping ahead a bit, but [here is an example](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L12){:target="_blank" rel="noopener"} of that process in action.  The `version-name` command calls `rbenv-hooks version-name`, which internally relies on the `RBENV_HOOKS_PATH` variable to print out a list of hooks for (in this case) the `version-name` command.  For each of those paths, we look for any `.bash` scripts, and then we run `source` on each of those scripts, so that those scripts are executed in our current shell environment.
+For each of those paths, we look for any `.bash` scripts, and then we run `source` on each of those scripts, so that those scripts are executed in our current shell environment.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
@@ -89,9 +259,11 @@ RBENV_HOOK_PATH="${RBENV_HOOK_PATH#:}"
 export RBENV_HOOK_PATH
 ```
 
-This syntax is definitely parameter expansion, but I haven't seen the `#:` syntax before.  I don't know if `#:` is a specific command in parameter expansion (like `:+` or similar), or if `:` is a character that we're performing the `#` operation on.
+This syntax is definitely parameter expansion, but I haven't seen the `#:` syntax before.
 
-I search [the GNU docs](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"} for `#:`, since it looks like a specific kind of expansion pattern, but I don't see those two characters used together anywhere in the docs.  Maybe it's just the `#` pattern we've seen before, for instance when we saw `parameter#/*`?  In that case, we were removing any leading `/` character from the start of the parameter.  Maybe here we're doing the same, but with the `:` character instead?
+I search [the GNU docs](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"} for `#:`, since it looks like a specific kind of expansion pattern, but I don't see those two characters used together anywhere in the docs.  This is definitely parameter expansion, though.
+
+Maybe this is just another example of the `#` pattern that we've already seen before, for instance when we saw `parameter#/*`?  In that case, we were removing any leading `/` character from the start of the parameter.  Maybe here we're doing the same, but with the `:` character instead?
 
 As an experiment, I update my test script to read as follows:
 
@@ -134,3 +306,5 @@ shopt -u nullglob
 This just turns off the `nullglob` option in our shell that we turned on before we started adding plugin configurations.  This is a cleanup step, not too surprising to see it here.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+So that's how we add hooks to RBENV.  Let's move on.

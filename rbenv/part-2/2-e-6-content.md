@@ -458,9 +458,9 @@ When I run `ls -la` in `bar_dir/`, I see the following:
 bash-3.2$ ls -la
 
 total 0
-drwxr-xr-x   3 richiethomas  staff   96 Apr 22 20:03 .
-drwxr-xr-x  22 richiethomas  staff  704 Apr 22 20:03 ..
-lrwxr-xr-x   1 richiethomas  staff    6 Apr 22 20:00 bar -> ../foo
+drwxr-xr-x   3 myusername  staff   96 Apr 22 20:03 .
+drwxr-xr-x  22 myusername  staff  704 Apr 22 20:03 ..
+lrwxr-xr-x   1 myusername  staff    6 Apr 22 20:00 bar -> ../foo
 ```
 
 We see `bar -> ../foo`.  The `->` indicates that `bar` is a symlink to `../foo`.
@@ -473,10 +473,10 @@ $ mv bar ..
 $ ls -la ..
 
 total 0
-drwxr-xr-x   3 richiethomas  staff   96 Apr 22 20:03 .
-drwxr-xr-x  22 richiethomas  staff  704 Apr 22 20:03 ..
-lrwxr-xr-x   1 richiethomas  staff      6 Apr 22 20:00 bar -> ../foo
--rwxr-xr-x   1 richiethomas  staff     40 Apr 22 20:01 foo
+drwxr-xr-x   3 myusername  staff   96 Apr 22 20:03 .
+drwxr-xr-x  22 myusername  staff  704 Apr 22 20:03 ..
+lrwxr-xr-x   1 myusername  staff      6 Apr 22 20:00 bar -> ../foo
+-rwxr-xr-x   1 myusername  staff     40 Apr 22 20:01 foo
 ```
 
 Here we can see the problem- the symlink is still pointing to `../foo`, even though we're now in the directory where `foo` is located.  I surmise that the error `no such file or directory: ../bar` happens because `../bar` is pointing to a file that doesn't exist, relative to its current location.
@@ -531,9 +531,9 @@ $ ln foo hardfoo
 
 $ ls -la
 
--rwxr-xr-x   2 richiethomas  staff     47 Apr 22 20:16 foo
-lrwxr-xr-x   1 richiethomas  staff      3 Apr 22 20:09 foobarbaz -> foo
--rwxr-xr-x   2 richiethomas  staff     47 Apr 22 20:16 hardfoo
+-rwxr-xr-x   2 myusername  staff     47 Apr 22 20:16 foo
+lrwxr-xr-x   1 myusername  staff      3 Apr 22 20:09 foobarbaz -> foo
+-rwxr-xr-x   2 myusername  staff     47 Apr 22 20:16 hardfoo
 ```
 
 Notice the relative filesizes:
@@ -663,7 +663,7 @@ $ cd ..
 
 $ ./OpenSource/foo
 
-/Users/richiethomas/Workspace
+/Users/myusername/Workspace
 ```
 
 After we `cd ..`, we no longer see `/OpenSource` at the end of the `echo`'ed output.  This means that the value of `"$PWD"` depends on where the env var is printed from, **not** the location of the script that invokes it.
