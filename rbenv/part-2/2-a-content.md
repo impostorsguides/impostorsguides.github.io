@@ -2,8 +2,11 @@ Having finished reading [the code for RBENV's shims](https://docs.google.com/doc
 
 I see the following directories in the Github repo:
 
+
 <center style="margin-bottom: 3em">
-  <img src="/assets/images/screenshot-19mar2023-237pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
+  <a target="_blank" href="/assets/images/screenshot-19mar2023-237pm.png">
+    <img src="/assets/images/screenshot-19mar2023-237pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
+  </a>
 </center>
 
 When I look inside each of these directories, I see that `libexec/` has the most files in it.  While this doesn't *necessarily* mean that it's the most important directory, it does indicate that a lot of development has taken place in that directory.  It also means that, if we were to finish reading through all the files in that directory, we will have taken a big step toward understanding the codebase as a whole.
@@ -14,7 +17,7 @@ Additionally, the last line in the shim file we just examined was the following:
 exec "/usr/local/bin/rbenv" exec "$program" "$@"
 ```
 
-This essentially boils down to `exec`'ing the `/usr/local/bin/rbenv` command.  The file `/usr/local/bin/rbenv` is a symlink to `/usr/local/Cellar/rbenv/1.2.0/bin`, which in turn is just a symlink to `/usr/local/Cellar/rbenv/1.2.0/libexec/rbenv`:
+This essentially boils down to `exec`'ing the `/usr/local/bin/rbenv` command.  The file `/usr/local/bin/rbenv` is a [symlink](https://web.archive.org/web/20221126123116/https://devdojo.com/devdojo/what-is-a-symlink){:target="_blank" rel="noopener"} to `/usr/local/Cellar/rbenv/1.2.0/bin`, which in turn is just a symlink to `/usr/local/Cellar/rbenv/1.2.0/libexec/rbenv`:
 
 ```
 $ ls -la /usr/local/bin/rbenv
@@ -35,4 +38,4 @@ $ ls -la /usr/local/Cellar/rbenv/1.2.0/libexec/rbenv
 
 So the `libexec/rbenv` command would be a logical next step in our analysis.  Coincidentally, this is also the first file in the `libexec/` directory, so it's already the file we'd start with if we were to work our way through the files in that directory.
 
-For both of these reasons, I decide to start there.
+For all of these reasons, I decide to start there.

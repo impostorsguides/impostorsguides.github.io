@@ -572,6 +572,8 @@ This time, the environment variable was **not** set.  This proves that using `co
 
 We'll see later on that scripts which are prefaced with `sh-` have the convention of `echo`ing lines of code to `stdout`.  Now we understand why this is the case- that output is executed by the caller using `eval`, because this is the only way for child scripts to affect the environment variables of a parent script.
 
+More generally, this is also a cool design pattern for the case where you need to run a child script which modifies environment variables, and have those modifications be available to the parent script.  We can write the child script such that it `echo`s the code for the modifications of the env vars, and have our parent script `eval` the code that is `echo`'ed.  This is a work-around we can use if we're ever stymied by the fact that env var changes in a child script aren't available to the parent.
+
 ### Aside- backticks vs. command substitution
 
 FYI, [according to StackOverflow](https://web.archive.org/web/20230411191359/https://stackoverflow.com/questions/9405478/command-substitution-backticks-or-dollar-sign-paren-enclosed){:target="_blank" rel="noopener"}, the following syntax...
