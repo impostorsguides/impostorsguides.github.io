@@ -1,7 +1,7 @@
 ---
 layout: home
 permalink: /
-title: Welcome to Impostor's Guides
+title: Impostor's Guides
 ---
 
 ## This site, in 10 seconds
