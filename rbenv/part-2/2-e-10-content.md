@@ -4,6 +4,8 @@ Next line of code is:
 RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${RBENV_ROOT}/rbenv.d"
 ```
 
+## Telling RubyGems to auto-generate shims
+
 According to the README, `RBENV_HOOK_PATH` is a:
 
 ```
@@ -16,8 +18,6 @@ This code adds `${RBENV_ROOT}/rbenv.d` to the end of the current value of `RBENV
 - Hooks modify existing commands.
 
 But what is `"${RBENV_ROOT}/rbenv.d"`?
-
-## Telling RubyGems to automatically generate shims
 
 I `cd` into my `~/.rbenv` directory and run `find . -name rbenv.d`.  I see the following:
 
@@ -84,11 +84,15 @@ Based on this, I think we can now determine the reason for this line of code:
 RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${RBENV_ROOT}/rbenv.d"
 ```
 
-We want RBENV to automatically re-run the `rbenv rehash` command every time we install a new Ruby gem.  The way we achieve this is by updating `RBENV_HOOK_PATH`, thereby hooking into the Rubygems `gem install` and `gem uninstall` commands.  RubyGems will then call [the `rubygems_plugin.rb` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/rbenv.d/exec/gem-rehash/rubygems_plugin.rb){:target="_blank" rel="noopener"}, which runs `rbenv rehash` for us.
+ - We want RBENV to automatically re-run the `rbenv rehash` command every time we install a new Ruby gem.
+ - The way we achieve this is by updating `RBENV_HOOK_PATH` to include `${RBENV_ROOT}/rbenv.d`, which itself includes a subdirectory named `exec` with a bash script named `gem-rehash.bash`.
+ - This presence of this script inside this directory causes this `bash` script to be `source`'ed every time `rbenv exec` is run.
+ - The act of `source`'ing this script causes the `RUBYLIB` environment variable to be updated to include `/.rbenv/rbenv.d/exec/gem-rehash`, i.e. the value which `${BASH_SOURCE%.bash}` resolves to.
+ - This directory includes the Ruby file `rubygems_plugin.rb`, which then is run by `gem` whenever you install a new RubyGem.
 
 ### The `.d` extension in `rbenv.d`
 
-The `.d` in `rbenv.d` looked funny to me.  It appears to be a file extension, but it's being used on a directory.  I Google `what does ".d" stand for bash`, and the first result I see is [this StackOverflow post](https://web.archive.org/web/20220619172419/https://unix.stackexchange.com/questions/4029/what-does-the-d-stand-for-in-directory-names){:target="_blank" rel="noopener"}:
+The `.d` in `rbenv.d` appears to be a file extension, but it's being used on a directory.  I Google `what does ".d" stand for bash`, and the first result I see is [this StackOverflow post](https://web.archive.org/web/20220619172419/https://unix.stackexchange.com/questions/4029/what-does-the-d-stand-for-in-directory-names){:target="_blank" rel="noopener"}:
 
 > The .d suffix here means directory. Of course, this would be unnecessary as Unix doesn't require a suffix to denote a file type but in that specific case, something was necessary to disambiguate the commands (/etc/init, /etc/rc0, /etc/rc1 and so on) and the directories they use (/etc/init.d, /etc/rc0.d, /etc/rc1.d, ...)
 >
@@ -195,7 +199,7 @@ Moving on to the next line of code:
 ```
 RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
 ```
-This just means we're further updating RBENV_HOOK_PATH to include more `rbenv.d` directories, including those inside `/usr/local/etc`, `/etc`, and `/usr/lib/`.  These directories may or may not even exist on the user's machine (for example, I don't currently have a `/usr/local/etc/rbenv.d` directory on mine).  They're just directories where the user *might* have installed additional hooks.
+This just means we're further updating RBENV_HOOK_PATH to include more `rbenv.d` directories, including those inside `/usr/local/etc`, `/etc`, as well as `/usr/lib/rbenv/hooks`.  These directories may or may not even exist on the user's machine (for example, I don't currently have a `/usr/local/etc/rbenv.d` directory on mine).  They're just directories where the user *might* have installed additional hooks.
 
 Why these specific directories?  They appear to be a part of a convention known as the [Filesystem Hierarchy Standard](https://web.archive.org/web/20230326013203/https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard){:target="_blank" rel="noopener"}, or the conventional layout of directories on a UNIX system.  Using this convention means that developers on UNIX machines can trust that the files they're looking for are likely to live in certain places.
 
@@ -244,11 +248,7 @@ for plugin_hook in "${RBENV_ROOT}/plugins/"*/etc/rbenv.d; do
 done
 ```
 
-Here, we appear to be telling RBENV which hooks the user has installed.  This is not so that we can run that hook's commands, but so that a hook's logic will be executed when we run certain *RBENV* commands.
-
-We're skipping ahead a bit, but [here is an example](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L12){:target="_blank" rel="noopener"} of that process in action.  The `version-name` command calls `rbenv-hooks version-name`, which internally relies on the `RBENV_HOOKS_PATH` variable to print out a list of hooks for (in this case) the `version-name` command.
-
-For each of those paths, we look for any `.bash` scripts, and then we run `source` on each of those scripts, so that those scripts are executed in our current shell environment.
+Here, we're telling RBENV to also check the `plugins/` directory for any potential hooks.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
@@ -284,7 +284,7 @@ foo:bar/baz/buzz:quox
 
 Nothing has changed- the output is the same as the input.
 
-When I update FOO to add a `:` at the beginning (i.e. ':foo:bar/baz/buzz:quox'), and I re-run the script, I see:
+I update FOO to add a `:` at the beginning (so it becomes `:foo:bar/baz/buzz:quox`), and I re-run the script, I see:
 
 ```
 $ ./bar

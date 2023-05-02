@@ -1,6 +1,6 @@
 
 
-Next line of code is:
+The next block of code is:
 
 ```
 abort() {
@@ -16,7 +16,7 @@ abort() {
 
 Here we declare a function named `abort`.
 
-The first thing I notice is the `exit 1` at the end.  We're returning a non-zero (i.e. failure-mode) exit status at the end of the function, which makes sense for a function named `abort`.
+The first thing I notice is the `exit 1` at the end.  We're returning a non-zero (i.e. failure-mode) exit status at the end of the function, which makes sense for a function named `abort`.  This also implies that, if we see a call to `abort`, we're dealing with a sad-path scenario.
 
 Before that, however, we see a block of code surrounded with curly braces, with `>&2` appended to the end:
 
@@ -170,11 +170,7 @@ $ ./foo bar baz
 2 args given
 ```
 
-Good enough for me!  I think we can conclude that `[ "$#" -eq 0 ]` returns true if the number of args is equal to zero.
-
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
-
-But whose positional parameters are we talking about- the `abort` function's params, or rbenv's params?
+I think we can conclude that `[ "$#" -eq 0 ]` returns true if the number of args is equal to zero.  But whose positional parameters are we talking about- the `abort` function's params, or rbenv's params?
 
 I try wrapping my experiment code in a simple function definition:
 
@@ -210,7 +206,7 @@ $ ./foo bar baz
 
 We see different counts for the # of args passed to the file vs. to `myFunc`.  So when `$#` is inside a function, it *must* be refer to the # of args passed to that same function.
 
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+## Reading from `stdin`
 
 Back to our block of code:
 
@@ -235,7 +231,7 @@ I search for `| abort` in this file, and I find [this block of code](https://git
   } | abort
 ```
 
-It looks like we're doing something similar with curly braces (i.e. capturing the output from a block of code) and piping it to `abort`.  So, yeah, it looks like we were right about the purpose of `cat -`- it lets us capture arbitrary input from `stdin` and print it to the screen.
+It looks like we're doing something similar with curly braces (i.e. capturing the output from a block of code) and piping it to `abort`.  So, yeah, it looks like we were right about the purpose of `cat -`.  It lets us capture arbitrary input from `stdin` and print it to the screen.
 
 Let's try to replicate that and see what happens:
 
@@ -263,7 +259,7 @@ Whoops
 
 Gotcha- the logic inside the `if` clause is meant to allow the caller of the `abort` function to send text into the function via piping.
 
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+## Listing any and all arguments
 
 Last bit of code inside `abort()`:
 
@@ -314,7 +310,7 @@ foo() {
   exit 1
 }
 
-foo "cannot find readlink - are you missing GNU coreutils?"
+foo "oopsy-daisies"
 ```
 
 Running the script gives us:
@@ -322,7 +318,7 @@ Running the script gives us:
 ```
 $ ./foo
 
-rbenv: cannot find readlink - are you missing GNU coreutils?
+rbenv: oopsy-daisies
 ```
 
 So it just concatenates "rbenv: " at the front of whatever error message you pass it.
@@ -334,8 +330,8 @@ So to sum up the "abort" function:
  - It prints THAT to STDERR.
  - Lastly, it terminates with a non-zero exit code.
 
-We were lucky here, because the `abort` function is called throughout the file, and we used those examples in understanding how the function worked.  It's not always possible to use this strategy, but when it IS possible, it's a good tool for our toolbelt.
-
-Let's move on.
+We were lucky here, because the `abort` function is called throughout the `rbenv` file, and we were able to use those examples in understanding how the function worked.  It's not always possible to use this strategy, but when it IS possible, it's a good tool for our toolbelt.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Let's move on.

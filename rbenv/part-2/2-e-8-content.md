@@ -13,11 +13,9 @@ export RBENV_ROOT
 
 ## Setting `RBENV_ROOT`
 
-We've seen the `-z` flag for the `[` command before- it checks whether a value has a length of zero.
+We've seen the `-z` flag in conditional logic before- it checks whether a value has a length of zero.
 
-So if the `RBENV_ROOT` variable has not been set, then we set it equal to `${HOME}/.rbenv`, i.e. the `.rbenv` hidden directory located as a subdir of our UNIX home directory.  If it *has* been set, then we just trim off any trailing "/" character.  Then we export it as a environment variable.
-
-The purpose of this code seems to be ensuring that `RBENV_ROOT` is set to some value, whether it's the value that the user specified or the default value.
+So if the `RBENV_ROOT` variable has not yet been set, then we give it a default value of `${HOME}/.rbenv`, i.e. the `.rbenv` hidden directory located as a subdir of our UNIX home directory.  If it *has* been set, then we just trim off any trailing "/" character.  Either way, we export it as a environment variable.
 
 What does `$RBENV_ROOT` do?  According to [the "Environment Variables" section](https://github.com/rbenv/rbenv#environment-variables){:target="_blank" rel="noopener"} of the README, it:
 
@@ -40,7 +38,7 @@ export RBENV_DIR
 
 Let's examine everything *except* the code inside the `else` block, which we'll look at next.
 
-This block of code is similar to the block before it.  We check if a variable has not yet been set (in this case, `RBENV_DIR` instead of `RBENV_ROOT`).  If it's not yet set, then we set it equal to the current working directory.  Once we've exited the `if/else` block, we export `RBENV_DIR` as an environment variable.
+This block of code is similar to the block before it.  We check if a variable has not yet been set (in this case, `RBENV_DIR` instead of `RBENV_ROOT`).  If it's not yet set, then we give it a default value of the current working directory.  Once we've exited the `if/else` block, we export `RBENV_DIR` as an environment variable.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
@@ -67,27 +65,7 @@ RBENV_DIR="$PWD"
 cd "$OLDPWD"
 ```
 
-Here we're attempting to `cd` into our latest version of `$RBENV_DIR`, sending any error message to `/dev/null`, and aborting with a helpful error message if that `cd` attempt fails.  We then set the value of `RBENV_DIR` to the value of `$PWD` (the directory we're currently in), before `cd`ing into `OLDPWD`, an environment variable [that `bash` maintains ](https://web.archive.org/web/20220127091111/https://riptutorial.com/bash/example/16875/-oldpwd){:target="_blank" rel="noopener"} which comes with `bash` and which stores the directory we were in prior to our current one:
-
-```
-$ cd /home/user
-
-$ mkdir directory
-
-$ echo $PWD
-
-/home/user
-
-$ cd directory
-
-$ echo $PWD
-
-/home/user/directory
-
-$ echo $OLDPWD
-
-/home/user
-```
+Here we're attempting to `cd` into our latest version of `$RBENV_DIR`, sending any error message to `/dev/null`, and aborting with a helpful error message if that `cd` attempt fails.  We then set the value of `RBENV_DIR` to the value of `$PWD` (the directory we're currently in), before `cd`ing into `OLDPWD`, an environment variable [that `bash` maintains ](https://web.archive.org/web/20220127091111/https://riptutorial.com/bash/example/16875/-oldpwd){:target="_blank" rel="noopener"} and which stores the directory we were in prior to our current one.
 
 This sequence of code is doing two things:
 

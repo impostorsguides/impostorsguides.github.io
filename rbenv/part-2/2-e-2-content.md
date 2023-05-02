@@ -1,7 +1,7 @@
 
-## [Code](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv){:target="_blank" rel="noopener"}
+## Code
 
-This file's first line is:
+The first line in [this file](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv){:target="_blank" rel="noopener"} is:
 
 ```
 #!/usr/bin/env bash
@@ -31,9 +31,12 @@ fi
 
 We recognize the `if` statement and the `[` syntax from earlier.  Here, we're testing whether `"$1"` evaluates to the string `--debug`.  I suspect that `$1` represents the first argument that gets passed to the command, but I'm not sure if the indexing is 0-based or 1-based.  A quick Google search leads me [here](https://web.archive.org/web/20211006091051/https://stackoverflow.com/questions/29258603/what-do-0-1-2-mean-in-shell-script){:target="_blank" rel="noopener"}:
 
-<p style="text-align: center">
-  <img src="/assets/images/stackoverflow-answer-positional-arguments.png" width="90%" style="border: 1px solid black; padding: 0.5em" alt="StackOverflow answer about positional arguments">
-</p>
+
+<center style="margin-bottom: 3em">
+  <a target="_blank" href="/assets/images/stackoverflow-answer-positional-arguments.png">
+    <img src="/assets/images/stackoverflow-answer-positional-arguments.png" width="90%" style="border: 1px solid black; padding: 0.5em">
+  </a>
+</center>
 
 My guess was correct.  Based on this, we can conclude that if the first argument is equal to "--debug", then... what?
 
@@ -47,11 +50,11 @@ Next line of code:
 
 We recognize the `export` statement from Part 1.  We set `RBENV_DEBUG` equal to 1, and then export it.
 
-We know from [here](https://unix.stackexchange.com/a/28349/142469){:target="_blank" rel="noopener"} that an `export`ed variable is available in the same script, in a child script, and in a function which is called inside that same script, but not in the parent process or other sibling scripts called by that parent process.
+We know from [here](https://unix.stackexchange.com/a/28349/142469){:target="_blank" rel="noopener"} that an `export`ed variable is available in the same script, in a child script, and in a function which is called inside that same script, but not in the parent process or other sibling scripts called by that parent process.  So we can assume that `RBENV_DEBUG` will be used in one of those places in the near future.
+
+## The `shift` keyword
 
 Next line of code.
-
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 ```
 shift
@@ -59,15 +62,17 @@ shift
 
 What does `shift` do?  According to [the docs](https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_09_07.html){:target="_blank" rel="noopener"}:
 
-> This command takes one argument, a number. The positional parameters are shifted to the left by this number, N. The positional parameters from N+1 to $# are renamed to variable names from $1 to $# - N+1.
+> This command takes one argument, a number. The positional parameters are shifted to the left by this number, N. The positional parameters from `N+1` to `$#` are renamed to variable names from `$1` to `$#` - `N+1`.
 >
-> Say you have a command that takes 10 arguments, and N is 4, then $4 becomes $1, $5 becomes $2 and so on.  $10 becomes $7 and the original $1, $2 and $3 are thrown away.
+> Say you have a command that takes 10 arguments, and N is 4, then `$4` becomes `$1`, `$5` becomes `$2` and so on.  `$10` becomes `$7` and the original `$1`, `$2` and `$3` are thrown away.
 >
 > ...
 >
 > If N is not present, it is assumed to be 1.
 
-Let's try it out for ourselves.
+Am I the only one who thinks there's an off-by-one error in this explanation?  If `N` is 4, then shouldn't `$5` become `$1`, not `$2`?
+
+Let's see for ourselves how `shift` works.
 
 ### Experiment- the `shift` command
 
@@ -78,14 +83,16 @@ I write a script containing the following code:
 
 echo "old arg length: $#"
 echo "old args: $@"
+echo "old fifth arg: $5"
 
 echo
-echo "Calling shift..."
+echo "Calling 'shift 4'..."
 echo
-shift
+shift 4
 
 echo "new arg length: $#"
 echo "new args: $@"
+echo "new first arg: $1"
 ```
 
 `$#` evaluates to the number of positional arguments, and `$@` evaluates to the list of args.
@@ -93,26 +100,35 @@ echo "new args: $@"
 I run it, passing it the args `foo`, `bar`, and `baz`, and I get:
 
 ```
-$ ./foo bar baz buzz
-old arg length: 3
-old args: bar baz buzz
+$ ./foo bar baz buzz quox bing
 
-Calling shift...
+old arg length: 5
+old args: bar baz buzz quox bing
+old fifth arg: bing
 
-new arg length: 2
-new args: baz buzz
+Calling 'shift 4'...
+
+new arg length: 1
+new args: bing
+new first arg: bing
 ```
 
-Great, it does what I thought it would- decreases the argument count by 1, and lops the first argument off the front of the list.
+Great, it does what we thought it would- decreases the argument count by 4, and lops the first 4 arguments off the front of the list.
+
+We also proved that the Linux Documentation Project's example **does** contain an off-by-one error.
 
 So to summarize the entire `if` block: if the user passes `--debug` as their first arg to `rbenv`, we set RBENV_DEBUG and trim the `--debug` flag off the list of args.
 
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+## The `xtrace` feature
 
-Next line:
+Next block of code:
 
 ```
 if [ -n "$RBENV_DEBUG" ]; then
+  # https://wiki-dev.bash-hackers.org/scripting/debuggingtips#making_xtrace_more_useful
+  export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+  set -x
+fi
 ```
 
 Since the `-n` flag is passed to the `[` command, I run `man test` and search for `-n`.  I see:
@@ -123,8 +139,6 @@ Since the `-n` flag is passed to the `[` command, I run `man test` and search fo
 
 So if the length of `$RBENV_DEBUG` is non-zero (i.e. if we just set it), then execute the code inside this `if`-block.  Which is:
 
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
-
 ```
 # https://wiki-dev.bash-hackers.org/scripting/debuggingtips#making_xtrace_more_useful
 
@@ -132,7 +146,7 @@ export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 set -x
 ```
 
-The first line of code is a comment, containing [a link to an article](https://wiki-dev.bash-hackers.org/scripting/debuggingtips#making_xtrace_more_useful){:target="_blank" rel="noopener"} about a program named `xtrace`.  Inside the article, we see the following:
+The first line of code is just a comment, containing [a link to an article](https://wiki-dev.bash-hackers.org/scripting/debuggingtips#making_xtrace_more_useful){:target="_blank" rel="noopener"} about a program named `xtrace`.  Inside the article, we see the following:
 
 > #### Making xtrace more useful
 > (by AnMaster)
@@ -305,13 +319,13 @@ Does all that pan out when we actually run `rbenv` with the `--debug` flag?  Let
 $ rbenv --debug version
 ```
 
-There's a ton of output.  Below is one line from that output which comes from *outside* of a function...
+There's a ton of output.  Below is one line from that output [which comes from *outside* of a function](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L73){:target="_blank" rel="noopener"}...
 
 ```
 +(/Users/myusername/.rbenv/bin/rbenv:73): shopt -s nullglob
 ```
 
-...and another which comes from *inside* a function:
+...and another [which comes from *inside* a function](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L41){:target="_blank" rel="noopener"}:
 
 ```
 ++(/Users/myusername/.rbenv/bin/rbenv:41): abs_dirname(): local path=/Users/myusername/.rbenv/bin/rbenv
@@ -331,39 +345,35 @@ I kept noticing the phrase `xtrace` being thrown around on some of the links I e
 
 That's a lot, but the bottom table shows the short notation of `set -x` corresponds to the long notation of `set -o xtrace`, or "set the xtrace option".  So `xtrace` is the name of a mode in bash.
 
-And the cool thing is, you don't have to enable `set -x` only at the beginning of the script, like RBENV's code does.  According to the above link from TLDP, you can enable it and disable it anywhere you want in your code, as many times as you want.
+RBENV calls `set -x` at the beginning of the file, because we want to enable debugging over the entire file.  But the cool thing about `set -x` is, you don't have to call it only at the beginning of a script.
 
-So if you're trying to debug something tricky and you want to avoid getting overloaded with `PS4` output for every line of your code, you can turn it on for just the buggy section of your code, and turn it off immediately after.
+According to the above link from TLDP, you can enable it only for a certain section of code that you suspect is buggy, and disable it as soon as the section of buggy code is complete.  This reduces the amount of noise you have to wade through before getting to the helpful lines of the `xtrace` output.
 
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+Even further, **you can do this anywhere you want in your code, as many times as you want.**
+
+I think that's pretty cool.
 
 So summarizing the first 2 blocks of code: we first check if the user passed `--debug` as the first argument.  If they do:
 
- - we set the `RBENV_DEBUG` env var.
+ - we `export` the `RBENV_DEBUG` env var.
  - Then in the 2nd block, if the `RBENV_DEBUG` env var has been set:
     - we change the terminal prompt to output more useful version of `PS4`, and
     - we call `set -x` to put bash into debug mode.
 
-But why do we need to separate these steps into different blocks of code?  Why didn't we just combine them, like so:
-
-```
-if [ "$1" = "--debug" ]; then
-  export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
-  set -x
-fi
-```
-
-The reason is because we need to `export` the `RBENV_DEBUG` environment variable so that other commands can access it for their own purposes.
-
 If we look for `RBENV_DEBUG` throughout the codebase, we can see it used in multiple locations:
 
+
 <center style="margin-bottom: 3em">
-  <img src="/assets/images/screenshot-24mar2023-623pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
+  <a target="_blank" href="/assets/images/screenshot-24mar2023-623pm.png">
+    <img src="/assets/images/screenshot-24mar2023-623pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
+  </a>
 </center>
 
-All of the line numbers are pretty low: I see lines 4, 5, 6, 11, 10, 4, etc.  So it looks like at the start of all these files, we check if `RBENV_DEBUG` has been set, and if it has, we invoke `xtrace` via the `set -x` command.
+All of the line numbers are pretty low: I see lines 4, 5, 6, 11, 10, 4, etc.  So it looks like at the start of all these files, we check if `RBENV_DEBUG` has been set, and if it has, we invoke `xtrace` via the `set -x` command.  This is why we had to `export` this env var.
 
-This also implies that you can't just turn on `xtrace` in a parent script and expect it to remain on in the parent's child scripts.  Instead, you need to turn it on for each file that you expect to run.
+Since the `rbenv` file sets `RBENV_DEBUG` and the files listed above consume `RBENV_DEBUG`, this also implies that these files will be run as child processes of the `rbenv` command.  But we'll get to that later.
+
+Lastly, this implies that you can't just turn on `xtrace` in a parent script and expect it to remain on in the parent's child scripts.  Instead, you need to turn it on for each file that you expect to run.
 
 We can prove this with an experiment:
 
@@ -393,7 +403,7 @@ set -x
 echo "Inside bar"
 ```
 
-`bar` does the same thing `foo` does, but it doesn't call a child script.
+The `bar` script calls `set -x` and `echo` the same way `foo` does, but `bar` doesn't call a child script the way `foo` does.
 
 When I run `foo`, I see the following:
 
@@ -407,7 +417,9 @@ Inside foo
 Inside bar
 ```
 
-We see xtrace statements print out for the `echo` statements inside **both** `foo` and `bar`.  Then, I remove the call to `set -x` in `bar`:
+We see `xtrace` statements print out for the `echo` statements inside **both** `foo` and `bar`.
+
+Then, I remove the call to `set -x` in `bar`:
 
 ```
 #!/usr/bin/env bash
@@ -432,5 +444,5 @@ So the effects of `xtrace` do **not** automatically trickle down from parent to 
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
-Let's move on to the next line of code.
+Let's move on to the next block of code.
 

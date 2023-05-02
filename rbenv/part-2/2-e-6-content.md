@@ -15,17 +15,17 @@ The above function does the following:
  - It creates a local variable named `path`.
  - It calls `realpath` via command substitution, passing it the first argument given to the `abs_dirname` function.
  - It sets the local variable equal to the return value of the above call to `realpath`.
- - It `echo`s the contents of the local variable.
+ - It `echo`s the contents of the local variable, minus its final `/` character and anything after.
 
 A reminder that, if we've reached the inside of this `if`-block, we can be confident that the version of `realpath` that we're calling is our newly-redefined version (remember `enable -f`), **not** the version that ships with our shell.
 
 ### The `local` keyword
 
-By default, variables declared inside a function are available outside that function.  To prevent that from happening, we use the `local` keyword to ensure their scope is limited to the body of the function.  Note- this keyword [is **not** POSIX-compliant](https://web.archive.org/web/20221114113625/https://stackoverflow.com/questions/18597697/posix-compliant-way-to-scope-variables-to-a-function-in-a-shell-script){:target="_blank" rel="noopener"}.
+By default, variables declared inside a function are available outside that function.  To prevent that from happening, we use the `local` keyword to ensure their scope is limited to the body of the function.  Note- this keyword [is **not** POSIX-compliant](https://web.archive.org/web/20221114113625/https://stackoverflow.com/questions/18597697/posix-compliant-way-to-scope-variables-to-a-function-in-a-shell-script){:target="_blank" rel="noopener"}, though many POSIX shells support it.
 
-We can see how `local` works with an experiment.
+Let's do an experiment to see how `local` works.
 
-#### Experiment- keeping a local variable local
+#### Experiment- setting a variable to have local scope
 
 We create a function named `foo`, which creates and calls a function:
 
@@ -37,16 +37,19 @@ function foo() {
   echo "bar inside the 'foo' function: $bar"
 }
 
+echo "bar's initial value: $bar"
+
 foo
 
 echo "bar outside the 'foo' function: $bar"
 ```
 
-We call the function to make sure that `bar` is initialized inside the `foo` function, and then we attempt to echo `bar` to see if it has a value outside of `foo`.  Sure enough, we see that it does:
+We print out `bar`'s initial value to ensure that it doesn't previously have any value.  We then call the function to make sure that `bar` is initialized inside the `foo` function.  Lastly, we attempt to echo `bar` to see if it has a value outside of `foo`.  Sure enough, we see that it does:
 
 ```
 $ ./foo
 
+bar's initial value:
 bar inside the 'foo' function: Hello world
 bar outside the 'foo' function: Hello world
 ```
@@ -61,6 +64,8 @@ function foo() {
   echo "bar inside the 'foo' function: $bar"
 }
 
+echo "bar's initial value: $bar"
+
 foo
 
 echo "bar outside the 'foo' function: $bar"
@@ -71,11 +76,12 @@ When we re-run the script, we see:
 ```
 $ ./foo
 
+bar's initial value:
 bar inside the 'foo' function: Hello world
 bar outside the 'foo' function:
 ```
 
-This time, `bar` has no value outside the `foo` function.
+This time, `bar` has no value outside the `foo` function, neither before nor after the `foo` function is called.
 
 ### `echo`ing from inside a function
 
@@ -108,7 +114,11 @@ Hello world
 
 We can see that we initialized `result_of_foo` to equal the result of the command substitution, and from there we were able to print out its value to `stdout`.
 
-Note that I'm careful not to say "The return value of the foo function is 'Hello world'."  That would be inaccurate.  Functions in `bash` don't work the same way that they do in Ruby, where the return value is the last expression executed in the function's body.  The closest thing a `bash` function has to a return value is the exit code.  However, you can `echo` anything you want from inside the function, and store that result via command substitution, as we've done above.
+Note that I'm careful not to say "The return value of the foo function is 'Hello world'."  That would be inaccurate.
+
+Functions in `bash` don't work the same way that they do in Ruby, where the return value is the last expression executed in the function's body.  The closest thing a `bash` function has to a return value is the exit code.
+
+However, you can `echo` anything you want from inside the function, and store that result via command substitution, as we've done above.
 
 Recall that the `%/*` after `path` inside the parameter expansion just shaves off any trailing `/` character, as well as anything after it.  We can reproduce that in the terminal:
 
@@ -122,7 +132,7 @@ $ echo ${path%/*}
 /foo/bar
 ```
 
-So in our case, what we're "returning" from the `abs_dirname` function is the directory name of the argument (a filepath) which we pass to the function.
+So in our case, what we're "returning" from the `abs_dirname` function is the parent directory of the file whose name we pass to the function.
 
 ### Nested double-quotes
 
@@ -175,9 +185,9 @@ abs_dirname() {
 }
 ```
 
-This is a lot.  We'll process it in steps, but it looks like we're doing something similar here (defining a function named `abs_dirname`), albeit this time with a bit of setup beforehand.
+This is a lot.  We'll process it in steps, but it looks like we're doing something similar here (defining a function named `abs_dirname`), but this time with a bit of setup beforehand.
 
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+## Aborting if `RBENV_NATIVE_EXT` is set
 
 First line of this block of code is:
 
@@ -199,6 +209,31 @@ What does the `RBENV_NATIVE_EXT` env var do?  I don't see anything mentioned in 
 
 So we would set `RBENV_NATIVE_EXT` to a non-empty value if we want to make sure that we successfully import the native extension for `realpath` in the `if`-block.  If we set this env var and the `if enable -f ...` operation fails, we abort the entire script.
 
+We can replicate this behavior by navigating to `~/.rbenv`, checking the `libexec/` directory for any file named `rbenv-realpath.dylib`, renaming it if it's there, and running `RBENV_NATIVE_EXT=1 rbenv local`:
+
+```
+$ cd ~/.rbenv
+
+$ ls libexec
+
+rbenv				rbenv-help			rbenv-rehash			rbenv-version-file		rbenv-whence
+rbenv---version			rbenv-hooks			rbenv-root			rbenv-version-file-read		rbenv-which
+rbenv-commands			rbenv-init			rbenv-sh-rehash			rbenv-version-file-write
+rbenv-completions		rbenv-local			rbenv-sh-shell			rbenv-version-name
+rbenv-exec			rbenv-prefix			rbenv-shims			rbenv-version-origin
+rbenv-global			rbenv-realpath.dylib		rbenv-version			rbenv-versions
+
+$ mv libexec/rbenv-realpath.dylib libexec/rbenv-realpath2.dylib
+
+$ RBENV_NATIVE_EXT=1 rbenv local
+
+rbenv: failed to load `realpath' builtin
+```
+
+We see the `failed to load 'realpath' builtin` error message from the call to `abort`.
+
+Before we move on, don't forget to rename your `dylib` file back to its original name (`libexec/rbenv-realpath.dylib`).
+
 ### Native Extensions
 
 The `NATIVE_EXT` in the name `RBENV_NATIVE_EXT` refers to the concept of ["native extensions"](https://web.archive.org/web/20180912035230/https://stackoverflow.com/questions/31202707/what-exactly-is-a-gem-native-extension){:target="_blank" rel="noopener"}.  A native extension is a library written in one language, which can be used by a program written in another language.  In this case, RBENV is written in `bash`, but we're relying on an implementation of `realpath` which is [written in C](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/realpath.c){:target="_blank" rel="noopener"}.
@@ -210,7 +245,7 @@ Ruby does a lot of things well, but it's not the right tool for every job.  If a
 
 [This article](https://web.archive.org/web/20230223203806/https://patshaughnessy.net/2011/10/31/dont-be-terrified-of-building-native-extensions){:target="_blank" rel="noopener"} goes into some depth about how to use native extensions in Ruby, as well as what to do when the installation of a Ruby native extension goes wrong.
 
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+## Storing the name of a command to execute later
 
 Next line of code:
 
@@ -220,7 +255,7 @@ Next line of code:
 
 Here we again use command substitution to set a variable called `READLINK`.  What value are we storing?  Whatever is returned by `type -p greadlink readlink 2>/dev/null | head -n1`.
 
-To start, I decide to look up the commit which introduced this line of code.  I do my `git blame / git checkout` dance until [I find it in Github](https://github.com/rbenv/rbenv/commit/81bb14e181c556e599e20ca6fdc86fdb690b8995){:target="_blank" rel="noopener"}.  The commit message reads:
+To get some context, I decide to look up the commit which introduced this line of code.  I do my `git blame / git checkout` dance until [I find it in Github](https://github.com/rbenv/rbenv/commit/81bb14e181c556e599e20ca6fdc86fdb690b8995){:target="_blank" rel="noopener"}.  The commit message reads:
 
 > `readlink` comes from GNU coreutils.  On systems without it, rbenv used to spin out of control when it didn't have `readlink` or `greadlink` available because it would re-exec the frontend script over and over instead of the worker script in libexec.
 
@@ -256,7 +291,7 @@ I decide to do an experiment with the `type` command and its `-p` flag.
 
 I interpret `name` to mean the name of a command, alias, reserved word, etc.
 
-I make a `foo` script, which looks like so and uses `ls` as the value of `name`:
+I make a `foo` script, which looks like so and uses `ls` as the argument to pass to `type`:
 
 ```
 #!/usr/bin/env bash
@@ -311,7 +346,7 @@ I see the 3 paths I expected, each one on a separate line.  Great, I think this 
 
 ### The `head` command
 
-Moving on, we already know what `2>/dev/null` is from earlier- here we redirect any error output from `type -p` to `/dev/null`, aka [the black hole of the console](https://web.archive.org/web/20230116003037/https://linuxhint.com/what_is_dev_null/){:target="_blank" rel="noopener"}.
+Moving on, we already know what `2>/dev/null` is from earlier- here we redirect any error output from `type -p` to `/dev/null`, aka [the black hole of the terminal](https://web.archive.org/web/20230116003037/https://linuxhint.com/what_is_dev_null/){:target="_blank" rel="noopener"}.
 
 But what do we do with any non-error output?  That's answered by the last bit of code from this line: `| head -n1`.  Running `man head` gives us:
 
@@ -385,11 +420,11 @@ DESCRIPTION
 
 Looks like these two programs are used to resolve a symlink to its canonical link.
 
-I Google "greadlink vs readlink", and am unable to find any explanation of why someone would use one over the other.  I search the Github repo for the commit which introduced the `greadlink readlink` combination, and after some digging, I find [this PR](https://github.com/rbenv/rbenv/pull/43){:target="_blank" rel="noopener"} which mentions that Solaris (a UNIX operating system originally developed by Sun Microsystems) doesn't support `readlink`, so `greadlink` is called first and `readlink` is used as the fallback.
+I search the Github repo for the commit which introduced the `greadlink readlink` combination, and after some digging, I find [this PR](https://github.com/rbenv/rbenv/pull/43){:target="_blank" rel="noopener"} which mentions that Solaris (a UNIX operating system originally developed by Sun Microsystems) doesn't support `readlink`, so `greadlink` is called first and `readlink` is used as the fallback.
 
 ### Symlinks
 
-I like to think of a symbolic link, or a symlink for short, as a signpost to a file.  As [this link](https://web.archive.org/web/20221126123116/https://devdojo.com/devdojo/what-is-a-symlink){:target="_blank" rel="noopener"} says, "it is a file that points to another file".  If you type `open` plus the name of the symlink in your terminal, you're actually opening the canonical file, not the symlink file.
+The docs for `readlink` mentioned the concept of a "symbolic link".  As [this link](https://web.archive.org/web/20221126123116/https://devdojo.com/devdojo/what-is-a-symlink){:target="_blank" rel="noopener"} says, a symbolic link (or symlink) is "...a file that points to another file".  If you type `open` plus the name of the symlink in your terminal, you're actually opening the canonical file, not the symlink file.
 
 ### Experiment- creating symlinks
 
@@ -479,7 +514,7 @@ lrwxr-xr-x   1 myusername  staff      6 Apr 22 20:00 bar -> ../foo
 -rwxr-xr-x   1 myusername  staff     40 Apr 22 20:01 foo
 ```
 
-Here we can see the problem- the symlink is still pointing to `../foo`, even though we're now in the directory where `foo` is located.  I surmise that the error `no such file or directory: ../bar` happens because `../bar` is pointing to a file that doesn't exist, relative to its current location.
+Here we can see the problem- the symlink is still pointing to `../foo`, even though we're now in the same directory in which `foo` is located.  I surmise that the error `no such file or directory: ../bar` happens because `../bar` is pointing to a file that doesn't exist, relative to its current location.
 
 ### Experiment- resolving symlinks
 
@@ -516,7 +551,9 @@ $ readlink foo
 $
 ```
 
-I notice that, when I get to the regular, non-symlink file, `readlink` has no output.  I also notice that, without any flags, `readlink` just resolves the symlink 1 level deep.
+I notice that, without any flags, `readlink` just resolves the symlink 1 level deep.
+
+I also notice that, when I get to the regular, non-symlink file, `readlink` has no output.  This will become important later.
 
 ### Hard links vs. soft links
 
@@ -578,7 +615,7 @@ echo "Hello globetrotter"
  - using `rm` to remove a symlink
  - finding and deleting broken symlinks
 
-### Ensuring we have a value for `READLINK`
+## Ensuring we have a value for `READLINK`
 
 The next line of code is:
 
@@ -588,7 +625,7 @@ The next line of code is:
 
 We already learned what `[ -n ...]` does from reading about `$RBENV_DEBUG`.  Here, it returns true if the length of (in this case) `$READLINK` is non-zero.  So if the length of `$READLINK` *is* zero, then we `abort` with the specified error message.
 
-### Using `READLINK` to define a function
+## Using `READLINK` to define a function
 
 Let's look at the next 3 lines of code together, since it's just a simple function declaration:
 
@@ -600,7 +637,7 @@ Let's look at the next 3 lines of code together, since it's just a simple functi
 
 When we call this `resolve_link` function, we invoke either the `greadlink` command or (if that doesn't exist) the `readlink` command.  When we do this, we pass any arguments which were passed to `resolve_link`.
 
-### Defining our non-native-extension `abs_dirname` function
+## Defining our non-native-extension `abs_dirname` function
 
 Next block of code:
 
@@ -620,7 +657,7 @@ abs_dirname() {
 }
 ```
 
-So here's where we're declaring the version of `abs_dirname` from the `else` block (as an alternative to the `abs_dirname` function in our `if` block above).
+Here we declare the version of `abs_dirname` from the `else` block.  We declared a similar function in our `if` block above, but that function made a single call to the `realpath` function.  We use a `while` loop to repeatedly call `greadlink` or `readlink` (depending on which one was found first on our system).
 
 The first two lines of code in our function body are:
 
@@ -631,12 +668,10 @@ local path="$1"
 
 We declare two local variables:
 
- - A var named `cwd`.
-    - This likely stands for "current working directory".
-    - Here we store the absolute directory of whichever directory we're currently in when we run the `rbenv` command.
  - A var named `path`, which contains the first argument we pass to `abs_dirname`.
+ - A var named `cwd`.  Since the content of `cwd` is the value of `$PWD`, we can assume that `cwd` stands for "current working directory".
 
-We can prove that `"$PWD"` resolves to the directory from which we run `rbenv`, **not** the directory containing the `libexec/rbenv` file, by running another experiment.
+`"$PWD"` resolves to the directory from which we run `rbenv`, **not** the directory containing the `libexec/rbenv` file.  We can prove this by running another experiment.
 
 ### Experiment- which directory does `"$PWD"` resolve to?
 
@@ -668,7 +703,7 @@ $ ./OpenSource/foo
 
 After we `cd ..`, we no longer see `/OpenSource` at the end of the `echo`'ed output.  This means that the value of `"$PWD"` depends on where the env var is printed from, **not** the location of the script that invokes it.
 
-### Resolving the canonical filepath
+## Resolving the canonical filepath
 
 ```
 while [ -n "$path" ]; do
@@ -676,9 +711,7 @@ while [ -n "$path" ]; do
 done
 ```
 
-In other words, while the length of our `path` local variable is greater than zero, we do...something.
-
-That something is contained in the next block of code:
+In other words, while the length of our `path` local variable is greater than zero, we execute the code contained in the loop.  That code is:
 
 ```
 cd "${path%/*}"
@@ -706,7 +739,16 @@ So on the 2nd line of the `while` loop, we create a local variable called `name`
 
 Lastly, we call `resolve_link "$name"` to see whether the filename stored in `"$name"` is a symlink or not.  Now we see our `resolve_link` function in-use.
 
-If the file represented by `"$name"` is a symlink, then we store the name of the file it points to in `path` and perform another iteration of the `while` loop (since `[ -n "$path" ]` is still true as long as `path` is non-empty).  If it's not a symlink, `resolve_link "$name"` will return an empty string, the `while` condition will become falsy, and we will exit out of the loop.
+If the file represented by `"$name"` is a symlink, then we:
+
+ - store the name of the file it points to in `path`, and
+ - perform another iteration of the `while` loop (since `[ -n "$path" ]` is still true as long as `path` is non-empty).
+
+If it's not a symlink, then:
+
+ - `resolve_link "$name"` will return an empty string,
+ - the `while` condition will become falsy, and
+ - we will exit out of the loop.
 
 
 At this point, we can conclude that the `abs_dirname` function declared in the `else` block is functionally equivalent to the same function declared in the `if` block, in which case the goal is to resolve any symlinks to their canonical, non-symlink file.
@@ -735,7 +777,7 @@ I Google `bash "|| true"`, and I see a StackOverflow post with [this answer](htt
 
 So even though `$path` resolves to an empty value, the `resolve_link` function could still end up triggering an error, which would cause the script to exit due to our use of `set -e` at the beginning of the script.  We don't want that, so we gracefully handle any potential error with `|| true`.
 
-### Wrapping up the `abs_dirname` function
+## Wrapping up the `abs_dirname` function
 
 So we were right- the purpose of the `while` link is to allow us to keep `cd`ing until we've arrived at the real, non-symlink home of the command represented by the `$name` variable (in our case, `rbenv`).  When that happens, we exit the `while` loop and run the last two lines in the function:
 
@@ -744,11 +786,11 @@ pwd
 cd "$cwd"
 ```
 
-`pwd` stands for `print working directory`, which means we `echo` the directory we're currently in, after having `cd`'ed into the canonical .  After we `echo` that, we `cd` back into the directory we were in before we started the `while` loop.
+`pwd` stands for `print working directory`, which means we `echo` the directory we're currently in, after having `cd`'ed into the canonical file's parent directory.  After we `echo` that, we `cd` back into the directory we were in before we started the `while` loop.
 
 The purpose here is to `echo` the current directory, so that this can be captured by command substitution, without moving the user to a new directory as a side effect of calling the function.
 
-### "Return values" from `bash` functions
+## "Return values" from `bash` functions
 
 Remember, the return value of a `bash` function is **not** the result of the last line of code in the function.  Technically, it's the exit code of the function.  The *output* of a function (i.e. what you can capture via command substitution) is whatever is `echo`'ed while inside the function.
 
@@ -789,7 +831,7 @@ value before:
 value after: Hey there
 ```
 
-So it looks like, when we don't make a variable local inside a function, its scope does indeed become global, and we can access it outside the function.
+So it looks like, when we don't make a variable local inside a function, its scope does indeed become global, and we can access it outside the function.  We saw this same behavior earlier, when we experimented with the `local` keyword.
 
 ### Experiment- using command substitution to return a value from a function
 
