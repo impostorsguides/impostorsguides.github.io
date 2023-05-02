@@ -1,0 +1,23 @@
+ed1a3a554585799cd0537c6a5678f6c793145b8e
+
+Author: Mislav Marohnić <git@mislav.net>
+Date:   Thu Sep 29 15:27:17 2022 +0200
+
+    Switch back to resolving symlinks for `rbenv` executable (#1439)
+
+    Considerations:
+
+    - `./libexec/rbenv` executable is the entrypoint to the program;
+
+    - BASH_SOURCE might be the path to a symlink that has activated `./libexec/rbenv`;
+
+    - We must resolve the symlink to learn where rbenv's libexec directory is;
+
+    - It's not guaranteed that rbenv commands will always remain directly under their own "libexec" directory, since a package maintainer can change that, e.g. rbenv commands are sometimes placed into `/usr/libexec/rbenv/*`;
+
+    - Resolving symlinks might fail and in that case we just assume rbenv project layout.
+
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+
