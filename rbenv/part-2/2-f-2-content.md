@@ -1,8 +1,9 @@
-TODO: figure out why this file has multiple case statements, each of which prints one section of the shell function, instead of one case statement that prints each shell's function in its entirety.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init){:target="_blank" rel="noopener"}
+Link to the code [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init){:target="_blank" rel="noopener"}.
 
-First few lines of code are:
+## Setup
+
+The first few lines of code are:
 
 ```
 #!/usr/bin/env bash
@@ -13,12 +14,16 @@ set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 ```
 
-We have our shebang, which tells us we're in bash-land.
-We have 2 lines of comments, which tell us what this command does and how to invoke it.
-We have our old friend, `set -e`, which tells the shell to stop execution and exit immediately if an error is raised.
-The last line checks if the `$RBENV_DEBUG` env var is set, and if it is, to set the shell's verbose option so that things like the line of code and its location are output to the screen.
+We see the following:
 
-<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+ - Our shebang, which tells UNIX to interpret the code using `bash`.
+ - "Summary" and "Usage" comments.  These comments are actually used to print the output of the `rbenv-help` command, as we'll see when we read through that command's code.
+ - The `set -e` command, which as we know, tells the shell to stop execution and exit immediately if an error is raised.
+ - The last line checks if the `$RBENV_DEBUG` env var is set, and if it is, we turn on `xtrace` mode so that the filename and line of code are printed for each line of code that is executed.
+
+ We'll encounter this code throughout most if not all of the command files.  We'll breeze through future instances of this setup step very quickly.
+
+## Completions Code
 
 Next block of code is:
 
@@ -35,7 +40,11 @@ if [ "$1" = "--complete" ]; then
 fi
 ```
 
-The first line is a comment which seems to say that this block of code adds completion functionality.  But that doesn't appear to be what the code actually does.  Instead, it first checks whether the first argument to `init` is the string "--complete".  If it is, it just `echo`'s some strings to the screen and then exits.  I'm able to reproduce this by running a simple `rbenv init --complete` in my terminal:
+The first line is a comment which tells us the intention of this code.
+
+The next line is a test which checks whether the first argument to `init` is the string "--complete".  If it is, it just `echo`'s some strings to the screen and then exits.  These strings correspond to the valid arguments that `rbenv init` accepts.
+
+I'm able to reproduce this by running a simple `rbenv init --complete` in my terminal:
 
 ```
 $ rbenv init --complete
@@ -48,179 +57,140 @@ ksh
 zsh
 ```
 
-I think resolving my confusion here would involve doing a Github history dive.  Again, I don't want to get too sidetracked here, so I timebox it for 10 minutes.
+These arguments correspond to the 4 shells that RBENV supports (`bash`, `fish`, `ksh`, and `zsh`), plus the `-` argument and the `--no-rehash` argument, both of which we'll examine later in this file.
 
-I find [the PR which introduced the code](https://github.com/rbenv/rbenv/pull/822){:target="_blank" rel="noopener"}.  It doesn't contain any comments around this section of the diff, but it does contain a comment that catches my eye:
+## The 'print' and 'no_rehash' variables
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-732am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I've never heard of "magic comments" before.  Does this imply that this comment isn't *just* a comment, but is in fact picked up by an interpreter too?
-
-After a quick search of the codebase for "provide rbenv completions", it looks like [the answer is yes](https://github.com/rbenv/rbenv/blob/d604acb78aeba583be95f08d45eeae430372beb9/libexec/rbenv-completions#L23){:target="_blank" rel="noopener"}.  I don't want to get too in the weeds now, so I add it to my list of questions to answer later.
-
-But I still have my larger question of why we're `echo`ing the names of different shells here, along with the `--no-rehash` flag and the `-` symbol.
-
-I do recall that `rbenv init` is part of the `eval` command (i.e. `eval "$(rbenv init - )" `) that I've often run when, for example, adding tracer statements to my actual version of `rbenv`.  I try replacing the `-` with `--complete` in this code and running it directly in my terminal:
+Next block of code:
 
 ```
-$ eval "$( rbenv init --complete )"
-
-zsh: command not found: --no-rehash
-
-The default interactive shell is now zsh.
-To update your account to use zsh, please run `chsh -s /bin/zsh`.
-For more details, please visit https://support.apple.com/kb/HT208050.
-
-bash-3.2$ echo $0
-bash
+print=""
+no_rehash=""
+for args in "$@"
+do
+...
+done
 ```
+Pretty straightforward.  We're declaring two variables (`print` and `no_rehash`), setting them to empty strings, then iterating over each arg in the list of args sent to `rbenv init`.
 
-It looks like the only thing this did was change my command prompt and create a `bash` shell.  I kill this terminal tab because I want my old shell prompt back, and re-assess.
-
-I realize I don't even know for sure in what order the different command files are run.  Initially I thought the `rbenv` file is run first.  But then I realized that the `init` command defines a function called `rbenv`, which internally calls the `rbenv` command.
-
-I'm now well past my 10-minute timebox, but I think it's important to at least figure out the order in which files are executed.  I hypothesize that a good place to start is to add tracer statements in various files (including `rbenv` as well as `rbenv-init` and maybe a few others), then open a new terminal.  Since the above `eval` command is located in my `~/.zshrc` file, opening a new terminal will kick off the initialization of RBENV, which in turn should show us the order in which the files with tracer statements are executed.
-
-I add a line to the start of the `rbenv` file:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-736am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-When I open a new tab, I see it run:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-738am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I then add a tracer to the beginning of "rbenv-init":
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-739am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-When I open I new terminal, I see this:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-740am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I then add a tracer to the first line of the `rbenv` shell function:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-741am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-When I open a new tab, I see the following:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-742am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-So my 3rd of 3 tracers does not show up on a terminal start.  This seems to mean that neither the `init` script nor the `rbenv` script execute the `rbenv` shell function.  When I try to run a command, I see the following:
+Inside the `for` loop, we see:
 
 ```
-$ rbenv global
+  if [ "$args" = "-" ]; then
+    print=1
+    shift
+  fi
 
-inside rbenv shell function
-start of rbenv file
-2.7.5
+  if [ "$args" = "--no-rehash" ]; then
+    no_rehash=1
+    shift
+  fi
+```
+For each of the args, we check whether the arg is equal to either the "-" string or the "--no-rehash" string.  If the first condition is true, we set the "print" variable equal to 1.  If the 2nd condition is true, we set the "no_rehash" variable equal to 1.  Otherwise, they remain empty strings.
+
+These variables will be used later in the file.
+
+## Specifying The User's Shell
+
+Next lines of code:
+
+```
+shell="$1"
+if [ -z "$shell" ]; then
+  shell="$(ps -p "$PPID" -o 'args=' 2>/dev/null || true)"
+  shell="${shell%% *}"
+  shell="${shell##-}"
+  shell="${shell:-$SHELL}"
+  shell="${shell##*/}"
+  shell="${shell%%-*}"
+fi
 ```
 
-OK, so this is the first time we see the function being executed.
+We grab the 1st argument, and we store it in a variable named `shell`.  The value we store may be the original value of `"$1"` or a new one, depending on whether `shift` was called in the previous `for` loop.
 
-I'm curious whether `rbenv-init` or `rbenv` finishes executing first.  I add tracer statements to the ends of both files.  Here's `rbenv-init`:
+If that argument was empty, we assume that the user didn't manually specify which shell they're using.  In that case, we set it for them.  We run the command `ps -p "$PPID" -o 'args='`, and then progressively whittle down the value of this output, until we get to just the name of the user's shell.
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-743am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
+To see in detail what happens here, I add a bunch of `echo` statements to [this `if`-block](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L35-L42){:target="_blank" rel="noopener"}, so that it looks like this:
 
-And here's the "rbenv" file:
+```
+shell="$1"
+>&2 echo "initial shell: $shell"                           # I added this line
+if [ -z "$shell" ]; then
+  shell="$(ps -p "$PPID" -o 'args=' 2>/dev/null || true)"
+  >&2 echo "shell1: $shell"                                # I added this line
+  shell="${shell%% *}"
+  >&2 echo "shell2: $shell"                                # I added this line
+  shell="${shell##-}"
+  >&2 echo "shell3: $shell"                                # I added this line
+  shell="${shell:-$SHELL}"
+  >&2 echo "shell4: $shell"                                # I added this line
+  shell="${shell##*/}"
+  >&2 echo "shell5: $shell"                                # I added this line
+  shell="${shell%%-*}"
+  >&2 echo "shell6: $shell"                                # I added this line
+fi
+```
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-744am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
+Since the code I edited is the code for my actual RBENV installation (i.e. it's located at `~/.rbenv/libexec/rbenv-init`), and since I have `eval "$(rbenv init -)"` included in my `~/.zshrc` file, I know that these `echo` statements will be executed if I open a new ZSH tab.
 
-Opening a new tab, I see:
+When I do so, I get:
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-745am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
+```
+Last login: Fri May  5 12:54:42 on ttys020
+initial shell:
+shell1: -zsh
+shell2: -zsh
+shell3: zsh
+shell4: zsh
+shell5: zsh
+shell6: zsh
+$
+```
 
-Hmm, so we see the start of both files, but the end of only "rbenv-init", not "rbenv".  Does it exit before it hits my tracer?
+Since I didn't pass `zsh` to the code `eval "$(rbenv init -)"` in my ZSH config file, we see that the value of `initial shell` is empty, and the remaining `echo` statements for `shell1`, `shell2`, etc. are executed.
 
-I add a few more tracers to "rbenv", including the ones on lines 123 and 131:
+If I open `~/.zshrc` and change `eval "$(rbenv init - )"` to `eval "$(rbenv init - zsh)"`, and open another new terminal tab, I see:
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-746am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
+```
+Last login: Fri May  5 12:55:03 on ttys020
+initial shell: zsh
+$
+```
 
-Opening a new tab results in:
+Since `shell="$1"` stores the string `zsh` (as proven by `initial shell: zsh`), the condition check `if [ -z "$shell" ];` returns false, and the code inside the `if`-block is not executed.
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-747am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
+On my machine, the final value of `"$shell"` was known by the time we hit the third parameter expansion (i.e. the value that was `echo`'ed for `shell3`).  This might not be true on everyone's machine, however.  Hence this series of parameter expansions inside that `if`-block, whose purpose is to handle output for `$(ps -p "$PPID" -o 'args=' 2>/dev/null || true)` **regardless of the machine** on which the code is run.
 
-So we get all the way up to "just before execution of..." in the "rbenv" file, but no further.
+Let's remove the `echo` statements we just added, and move on to the next line of code.
 
-Oh, I think I know what's going on.  The line after line 131 in "rbenv" is an "exec" command.  "exec" will exit after it finishes executing the given command.  I think we actually encountered this before.  See the following terminal experiment:
+## Grabbing the Root Dir
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-748am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
+```
+root="${0%/*}/.."
+```
 
-So the process (in this case, the execution of the "rbenv" script) exits before we can run the tracer statement on line 137.
+In a bash script, both `$0` and `${0}` resolve to the name of the file that's being run.  Adding `%/*` just trims off everything from the final `/` character to the end of the string.  Let's echo a few relevant values to see what we're working with:
 
-I form another hypothesis after viewing more of the "if/else" logic before the "end of rbenv file" tracer:
+```
+root="${0%/*}/.."
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-749am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
+echo "arg 0 pre-expansion: ${0}" >&2
+echo "arg 0 post-expansion: ${0%/*}" >&2
+echo "root: $root" >&2
+```
 
-I see that line 126 only "echo"s, it doesn't "exec".  The conditional seems to be structured so that, if this "if" branch is reached, the "echo" command would run and then the entire "case" statement would break, leaving the last tracer statement to be executed.  The way to reach line 126 is to make sure that a) the "rbenv" command I run begins with "sh-", b) that it's a valid command, and c) the first argument that I pass to my "sh-" command is "--help".  I know "sh-shell" is a valid command, so I run "rbenv sh-shell --help" in my terminal, and get the following:
+Opening a new tab, we see:
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-750am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
+```
+arg 0 pre-expansion: /Users/myusername/.rbenv/libexec/rbenv-init
+arg 0 post-expansion: /Users/myusername/.rbenv/libexec
+root: /Users/myusername/.rbenv/libexec/..
+```
 
-Success- we see the "end of rbenv file" tracer!
+We see the `rbenv-init` file, its parent directory, and the final value of `$root`.  The name "root" makes sense, because it's the root directory of RBENV.
 
-I also notice that we seem to go from the "rbenv-init" file, *back to* the "rbenv" file.  I see this because the 2nd tracer statement above is "inside rbenv-init, just before 'command rbenv'", then the 3rd tracer is "start of rbenv file".  I actually know why this is, because I read [a post on StackExchange](https://web.archive.org/web/20220203113040/https://askubuntu.com/questions/512770/what-is-use-of-command-command){:target="_blank" rel="noopener"} earlier today which explains what the `command` command does:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-751am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-The important thing that I get from this answer is that, if we want to make sure the `rbenv` we're running is our `rbenv` *file* (instead of the `rbenv()` *function*), we need to use `command rbenv` instead of `rbenv` by itself.  This tells the shell to skip any pre-defined shell functions (including `rbenv()`) when looking for the right executable to use.
-
-OK, so now I feel like I have a slightly better understanding of what gets executed when.  But I still don't know what the intention is behind all the `echo` statements in the `completion` code.  I decide to add more tracer statements, this time to the list of `echo`'ed shell apps...
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-752am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-...as well as the beginning of the `rbenv-completions` file:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-753am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I try a few rbenv commands with the "--complete" flag added at the end:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-754am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I don't see my "completions" tracer anywhere, but I do see "inside --complete of rbenv-init" when I run "rbenv-init --complete".  The only time I see my "completions" tracer is when running "rbenv completions –complete":
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-13mar2023-755am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I thought based on the comment (`# Provide rbenv completions`) that this was meant to actually do some sort of initialization, which implies that the `echo` statements were consumed by some higher-level caller and `exec`'ed.  But based on what we've seen so far, especially when running the "rbenv init --complete" command, I think it's safe to say that the purpose of this "if" block really is as simple as it seems- to simply provide a list of possible arguments you can pass to (in this case) the "rbenv init" command.  I guess I was thrown off by the word "Provide"- I interpreted it to mean "initialize", when really it just meant "print out for the user".
-
-I remove all the tracer statements I've added up to this point, verify that they don't appear when I run any `rbenv` commands from a new terminal tab, and move on.
+This variable isn't used until later, when we look for a file whose job is to enable [tab completion](https://web.archive.org/web/20230330150603/https://en.wikipedia.org/wiki/Command-line_completion){:target="_blank" rel="noopener"} in the terminal.  We can ignore `root` for now.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Let's move on.

@@ -38,4 +38,10 @@ In the process of learning about this command, we talked about:
 
 What should we do next?
 
-Normally I'd want to copy the order in which the files appear in the "libexec" directory, which would mean looking at `rbenv---version` next.  But given what we saw with `rbenv-init` and how it has a big effect on the execution of `rbenv`, I think it makes more sense to start there and come back to `rbenv---version` afterward.
+Normally I'd want to copy the order in which the files appear in the "libexec" directory, which would mean looking at `rbenv---version` next.  But I still have questions around shell integration and the `rbenv-init` file, mainly:
+
+ - Why would someone **not** want to enable shell integration?
+ - What's the downside of enabling it?
+ - How would you use RBENV without it?
+
+I think it makes more sense to start with `rbenv-init` and come back to `rbenv---version` afterward.

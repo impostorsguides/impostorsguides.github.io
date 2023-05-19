@@ -1,3 +1,5 @@
+TODO- does this post cover the reason why we clear the shell cache [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-sh-rehash#L21){:target="_blank" rel="noopener"}?  If not, it's because of [this issue](https://github.com/rbenv/rbenv/issues/119){:target="_blank" rel="noopener"}.  Consider adding context around that.
+
 From the README.md file, we see a description for this command:
 
 <p style="text-align: center">

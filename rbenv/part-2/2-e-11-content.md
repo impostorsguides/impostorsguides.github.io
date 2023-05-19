@@ -105,9 +105,9 @@ rbenv 1.2.0-16-gc4395e5
 
 ### Version Numbers
 
-In the output `1.2.0-16-gc4395e5`, the `1.2.0` represent the major, minor, and patch versions, in accordance with [semantic versioning](https://semver.org/){:target="_blank" rel="noopener"} (or SemVer, for short).  You might also be asking what `16-gc4395e5` represent.  I know I did.
+In the output `1.2.0-16-gc4395e5`, the `1.2.0` represent the major, minor, and patch versions, in accordance with [semantic versioning](https://semver.org/){:target="_blank" rel="noopener"} (or SemVer, for short).
 
-I wasn't sure what to Google here, so I asked ChatGPT instead:
+You might also be asking what `16-gc4395e5` represents.  I wasn't sure either, and I didn't know what to Google, so I asked ChatGPT:
 
 <center style="margin-bottom: 3em">
   <a target="_blank" href="/assets/images/screenshot-2may2023-957am.png">
@@ -117,7 +117,7 @@ I wasn't sure what to Google here, so I asked ChatGPT instead:
 
 According to ChatGPT, `16` is the number of commits since the last release of RBENV, and `gc4395e5` is a reference to the SHA that we're currently pointing to (`c4395e58201966d9f90c12bd6b7342e389e7a4cb`) plus a `g` at the end to indicate that there are changes in our version which are not yet released.
 
-We can verify this by running a `git log` to find the previous commits and their SHAs, checking one of them out, and re-running `rbenv --version`:
+We can double-check this by running a `git log` to find the previous commits and their SHAs, checking one of them out, and re-running `rbenv --version`:
 
 ```
 commit c4395e58201966d9f90c12bd6b7342e389e7a4cb (HEAD -> impostorsguides)
@@ -392,7 +392,7 @@ Moving on to the next line of code:
 ```
 shift 1
 ```
-This just shifts the first argument off the list of `rbenv`'s arguments.  The argument we're removing was previously stored in the `command` variable, and we've already processed it so we don't need it anymore.
+This just shifts the first argument off the list of `rbenv`'s arguments.  The argument we're removing was previously stored in the `command` variable, so we no longer need to reference it with `"$1"`.  The call to `shift` makes it easier to access the next argument, if any.
 
 ## Printing `help` Instructions For The User's Command
 
@@ -627,7 +627,7 @@ $ echo "$FOO"
 $ PATH="$(pwd):$PATH"
 
 $ which sh-foo
-/Users/richiethomas/Workspace/OpenSource/impostorsguides.github.io/sh-foo
+/Users/myusername/Workspace/OpenSource/impostorsguides.github.io/sh-foo
 
 $ eval `sh-foo`
 
@@ -645,7 +645,7 @@ Next, I try running the `bar` script:
 
 $ which bar
 
-/Users/richiethomas/Workspace/OpenSource/impostorsguides.github.io/bar
+/Users/myusername/Workspace/OpenSource/impostorsguides.github.io/bar
 
 $ command bar
 
@@ -701,10 +701,10 @@ When we then run `rbenv local 3.0.0`, we see the following output:
 ```
 $ rbenv local 3.0.0
 
-what gets run: /Users/richiethomas/.rbenv/libexec/rbenv-local 3.0.0
+what gets run: /Users/myusername/.rbenv/libexec/rbenv-local 3.0.0
 ```
 
-So we `exec` the filepath `/Users/richiethomas/.rbenv/libexec/rbenv-local`, and pass `3.0.0` as the one and only arg to this command.
+So we `exec` the filepath `/Users/myusername/.rbenv/libexec/rbenv-local`, and pass `3.0.0` as the one and only arg to this command.
 
 And with that, we've examined how `rbenv` executes the commands in its API!
 
