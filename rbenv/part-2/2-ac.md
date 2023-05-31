@@ -6,8 +6,8 @@ previous-title: "rbenv-whence"
 previous-permalink: /rbenv/commands/whence
 title: "rbenv-which"
 permalink: /rbenv/commands/which
-next-title: "Part 3- Introduction"
-next-permalink: /rbenv/infrastructure/introduction
+next-title: "Commands Summary"
+next-permalink: /rbenv/commands/summary
 ---
 
 {% include_relative 2-ac-content.md %}

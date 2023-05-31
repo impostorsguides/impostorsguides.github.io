@@ -1,5 +1,7 @@
 "The most effective debugging tool is still careful thought, coupled with judiciously placed print statements." — Brian Kernighan, [<u>Unix for Beginners</u>](https://web.archive.org/web/20220122011437/https://wolfram.schneider.org/bsd/7thEdManVol2/beginners/beginners.pdf){:target="_blank" rel="noopener"}.
 
+TODO: include instructions on installing RBENV from the Github repo, as opposed to from Homebrew?
+
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 (Note: this walk-through is based on RBENV version `1.2.0-46-g52acbdf`.  You'll likely need to install that version if you want to follow along on your own machine.  The git SHA for the code I'm analyzing is `c4395e58201966d9f90c12bd6b7342e389e7a4cb`, and you can find the Github repo for this version [here](https://github.com/rbenv/rbenv/tree/c4395e58201966d9f90c12bd6b7342e389e7a4cb){:target="_blank" rel="noopener"}.)

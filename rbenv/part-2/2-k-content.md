@@ -18,30 +18,45 @@ create_executable() {
 }
 ```
 
-We define a helper function called `create_executable`.  This function sets a variable named `name` equal to the first argument.  I'm not sure what the question-mark syntax does, so I Google "bash parameter expansion question mark" and find [this answer on StackOverflow](https://web.archive.org/web/20201128182437/https://stackoverflow.com/questions/8889302/what-is-the-meaning-of-a-question-mark-in-bash-variable-parameter-expansion-as-i){:target="_blank" rel="noopener"}:
+### The `create_executable` helper function
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-329am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
+We start by defining a helper function called `create_executable`.  This function sets a variable named `name` equal to the first argument, but it looks like something else is happening inside the parameter expansion.
+
+#### Storing the name of the executable
+
+I'm not sure what the question-mark syntax does, so I pull up [the bash docs on parameter expansion](https://web.archive.org/web/20230525183815/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"}:
+
+<center style="margin-bottom: 3em">
+  <a target="_blank" href="/assets/images/screenshot-28may2023-834pm.png">
+    <img src="/assets/images/screenshot-28may2023-834pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
+  </a>
+</center>
 
 So with the question mark, we get a specific error message saying that the value of `parameter` (or in our case, `"$1"`) is unset.  I try this in my local `bash` terminal, and I see the following:
 
 ```
 bash-3.2$ unset foo
 
-bash-3.2$ "${foo?}"
+bash-3.2$ "${foo:?}"
 
 bash: foo: parameter null or not set
 
 ```
 
-So the goal is to show the above error if a first param is not passed to `create_executable`.  Otherwise, we store that argument as the variable `name` and `shift` the arg off the argument list.  Next we create a variable named `bin` and set its value as:
+So the goal is to show an error if no params are passed to `create_executable`.  If at least one argument **is** passed, however, we store the first argument as the variable `name` and `shift` the arg off the argument list.
+
+#### Making a directory to store our executable
+
+Next bit of code:
 
 ```
 bin="${RBENV_ROOT}/versions/${RBENV_VERSION}/bin"
+mkdir -p "$bin"
 ```
 
-We then make a directory with the name stored in `bin`.
+ We create a variable named `bin` and set its value to the name of a series of directories and subdirectories.  We then make a directory with the name stored in `bin`, using the `-p` flag to ensure that any intermediary directories which don't yet exist will be created as well.
+
+#### Adding content to our executable file
 
 The next bit is long:
 
@@ -61,21 +76,27 @@ Let's break this into two pieces.  The first piece is:
   }
 ```
 
-This half is wrapped in curly braces, meaning we perform it as a single operation and send its contents to the next half.  What is that output?  Well, we check the length of something called "$#".  If we Google ""$#" bash" and click on [the first result](https://web.archive.org/web/20220516195326/https://askubuntu.com/questions/939620/what-does-mean-in-bash){:target="_blank" rel="noopener"}, we see:
+This half is wrapped in curly braces, meaning we perform it as a single operation and send its contents to the next half.  This is called ["command grouping"](https://web.archive.org/web/20230326002400/https://www.gnu.org/software/bash/manual/html_node/Command-Grouping.html){:target="_blank" rel="noopener"} in `bash`, and we've seen it before (for example, when we defined the `abort` helper function [in `libexec/rbenv`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L16-L19){:target="_blank" rel="noopener"}).
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-334am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
+What is the output of the command grouping?  We start by invoking `$#` and checking if it's equal to 0.  Referring back to [this line of `libexec/rbenv`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L16){:target="_blank" rel="noopener"}, we recall that `$#` expands to the number of arguments that were passed to the `create_executable` function.
 
-So if "$#" (i.e. the # of arguments) is equal to 0, then we `cat -` (i.e. we output whatever the `cat` program receives from STDIN).  Otherwise, if the # of arguments is greater than zero, we `echo $@` (i.e. we print all the arguments to STDOUT).
+So if the # of arguments is equal to 0, then we `cat -`.  Again referring back to [that same line of `libexec/rbenv`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L16){:target="_blank" rel="noopener"}, we recall that `cat -` reads from `stdin` and redirects its input to `stdout`.
 
-The 2nd half of the above block is:
+On the other hand, if the # of arguments is **greater than** zero, we `echo $@` (i.e. we print all the arguments to STDOUT).
+
+So to summarize the output of the command grouping- we either print the content passed from `stdin` if no arguments were passed to `create_executable`, or we print the arguments if there were any.
+
+That output gets piped via `|` to the 2nd half of this block of code.  That block is:
 
 ```
- | sed -Ee '1s/^ +//' > "${bin}/$name"
+sed -Ee '1s/^ +//' > "${bin}/$name"
 ```
 
-The `sed` command is a string editor command.  It takes a block of text and a series of commands, and runs the commands on each line of text from the block.  From the `man sed` page:
+##### The `sed` command
+
+First up- what is `sed`?
+
+From the `man sed` page:
 
 ```
 SED(1)                                                                       General Commands Manual                                                                      SED(1)
@@ -106,26 +127,83 @@ DESCRIPTION
              Append the editing commands specified by the command argument to the list of commands.
 ```
 
-The "-e" flag means we should be able to pass multiple `sed` commands here, but it looks like we're only passing one: '1s/^ +//' .  This command says to look at just line # 1, and delete any spaces at the start of that line (i.e. replace those spaces with the empty string).  We can test this by creating a file named "bar" that looks as follows:
+So the `sed` command is a string editor command.  It takes a block of text and a series of commands, and runs the commands on each line of text from the block.
+
+##### The `-E` flag
+
+According to the above `man` entry, the `-E` flag tells UNIX to treat the regular expression as a more modern version called an "extended regular expression", rather than an older version called a "basic regular expression".  [According to `gnu.org`](https://web.archive.org/web/20230524114622/https://www.gnu.org/software/sed/manual/sed.html){:target="_blank" rel="noopener"}:
+
+> Extended regexps are those that egrep accepts; they can be clearer because they usually have fewer backslashes.
+
+##### The `-e` flag
+
+According to [StackOverflow](https://unix.stackexchange.com/a/33159/142469){:target="_blank" rel="noopener"}, the `-e` flag means we should be able to pass multiple `sed` commands, chaining them together one after another.  However, it looks like we're only passing one.
+
+##### Reading the regexp pattern
+
+The one and only regexp that we pass to `sed` is:
+
+```
+`'1s/^ +//'`
+```
+
+Most regexps that I encounter are very specific to the concise use case they're being applied toward, making them notoriously hard to Google unless that use case is a very common one among programmers.  So in this case, I decide to ask ChatGPT what this pattern does:
+
+<center style="margin-bottom: 3em">
+  <a target="_blank" href="/assets/images/screenshot-29may2023-1209pm.png">
+    <img src="/assets/images/screenshot-29may2023-1209pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
+  </a>
+</center>
+
+From ChatGPT's answer, we learn that:
+
+ - `1` refers to the line number to which we want to apply the regexp pattern.  This is confirmed in the documentation for `sed`, [in Section 4.1 titled `Addresses overview`](https://web.archive.org/web/20230524114622/https://www.gnu.org/software/sed/manual/sed.html#Addresses-overview){:target="_blank" rel="noopener"}.
+- `s/` indicates we'll be performing a search-and-replace operation, finding some text which matches one pattern and replacing it with something else.  In the `sed` docs, this is covered in [section 3.3 ("The `s` command")](https://web.archive.org/web/20230524114622/https://www.gnu.org/software/sed/manual/sed.html#The-_0022s_0022-Command){:target="_blank" rel="noopener"}.
+- The `^` caret character after `/` tells `sed` that the subsequent pattern must start at the beginning of the line of input.  The docs confirm this [here](https://web.archive.org/web/20230524114622/https://www.gnu.org/software/sed/manual/sed.html#Regular-Expressions-Overview){:target="_blank" rel="noopener"}, in the section "Overview of basic regular expression syntax".
+  - Although this section deals with basic regular expressions (not extended ones), [the section on extended regular expression syntax](https://web.archive.org/web/20230524114622/https://www.gnu.org/software/sed/manual/sed.html#ERE-syntax){:target="_blank" rel="noopener"} says that `The only difference between basic and extended regular expressions is in the behavior of a few characters: ‘?’, ‘+’, parentheses, braces (‘{}’), and ‘\|’.`
+  - Therefore, we can safely assume that the `^` character functions the same in both BREs and EREs.
+- `" +"` (i.e. a space followed by a plus sign) means that we want to match against one or more empty-space characters.
+  - Remember that the `+` character **is** one of the characters whose behavior differs between basic vs. extended regular expressions.
+  - In basic regular expressions, we would add a `\` before `+` if we wanted it to be treated as a special character (i.e. to have the "one or more" meaning).
+  - [In extended regular expressions](https://web.archive.org/web/20230524114622/https://www.gnu.org/software/sed/manual/sed.html#ERE-syntax){:target="_blank" rel="noopener"}, it's the opposite- we precede `+` with `\` if we do **not** want it to be treated as a special character.
+- The `//` syntax indicates the content that we want to use to replace the one or more empty spaces that we found.
+  - With no characters in-between the `//`, we indicate that we want to replace those empty spaces with nothing.
+  - In other words, we want to delete them.
+
+To summarize- this command says to look at just line # 1, and delete any spaces at the start of that line (i.e. replace those spaces with the empty string).
+
+Let's test this to prove to ourselves that the above is correct.
+
+##### Experiment- removing empty spaces from a line of output
+
+We create a file named "bar" that looks as follows:
 
 ```
 #!/usr/bin/env bash
 
 echo "   foo"
 echo "   foo"
+echo "   foo"
+echo "   foo"
 echo "bar"
 ```
 
-When we run the file and pipe its output to the same `sed` command, we get:
+When we `chmod +x` our `bar` file, run it, and pipe its output to the same `sed` command, we get:
 
 ```
 $ ./bar | sed -E '1s/^ +//'
 foo
    foo
+   foo
+   foo
 bar
 ```
 
-Lastly, we take the output of the `sed` command, and send it to:
+As we can see, our empty spaces were removed from the first printed `foo` output, but not from the subsequent lines.
+
+##### Sending the output of `sed` to a file
+
+The output of `sed` is then sent to a filename that we specify, like so:
 
 ```
 > "${bin}/$name"
@@ -133,13 +211,17 @@ Lastly, we take the output of the `sed` command, and send it to:
 
 This means that the output from `sed` gets written to a file with the name of our `name` variable, inside the directory with the name of our `bin` variable.
 
-Lastly:
+#### Making our new file executable
+
+Last line of code in our `create_executable` function:
 
 ```
 chmod +x "${bin}/$name"
 ```
 
-We give the current user permission to execute the newly-created file.
+We give the current user permission to execute the newly-created file via the `chmod +x` command.
+
+### Invalid version number (provided by an env var)
 
 With the `create_executable` file out of the way, the next block of code is our first test:
 
@@ -151,7 +233,15 @@ With the `create_executable` file out of the way, the next block of code is our 
 }
 ```
 
-This test covers the failure mode of attempting to run a command with a Ruby version that's not installed.  We set the `RBENV_VERSION` to "2.0" without having first stubbed out a Ruby installation for version 2.0.  We then run the command "ruby -v" using "rbenv exec".  If we had stubbed out v2.0 of Ruby, we could expect to see "2.0" or equivalent in STDOUT.  Because we have not done this stubbing, however, we expect our command to fail with an error message indicating that this Ruby version is not installed.
+This test covers the failure mode of attempting to run a command with a Ruby version that's not installed:
+
+ - We set the `RBENV_VERSION` to "2.0" without having first stubbed out a Ruby installation for version 2.0.
+ - We then run the command "ruby -v" using "rbenv exec".
+ - If we had stubbed out v2.0 of Ruby, we could expect to see "2.0" or equivalent in STDOUT.
+ - However, because we have not done this stubbing, we expect our command to fail with an error message indicating that this Ruby version is not installed.
+ - Note that the error message also tells us that the invalid version number was provided by the `RBENV_VERSION` environment variable.
+
+### Invalid version number (provided by a `.ruby-version` file)
 
 Next test:
 
@@ -165,7 +255,15 @@ Next test:
 }
 ```
 
-This test is similar to the previous one, except this time we're setting the incorrect Ruby version via the ".ruby-version" file instead of via an environment variable.  We run a command via "rbenv exec" (this time it's the "rspec" command, but it doesn't really matter since either way the Ruby version is checked first), and we expect the same error message.  This time the error indicates that the Ruby version was set by the ".ruby-version" file, whereas in the last test the error message indicated that the version was set by the environment variable.  But the end result is the same.
+This test is similar to the previous one, except this time we're setting the incorrect Ruby version via the ".ruby-version" file instead of via an environment variable:
+- We make a test directory and `cd` into it.
+- Inside that test directory, we make a `.rbenv-version` file and populate it with a version of Ruby that our setup steps did not specifically install.
+- We run a command via "rbenv exec".
+- This time it's the "rspec" command, but it doesn't really matter since either way the Ruby version is checked first.
+- We assert that the command failed, and that we received an error message.
+- Note that this time, the error message also tells us that the invalid version number was provided by the `.ruby-version` file, not by an env var.
+
+### Printing the possible completions for `exec`
 
 Next test:
 
@@ -186,7 +284,14 @@ OUT
 }
 ```
 
-This test appears to cover [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L20-L22){:target="_blank" rel="noopener"}.  We specify the Ruby version and make two executables within RBENV's directory for that version.  We then run `rbenv rehash` to generate the shims for these two new commands, since the completions for `exec` depend on which shims exist.  We then run `rbenv completions` for the `exec` command, and lastly we assert that we get both the "--help" completion and the names of the two executables we just installed.
+This test appears to cover [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L20-L22){:target="_blank" rel="noopener"}.
+
+ - We specify the Ruby version and make two executables within RBENV's directory for that version.
+ - We then run `rbenv rehash` to generate the shims for these two new commands, since the completions for `exec` depend on which shims exist.
+ - We then run `rbenv completions` for the `exec` command.
+ - Lastly, we assert that we get both the "--help" completion and the names of the two executables we just installed.
+
+### Running a hook and respecting the `IFS` value
 
 Next test:
 
@@ -204,9 +309,17 @@ SH
 }
 ```
 
-We've seen a test like this before.  The goal is to cover [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L36-L41){:target="_blank" rel="noopener"}.  We create a hook file whose output depends on certain values being set for the [internal field separator](https://web.archive.org/web/20220715010436/https://www.baeldung.com/linux/ifs-shell-variable){:target="_blank" rel="noopener"}.  We then set the Ruby version to the machine's default version, and run `rbenv exec` with a command that we know will be on the user's machine (the `env` command, which ships with all `bash` terminals).  When we run `rbenv exec`, we set the value of the internal field separator to the characters which our hook depends on in order to produce the expected output.  Lastly, we assert that the command was successful and that the output was printed to STDOUT as expected.
+We've seen a test like this before.  The goal is to cover [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L36-L41){:target="_blank" rel="noopener"}.
 
-(stopping here for the day; 96843 words)
+ - We create a hook file whose output depends on certain values being set for the [internal field separator](https://web.archive.org/web/20220715010436/https://www.baeldung.com/linux/ifs-shell-variable){:target="_blank" rel="noopener"}.
+ - We then set the Ruby version to the machine's default version.
+ - We then run `rbenv exec` with a command that we know will be on the user's machine (the `env` command, which ships with all `bash` terminals).
+ - When we run `rbenv exec`, we set the value of the internal field separator to the characters which our hook depends on in order to produce the expected output.
+ - Lastly, we assert that the command was successful and that the output was printed to STDOUT as expected.
+
+It looks like this test was introduced in response to [this issue](https://github.com/rbenv/rbenv/pull/379){:target="_blank" rel="noopener"}, which reported that [a previous PR](https://github.com/rbenv/rbenv/commit/baf7656){:target="_blank" rel="noopener"} broke the way that plugins behave.
+
+### Forwarding arguments
 
 Next test:
 
@@ -235,20 +348,23 @@ OUT
 }
 ```
 
-This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L47){:target="_blank" rel="noopener"}.  It creates an executable whose logic consists of:
+This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L47){:target="_blank" rel="noopener"}.  It creates an executable named `ruby`, whose logic consists of:
 
- - printing out the "$0" argument, which [expands to the name of the script that's being run](https://web.archive.org/web/20220923182330/https://www.gnu.org/software/bash/manual/html_node/Special-Parameters.html#:~:text=If%20Bash%20is%20invoked%20with,executed%2C%20if%20one%20is%20present.){:target="_blank" rel="noopener"}
- - looping over all the arguments it receives, and printing each one.
+ - A simplified version of our `bash` shebang (using the `$BASH` env var, which evalates to `/bin/bash` on my machine).
+ - A call to print the "$0" argument, which [expands to the name of the script that's being run](https://web.archive.org/web/20220923182330/https://www.gnu.org/software/bash/manual/html_node/Special-Parameters.html#:~:text=If%20Bash%20is%20invoked%20with,executed%2C%20if%20one%20is%20present.){:target="_blank" rel="noopener"}
+ - A loop over all the arguments it receives, printing each one followed by a newline.
 
 We then run `rbenv exec` with the name of that script, passing arguments which are formatted in many different ways:
 
 
- - as a flag ("-w")
+ - as a flag (`-w`)
  - as a string with spaces in it (in this case, resembling a path to a file)
  - as a double-dash ([signifying the end of command options](https://web.archive.org/web/20221023095659/https://unix.stackexchange.com/questions/11376/what-does-double-dash-mean){:target="_blank" rel="noopener"})
- - as just regular ol' arguments ("extra" and "args")
+ - as regular arguments (`extra` and `args`)
 
 Lastly, we assert that the command exited successfully.  We then pass a heredoc string to `assert_output`, ensuring that the arguments printed out the way we expected.
+
+### Special test- ensuring `rbenv exec` respects the `ruby -S` command
 
 Next test:
 
@@ -284,27 +400,100 @@ SH
 }
 ```
 
-This is a huge test.  Let's break it up:
+This is a huge test.  Before we dive into the code, let's figure out what Ruby's `-S` flag is, and when it's useful.
+
+When I type `man ruby` and search for `-S`, eventually I see the following:
+
+```
+     -S             Makes Ruby use the PATH environment variable to search for script, unless its name begins with a slash.  This is used to emulate #! on
+                    machines that don't support it, in the following manner:
+
+                          #! /usr/local/bin/ruby
+                          # This line makes the next one a comment in Ruby \
+                            exec /usr/local/bin/ruby -S $0 $*
+
+                    On some systems $0 does not always contain the full pathname, so you need the -S switch to tell Ruby to search for the script if necessary
+                    (to handle embedded spaces and such).  A better construct than $* would be ${1+"$@"}, but it does not work if the script is being
+                    interpreted by csh(1).
+```
+
+OK, so some machines don't support the use of `#!` shebangs, and the goal of the `-S` flag is to be able to overcome this obstacle, enabling the execution of a Ruby script on those machines too.
+
+After a bit of digging, I found [this PR](https://github.com/rbenv/rbenv/issues/14){:target="_blank" rel="noopener"} with the following description:
+
+<center style="margin-bottom: 3em">
+  <a target="_blank" href="/assets/images/screenshot-29may2023-448pm.png">
+    <img src="/assets/images/screenshot-29may2023-448pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
+  </a>
+</center>
+
+I don't see any hints about this in [the original PR](https://github.com/rbenv/rbenv/commit/4b6ab0389b5b5401ca530f3edbef024972b943fc){:target="_blank" rel="noopener"}, so we'll have to make inferences and best guesses.
+
+The above Github issue reported the following error:
+
+```
+/Users/sam/.rbenv/versions/1.9.3-preview1/bin/ruby -S rake  -r /private/tmp/ruby-build.10166-13998/rubinius-1.2.4/config.rb -r /private/tmp/ruby-build.10166-13998/rubinius-1.2.4/rakelib/ext_helper.rb -r /private/tmp/ruby-build.10166-13998/rubinius-1.2.4/rakelib/dependency_grapher.rb build:mri
+/Users/sam/.rbenv/versions/1.9.3-preview1/bin/ruby: no Ruby script found in input (LoadError)
+rake aborted!
+Command failed with status (1): [/Users/sam/.rbenv/versions/1.9.3-preview1/...]
+```
+
+In particular, the command which triggered the error was:
+
+```
+/Users/sam/.rbenv/versions/1.9.3-preview1/bin/ruby -S rake ...
+```
+
+This must have been happening because (on a machine using RBENV) the `rake` executable that was found by `ruby -S` was the `rake` shim that RBENV generated.  This shim would have had a `bash` shebang, not a `ruby` shebang.  This caused Ruby to return the error `no Ruby script found in input (LoadError)`.
+
+We can replicate this error by making a script named `foo`, containing the following:
+
+```
+#!/usr/bin/env bash
+
+echo 'Hello world'
+```
+
+If we try to execute this script using `ruby`, we get the same error:
+
+```
+$ ruby foo
+
+ruby: no Ruby script found in input (LoadError)
+```
+
+So the goal of the test is to ensure that RBENV's shims to play nice with programs such as Rubinius, which make use of the `-S` flag (for what reason, I'm not sure yet, but we can skip that for now).
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Now to return to the test code:
 
 ```
 export RBENV_VERSION="2.0"
 ```
 
-We set the Ruby version equal to "2.0".
+We start by setting RBENV's Ruby version equal to "2.0", because the `create_executable` function depends on that value being set in order to know which directory to store the executable in.
+
+Next:
 
 ```
+# emulate `ruby -S' behavior
 create_executable "ruby" <<SH
 ...
 SH
 ```
 
-We create an executable named "ruby" using our `create_executable` helper function, and set its contents equal to a heredoc string.  That heredoc string contains:
+We create an executable named "ruby" using our `create_executable` helper function, and set its contents equal to a heredoc string.  The `create_executable` function will use the `RBENV_VERSION` value that we just set.
+
+The comment above the function invocation tells us that this executable is meant to emulate the `-S` behavior of the real `ruby` command.  I'm going to assume it's a safe assumption that it disregards any behavior not immediately relevant to that flag, in order to act as a minimally-viable test.
+
+The heredoc string representing our pared-down `ruby` command contains:
 
 ```
 #!$BASH
 ```
 
-A simple shebang pointing to the `bash` executable.
+A simple shebang pointing to the `bash` executable.  Inside our `bash` shell, `$BASH` evaluates to the path to the `bash` executable, for example `/bin/bash`.
 
 ```
 if [[ \$1 == "-S"* ]]; then
@@ -314,37 +503,33 @@ else
 fi
 ```
 
-An `if/else` conditional.  Let's get the `else` condition out of the way first, since that's easy.  If the condition is false, we print the string 'ruby 2.0 (rbenv test)'.
+An `if/else` conditional.  If the user's command starts with `-S`, we execute the `if` branch.  Otherwise, we execute the `else` branch.
 
-What do we do if the condition is true?  And what *is* the condition, anyway?  To answer that, one thing to highlight is the use of double-brackets for the conditional test, as opposed to single brackets.  Single-brackets are usable in any POSIX-compliant shell.  But they have sharper edges and aren't as safe to use as double-brackets, [according to StackOverflow](https://web.archive.org/web/20221031220510/https://stackoverflow.com/questions/669452/are-double-square-brackets-preferable-over-single-square-brackets-in-b){:target="_blank" rel="noopener"}:
+Let's get the `else` condition out of the way first, since that's easy.  If the condition is false, we print the string `ruby 2.0 (rbenv test)`.
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-338am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-339am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-This double-bracket syntax is being used for pattern-matching purposes, *not* for equality-checking purposes.  It checks whether the first argument to the executable contains the pattern "-S".
-
-What do we do if the "-S" flag is passed?
+What do we do if the condition is true?
 
 ```
 found="\$(PATH="\${RUBYPATH:-\$PATH}" which \$2)"
 ```
 
-First we create a variable named "found" and store... something in it?  Not sure.  I add some `echo` statements to find out:
+First we create a variable named `found` and store something in it.  But what?
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-340am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
+I add some `echo` statements to find out:
+
+<center style="margin-bottom: 3em">
+  <a target="_blank" href="/assets/images/screenshot-15mar2023-340am.png">
+    <img src="/assets/images/screenshot-15mar2023-340am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
+  </a>
+</center>
 
 When I re-run the test and `cat result.txt`, I get:
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-341am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
+<center style="margin-bottom: 3em">
+  <a target="_blank" href="/assets/images/screenshot-15mar2023-341am.png">
+    <img src="/assets/images/screenshot-15mar2023-341am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
+  </a>
+</center>
 
 OK, so the thing which eventually gets stored in "found" is:
 
@@ -354,8 +539,8 @@ OK, so the thing which eventually gets stored in "found" is:
 
 Now, the reason there are so many additional `echo` statements is so I can answer my remaining two questions, which are:
 
-How did this get constructed, and
-What is it used for?
+ - How did this get constructed, and
+ - What is it used for?
 
 From the text of "result.txt", we know that "RUBYPATH" is an empty variable, and PATH is not.  So the value that we pass as `PATH` to the `which` command is the original `PATH` value, not the empty `RUBYPATH`.
 
@@ -412,7 +597,7 @@ The above is what `\$BASH "\$found"` [here](https://github.com/rbenv/rbenv/blob/
 ...using the `bash` program:
 
 ```
-`/bin/bash`
+/bin/bash
 ```
 
 So if the first line of the file (i.e. the shebang) contains the word "ruby", then we run the script.  What if that `if` condition is false?

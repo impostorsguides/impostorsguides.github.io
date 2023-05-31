@@ -10,9 +10,17 @@ The first line of code is:
 
 This is a shebang, which we've seen before.  But importantly, it's not a `bash` shebang.  Instead, it's a `bats` shebang.  [BATS is a test-runner program](https://github.com/sstephenson/bats){:target="_blank" rel="noopener"} that Sam Stephenson (the original author of RBENV) wrote, and it's used here as RBENV's test framework.  But it's not RBENV-specific.  In theory, you could use it to test any shell script.
 
-### Experiment: running the BATS tests
+The `bats` repo is archived, meaning there won't be further updates to it, but I still want to see if the code works and can be used to run tests in the `rbenv` repo.  I'd be surprised if it didn't, since RBENV is still maintained and therefore still needs a way to run its own tests.
 
-To run these tests, we'll need to install `bats` first.  The installation instructions are [here](https://github.com/sstephenson/bats#installing-bats-from-source){:target="_blank" rel="noopener"}.  You'll know the installation was successful if you can run `which bats` and a filepath appears, like this:
+### Installing `bats`
+
+To run these tests, we'll need to install `bats` first.  There are installation instructions [on the Github repo's README file](https://github.com/sstephenson/bats#installing-bats-from-source){:target="_blank" rel="noopener"}, but I also discovered that there is [a Homebrew package for BATS](https://formulae.brew.sh/formula/bats){:target="_blank" rel="noopener"}, so I used that:
+
+```
+$ brew install bats
+```
+
+You'll know the installation was successful if you can run `which bats` and a filepath appears, like this:
 
 ```
 $ which bats
@@ -20,7 +28,9 @@ $ which bats
 /usr/local/bin/bats
 ```
 
-Note that I used Homebrew to install `bats` on my machine.  If you used another technique, your filepath may look different from mine.
+If you followed the "Installing Bats from source" instructions on the Github repo page, your filepath may look different from mine.
+
+### Experiment: running the BATS tests
 
 Once that's done, we can navigate to the home directory of our cloned RBENV codebase, and run the following:
 
@@ -46,9 +56,11 @@ $ bats ./test/rbenv.bats
 
 They all pass, as we'd expect since we haven't (yet) done anything which breaks the code.
 
+So now that these specs are running, what do they actually do?  Reading the tests for a piece of code you're studying is often a great source of documentation.  And the BATS repo has [helpful documentation](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/README.md#writing-tests){:target="_blank" rel="noopener"} on the commands it offers and the API it exposes.
+
 ## Loading helper code
 
-Next line of code:
+Returning to reading the test file, let's look at the next line of code:
 
 ```
 load test_helper
