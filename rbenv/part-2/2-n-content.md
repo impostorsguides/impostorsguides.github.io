@@ -11,7 +11,15 @@ setup() {
 }
 ```
 
-Pretty straightforward, just makes a directory for a fake test project and `cd`s into it.  I anticipate we'll need this fake project dir in order to set its Ruby version.
+Pretty straightforward, just makes a directory for a fake test project and `cd`s into it.  We can assume that we'll need this fake project directory in order to set its Ruby version.
+
+This `setup()` function is called by the `bats` testing framework, inside the `bats_test_begin()` function of the `bats-exec-test` file.
+
+### Getting the version
+
+The next few tests relate to fetching an existing version.  Later tests will relate to setting a new version number.
+
+#### When no version exists
 
 Our first test for this command:
 
@@ -23,13 +31,15 @@ Our first test for this command:
 }
 ```
 
-I don't remember if I've seen the `-e` flag in a `test` call before, so I look it up:
+I don't remember if I've seen the `-e` flag in a `[ ... ]` call before, so I look it up:
 
 ```
 -e file       True if file exists (regardless of type).
 ```
 
-So as a pre-condition / sanity check, this test asserts that a file named `.ruby-version` does *not* currently exist in the current directory.  It then runs the `rbenv local` command, and asserts that the command fails with a non-zero exit status and a helpful error message.
+So as a sanity check, this test first asserts that a file named `.ruby-version` does *not* currently exist in the current directory.  It then runs the `rbenv local` command, and asserts that the command fails with a non-zero exit status and a helpful error message.
+
+#### When a local version exists in the current dir
 
 Next test:
 
@@ -41,7 +51,12 @@ Next test:
 }
 ```
 
-Here we create a `.ruby-version` file and set its contents equal to `1.2.3`.  We then run the `rbenv local` command without any arguments and assert a) that the command exited successfully, and b) that its printed output was the contents of the file we just created.
+Here we create a `.ruby-version` file and set its contents equal to `1.2.3`.  We then run the `rbenv local` command without any arguments and assert that:
+
+- the command exited successfully, and
+- its printed output was the contents of the file we just created.
+
+#### When a local version exists in the parent dir
 
 Next test:
 
@@ -56,6 +71,8 @@ Next test:
 
 Here we create that same `.ruby-version` file in one directory, then we make (and navigate to) a subdirectory.  We run the `rbenv local` command and assert that, even though no `.ruby-version` file is found in this sub-directory, the command is smart enough to recursively check parent directories until it finds such a file.
 
+#### Preferring the `.ruby-version` file over the `RBENV_DIR` env var
+
 Next test:
 
 ```
@@ -69,7 +86,13 @@ Next test:
 ```
 Here we see that two `.ruby-version` files are created- the 1st one in the current directory, and the 2nd one in a special `$HOME` directory.  We then set the `RBENV_DIR` env var equal to the parent directory of that 2nd `.ruby-version` file and run the `rbenv local` command.  We expect that command to *ignore* this environment variable, and instead use the current directory's Ruby version file.
 
-Next test:
+### Setting the local Ruby version
+
+The next few tests relate to *setting* (not *getting*) the local Ruby version.
+
+#### Setting a previously-installed version
+
+First setter test:
 
 ```
 @test "sets local version" {
@@ -80,9 +103,13 @@ Next test:
 }
 ```
 
-Here we create a series of nested directories representing the location where RBENV installs its Ruby versions.  We then run `rbenv local` *with* an argument which corresponds to the version of Ruby that we created a fake directory for in the first step of this test.  We then assert that the test was successful and that the contents of the (newly-created) `.ruby-version` file are the same as the argument we provided to `rbenv local`.
+Here we create a directory representing the location where RBENV installs its Ruby versions, and create a sub-directory called `1.2.3/`.  This is our way of mocking out a real RBENV installation of Ruby v1.2.3.
+
+We then run `rbenv local` *with* an argument which corresponds to the version of Ruby that we just "installed".  We then assert that the test was successful and that the contents of the (newly-created) `.ruby-version` file are the same as the argument we provided to `rbenv local`.
 
 The reason we had to create that fake directory in step 1 is because we don't actually want RBENV to make a network call, pull down a real Ruby install, and set it up on our machine.  That would make the test take forever and could even result in a flaky test if (for example) the network was down.
+
+#### Updating an existing `.ruby-version` file to a new version number
 
 Next test:
 
@@ -98,7 +125,11 @@ Next test:
 }
 ```
 
-Here we create a `.ruby-version` file with one version of Ruby (`1.0-pre`), and create a fake "installed" version with a different version number (`1.2.3`).  As a sanity check, we run `rbenv local` once to confirm that it outputs the first version number.  We then run `rbenv local` a 2nd time, and this time we pass it the 2nd version number.  We then assert that the command exited successfully and that our the contents of our `.ruby-version` file changed from the 1st Ruby version to the 2nd one.
+Here we create a `.ruby-version` file with one version of Ruby (`1.0-pre`), and create a fake "installed" version with a different version number (`1.2.3`).  As a sanity check, we run `rbenv local` once to confirm that it outputs the first version number.
+
+We then run `rbenv local` a 2nd time, and this time we pass it the 2nd version number.  We then assert that the command exited successfully and that our the contents of our `.ruby-version` file changed from the 1st Ruby version to the 2nd one.
+
+#### Unsetting the Ruby version
 
 Last test:
 
@@ -147,10 +178,12 @@ set -e
 
 Same deal as always:
 
-The `bash` shebang
-The usage + summary comments
-The call to `set -e`, which tells the shell to exit immediately upon the first error it encounters
-When the `RBENV_DEBUG` env var is present, call `set -x` to tell the shell to run in verbose mode.
+ - The `bash` shebang
+ - The usage + summary comments
+ - The call to `set -e`, which tells the shell to exit immediately upon the first error it encounters
+ - When the `RBENV_DEBUG` env var is present, call `set -x` to tell the shell to run in verbose mode.
+
+### Completions
 
 Next block of code:
 
@@ -173,6 +206,8 @@ These are the completions that get picked up and printed out when the user runs 
 
 That's because these are the 3 versions of Ruby that I've installed via `rbenv`.
 
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
 Last block of code:
 
 ```
@@ -192,7 +227,25 @@ else
 fi
 ```
 
+Let's break this up into smaller chunks.
+
+### Setting a new Ruby version
+
+```
+RBENV_VERSION="$1"
+
+if [ "$RBENV_VERSION" = "--unset" ]; then
+  rm -f .ruby-version
+```
+
 We create a variable named `RBENV_VERSION` and set it equal to the first argument passed to `rbenv local`.  If that argument was `--unset`, then we delete the file named `.ruby-version` if it exists.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+```
+elif [ -n "$RBENV_VERSION" ]; then
+  rbenv-version-file-write .ruby-version "$RBENV_VERSION"
+```
 
 Otherwise, if the argument was any other value, then we pass that value to the program `rbenv-version-file-write`.  Based on a quick experiment, that program appears to check whether the argument it receives is equal to a version number for an installed version of Ruby.  If it's not, an error is returned:
 
@@ -202,49 +255,53 @@ $ rbenv local foobarbaz
 rbenv: version `foobarbaz' not installed
 ```
 
-Otherwise, if it *does* match an installed version of Ruby, it creates a local dotfile named `.ruby-version` and sets it equal to that version number:
-
-```
-$ ls -la .ruby-version
-
-ls: .ruby-version: No such file or directory
-
-$ rbenv local 2.7.5
-
-$ ls -la .ruby-version
-
--rw-r--r--  1 myusername  staff  6 Mar 16 08:26 .ruby-version
-
-$ cat .ruby-version
-
-2.7.5
-
-```
-
-If we reach the `else` block, that means there was no first argument, i.e. the user just typed `rbenv local`.  In this case, the expectation is that the user wants to know what version of Ruby has been set by RBENV for the current directory or project:
-
-```
-if version_file="$(rbenv-version-file "$PWD")"; then
-    rbenv-version-file-read "$version_file"
-  else
-```
-Here we attempt to store the path to the `.ruby-version` file in a variable called `version_file`.  If we succeed, then we run `rbenv version-file-read` with that filepath as the argument.  In my case, after having run the above commands, I see:
-
-```
- $ rbenv version-file-read .ruby-version
-
-2.7.5
-```
-
-So if you have a local `.ruby-version` file, the output of `rbenv local` is the contents of that `.ruby-version` file.  And if you don't:
+### Reading the existing Ruby version
 
 ```
 else
+  if version_file="$(rbenv-version-file "$PWD")"; then
+    rbenv-version-file-read "$version_file"
+```
+
+If we reach the `else` block, that means there was no first argument, i.e. the user just typed `rbenv local`.  In this case, the expectation is that the user wants to know what version of Ruby has been set by RBENV for the current directory or project.
+
+In this case, we check whether we have a file containing a Ruby version number, using the `rbenv-version-file` command.  I try this command out in a directory without a `.ruby-version` file, and I see the following:
+
+```
+$ rbenv version-file
+
+/Users/myusername/.rbenv/version
+```
+
+I then make a `.ruby-version` file in that same directory, and re-run it:
+
+```
+$ echo "2.0.0" > .ruby-version
+$ rbenv version-file
+
+/Users/myusername/.rbenv/.ruby-version
+```
+
+If we do have a version file somewhere, we run `rbenv version-file-read` and pass the name of that version file as an argument.  Again trying this command out on my machine, I see:
+
+```
+$ rbenv version-file-read .ruby-version
+
+2.0.0
+```
+
+Last block of code:
+
+```
+  else
     echo "rbenv: no local version configured for this directory" >&2
     exit 1
   fi
+fi
 ```
 
-The command prints out a helpful error message to STDERR and exits with a non-zero return status.
+If we reach this block, we're trying to read a Ruby version but RBENV doesn't have a source from which to read a Ruby version.  So it prints out a helpful error message to `stderr` and exits with a non-zero return status.
 
-(stopping here for the day; 51141 words)
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+That's it for this command.  On to the next one.

@@ -108,7 +108,7 @@ Next test:
 
 This test appears to cover [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version#L18){:target="_blank" rel="noopener"}.  The code does the following:
 
- - We `cd` into `${BASH_SOURCE%/*}`, which on my machine resolves to `/Users/richiethomas/.rbenv/test/../libexec` or simply `/Users/richiethomas/.rbenv/libexec`.
+ - We `cd` into `${BASH_SOURCE%/*}`, which on my machine resolves to `/Users/myusername/.rbenv/test/../libexec` or simply `/Users/myusername/.rbenv/libexec`.
  - We run `git remote -v`, which (in the above directory on my machine) returns:
 
 ```

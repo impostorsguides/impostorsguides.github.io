@@ -2,6 +2,8 @@ Again, let's start with the test file, `help.bats`.
 
 ## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/help.bats){:target="_blank" rel="noopener"}
 
+### Showing common commands
+
 After the shebang and the `test_helper` load, the first spec is:
 
 ```
@@ -13,23 +15,17 @@ After the shebang and the `test_helper` load, the first spec is:
 }
 ```
 
-This is the happy-path test.  We run the command file, assert that the exit code is 0, and assert that the "Usage:" and "Some useful rbenv commands" lines both appear in STDOUT.
+This is the happy-path test:
+
+ - We run the command file.
+ - We assert that the exit code is 0.
+ - We also assert that the "Usage:" and "Some useful rbenv commands" lines both appear in STDOUT.
 
 This is what appears when I type `rbenv help` in my console, a-la this first test case:
 
 ```
-$ git push
+$ rbenv help
 
-Enumerating objects: 99, done.
-Counting objects: 100% (99/99), done.
-Delta compression using up to 12 threads
-Compressing objects: 100% (94/94), done.
-Writing objects: 100% (94/94), 9.73 MiB | 4.39 MiB/s, done.
-Total 94 (delta 4), reused 0 (delta 0), pack-reused 0
-remote: Resolving deltas: 100% (4/4), completed with 4 local objects.
-To https://github.com/impostorsguides/impostorsguides.github.io.git
-   312678c..afa5595  main -> main
-~/Workspace/OpenSource/impostorsguides.github.io (main)  $ rbenv help
 Usage: rbenv <command> [<args>]
 
 Some useful rbenv commands are:
@@ -49,6 +45,8 @@ See `rbenv help <command>' for information on a specific command.
 For full documentation, see: https://github.com/rbenv/rbenv#readme
 ```
 
+### Sad path- specifying an invalid command
+
 Next test case:
 
 ```
@@ -58,12 +56,20 @@ Next test case:
 }
 ```
 
-This is a sad path case, for when the user types in an argument for a command that doesn't exist.  We assert that the exit code is non-zero, and that the feedback "rbenv: no such command..." appears in STDOUT.  I get this same result:
+When the user types in an argument for a command that doesn't exist, RBENV should show an error message and return a non-zero exit code.  In this test:
+
+ - We run a known-incorrect command (`rbenv hello`).
+ - We assert that the exit code is non-zero.
+ - We also that the feedback "rbenv: no such command..." appears in STDOUT.
+
+For what it's worth, I get this same result in my terminal:
 
 ```
 $ rbenv help foobar
 rbenv: no such command `foobar'
 ```
+
+### Happy path- showing the `help` results for a known-valid command
 
 Next test case:
 
@@ -89,8 +95,17 @@ SH
 
 This is a pretty big test.  Let's break it up into pieces:
 
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
 ```
   mkdir -p "${RBENV_TEST_DIR}/bin"
+```
+
+Above, we make a directory especially for this test that we're running.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+```
   cat > "${RBENV_TEST_DIR}/bin/rbenv-hello" <<SH
 #!shebang
 # Usage: rbenv hello <world>
@@ -100,22 +115,33 @@ echo hello
 SH
 ```
 
-Here we make a directory especially for this test that we're running, and then create a new executable command called `rbenv-hello`.  We add a fake shebang and some usage comments to the file, followed by a command to just echo 'hello'.  Basically just enough fake file content to mimic a real rbenv command file.
+We then create a new executable command called `rbenv-hello`.  We add a fake shebang and some usage comments to the file, followed by a command to just echo 'hello'.  Basically just enough fake file content to mimic a real rbenv command file.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next half of the test is:
 
 ```
-  run rbenv-help hello
-  assert_success
-  assert_output <<SH
+run rbenv-help hello
+assert_success
+```
+
+We then run `rbenv help` plus the name of our fake command, assert that the exit code is 0.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+```
+assert_output <<SH
 Usage: rbenv hello <world>
 This command is useful for saying hello.
 SH
 ```
 
-We then run `rbenv help` plus the name of our fake command, assert that the exit code is 0, and that the output contains just the usage and summary comments from the file, without the shebang and without the executable logic of the command itself.
+Lastly, we also assert that the output contains just the usage and summary comments from the file, without the shebang and without the executable logic of the command itself.
 
-One interesting thing I notice is that the line starting with `# Summary:` is *not* part of the expected output.  Does this mean `rbenv help` strips that out?  That seems unexpected to me; I would think that a summary line would be useful context that someone running this command would want.  If we notice that is indeed happening during our perusal of the code, I might end up diving into the git history to find out why this was needed.
+One interesting thing I notice is that the line starting with `# Summary:` is *not* part of the expected output, but the following line (`This command is useful for saying hello.`) **is** part of the output.  This implies that the `rbenv help` command strips the `Summary` line out.  The next test will address why.
+
+### Handling missing instruction text
 
 Next test:
 
@@ -138,9 +164,14 @@ SH
 }
 ```
 
-These tests are beefier than those of previous commands we've examined.  That's mostly because of the large multi-line heredoc strings which are necessary to test the output of a `help` command.
+This test does something similar to (but not identical to) the previous test.  The difference is, this time:
 
-This test does something similar to (but not identical to) the previous test.  The difference is, this time the command includes the `# Summary:` comments, since it looks like this file's comments do not contain any extended explanation below the summary line.  So that summary is only included if no detailed explanation is given.  I guess that answers our question from the last spec!
+ - the fake `hello` command is missing instruction text below the `# Summary:` comment, and
+ - the output of `rbenv help` includes the `# Summary:` line.
+
+Those two things are related.  The `Summary` line is only included if the detailed explanation text below `Summary` is missing.
+
+### Passing the `--usage` flag
 
 Next spec:
 
@@ -160,9 +191,13 @@ SH
 }
 ```
 
-This test creates a test command with usage, summary, and extended description info.  It then runs `rbenv help` for this test command, but this time it also passes the `--usage` flag.  It then asserts that the output only contains the `usage` info.
+In this test:
 
-I wanted to test this out, so I ran `rbenv help --usage rehash`, assuming that the `rehash` command would contain usage info.  However, it appears that it does not:
+ - We create a command with usage, summary, and extended description info.
+ - We then run `rbenv help` for this test command, this time passing the `--usage` flag.
+ - We then assert that the output only contains the `usage` info.
+
+To try this for myself, I run `rbenv help --usage rehash`, assuming that the `rehash` command would contain usage info.  However, it appears that it does not:
 
 ```
 $ rbenv help --usage rehash
@@ -178,7 +213,9 @@ $ rbenv help --usage global
 Usage: rbenv global <version>
 ```
 
-TODO: make a PR for the `rehash` command which adds "Usage" comments?
+We'll find out later that `rbenv help` actually inspects the file of the command you pass it, and scrapes the `Usage` instructions to use as output.  The reason this didn't work with `rbenv help rehash` was because the `rbenv-rehash` file doesn't include any `# Usage` comments.
+
+### Edge case- `Usage` comments spanning multiple lines
 
 Next test:
 
@@ -206,7 +243,14 @@ SH
 }
 ```
 
-This test makes another test command, this time with a multi-line "Usage" comment (as stated in the test description).  It then asserts that the `help` output includes both the entire "Usage" comment, and the description text, but not the "Summary" text.
+In this test:
+
+ - We make another test command, this time with a multi-line "Usage" comment.
+ - We then assert that the `help` output includes both the entire "Usage" comment, and the description text, but not the "Summary" text.
+
+So apparently there's something in `rbenv help` that is capable of detecting when the `Usage` comments stop and `Summary` comments start, even over multiple lines of output.
+
+### Edge case- multiple lines of additional help content
 
 Last spec is:
 
@@ -264,10 +308,12 @@ set -e
 
 As usual, we have:
 
-The bash shebang
-The usage summary and description
-The "exit on first error" setting
-The "set verbose mode when RBENV_DEBUG is passed" setting
+ - The bash shebang
+ - The usage summary and description
+ - The "exit on first error" setting
+ - The "set verbose mode when RBENV_DEBUG is passed" setting
+
+### Completions
 
 Next few lines of code:
 
@@ -279,7 +325,9 @@ if [ "$1" = "--complete" ]; then
 fi
 ```
 
-Here again is our list of completions.  We have a bespoke completion (aka "--usage") specific to the "help" command, and then we print out all possible rbenv commands via the `rbenv-commands` command, because any rbenv command is also a valid argument to "rbenv help".
+Here again is our list of completions.  We have a bespoke completion (aka `--usage`) specific to the `help` command, and then we print out all possible rbenv commands via the `rbenv-commands` command, because any rbenv command is also a valid argument to "rbenv help".
+
+### Defining the `command_path()` function
 
 Next few lines of code:
 
@@ -290,41 +338,17 @@ command_path() {
 }
 ```
 
-Here we define a function named "command_path".  It sets a variable named "command", which is scoped locally to the function, and is set to the value "$1".  I'm pretty sure we've covered this before, but I'm actually not sure whether "$1" here resolves to the first argument provided to the "command_path" function, or to the "rbenv help" command itself.  I write a test script to find out:
+Here we define a function named `command_path`.  It sets a variable named `command`, which is scoped locally to the function, and is set to the value `$1`, meaning it's the first argument provided to the function.
 
-```
-#!/usr/bin/env bash
-
-echo "arg 1 before function call: $1"
-
-function foo() {
-  local command="$1"
-  echo "command: $command"
-}
-
-foo bar
-
-echo "arg 1 after function call: $1"
-```
-
-The test script prints out the value of "$1" both inside the function and outside the function (before and after the function call).  Inside the script I call the function with the argument "bar", and outside the script I call the script itself with the argument "baz".  When I do so, I get the following:
-
-```
-~/Workspace/OpenSource (master)  $ ./foo/bar baz
-
-arg 1 before function call: baz
-command: bar
-arg 1 after function call: baz
-```
-So "$1" inside the function is defined as the first argument provided to the function, but outside the function it's defined as the first arg provided to the script itself.
-
-OK, so our `command_path` function takes the first arg it receives, and stores it as the variable "command".  Then we do the following:
+Then we do the following:
 
 ```
   command -v rbenv-"$command" || command -v rbenv-sh-"$command" || true
 ```
 
-We've seen this before- we first use `command -v` to find the path of a command named `rbenv-$command`, and send that to STDOUT.  For example, if we call `command_path foo`, we'd first check for the path of a command named `rbenv-foo`.  If there's no command by that name, we try to find the path of a command named `rbenv-sh-foo`.  If that's not found either, we simply send `true` to STDOUT (which has a length of zero).
+We've seen this before- we first use `command -v` to find the path of a command named `rbenv-$command`, and send that to STDOUT.  For example, if we call `command_path foo`, we'd first check for the path of a command named `rbenv-foo`.  If there's no command by that name, we try to find the path of a command named `rbenv-sh-foo`.  If that's not found either, we simply send `true` to `stdout`.
+
+### The `extract_initial_comment_block` function
 
 Next block of code:
 
@@ -342,31 +366,39 @@ extract_initial_comment_block() {
   "
 }
 ```
-Another function definition here, this time it's called `extract_initial_comment_block.  This function calls `sed` with the `-ne` flag, and passes a multi-line string.
 
-I don't know anything about the `sed` command, so I do a bit of searching, starting with the `man` entry:
+Another function definition here, this time it's called `extract_initial_comment_block`.  This function calls the `sed` command with the `-ne` flag, and passes a multi-line string.
 
-> The `sed` utility reads the specified files, or the standard input if no files are specified, modifying the input as specified by a list of commands.  The input is then written to the standard output.
+### What is the purpose of `sed`?
 
-The phrase "modifying the input as specified by a list of commands" is too abstract for me to really grok how this is used or why it's useful.  Luckily, further towards the bottom of the `man` entry is a list of examples of how the command can be used:
+To learn more about this command, I start with the `man` entry:
+
+```
+The `sed` utility reads the specified files, or the standard input
+if no files are specified, modifying the input as specified by a list
+of commands.  The input is then written to the standard output.
+```
+
+Although this definition is pretty abstract, luckily there's also a list of examples of how the command can be used:
 
 ```
 EXAMPLES
-     Replace 'bar' with 'baz' when piped from another command:
 
-           echo "An alternate word, like bar, is sometimes used in examples." | sed 's/bar/baz/'
+Replace 'bar' with 'baz' when piped from another command:
 
-     Using backlashes can sometimes be hard to read and follow:
+      echo "An alternate word, like bar, is sometimes used in examples." | sed 's/bar/baz/'
 
-           echo "/home/example" | sed  's/\/home\/example/\/usr\/local\/example/'
+Using backlashes can sometimes be hard to read and follow:
 
-     Using a different separator can be handy when working with paths:
+      echo "/home/example" | sed  's/\/home\/example/\/usr\/local\/example/'
 
-           echo "/home/example" | sed 's#/home/example#/usr/local/example#'
+Using a different separator can be handy when working with paths:
 
-     Replace all occurances of 'foo' with 'bar' in the file test.txt, without creating a backup of the file:
+      echo "/home/example" | sed 's#/home/example#/usr/local/example#'
 
-           sed -i '' -e 's/foo/bar/g' test.txt
+Replace all occurances of 'foo' with 'bar' in the file test.txt, without creating a backup of the file:
+
+      sed -i '' -e 's/foo/bar/g' test.txt
 ```
 
 That's a bit better.  I try my own example in the terminal and verify it works as expected:
@@ -377,7 +409,7 @@ $ echo "foo bar baz" | sed "s/foo/quox/"
 quox bar baz
 ```
 
-I continue Googling to get a bit more context.  My previous experience with bash tells me that `sed` is one of the most commonly-used utilities in shell scripting, so I think it'll pay to become a bit more familiar with it.
+I continue Googling to get a bit more context.  The command's usage inside `rbenv-help` looks complicated, so I think it'll pay to become a bit more familiar with it.
 
 The site HowToGeek [says the following](https://www.howtogeek.com/666395/how-to-use-the-sed-command-on-linux/){:target="_blank" rel="noopener"}:
 
@@ -397,6 +429,8 @@ The site HowToGeek [says the following](https://www.howtogeek.com/666395/how-to-
 >
 > Substitutions are probably the most common use of `sed`.
 
+### What do the flags do?
+
 HowToGeek clarifies what the `-n` flag does:
 
 > By default, sed prints all lines. We'd see all the text in the file with the matching lines printed twice. To prevent this, we'll use the -n (quiet) option to suppress the unmatched text.
@@ -411,131 +445,86 @@ I'm still a bit unclear on the `-e` flag, however.  When I Google 'what does the
   <img src="/assets/images/screenshot-15mar2023-123pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-From this and other answers in the post, I can see that `-e` tells `sed` to use the subsequent argument as a script to run against the input that it receives.  I search the file to see where this function is called, and I see [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L100){:target="_blank" rel="noopener"} that we send the text of a yet-to-be-specified file to `sed`, which means we run the script that was passed to `-e` against the text from the filename.  However, I'm not clear on what this script is.  It appears to be 3 scripts in one, separated by newlines.  [I ask StackExchange for help](https://unix.stackexchange.com/questions/717738/what-is-the-function-of-this-script-passed-to-sed-e){:target="_blank" rel="noopener"} and am waiting for an answer.
+From this and other answers in the post, I can see that `-e` tells `sed` to use the subsequent argument (i.e. the strange-looking syntax starting with `/^#/ !{`) as a script to run against the input that it receives.
 
-(stopping here for the day; 36997 words)
+To figure out what input we'll pass to `sed`, I search the file to see where the `extract_initial_comment_block` function is called.  I see [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L100){:target="_blank" rel="noopener"} that we send `sed` the content of a file (whose name we do not yet know), and then pipe the output of `sed` to another function named `collect_documentation` (also TBD).
 
-The next day, I have [my answer](https://unix.stackexchange.com/a/717747/142469){:target="_blank" rel="noopener"}.  The TL;DR is that I was right in thinking that the code inside the quotes represents 3 commands passed to `sed`, executed one-after-another.  When you pass "-e" to `sed`, you can then pass it commands which are chained in this style.  In our case, the 1st command says that if a line is encountered which does *not* start with a `#` symbol, quit the `sed` command entirely.  The 2nd command says that if a line is encountered which starts and ends with the same `#` symbol (i.e. it's just a one-character line containing `#`), to replace that lone character with a `# ` (i.e. `#` plus a space).  The 3rd command says that, if a line is encountered starting with `#` plus a space, to print that line (not including the `#-space` characters).
+### What does the `sed` script do?
 
-(stopping here for the day; 38048 words, mostly at the start of this file)
+Looking at the `sed` script itself, the syntax is hard to parse:
+
+```
+/^#/ !{
+  q
+}
+
+s/^#$/# /
+
+/^# / {
+  s/^# //
+  p
+}
+```
+
+It appears to be 3 scripts in one, separated by newlines.  [I ask StackExchange for help](https://unix.stackexchange.com/questions/717738/what-is-the-function-of-this-script-passed-to-sed-e){:target="_blank" rel="noopener"} and the next day, I have [my answer](https://unix.stackexchange.com/a/717747/142469){:target="_blank" rel="noopener"}.
+
+The TL;DR is that I was right in thinking that the code inside the quotes represents 3 commands passed to `sed`, executed one-after-another:
+
+ - The 1st command says that if a line is encountered which does *not* start with a `#` symbol, quit the `sed` command entirely.
+ - The 2nd command says that if a line is encountered which starts and ends with the same `#` symbol (i.e. it's just a one-character line containing `#`), to replace that lone character with a `# ` (i.e. `#` plus a space).
+ - The 3rd command says that, if a line is encountered starting with `#` plus a space, to print that line (not including the `#-space` characters).
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+So to summarize what the `extract_initial_comment_block` function does: it simply prints out the comments that we have frequently encountered at the top of the command files, deleting any `# ` characters at the beginning of each line and stopping after the first line it finds that doesn't begin with the `#` character.
+
+This is pretty much what we might expect from a function named `extract_initial_comment_block`, given what we know about RBENV's command files so far.
+
+For more on how to use `sed`, check out [LinuxHint.com's "50 `sed` command examples" post](https://linuxhint.com/50_sed_command_examples/){:target="_blank" rel="noopener"}.
+
+### The `collect_documentation` function
 
 Next few lines of code:
 
 ```
 collect_documentation() {
-  local awk
-  awk="$(type -p gawk awk 2>/dev/null | head -n1)"
-  if [ -z "$awk" ]; then
-    echo "rbenv: cannot find awk" >&2
-    return 1
-  fi
-...
+  ...
+}
 ```
 
-Here we open (but don't yet close) a declaration for a function called `collect_documentation`.  Inside we declare a local variable named `awk`, which I happen to know shares the same name as a shell utility.  GNU has [a user's guide](https://web.archive.org/web/20220915174506/https://www.gnu.org/software/gawk/manual/gawk.html){:target="_blank" rel="noopener"} on the `awk` utility, which says that it's "a program that you can use to select particular records in a file and perform operations upon them."  [The Linux man page](https://web.archive.org/web/20220707035408/https://man7.org/linux/man-pages/man1/awk.1p.html){:target="_blank" rel="noopener"} for `awk` has more details:
+The `collect_documentation` function is pretty big, and uses another new command called `awk` that is both unfamiliar and complicated.  So I'll break it up into pieces.
 
-> The awk utility shall execute programs written in the awk programming language, which is specialized for textual data manipulation. An awk program is a sequence of patterns and corresponding actions. When input is read that matches a pattern, the action associated with that pattern is carried out.
->
-> Input shall be interpreted as a sequence of records. By default, a record is a line, less its terminating <newline>, but this can be changed by using the `RS` built-in variable. Each record of input shall be matched in turn against each pattern in the program. For each pattern matched, the associated action shall be executed.
+#### Declaring and initializing the local `awk` variable
 
-This actually sounds really similar to the "pattern-matching + command" language we saw inside the `extract_initial_comment_block` function.  But I don't want to get ahead of ourselves with the details of the command; let's come back to it when we see the command syntax, further down the code.
+First block of code:
 
-We assign a value to our local variable `awk`, and that value is `$(type -p gawk awk 2>/dev/null | head -n1)`.  We've seen `type -p` before- in `bash`, it returns the path to a command, but *only* if that command lives in a disk file somewhere.  If the command is (for example) a shell function, `type -p` will return nothing.
+```
+local awk
+awk="$(type -p gawk awk 2>/dev/null | head -n1)"
+```
+
+We declare a local variable named `awk`.  I happen to know there's a shell utility by the same name, so I imagine we'll be passing this variable to that command at some point.  We assign a value to our local variable `awk`, and that value is `$(type -p gawk awk 2>/dev/null | head -n1)`.
+
+We've seen `type -p` before, when deciding whether to use `greadlink` or `readlink` to find a command.  It returns the path to a command, but *only* if that command lives in a disk file somewhere.  If the command is (for example) a shell function, `type -p` will return nothing.
 
 In the case of setting our local `awk` variable, `type -p gawk awk` searches the disk for the files associated with 2 commands, `gawk` and `awk`.  It pipes the results to `head -n1`, which means it takes the first filepath it finds from those 2 commands, and it pipes any errors to `/dev/null`.  So the value of the `awk` local variable is either the filepath for the `gawk` command or that of the `awk` command (if no filepath was found for `gawk`).
 
-I was curious why the value of the local variable was set using the `type` command, and not `which`, a command that I'm more familiar with.  I Google "type vs which bash" and get [this very authoritative-looking StackExchange post](https://unix.stackexchange.com/questions/85249/why-not-use-which-what-to-use-then){:target="_blank" rel="noopener"}.  The question itself says "We often hear that which should be avoided", and this is new information to me.  This seems important, because `which` is one of the first shell commands I learned and is something I rely on not-infrequently, so I decide to read up on this a bit.  Here are some snippets of information that I was able to pick up from the top-rated answer:
+[According to the Github history](https://github.com/rbenv/rbenv/pull/581){:target="_blank" rel="noopener"}, the reason we check for `gawk` first and then fall back to `awk` is because the Solaris version of UNIX implements `awk` in a way which broke `rbenv-help`.
 
-> The `which` command is a broken heritage from the C-Shell and is better left alone in Bourne-like shells.
->
-> There's a distinction between looking for that information as part of a script or interactively at the shell prompt.
->
-> At the shell prompt, the typical use case is: this command behaves weirdly, am I using the right one? What exactly happened when I typed mycmd? Can I look further at what it is?
->
-> In that case, you want to know what your shell does when you invoke the command without actually invoking the command.
->
-> In shell scripts, it tends to be quite different. In a shell script there's no reason why you'd want to know where or what a command is if all you want to do is run it. Generally, what you want to know is the path of the executable, so you can get more information out of it (like the path to another file relative to that, or read information from the content of the executable file at that path).
->
-> ...
->
-> ...to get the pathname of an executable in a script, there are a few caveats:
->
-> `ls=$(command -v ls)`
->
-> ...would be the standard way to do it.
->
-> There are a few issues though:
->
-> It is not possible to know the path of the executable without executing it. All the `type`, `which`, `command -v`... all use heuristics to find out the path. They loop through the `$PATH` components and find the first non-directory file for which you have execute permission.
->
-> ...if foo is a builtin or function or alias, command -v foo returns foo.
->
-> ...
->
-> Most answers and reasons against `which` deal with aliases, builtins and functions...
->
-> ...
->
-> ...`which`... aims to give you the aliases, because it's meant as a tool for (interactive) users of csh. POSIX shells users have `command -v`.
->
-> ...
->
-> Now, on the standard front, POSIX specifies the `command -v` and `-V` commands (which used to be optional until POSIX.2008). UNIX specifies the `type` command (no option). That's all (`where`, `which`, `whence` are not specified in any standard).
+#### Erroring out if no `awk` command
 
-Another good StackOverflow question [here](https://stackoverflow.com/questions/592620/how-can-i-check-if-a-program-exists-from-a-bash-script){:target="_blank" rel="noopener"} ("How would I validate that a program exists, in a way that will either return an error and exit, or continue with the script?"), with answer [here](https://stackoverflow.com/a/677212/2143275){:target="_blank" rel="noopener"}.  An excerpt:
-
-> ### POSIX compatible:
->
-> `command -v <the_command>`
->
-> Avoid `which`. Not only is it an external process you're launching for doing very little (meaning builtins like `hash`, `type` or `command` are way cheaper), you can also rely on the builtins to actually do what you want, while the effects of external commands can easily vary from system to system.
->
-> Why care?
->
-> - Many operating systems have a `which` that doesn't even set an exit status, meaning the `if which foo` won't even work there and will always report that `foo` exists, even if it doesn't (note that some POSIX shells appear to do this for `hash` too).
-> - Many operating systems make `which` do custom and evil stuff like change the output or even hook into the package manager.
->
-> So, don't use which. Instead use one of these:
->
-> - `command -v foo >/dev/null 2>&1 || { echo >&2 "I require foo but it's not installed.  Aborting."; exit 1; }`
-> - `type foo >/dev/null 2>&1 || { echo >&2 "I require foo but it's not installed.  Aborting."; exit 1; }`
-> - `hash foo 2>/dev/null || { echo >&2 "I require foo but it's not installed.  Aborting."; exit 1; }`
-
-Oof, that's a lot of info.  But what I gather from all the above is that the output `which` prints to STDOUT isn't necessarily a filepath, since (as a feature) it also includes commands defined via shell functions, aliases, etc.  This can be dangerous from our perspective- in RBENV, we want *just* original, non-overridden commands from the shell, and the way we try to achieve this is by avoiding `which` in favor of `type -p` or `command -v`, both of which are used in the RBENV codebase.
-
-Continuing on with the `collect_documentation` function:
+Next block of code:
 
 ```
-  if [ -z "$awk" ]; then
-    echo "rbenv: cannot find awk" >&2
-    return 1
-  fi
+if [ -z "$awk" ]; then
+  echo "rbenv: cannot find awk" >&2
+  return 1
+fi
 ```
 
-If neither `gawk` nor `awk` is installed on the user's system, we echo an error message to STDERR and return a non-zero exit code.  But why wouldn't `awk` be installed on the user's system?  We have a `bash` shebang in this file; isn't `awk` part of every `bash` installation?
+If neither `gawk` nor `awk` is installed on the user's system, we echo an error message to STDERR and return a non-zero exit code.  This might happen if (for example) a user is running RBENV on a version of Windows with which `bash` does not natively ship.  Note that `bash` is now available for Windows, but [that hasn't always been the case](https://web.archive.org/web/20230329195218/https://venturebeat.com/business/microsoft-is-bringing-the-bash-shell-to-windows/){:target="_blank" rel="noopener"}.
 
-And what is the difference between `awk` and `gawk`?  I ask a StackExchange question [here](https://unix.stackexchange.com/questions/717991/why-is-it-necessary-to-check-for-awk-in-this-bash-script){:target="_blank" rel="noopener"}, and eventually I get the answer that `awk` is part of the POSIX standard, but that the RBENV authors probably couldn't assume that the user would be running in a POSIX-compliant environment.
-
-Another question: I see both `type -p` and `command -v` being used for the same purpose in this file ([here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L26){:target="_blank" rel="noopener"} and [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L46){:target="_blank" rel="noopener"}).  Is there any difference between these?  From [shell-tips.com](https://web.archive.org/web/20220705053124/https://www.shell-tips.com/bash/type-command/#gsc.tab=0){:target="_blank" rel="noopener"}, I see the following:
-
-> You can use the bash specific syntax `type -p` to find the actual path to an external shell command. It is similar to using `command -v` which is POSIX compliant. Both methods should be preferred in bash to the legacy `which` command.
->
-> You can easily test with a bash if statementicon mdi-link-variant whether a command exists or not and get the path for it.
->
-> ```
-> [me@linux ~]$ type -p date
-> /bin/date
-> [me@linux ~]$ type -p python
-> /usr/local/bin/python
-> [me@linux ~]$ command -v python
-> /usr/local/bin/python
-> [me@linux ~]$ if ! command -v python &>/dev/null; then echo "Python not installed"; fi
-> Python not installed
-> ```
-
-So based on the description and terminal examples, it seems like the two methods are equivalent.
-
-(stopping here for the day; 39509 words)
+#### Disabling a `shellcheck` rule
 
 Next line of code:
 
@@ -543,7 +532,7 @@ Next line of code:
 # shellcheck disable=SC2016
 ```
 
-I haven't seen code like this before, so I Google "shellcheck disable".  [The first result](https://web.archive.org/web/20220626113148/https://www.bashsupport.com/manual/editor/shellcheck/){:target="_blank" rel="noopener"} refers to a program called ShellCheck.  I Google "what is ShellCheck", and [the first result](https://web.archive.org/web/20220915000849/https://www.shellcheck.net/){:target="_blank" rel="noopener"} of *this* search describes it as "ShellCheck is an open source static analysis tool that automatically finds bugs in your shell scripts."  Back to the line of code, it appears that `shellcheck disable=SC2016` disables [rule number 2016](https://www.shellcheck.net/wiki/SC2016){:target="_blank" rel="noopener"}:
+ I Google "what is ShellCheck", and [the first result](https://web.archive.org/web/20220915000849/https://www.shellcheck.net/){:target="_blank" rel="noopener"} of *this* search describes it as "ShellCheck is an open source static analysis tool that automatically finds bugs in your shell scripts."  Back to the line of code, it appears that `shellcheck disable=SC2016` disables [rule number 2016](https://www.shellcheck.net/wiki/SC2016){:target="_blank" rel="noopener"}:
 
 > Expressions don't expand in single quotes, use double quotes for that.
 >
@@ -564,370 +553,755 @@ I haven't seen code like this before, so I Google "shellcheck disable".  [The fi
 >
 > Single quotes express all such expansions. If you want the expression to expand, use double quotes instead.
 
-It appears that, normally, running ShellCheck against the subsequent code would trigger rule # 2016.  The authors didn't want that to happen, so they added an annotation to disable that for the following line of code.  That line of code includes the beginning of a single-quoted, multi-line string containing a series of commands passed to `awk`.  Let's look at the next line of code, and the few lines of code after that (which contain the first of the commands that `awk` receives):
+The next line of code includes the beginning of a single-quoted, multi-line string containing a series of commands passed to `awk`.  Normally, running ShellCheck against that line of code would trigger rule # 2016.  The RBENV team didn't want that to happen, so they added an annotation to disable this check, *just for that one block of code*.
+
+#### Invoking `awk` with its first command
+
+That block of code starts out like this:
 
 ```
 "$awk" '
+```
+We first see `"$awk" ` followed by the opening single-quote.  `"$awk"` is the expansion of the variable we stored a few lines of code earlier, the result of our `type -p` command.  It will expand to either `gawk` or `awk`, whichever the user has installed.  When it's expanded, it will be automatically called by the shell.
+
+
+### The `awk` command
+
+GNU has [a user's guide](https://web.archive.org/web/20220915174506/https://www.gnu.org/software/gawk/manual/gawk.html){:target="_blank" rel="noopener"} on the `awk` utility, which says that it's "a program that you can use to select particular records in a file and perform operations upon them."  [The Linux man page](https://web.archive.org/web/20220707035408/https://man7.org/linux/man-pages/man1/awk.1p.html){:target="_blank" rel="noopener"} for `awk` has more details:
+
+> The awk utility shall execute programs written in the awk programming language, which is specialized for textual data manipulation. An awk program is a sequence of patterns and corresponding actions. When input is read that matches a pattern, the action associated with that pattern is carried out.
+
+This sounds kind of similar to how `sed` is used, actually.
+
+The guide continues:
+
+> Input shall be interpreted as a sequence of records. By default, a record is a line, less its terminating <newline>, but this can be changed by using the `RS` built-in variable. Each record of input shall be matched in turn against each pattern in the program. For each pattern matched, the associated action shall be executed.
+
+More similarities to `sed`:
+
+ - each record is a line from the input
+ - each record is matched against a specified pattern.
+ - for each matching record, the corresponding behavior specified in the command is performed.
+
+TODO: come up with a guide on how to do some common operations using `sed`, and again using `awk`.  Compare which tool is best for which operations.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+I've decided that the easiest way to understand the subsequent sequence of `awk` commands is to ask ChatGPT what the script does, and then do a series of experiments to test whether ChatGPT led me astray or not.  Here's the initial question I asked, followed by the initial answer.  I'll be diving deeper into each part of the answer in follow-up questions.
+
+<center style="margin-bottom: 3em">
+  <a target="_blank" href="/assets/images/screenshot-5jun2023-107pm.png">
+    <img src="/assets/images/screenshot-5jun2023-107pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
+  </a>
+</center>
+
+My question to ChatGPT was:
+
+> I have the following `awk` invocation:
+
+```
+awk '
     /^Summary:/ {
       summary = substr($0, 10)
       next
     }
-```
-We first see `"$awk" ` followed by the opening single-quote.  `"$awk"` is the expansion of the variable we stored a few lines of code earlier, the result of our `type -p` command.  It will expand to either `gawk` or `awk`, whichever the user has installed.  We then call that command, and pass it the multi-line string of `awk` commands, beginning with a regex that searches for the string "Summary:" including the colon.  If we find it, we create a variable named "summary" and set its value to... I'm not sure?  I mean it's clearly the return value of "substr)($0, 10)", but since "$0" is wrapped in single-quotes here, it won't expand to the zeroth argument like it normally would, right?
 
-As an experiment, I decide to store this single-quoted string in a variable first, and then pass that variable to the "$awk" command.  This will allow me to print out the string and see what it resolves to, and in particular whether the "$0" is expanded (and if so, what the expanded value is):
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-133pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-In a new terminal, this results in output of:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-134pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-So the "$0" symbol is not expanded here.  And I think I know why.
-
-When I was `echo`ing the `myStr` variable that I created, I initially did not send the `echo` to STDERR via the `>&2` command that you now see in the first screenshot.  By default, `echo` goes to STDOUT, and this resulted in an error of `myStr: command not found`.  This must be because the output sent to STDOUT from here must be getting `eval`ed at some higher calling script.  This is also why the single-quotes are used- we *don't want* the "$0" to be expanded here- we want it to be expanded by the higher-level calling script, so we need to make sure it's preserved and not expanded here.  The way we do that is by using single-quotes.  And since ShellCheck will alert by default whenever it sees a potential expansion inside single-quotes, we have to add the `shellcheck disable` annotation above it.
-
-I wanted to see what "summary" expands to, after all is said and done.  I initially tried the same `>&2 echo` trick that I used above...
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-135pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-...but that didn't work:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-136pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I Google "awk print a string" and find [this result](https://www.gnu.org/software/gawk/manual/html_node/Print-Examples.html){:target="_blank" rel="noopener"}, which suggests using the `print` command instead.  I try this...
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-137pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-...and get the following:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-138pm.png" width="100%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-OK, so I'm still getting a "command not found" error, which means our string is still accidentally getting interpreted as a command.  I Google "awk print to stderr", since I suspect that printing to a destination other than STDOUT will have the effect we want.  I get [this link](https://web.archive.org/web/20230407073708/https://groups.google.com/g/comp.unix.shell/c/iLB2_h4QFIo){:target="_blank" rel="noopener"}, with a comment (again by Stephane Chazelas; this guy is everywhere!) that suggests the command `​​print "foo" | "cat >&2"`.  I try the equivalent for my code:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-139pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-...and I get the following:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-140pm.png" width="100%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-This seems to fix the error, at least!  The only problem is, I'm not sure where (or whether) my print statement output is rendered.  I add a 2nd, tracer print statement:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-141pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-...which results in the following:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-142pm.png" width="100%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-Great!  So the "summary" variable evaluates to "Set or show the global Ruby version".  We can be reasonably confident of this because that's the string printed out immediately before the "foobar" string.
-
-But wait, when I initially glanced at the call to `substr`, I saw that the 2nd parameter was `10`.  I had assumed that this meant we wanted the substring only up to the 10th character, and that the first param of `$0` was the index of the character that we wanted to start at.  This can't be the case, since we clearly have more than 10 characters in the output.  I look up the documentation for `substr` by Googling "awk substr", and I get [this result](https://web.archive.org/web/20201129014027/https://thomas-cokelaer.info/blog/2011/05/awk-the-substr-command-to-select-a-substring/){:target="_blank" rel="noopener"}, which says that the syntax of `substr` is as follows:
-
-> substr(s, a, b) : it returns b number of chars from string s, starting at position a. The parameter b is optional, in which case it means up to the end of the string.
-
-Ah OK, so I bet that our "$0" flag evaluates to the line of code that's found by the `/^Summary:/` regex, and the `10` says "take everything from the 10th character to the end of the line".  That explains why the "summary" variable didn't include the string "Summary:".  To triple-check this hypothesis, I do one last test, which is print the "$0" string in its entirety (not just the substring represented by "summary"):
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-143pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-This results in:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-144pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-Yep!  So "Summary: " is 9 characters long.  The 10th character is the "S" in "Set or show...", so that's where our substring starts.  This also explains why the error message I was getting earlier was "Set: command not found".  Our substring starts with "Set", and it was this string fragment that the higher-level `eval` was mis-interpreting as a command to execute.  Lastly, this also confirms that the way `awk` commands work is, they run one or more regexes against each line of an input (which means they must be separated by `\n` newlines by default), and for each matching line, they run the code inside the curly braces.
-
-I think we can move on now.  But before I forget, I make sure to clean up the print statements I added.
-
-One last thing before moving on to the next `awk` command is the line of code after the `summary` declaration: `next`.  [GNU.org says](https://web.archive.org/web/20220525202544/https://www.gnu.org/software/gawk/manual/html_node/Next-Statement.html){:target="_blank" rel="noopener"}:
-
-> The next statement forces awk to immediately stop processing the current record and go on to the next record. This means that no further rules are executed for the current record, and the rest of the current rule's action isn't executed.
->
-> ...
->
-> At the highest level, awk program execution is a loop that reads an input record and then tests each rule's pattern against it. If you think of this loop as a for statement whose body contains the rules, then the next statement is analogous to a continue statement. It skips to the end of the body of this implicit loop and executes the increment (which reads another record).
-
-OK, easy enough.  So if the current line of `awk` input starts with "Summary:", we *only* want to instantiate a variable named "summary" and populate it with the substring of the current line of text.  We explicitly *do not* want to execute any of the remaining rules that we'll examine next.
-
-It's interesting that we can declare a variable inside the curly braces, but with spaces on the left and right of the `=` sign that we usually couldn't have in a shell script.  For example, if I open a bash shell and type `foo = 5`, I get the following:
-
-```
-bash-3.2$ foo = 5
-
-bash: foo: command not found
-```
-
-The rules for whitespace when declaring variables seem to be different inside `awk` code, which makes me wonder what else is different.  I really don't want to do a deep-dive into `awk` right now, though, because I think that would slow down my reading of the codebase.  I decide to keep pushing forward.
-
-(stopping here for the day; 40791 words)
-
-Next `awk` rule is:
-
-```
     /^Usage:/ {
       reading_usage = 1
       usage = usage "\n" $0
       next
     }
-```
 
-If the line of code starts with the string "Usage:", then we execute the code inside the curly braces.  That code sets a variable called `reading_usage` equal to 1, and it sets another variable (called simply `usage`) equal to... what?  It looks like we're running a command (confusingly, also called `usage`) and passing it the newline string "\n" plus the line of text that was matched, as we did with the previous "Summary" command.  But where is that `usage` command coming from?  I Google `awk usage command` but nothing comes up.  I'm a bit flummoxed.
-
-I decide to start at the end and work backwards.  This whole `awk` command is part of the `collect_documentation` function body.  What is that function's return value?  I copy/paste the entire function into a new `bash` terminal:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-145pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I then check how the function is called in the code.  I see we pipe some text to it:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-151pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I mimic this in the simplest way I can think of, by `echo`ing "Summary: foobar" and piping that to the function:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-146pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-
-I do the same with "Usage: foobar":
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-147pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I assumed that "help" would be populated the same way, but when I try "Help: foobar", I get the following:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-148pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-
-I scroll down in the code a bit and I notice that, while there is a line here of `help = help "\n" $0`, it doesn't come with a regex before the opening curly brace, so maybe that means there's no matching lines?  But if that's the case, how does "help=" get populated?  I assume it must be happening somehow, otherwise why have `help = help "\n" $0` in the function at all?
-
-I don't think it's correct to say that curly braces without a regex means the code will never get executed.  I find a StackOverflow answer [here](https://web.archive.org/web/20160901162438/https://stackoverflow.com/questions/38596130/what-does-it-mean-when-an-awk-script-has-code-outside-curly-braces){:target="_blank" rel="noopener"}, which in fact says the opposite - that `awk` code without a regex will *always* be run:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-149pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-
-I have a hypothesis that might address part of my confusion, specifically on where the 2nd reference to `usage` comes from.  I scroll through the code and see that `collect_documentation` is called by `documentation_for`, which in turn is called by `print_summary`.  [That function](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L106){:target="_blank" rel="noopener"}, in turn, declares local variables `summary`, `usage`, and `help`.  There are similar functions called [`print_help`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L120){:target="_blank" rel="noopener"} and [`print_usage`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L143){:target="_blank" rel="noopener"}, which declare the same local variables in a similar way.
-
-I also see that `documentation_for ` is called within the context of an `eval` command:
-
-```
-print_summary() {
-  local command="$1"
-  local summary usage help
-  eval "$(documentation_for "$command")"
-
-  if [ -n "$summary" ]; then
-    printf "   %-9s   %s\n" "$command" "$summary"
-  fi
-}
-```
-
-Since the output of `collect_documentation` appears to be the 3 `print` statements [starting on line 88](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L88){:target="_blank" rel="noopener"}, my guess is that we `eval` the following:
-
-```
-summary="Summary: foobar"
-usage="
-help="
-```
-The effect of `eval`ing the above is to set 3 variables, which are presumably used in the final output.
-
-Going back to our current block of code:
-
-```
-    /^Usage:/ {
-      reading_usage = 1
-      usage = usage "\n" $0
-      next
-    }
-```
-
-...I further suspect that the 2nd reference to `usage` in the line `usage = usage "\n" $0` is referencing the local `usage` variable which was declared in the `print_summary` or `print_usage` or `print_help` function.
-
-Lastly, I suspect that the purpose of this block is to handle the case when we reach the *beginning* of a "Usage" comment.  We set the `reading_usage` flag to 1, so that we know we're currently in the middle of reading a usage comment.  This is useful because there is logic in the next `awk` command that we only want to execute if we're in the middle of reading a usage comment:
-
-```
     /^( *$|       )/ && reading_usage {
       usage = usage "\n" $0
       next
     }
-```
 
-We'll get back to the above `awk` command later; this is just to outline my current hypothesis.
-
-I do a quick experiment.  I create a function named `baz` which `echo`s a string that, when `eval`ed, should set a variable named `bar` to "this is a bar".  I create another function named `foo` which creates a local variable named `bar`, calls the earlier `baz` function and `eval`s the results, and then `echo`s the value of its local `bar` variable.  I see the following:
-
-```
-$ bash
-
-The default interactive shell is now zsh.
-To update your account to use zsh, please run `chsh -s /bin/zsh`.
-For more details, please visit https://support.apple.com/kb/HT208050.
-bash-3.2$ baz() { echo "bar='this is a bar'"; }
-bash-3.2$ foo() { local bar; eval "$(baz)"; echo "bar: $bar"; }
-bash-3.2$ foo
-bar: this is a bar
-```
-
-OK, so even though I didn't set the value of `bar` inside the `foo` function, calling `eval` on the result of `baz` still results in `bar`'s value being set within the context of the body of `foo`.
-
-What I think this means is, the 2nd reference to `usage` above is *not* the local `usage` variable declared in `print_summary` etc.  I think this `usage` variable is local to the `awk` function, and just happens to be named the same thing as the outer local variable.  I believe that the outer local var named `usage` doesn't get set until we eval the line `usage=....`.
-
-I feel like today's analysis has got me kinda muddled in the brain.  I have multiple active threads that I haven't tied up, multiple trains of thought going at once, and in my experience that tends to lead to a less-than-scientific process being used.  I could break here and come back tomorrow with a clearer head.  Or I could try to recap what I think I know so far, from the top.
-
-I know I'm skipping ahead again, but I decide to do a quick experiment to see if I can trigger the `/^( *$|       )/ && reading_usage` condition in the next `awk` command.  I remove the tracer statements that I previously added to `collect_documentation`, as well as the test for the presence of `gawk` and `awk` (since I know `awk` exists on my machine), and I echo two separate strings, both of which I pipe to `collect_documentation`:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-152pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I see that, when I pipe a multi-line string that begins with "Usage:" to `collect_documentation`, and I be sure to include the requisite # of spaces before lines 2-4, the entire multi-line string is included as part of the `usage=` assignment.  However, when I *don't* prepend lines 2-4 with those spaces, only the "Usage: " line is included in the `usage` assignment.  The rest of the lines are added to the `help` assignment.
-
-I think this actually makes sense- if we've already encountered the "Usage:" string on a previous line that was processed by `awk`, this means the `reading_usage` flag has been set, so it's now truthy.  That's the 2nd part of the `/^( *$|       )/ && reading_usage` condition.  And if there are sufficient space characters at the beginning (`^`) of the current line, that means the regex condition is met.  Note that there are actually 2 ways that the first condition could be triggered: one is by prepending the line with 7 spaces (i.e. the `|       `) half of the regex, and the other (according to [this guide](https://web.archive.org/web/20230321100428/https://opensource.com/article/19/11/how-regular-expressions-awk){:target="_blank" rel="noopener"} to regex in `awk`) *seems to be* a line containing *only* zero or more spaces.  However, I can't reproduce this 2nd case.  When I try adding a line of only spaces, I get the following:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-15mar2023-153pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I would have expected to see:
-
-```
-usage="Usage:
-
-"
-help=" bar
- baz"
-```
-
-So my hypothesis is incorrect.  However, proving this first regex pattern feels like a bit of a distraction from the more important work of understanding the overall `awk` command, so I decide to push forward.  The important thing is that we execute the code inside the following block *if and only if* we've already encountered "Usage:":
-
-```
-    /^( *$|       )/ && reading_usage {
-      usage = usage "\n" $0
-      next
-    }
-```
-
-(stopping here for the day; 42117 words)
-
-Next block of code:
-
-```
     {
       reading_usage = 0
       help = help "\n" $0
     }
-```
 
-If we reach this block of code (i.e. if we haven't met any of the previous regex conditions, which all trigger the `next` command and would cause us to skip this step), then we know we are no longer reading part of the "Usage" section, so we turn off that flag by setting "reading_usage" to "0".  We then append a newline and the current line to the pre-existing "help" variable, which contains a multi-line string.
-
-Next line of code:
-
-```
     function escape(str) {
       gsub(/[`\\$"]/, "\\\\&", str)
       return str
     }
-```
-
-Here we declare a helper function which will be used further down in the `awk` code.  This function, called "escape", looks for the characters `, \, $, or ", and escapes any and all instances it finds (i.e. it prepends it with the \ character).  It then returns the modified string.
-
-The & character has a special meaning here, according to [the GNU docs](https://web.archive.org/web/20220608181534/https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html){:target="_blank" rel="noopener"} for the "sub()" function:
-
-> If the special character '&' appears in replacement, it stands for the precise substring that was matched by regexp. (If the regexp can match more than one string, then this precise substring may vary.) For example:
->
-> ```
-> { sub(/candidate/, "& and his wife"); print }
-> ```
->
-> changes the first occurrence of 'candidate' to 'candidate and his wife' on each input line.
-
-In this case, the docs say that the function "changes the first occurrence", but that's just because the function that the doc is discussing here is the "sub" function.  Under the docs for "gsub", we see:
-
-> As in sub(), the characters '&' and '\' are special...
-
-Next block of code:
-
-```
 
     function trim(str) {
       sub(/^\n*/, "", str)
       sub(/\n*$/, "", str)
       return str
     }
-```
 
-This is a 2nd helper function, which deletes any number of newlines at the beginning of the string (`      sub(/^\n*/, "", str)`) or at the end of the string (`sub(/\n*$/, "", str))`).
-
-We can prove this by passing a multi-line string with newlines in strategic places:
-
-```
-bash-3.2$ echo -e "
-> Usage: foo
-> \nfoo
-> bar\nbaz
-> buz\n
-> " | collect_documentation
-summary=""
-usage="Usage: foo"
-help="foo
-bar
-baz
-buz"
-```
-
-We can see that there are separate help lines for "foo", "bar", "baz", and "buzz".  I was initially expecting to see "bar\nbaz" on its own line, since I placed the newline in the middle of the string (not the beginning or the end, as referenced by ^ and $ in the regexes).  But it appears that the newline in the middle of that string was interpreted as a real newline, not as part of the string.  Note that we need the `Usage: foo` line because `collect_documentation` only prints output if there is either a `summary` or `usage` variable set by `awk`.  Also note that I initially tried a simple `echo` with no flags, not the `echo -e` command that you see above.  This resulted in the newlines being treated as a printable part of the string, not as regular newlines.  [According to StackOverflow](https://stackoverflow.com/questions/8467424/echo-newline-in-bash-prints-literal-n){:target="_blank" rel="noopener"}, the solution is to use either `echo -e` or `printf`.
-
-Question: if `printf` and `echo -e` automatically handle the newlines for us, why do we need the `trim` function at all?
-
-Next lines of code:
-
-```
-END {
+    END {
       if (usage || summary) {
         print "summary=\"" escape(summary) "\""
         print "usage=\"" escape(trim(usage)) "\""
         print "help=\"" escape(trim(help)) "\""
       }
     }
+  '
+}
 ```
 
-I have been confused by this `END` thing since I skipped ahead in the code a few days ago.  It looked like the termination of a heredoc, but I didn't see where the heredoc began, so I didn't know what to make of it.  Attempting to answer my question, I consulted [the GNU awk docs](https://www.gnu.org/software/gawk/manual/gawk.html#BEGIN_002fEND){:target="_blank" rel="noopener"}.  Searching for the string "END", I was rewarded with an answer:
+> What does this do?
 
-> All the patterns described so far are for matching input records. The BEGIN and END special patterns are different. They supply startup and cleanup actions for awk programs. BEGIN and END rules must have actions; there is no default action for these rules because there is no current record when they run.
+And ChatGPT's response:
 
-That means our `END` command is like a "cleanup" action that happens after all the lines of text have been read.  And this command states that, if `usage` or `summary` variables are non-empty, then we print lines of text which, when converted to actual code by the `eval` caller, will set  `summary`, `usage`, and `help` variables equal to (respectively) the escaped `summary` variable, the trimmed and escaped `usage` variable, and the trimmed + escaped `help` variable.
+> The given `awk` invocation is a script that processes input lines and extracts information related to summary, usage, and help text. Let's break down its functionality:
+>
+> When a line starts with "Summary:", it captures the remaining part of the line (excluding "Summary:") into the variable `summary`. It then proceeds to the next line.
+>
+> When a line starts with "Usage:", it indicates the start of the usage section. It sets the `reading_usage` flag to 1 and appends the entire line to the `usage` variable. It then proceeds to the next line.
+>
+> Lines that either consist of only whitespace or start with at least 7 spaces and the `reading_usage` flag is set, are considered part of the usage section. These lines are appended to the `usage` variable, preserving the newlines. It then proceeds to the next line.
+>
+> All other lines that don't match the above patterns are considered part of the help text. They are appended to the `help` variable, preserving the newlines. The `reading_usage` flag is reset to 0.
+>
+> Two helper functions are defined within the `awk` script:
+>
+> - `escape(str)`: This function escapes backticks, backslashes, dollar signs, and double quotes in the given `str` by replacing them with their escaped counterparts using gsub(). The function then returns the modified `str`.
+>
+> - `trim(str)`: This function removes leading and trailing newline characters from the given `str` using `sub()`. It then returns the modified `str`.
+>
+> In the `END` block, which is executed after all input has been processed, the script checks if either `usage` or `summary` variables are non-empty. If so, it prints the escaped and trimmed values of `summary`, `usage`, and `help` in a format suitable for assignment in a shell script.
+>
+> In summary, this `awk` script extracts summary, usage, and help text from an input file and prints the processed values in a format that can be used as variables in a shell script.
 
-And that's the end of the body of `collect_documentation`!
+So this function:
+
+ - reads the comments that were redirected to it from the extracted comment blocks,
+ - stores them in variables named `summary`, `usage`, or `help` depending on which section of the comments they appeared in, and
+ - prints a script to `stdout` which creates shell variables with the same names and contents as the `awk` variables.
+
+We'll see later on that the `bash` code which is output by `collect_documentation` is later `eval`'ed by multiple other functions, defined further down in the file.
+
+So that's a high level of what this function does.
+
+I find [this link](https://web.archive.org/web/20230402124238/https://tldp.org/LDP/abs/html/awk.html){:target="_blank" rel="noopener"} from The Linux Documentation Project, which walks through how to use `awk`:
+
+> Awk breaks each line of input passed to it into fields. By default, a field is a string of consecutive characters delimited by whitespace, though there are options for changing this. Awk parses and operates on each separate field. This makes it ideal for handling structured text files -- especially tables -- data organized into consistent chunks, such as rows and columns.
+>
+> Strong quoting (i.e. single quotes) and curly brackets enclose blocks of awk code within a shell script.
+
+
+Let's do some experiments to see how `awk` works, after which we'll be able to better understand how it achieves the above.
+
+### Experiments
+
+#### Basic `awk` usage w/ `echo`
+
+I see this example in the above TLDP link:
+
+```
+# $1 is field #1, $2 is field #2, etc.
+
+echo one two | awk '{print $1}'
+# one
+
+echo one two | awk '{print $2}'
+# two
+
+# But what is field #0 ($0)?
+echo one two | awk '{print $0}'
+# one two
+# All the fields!
+```
+
+I successfully reproduce the behavior of the exact same commands in my `bash` terminal:
+
+```
+bash-3.2$ echo one two | awk '{print $1}'
+
+one
+
+bash-3.2$ echo one two | awk '{print $2}'
+
+two
+
+bash-3.2$ echo one two | awk '{print $0}'
+
+one two
+```
+
+#### Using `awk` with input from a file
+
+The same TLDP example contains the following code:
+
+```
+awk '{print $3}' $filename
+# Prints field #3 of file $filename to stdout.
+
+awk '{print $1 $5 $6}' $filename
+# Prints fields #1, #5, and #6 of file $filename.
+
+awk '{print $0}' $filename
+# Prints the entire file!
+# Same effect as:   cat $filename . . . or . . . sed '' $filename
+```
+
+I make my own text file named `foo` containing the following text:
+
+```
+foo bar baz
+bar baz buzz
+baz buzz quox
+```
+
+I then run the following:
+
+```
+bash-3.2$ awk '{print $3}' foo
+
+baz
+buzz
+quox
+```
+
+I do in fact see the 3rd field from each line of text in the input file.  This shows that we're applying the same `awk` rule (i.e. `'{print $3}'`) to each line of the input file.
+
+#### Variables in `awk`- initializing the var in the script
+
+I don't really like the last example in the TLDP link, so I ask ChatGPT for a simple example of how to use variables in `awk`:
+
+> Can you give me a very simple example of using a variable in an `awk` script?
+
+The answer I get is pretty clear:
+
+> Let's say we have a file called `numbers.txt` with the following content:
+>
+> ```
+> 1
+> 2
+> 3
+> 4
+> 5
+> ```
+>
+> And we want to calculate the sum of these numbers using an `awk` script. We can use a variable to accumulate the sum. Here's the script, stored in a file named `sum.awk`:
+>
+> ```
+> {
+>   sum += $1
+> }
+>
+> END {
+>   print "Sum:", sum
+> }
+> ```
+>
+> Now, if we run the script with the `numbers.txt` file as input:
+>
+> ```
+> awk -f sum.awk numbers.txt
+> ```
+>
+> The output will be:
+>
+> ```
+> Sum: 15
+> ```
+>
+> Let's break down the script:
+>
+> 1. sum += $1: This line is the main action of the script. It adds the value of the first field ($1) to the variable sum. The first field refers to the value in the current line being processed.
+>
+> 2. END: This keyword denotes the beginning of the END block, which is executed after all input lines have been processed.
+>
+> 3. print "Sum:", sum: In the END block, this line prints the string "Sum:" followed by the value of the sum variable.
+>
+> In this example, the variable sum is initialized to 0 implicitly. For each line in the input file, the value of the first field is added to the sum variable. Finally, in the END block, the script prints the accumulated sum.
+
+I try this in my `bash` terminal, and get the same output:
+
+```
+bash-3.2$ awk -f sum.awk numbers.txt
+
+Sum: 15
+```
+
+This example showed that variables can be initialized in an earlier round of parsing lines, and re-used in subsequent rounds of parsing lines.  It also showed how to use the `END` keyword to execute a one-time block of logic after all the lines of input have been processed.
+
+#### Variables in `awk`- passing in a variable using `-v`
+
+I modify the last command I executed, adding the flag `-v sum=5` like so:
+
+```
+bash-3.2$ awk -v sum=5 -f sum.awk numbers.txt
+
+Sum: 20
+```
+
+I initialized the `sum` variable to start at `5`, instead of relying on `awk` to implicitly initialize the variable to `0`.  When I did this, the final value of `sum` was 5 higher than it was before.
+
+#### Executing an `awk` rule only on certain lines
+
+We can choose to optionally execute an `awk` action only when certain conditions are met.  This is called a "pattern-action pair".  For example, according to ChatGPT, if we want to print only the lines from our `numbers.txt` file which are even, we can do the following:
+
+```
+awk '{ if ($1 % 2 == 0) { print $0 } }' numbers.txt
+```
+
+I successfully reproduce the above in my terminal:
+
+```
+bash-3.2$ awk '{ if ($1 % 2 == 0) { print $0 } }' numbers.txt
+
+2
+4
+```
+
+#### Using the `next` keyword to skip certain lines
+
+According to ChatGPT:
+
+> The next keyword is used in awk to skip the execution of any further rules or actions for the current line of input and immediately move on to the next line. It effectively allows you to control the flow of processing within the awk script.
+>
+> Here's how the next keyword works in a series of awk commands:
+>
+> 1. When awk reads a line of input, it evaluates each rule or action in the script in the order they appear.
+>
+> 2. If the next keyword is encountered within a rule or action, it immediately terminates the processing of the current line and proceeds to the next line.
+>
+> 3. No further rules or actions are executed for the current line. The next line is then processed from the beginning of the script.
+>
+> The next keyword is often used to optimize awk scripts and avoid unnecessary processing.
+
+We can use the `next` keyword along with our `numbers.txt` input file to sum up all the even numbers, and print them out at the end, like so:
+
+```
+awk -v sum=0 -f - "$filename" <<'EOF'
+{
+  if ($1 % 2 == 0) {
+    sum += $1
+  }
+}
+
+END {
+  print "Sum:", sum
+}
+EOF
+```
+
+In the above example, we input the pattern-action pairs via a heredoc.  `-f -` specifies that the awk script should be read from the standard input (heredoc) rather than from a file. The `-` indicates the standard input.
+
+Running the above results in:
+
+```
+bash-3.2$ awk -v sum=0 -f - "$filename" <<'EOF'
+> {
+>   if ($1 % 2 == 0) {
+>     sum += $1
+>   }
+> }
+>
+> END {
+>   print "Sum:", sum
+> }
+> EOF
+
+Sum: 6
+```
+
+#### Defining functions in `awk`
+
+We can extract the above logic from the action itself, and into a function, and then call our function from inside the rule.  That would look something like this:
+
+```
+bash-3.2$ awk -v sum=0 -f - "$filename" <<'EOF'
+> function addToSum(num) {
+>   if (num % 2 == 0) {
+>     sum += num
+>   }
+> }
+>
+> {
+>   addToSum($1)
+> }
+>
+> END {
+>   print "Sum:", sum
+> }
+> EOF
+
+Sum: 6
+```
+
+Above, we declare a function called `addToSum` which takes a number as a parameter.  If the number is divisible by 2, we add it to our running `sum` variable, which we have access to inside of our function.  Then, we create a rule where we call `addToSum` for each line in the input file, passing the first param (`$1`) as the argument.
+
+In the `END` step, we print the final value for `sum` to the terminal.  Since we initialize our `sum` variable to 0 and the even numbers in our series are 2 and 4, our final `Sum` value is 6.
+
+#### Using `awk`'s built-in functions
+
+Let's say that our `numbers.txt` file contains some malformed data- occasionally a line will be a letter instead of a number:
+
+```
+1
+a
+2
+b
+3
+c
+4
+d
+5
+e
+```
+
+If the letter is a vowel, we want to replace it with the number 2.  Otherwise, we want to ignore it.  We can use `awk`'s `sub()` function to replace any vowel from field #1 (aka `$1`) with the number 2:
+
+```
+bash-3.2$ awk -v sum=0 -f - "$filename" <<'EOF'
+> function addToSum(num) {
+>   if (num % 2 == 0) {
+>     sum += num
+>   }
+> }
+>
+> {
+>   sub(/[aeiou]/, 2, $1)
+>   addToSum($1)
+> }
+>
+> END {
+>   print "Sum:", sum
+> }
+> EOF
+
+Sum: 10
+```
+
+This time, we replace the letters `a` and `e` with 2, giving us a `Sum` of 10, or 4 more than our previous `Sum` of 6.
+
+#### `sub` with the `&` character
+
+Let's now assume that our input file once again looks like this:
+
+```
+1
+2
+3
+4
+5
+```
+
+If a line contains an odd number, we should concatenate a `2` to the end of that number, making it even.  For example, the `1` should be replaced with `12`.  Similarly, the line `3` should be replaced with `32`.  The rest of the program should behave as before.
+
+Our command will therefore look like this:
+
+```
+awk -v sum=0 -f - "$filename" <<'EOF'
+function addToSum(num) {
+  print "num:", num
+  if (num % 2 == 0) {
+    sum += num
+  }
+}
+
+{
+  print "line:", $0
+  sub(/[13579]/, "&2", $0)
+  addToSum($1)
+}
+
+END {
+  print "Sum:", sum
+}
+EOF
+```
+
+The line...
+
+```
+sub(/[13579]/, "&2", $0)
+```
+
+...means "replace any occurrence of `1`, `3`, `5`, `7`, or `9`, with the same number, followed by `2`.
+
+We're also printing each input line, before and after this transformation takes place.
+
+When we run this script, we get:
+
+```
+line: 1
+num: 12
+line: 2
+num: 2
+line: 3
+num: 32
+line: 4
+num: 4
+line: 5
+num: 52
+Sum: 102
+```
+
+So the line `1` is transformed into `12`, and then the number `12` is passed to `addToSum()`.  As a result, our sum is `12+2+32+4+52`, or `102`.
+
+Notice that the 2nd argument passed to `sum` was `"&2"`, with `&2` wrapped in double-quotes, **not** regex forward slashes (i.e. `/&2/`).  The latter will result in an error.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+The above examples should give us enough knowlege about `awk` to be able to understand how it's used in RBENV, but its capabilities go far beyond what we've demonstrated here.  `awk` is one of those tools which takes a minute to learn and a lifetime to master.  If you want to learn more, GNU maintains an entire manual just on `awk` [here](https://web.archive.org/web/20230000000000*/https://www.gnu.org/software/gawk/manual/gawk.html){:target="_blank" rel="noopener"}.
+
+Let's now turn to the `collect_documentation` function.  We start with this pattern-action pair:
+
+```
+/^Summary:/ {
+  summary = substr($0, 10)
+  next
+}
+```
+
+The pattern is:
+
+```
+/^Summary:/
+```
+
+And our action is:
+
+```
+{
+  summary = substr($0, 10)
+  next
+}
+```
+
+This means we initialize the `summary` variable and store the `substr($0, 10)` value inside of it when the given line of input starts with `Summary:`.  According to [the GNU guide to `awk`](https://web.archive.org/web/20230509013018/https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html){:target="_blank" rel="noopener"}, the `substr` built-in function takes an input string and a character position number (1-based, not 0-based), and returns all the characters from the specified position number until the end of the string.
+
+You can optionally provide a 3rd argument, the length N of characters you want to check, and `substr` will return a string starting at your position number and spanning the N subsequent characters (inclusive of the starting character).
+
+The last thing we do in this rule is skip to the next line of input, without falling through to any subsequent pattern-action pairs.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Next rule:
+
+```
+/^Usage:/ {
+  reading_usage = 1
+  usage = usage "\n" $0
+  next
+}
+```
+
+If the line starts with the string `Usage:`, we initialize the `reading_usage` variable to `1` and either initialize the variable to equal the entire line, or concatenate the entire line to the existing value of `usage`, with a newline separating the previous value of `usage` and the value of the current line.
+
+The last thing we do in this rule is skip to the next line of input, without falling through to any subsequent pattern-action pairs.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Next block of code:
+
+```
+/^( *$|       )/ && reading_usage {
+  usage = usage "\n" $0
+  next
+}
+```
+
+If the `reading_usage` variable has been set **and** the current line either starts with 7 spaces or consists entirely of spaces, we concatenate a newline and the current line of input to the `usage` variable.
+
+This is the same action we took on the previous rule, except we don't need to set `reading_usage` to `1` because we already know it's equal to `1` (because of the `&& reading_usage` check).
+
+The last thing we do in this rule is skip to the next line of input, without falling through to any subsequent pattern-action pairs.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Next block of code:
+
+```
+{
+  reading_usage = 0
+  help = help "\n" $0
+}
+```
+
+If we reach this rule, we know that we're no longer working with summary or usage data, so we set `reading_usage` equal to `0` and either create a new variable called `help` (if it didn't already exist) or concatenate a newline and the current line of input to the existing value of `help`.
+
+This is the last rule, so then we either move on to the next line of input, or (if there are no more lines of input) execute the `END` block.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Next block of code:
+
+```
+function escape(str) {
+  gsub(/[`\\$"]/, "\\\\&", str)
+  return str
+}
+```
+
+We define a function called `escape`, which calls `gsub` (a function that is similar to `sub`, but operates on **every** occurrence of the regex pattern, not just the first one it finds).
+
+What is the pattern that we're matching against?  I find regular expressions hard to read, so to save time, I ask ChatGPT to translate this for me.  It tells me that the 1st argument to `gsub` is this:
+
+```
+/[`\\$"]/
+```
+
+This regular expression will match any occurrence of the following characters:
+
+```
+` \ $ "
+```
+
+The 2nd argument to `gsub` is:
+
+```
+"\\\\&"
+```
+
+This was pretty confusing for me, so I decided to do an experiment.
+
+#### Experiment- why so many backslashes?
+
+I create a file named `escape.awk`, which I will use as the command when I run `awk`:
+
+```
+function escape(str) {
+  gsub(/[`\\$"]/, "&", str)
+  return str
+}
+
+{
+  print escape($0)
+}
+```
+
+Notice there are no `\` characters in the 2nd param to `gsub`.
+
+Then I create a text file named "file.txt" and containing the following:
+
+```
+` foo
+$ bar
+" baz
+\ buzz
+```
+
+I then run the following in my terminal:
+
+```
+$ awk -f escape.awk file.txt
+
+` foo
+$ bar
+" baz
+\ buzz
+```
+
+I get the same output as the original input.
+
+Then I add a single `\` character in front of `&`:
+
+```
+function escape(str) {
+  gsub(/[`\\$"]/, "\&", str)
+  return str
+}
+
+{
+  print escape($0)
+}
+```
+
+When I run the command again, I get:
+
+```
+$ awk -f escape.awk file.txt
+
+` foo
+$ bar
+" baz
+\ buzz
+```
+
+I then add another `\` and re-run the command:
+
+```
+$ awk -f escape.awk file.txt
+
+& foo
+& bar
+& baz
+& buzz
+```
+
+This time the output is different- a `&` character everywhere, instead of the original characters.
+
+I add another `\` and see the same thing:
+
+```
+$ awk -f escape.awk file.txt
+
+& foo
+& bar
+& baz
+& buzz
+```
+
+Finally, I add a fourth `\`, and see:
+
+```
+$ awk -f escape.awk file.txt
+
+\` foo
+\$ bar
+\" baz
+\\ buzz
+```
+
+Now it's back to the original characters, but this time with a `\` before each one.  So 4 backslashes in the 2nd argument to `gsub` is the minimum number of backslashes needed for the output to show a single backslash, plus the original character.  Based on this function's name (`escape()`), that sounds like what we want.
+
+Skipping ahead a bit to the `END` block, we see that the output of `collect_documentation` is a series of commands printed to `stdout`, which assign text values to variables named `usage`, `summary`, and `help`.  Those commands will be passed to a call to `eval` later.  Our current function, `escape`, ensures that any such text values which contain those 4 special characters don't lose those characters when they're printed to the screen for the user to read.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Next block of code:
+
+```
+function trim(str) {
+  sub(/^\n*/, "", str)
+  sub(/\n*$/, "", str)
+  return str
+}
+```
+
+This function is much more straightforward.  We check for one or more newline characters (`\n`) at the beginning of the line, and then again at the end of the line, and delete any that we find.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Next block of code:
+
+```
+END {
+  if (usage || summary) {
+    print "summary=\"" escape(summary) "\""
+    print "usage=\"" escape(trim(usage)) "\""
+    print "help=\"" escape(trim(help)) "\""
+  }
+}
+```
+
+We've reached the `END` block of our call to `awk`.  We print a series of strings which represent shell commands, specifically commands which store string values in variables named `summary`, `usage`, and `help`.  The output might look something like this:
+
+```
+summary="Display the version of rbenv"
+usage=""
+help="Displays the version number of this rbenv release, including the
+current revision from git, if available.
+
+The format of the git revision is:
+  <version>-<num_commits>-<git_sha>
+where `num_commits` is the number of commits since `version` was
+tagged."
+```
+
+These variables will be used later in the code for `rbenv help`.
+
+### Calling `extract_initial_comment_block` and `collect_documentation`
 
 Next block of code:
 
@@ -941,7 +1315,13 @@ documentation_for() {
 }
 ```
 
-This is the definition of a function named `documentation_for`.  In its body, we declare a local variable named `filename`, and set it equal to the filepath of the command we pass to `documentation_for` when we call it.  We get this filepath with the help of our previously-examined `command_path` helper function.  If `filename` is non-empty, we pass the filename to `extract_initial_comment_block` to get just the comment lines at the head of the file, we strip out the `#` comment indicators, and we pass the result to `collect_documentation`.
+We define a function named `documentation_for`.  In its body, we declare a local variable named `filename`, and set it equal to the filepath of the command we pass to `documentation_for` when we call it.  The filepath comes from the `command_path` function we defined earlier.
+
+If `filename` is non-empty, we pass the filename to the `extract_initial_comment_block` function that we previously examined.  From this, we get the raw comment lines at the head of the file, (minus the comments' `#` symbols), and we pass the result to `collect_documentation`.
+
+So the return value of something like `documentation_for "global"` would be the above variable assignment text (i.e. `summary: Set or show the global Ruby version`) for the `rbenv global` command.
+
+### Printing just the summary text
 
 Next block of code:
 
@@ -957,7 +1337,15 @@ print_summary() {
 }
 ```
 
-This is the definition of a function named `print_summary`.  We create a local variable named `command` and set it equal to the first argument passed to this function.  We then create 3 more local variables, called `summary`, `usage`, and `help`.  We then run `documentation_for` on our `command` variable, and `eval` the result (which should be the `summary=...` / `usage=....` / `help=...` lines of text) in order to populate values in the local variables we just declared.  If our `summary` variable is non-empty, we print just the contents of that variable; since this function is called `print_summary`, that's all we want to do here.
+We define a function named `print_summary`.  Inside of that function, we:
+
+ - create a local variable named `command` and set it equal to the first argument passed to this function.
+ - then create 3 more local variables, called `summary`, `usage`, and `help`.
+ - then run `documentation_for` on our `command` variable, and `eval` the result (which should be the `summary=...` / `usage=....` / `help=...` lines of text) in order to populate values in the local variables we just declared.
+
+If our `summary` variable is non-empty, we print just the contents of that variable; since this function is called `print_summary`, that's all we want to do here.
+
+### Printing summaries for all requested commands
 
 Next block of code:
 
@@ -971,7 +1359,9 @@ print_summaries() {
 
 Another definition for a function, this one called `print_summaries`.  This just iterates over all the commands that the user passed in as arguments, and calls the previous `print_summary` function on each one.
 
-(stopping here for the day; 43137 words)
+We'll see later that this function is called if the user just types `rbenv help`, with no specific command as an argument.
+
+### Printing just the help docs
 
 Next block of code:
 
@@ -1002,14 +1392,31 @@ print_help() {
 
 This is another function definition, but a big one.  So we'll break it up further into shorter snippets.
 
-The first few lines of this function, called `print_help`, function the same as those of `print_summary`.  We declare 4 local vars (called `command`, `summary`, `usage`, and `help`), and initialize `command` to be the first argument passed to `print_help`.  We then `eval` the return value of `documentation_for $command`.  That return value is the `summary=...`, `usage=...`, etc., so calling `eval` on that multi-line string has the effect of initializing the remaining 3 valueless variables with their values.
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+First off:
+
+```
+local command="$1"
+local summary usage help
+```
+
+The first few lines of this function work the same way as those of `print_summary`:
+
+ - We declare 4 local vars (called `command`, `summary`, `usage`, and `help`), and initialize `command` to be the first argument passed to `print_help`.
+ - We then `eval` the return value of `documentation_for $command`.
+ - That return value is the `summary=...`, `usage=...`, etc., so calling `eval` on that multi-line string has the effect of initializing the remaining 3 valueless variables with their values.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 The next line:
 ```
 [ -n "$help" ] || help="$summary"
 ```
 
-This says that, if the `help` variable is empty, we initialize it to be the same value as `summary`.
+This says that, if the `help` variable already has a value, we do nothing.  If it's empty, we initialize it to be the same value as `summary`.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next line:
 
@@ -1017,43 +1424,52 @@ Next line:
 if [ -n "$usage" ] || [ -n "$summary" ]; then
 ```
 
-If we have a non-empty value for either our `usage` or `summary` variable, then we execute the contents of this `if` block.
+If either our `usage` or `summary` variable have values, then we execute the following block of code.
 
-Next block of code:
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Next:
 
 ```
-    if [ -n "$usage" ]; then
-      echo "$usage"
-    else
-      echo "Usage: rbenv ${command}"
-    fi
+if [ -n "$usage" ]; then
+  echo "$usage"
+else
+  echo "Usage: rbenv ${command}"
+fi
 ```
 
-If `usage` is non-empty (i.e. if this command has specific usage instructions in its file), then we echo it.  Otherwise, we echo a default value of `Usage: rbenv` plus the name of the command.
+If the `usage` variable has a value (i.e. if this command has usage documentation), then we `echo` those docs.  Otherwise, we `echo` the string `Usage: rbenv ` plus the name of the command.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next block of code:
 
 ```
 if [ -n "$help" ]; then
-      echo
-      echo "$help"
-      echo
-    fi
+  echo
+  echo "$help"
+  echo
+fi
 ```
+
 If the `help` variable is non-empty, we echo its value, surrounded by a newline both before and after.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Last block of code for our `print_help` function:
 
 ```
-  else
-    echo "Sorry, this command isn't documented yet." >&2
-    return 1
-  fi
+else
+  echo "Sorry, this command isn't documented yet." >&2
+  return 1
+fi
 ```
 
-This is the `else` block for our `if [ -n "$usage" ] || [ -n "$summary" ]; then` condition.  If neither the `usage` nor the `summary` variables have values, we print an error message to STDERR and return a non-zero exit status.
+If neither the `usage` nor the `summary` variables have values, we print an error message to STDERR and return a non-zero exit status.
 
 That's it for the `print_help` function!
+
+### Printing just the `usage` docs
 
 Next block of code:
 
@@ -1068,6 +1484,8 @@ print_usage() {
 
 The first 3 lines should look familiar- we instantiate and populate 4 local variables, named `command`, `summary`, `usage`, and `help`.  Then, if `usage` contains a value, we print it to STDOUT.
 
+### Re-using the `usage` variable for something else
+
 Next block of code:
 
 ```
@@ -1078,11 +1496,11 @@ if [ "$1" = "--usage" ]; then
 fi
 ```
 
-First we unset the `usage` variable if it has already been set, to guarantee that it's empty.  If the first argument to `rbenv help` is `--usage`, we set the value of the `usage` variable to "1".  We then remove that first argument from the list of shell arguments, leaving us with a new first argument (which is accessed in the next block of code).
+ - First we unset the `usage` variable if it has already been set, to guarantee that it's empty.
+ - If the first argument to `rbenv help` is `--usage`, we set the value of the `usage` variable to "1".
+ - We then remove that first argument from the list of shell arguments, leaving us with a new first argument (which is accessed in the next block of code).
 
-### Quick aside
-
-I checked the status of [the PR I submitted to RBENV](https://github.com/rbenv/rbenv/pull/1422){:target="_blank" rel="noopener"} (the one about the `KSH_ARRAYS` option), and it looks like it was merged!  Holy crap, I'm now officially a contributor to the RBENV codebase! :party:
+### Printing general help docs
 
 Next block of code:
 
@@ -1098,9 +1516,16 @@ if [ -z "$1" ] || [ "$1" == "rbenv" ]; then
   echo "For full documentation, see: https://github.com/rbenv/rbenv#readme"
 ```
 
-If `[ -z "$1" ]` is true, that means the first argument is empty.  This, in turn, means either the user typed `rbenv help` without arguments, or they typed `rbenv help --usage` and the `--usage` argument was `shift`ed off in the previous block of code.  If that's the case, *or* if the first argument to `rbenv help` was `rbenv` (i.e. the user typed `rbenv help rbenv`), we do the following:
+If `[ -z "$1" ]` is true, that means the first argument is empty.  This, in turn, means either the user typed `rbenv help` without arguments, or they typed `rbenv help --usage` and the `--usage` argument was `shift`ed off in the previous block of code.
 
-First, we echo a general usage instruction that applies to all rbenv commands.  Then, if we set the value of `usage` in the preious `if` block, we exit.  Otherwise, if that variable is currently empty, we echo summaries for a hard-coded list of rbenv commands (the line `print_summaries commands local global shell install...`), as well as some additional hard-coded strings before and after the summaries.
+If that's the case, *or* if the first argument to `rbenv help` was `rbenv` (i.e. the user typed `rbenv help rbenv`), we do the following:
+
+ - First, we echo a general usage instruction that applies to all rbenv commands.
+ - Then, if we set the value of `usage` in the preious `if` block, we exit.
+ - Otherwise, if that variable is currently empty, we echo summaries for a hard-coded list of rbenv commands (the line `print_summaries commands local global shell install...`).
+ - We also print some additional hard-coded strings before and after the summaries.
+
+### Printing help docs for a specific command
 
 Next block of code:
 
@@ -1119,12 +1544,55 @@ else
   fi
 fi
 ```
-This is the `else` block for the `if [ -z "$1" ] || [ "$1" == "rbenv" ]; then` condition.  If that condition is false, that means the user provided an argument to `rbenv help` which was *not* "rbenv" (i.e. they typed `rbenv help` plus a specific command like `global`, `local`, etc.  In this case, we do the following:
+This is the `else` block for our previous `if` condition.  If that condition is false, that means the user provided an argument to `rbenv help` which was *not* "rbenv" itself (i.e. they typed `rbenv help` plus a specific command like `global`, `local`, etc.).  In this case, we do the following:
 
-First, we set the `command` variable equal to the first argument.  If that command is associated with a file in our `$PATH` directories, then we either print any `usage` instructions for that command (if they exist), or else print the `help` instructions for that command.  Remember that the `print_help` method specifies that we only print `help` instructions if either `summary` or `usage` instructions also exist.  So I think this means we don't actually need the `if [ -n "$usage" ] || ` check on [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L126){:target="_blank" rel="noopener"}.  Because if we've reached this line, that means the `if` check [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L169){:target="_blank" rel="noopener"} (which is the same check) must have failed.  Alternately, we could keep that `if` check and delete [the one here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L168){:target="_blank" rel="noopener"}, which (I think?) should have the same effect.
+ - First, we set the `command` variable equal to the first argument.
+ - If that command is associated with a file in our `$PATH` directories, then we either:
+    - print any `usage` instructions for that command (if the user passed the `--usage` flag and `$usage` was re-set), or
+    - print the `help` instructions for that command.
+ - Lastly, if the `if` check here (`if [ -n "$(command_path "$command")" ]; then`) fails, then we echo a "no such command" error message and direct it to STDERR, and we exit with a non-zero status.
 
-TODO- submit a PR for this change.
+### A Potential PR?
 
-Lastly, if the `if` check here (`if [ -n "$(command_path "$command")" ]; then`) fails, then we echo a "no such command" error message and direct it to STDERR, and we exit with a non-zero status.
+Remember that the `print_help` method specifies that we only print `help` instructions if either `summary` or `usage` instructions also exist:
 
-That's it for this command!  On to the next command in our repo.
+```
+print_help() {
+  local command="$1"
+  local summary usage help
+  eval "$(documentation_for "$command")"
+  [ -n "$help" ] || help="$summary"
+
+  if [ -n "$usage" ] || [ -n "$summary" ]; then         # here
+    if [ -n "$usage" ]; then                            # and here
+      echo "$usage"
+    else
+      echo "Usage: rbenv ${command}"
+    fi
+    if [ -n "$help" ]; then
+      echo
+      echo "$help"
+      echo
+    fi
+  else
+    echo "Sorry, this command isn't documented yet." >&2
+    return 1
+  fi
+}
+```
+
+So I think this means that we may have some redundant `if` conditions.  For example:
+
+```
+if [ -n "$usage" ]; then
+  print_usage "$command"
+else
+  print_help "$command"
+fi
+```
+
+If we reach the `print_help` call above, that means `$usage` is empty.  So we shouldn't need the 2 `if [ -n "$usage" ]` checks inside `print_help` (indicated by the `#here` comments above).  If those are indeed superfluous, removing them would make the code cleaner and easier to read.  Could be a good candidate for a PR.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+That's it for this command!  On to the next one.
