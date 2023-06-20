@@ -1,3 +1,5 @@
+TODO- start with the `Usage`, `Summary`, and `Help` comments in the top of each file, before reading the tests.
+
 This is the file that gets called by [this block of the `rbenv` file](https://github.com/rbenv/rbenv/blob/0767d64344d0c52282125e2e25aa03f4d7a80698/libexec/rbenv#L103-L104){:target="_blank" rel="noopener"} when the user types either `rbenv -v` or `rbenv --version` in their terminal.
 
 As we've done before, we'll start with the tests first:

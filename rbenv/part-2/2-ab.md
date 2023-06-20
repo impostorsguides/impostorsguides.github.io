@@ -1,7 +1,7 @@
 ---
 layout: page
 category: rbenv-pt-2
-id: 38
+id: 36
 previous-title: "rbenv-versions"
 previous-permalink: /rbenv/commands/versions
 title: "rbenv-whence"

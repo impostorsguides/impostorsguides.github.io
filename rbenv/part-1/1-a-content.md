@@ -1,5 +1,7 @@
 "The most effective debugging tool is still careful thought, coupled with judiciously placed print statements." — Brian Kernighan, [<u>Unix for Beginners</u>](https://web.archive.org/web/20220122011437/https://wolfram.schneider.org/bsd/7thEdManVol2/beginners/beginners.pdf){:target="_blank" rel="noopener"}.
 
+NOTE: this is NOT an official guide to RBENV's codebase.  It is not written by any member of the RBENV core team, and is not endorsed by them in any way.  It is simply the educated guesses of a journeyman engineer who wants to attain mastery by reading open-source code.
+
 TODO: include instructions on installing RBENV from the Github repo, as opposed to from Homebrew?
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>

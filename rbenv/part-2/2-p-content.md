@@ -1,14 +1,85 @@
-TODO- does this post cover the reason why we clear the shell cache [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-sh-rehash#L21){:target="_blank" rel="noopener"}?  If not, it's because of [this issue](https://github.com/rbenv/rbenv/issues/119){:target="_blank" rel="noopener"}.  Consider adding context around that.
+If we haven't mentioned this already, "rehashing" in the context of RBENV means "re-generating the shims".  This is a process which happens automatically, when you install a new gem, but you can also trigger it yourself.  RBENV's rehashing behavior is controlled mainly by two files- `rbenv-rehash` and `rbenv-sh-rehash`.
 
-From the README.md file, we see a description for this command:
+Since the `libexec/rbenv-rehash` and `libexec/rbenv-sh-rehash` files are closely related, we'll look at both of them in this same post.
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-904am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
-</p>
+From [the latest version of the README.md file](https://github.com/rbenv/rbenv/blob/af9201ea1ef7dca287a15fe30d51dd187403c993/README.md){:target="_blank" rel="noopener"}, we see a description for this command:
 
-First up- the test file.
+> `rbenv rehash`
+>
+> Installs shims for all Ruby executables known to rbenv (`~/.rbenv/versions/*/bin/*`). Typically you do not need to run this command, as it will run automatically after installing gems.
+
+If we look at the path `~/.rbenv/versions/*/bin/*`, we see two asterisks.  The first one is after the `versions/` directory.  When I look inside `~/.rbenv/versions`, I see a single sub-directory for each version of Ruby that I've installed via RBENV:
+
+```
+$ ls -la ~/.rbenv/versions/
+
+total 0
+drwxr-xr-x   4 myusername  staff  128 Jun  5 09:41 .
+drwxr-xr-x  17 myusername  staff  544 Jun 11 10:04 ..
+drwxr-xr-x   7 myusername  staff  224 May 30 13:34 2.7.5
+drwxr-xr-x   7 myusername  staff  224 Jun  5 09:46 3.0.0
+```
+
+If I look inside one of these sub-directories, and further drill down into its `bin/` sub-directory (as per the path mentioned in `README.md`), I see:
+
+```
+$ ls -la ~/.rbenv/versions/2.7.5/bin/
+
+total 792
+drwxr-xr-x  88 myusername  staff   2816 May 31 11:55 .
+drwxr-xr-x   7 myusername  staff    224 May 30 13:34 ..
+-rwxr-xr-x   1 myusername  staff    538 May 30 13:37 bootsnap
+-rwxr-xr-x   1 myusername  staff    538 May 30 13:37 brakeman
+-rwxr-xr-x   1 myusername  staff    563 May 30 13:35 bundle
+-rwxr-xr-x   1 myusername  staff    566 May 30 13:37 bundle-audit
+-rwxr-xr-x   1 myusername  staff    556 May 30 13:39 bundle_report
+-rwxr-xr-x   1 myusername  staff    565 May 30 13:35 bundler
+-rwxr-xr-x   1 myusername  staff    568 May 30 13:37 bundler-audit
+-rwxr-xr-x   1 myusername  staff    526 May 30 13:38 byebug
+-rwxr-xr-x   1 myusername  staff    590 May 30 13:38 chromedriver
+-rwxr-xr-x   1 myusername  staff    604 May 30 13:38 chromedriver-update
+-rwxr-xr-x   1 myusername  staff    532 May 30 13:38 coderay
+-rwxr-xr-x   1 myusername  staff    562 May 30 13:38 commonmarker
+-rwxr-xr-x   1 myusername  staff    552 May 30 13:38 console
+-rwxr-xr-x   1 myusername  staff    554 May 30 13:39 deprecations
+-rwxr-xr-x   1 myusername  staff    526 May 30 13:38 dotenv
+-rwxr-xr-x   1 myusername  staff    582 May 30 13:38 elastic_ruby_console
+-rwxr-xr-x   1 myusername  staff   5097 May 30 13:35 erb
+-rwxr-xr-x   1 myusername  staff    526 May 30 13:38 erubis
+-rwxr-xr-x   1 myusername  staff    520 May 30 13:38 faker
+-rwxr-xr-x   1 myusername  staff    532 May 30 13:38 fission
+-rwxr-xr-x   1 myusername  staff    508 May 30 13:39 fog
+-rwxr-xr-x   1 myusername  staff    532 May 30 13:39 foreman
+-rwxr-xr-x   1 myusername  staff    576 May 30 13:39 gecko_updater
+
+...
+```
+
+Each `bin/` sub-directory of each `versions/*` directory contains all the Ruby gems I've installed for that version of Ruby.  So now we know that RBENV will maintain a different installation of a given gem for each version of Ruby you have installed.
+
+Note, however, that it doesn't install each of these copies automatically.  For example, if I have Rails installed for Ruby `v2.7.5` and I use `rbenv local 3.0.0` to change my project's Ruby version, I'll have to re-install the `rails` gem (if I haven't already done so) for this new Ruby version.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Now onto reading the files.  As usual, first we'll look at the usage comments.
+
+## Usage + summary comments
+
+`rbenv-sh-rehash` doesn't have any usage or summary comments, because we're not meant to run that command directly.  That command is executed elsewhere, as we'll see below.
+
+`rbenv-rehash` does contain comments, but only a one-liner Summary section:
+
+```
+# Summary: Rehash rbenv shims (run this after installing executables)
+```
+
+This doesn't tell us anything that the README file didn't already tell us.
+
+That's it for the usage comments, now on to the test file.
 
 ## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rehash.bats){:target="_blank" rel="noopener"}
+
+### The `create_executable` function
 
 After the `bats` shebang and the loading of `test_helper`, the first block of code is:
 
@@ -27,9 +98,24 @@ Here we define a helper function named `create_executable`.  This function gets 
 create_executable "1.8" "ruby"
 ```
 
-This function creates a local variable named `bin`, and sets it equal to a directory path constructed with the value of `RBENV_ROOT` plus the first argument.  For example, if the value of this env var on my machine is `/Users/myusername/.rbenv` and the first argument I supply to the function is `1.8` (as it is above), then `bin` resolves to `/Users/myusername/.rbenv/versions/1.8/bin`.  We then make a directory with this name, and make any sub-directories too if they don't already exist.  We then create an empty file in this directory using the 2nd argument to the function (in the case above, the file is named `/Users/myusername/.rbenv/versions/1.8/bin/ruby`).  We then modify this new file to make it executable, hence the function name `create_executable`.
+The first line of this function does the following:
 
-(stopping here for the day; 54037 words)
+ - creates a local variable named `bin`
+ - sets the variable equal to a directory path composed of:
+ - the value of `RBENV_ROOT` (ex.- `~/.rbenv`)
+ - the string `/versions/`
+ - the first argument
+ - the string `/bin`
+
+For example, if the value of this env var on my machine is `/Users/myusername/.rbenv` and the first argument I supply to the function is `1.8` (as it is above), then `bin` resolves to `/Users/myusername/.rbenv/versions/1.8/bin`.
+
+We then:
+
+ - make a directory with this name.
+ - create an empty file in this directory with the same name as the 2nd argument to the function.
+ - modify this new file to make it executable, hence the function name `create_executable`.
+
+### `rbenv rehash` without any parameters
 
 First test in this file:
 
@@ -43,7 +129,14 @@ First test in this file:
 }
 ```
 
-As a sanity check, we first assert that the `$RBENV_ROOT/shims` directory does not currently exist.  We then run the `rbenv rehash` command, and assert that it succeeded without any printed output lines.  We also assert that the `$RBENV_ROOT/shims` does now exist, implying that it's the job of `rbenv rehash` to create this dir.  Lastly, as a cleanup step, we remove the newly-created dir.
+This test does the following:
+
+ - As a sanity check test, we first assert that the `/shims` directory does not exist
+ - We then run the `rbenv rehash` command, and assert that it succeeded without any printed output lines.
+ - We also assert that the `$RBENV_ROOT/shims` does now exist, implying that it's the job of `rbenv rehash` to create this dir.
+ - Lastly, as a cleanup step, we remove the newly-created dir.
+
+### When we don't have permission to create files in the `/shims` folder
 
 Next test:
 
@@ -56,7 +149,15 @@ Next test:
 }
 ```
 
-Here we again make the same directory, but then change its permissions via `chmod -w`.  The `w` symbol means we're changing the "write" permissions, and the "-" means we're preventing the user from doing the thing that comes after "-".  So we're preventing users (including the programs they execute, such as `rbenv rehash`) from being able to write to this new directory.  After we run `rbenv rehash`, we assert that the program failed and that a specific error message is output which tells the user that the directory is non-writable.
+ - Here we again make the same directory, but then change its permissions via `chmod -w`.
+    - The `w` symbol means we're changing the "write" permissions, and
+    - the "-" means we're preventing the user from doing the thing that comes after "-".
+    - So we're preventing users (including the programs they execute, such as `rbenv rehash`) from being able to write to this new directory.
+ - After we run `rbenv rehash`, we assert that:
+    - the program failed and that
+    - a specific error message is output which tells the user that the directory is non-writable.
+
+### Protecting against two colliding attempts at hashing
 
 Next test:
 
@@ -69,7 +170,17 @@ Next test:
 }
 ```
 
-We start by making the same `/shims` directory that we made in the last 2 tests.  We then create an empty file called `.rbenv-shim`, run `rbenv rehash`, and assert that the program failed and that the error message tells the user that the `.rbenv-shim` file already exists.  Judging by the test description ("rehash in progress"), we can likely deduce that this file is created when the rehash process starts, and is deleted when the process is finished.
+This test does the following:
+
+ - We start by making the same `/shims` directory that we made in the last 2 tests.
+ - We then create an empty file called `.rbenv-shim`, run `rbenv rehash`.
+ - Lastly, we assert that:
+    - the program failed, and that:
+    - the error message tells the user that the `.rbenv-shim` file already exists.
+
+Judging by the test description ("rehash in progress"), we can likely deduce that this file is created when the rehash process starts, and is deleted when the process is finished.
+
+### Creating the shim files
 
 Next test:
 
@@ -97,9 +208,20 @@ OUT
 }
 ```
 
-Here we see the use of the `create_executable` helper function we analyzed at the start of this file.  We create 4 executable files, 2 in the "1.8/" version directory (one file named "ruby" and one named "rake") and 2 in the "2.0/" version directory (one also named "ruby" and one named "rspec").  We then, as a sanity check, assert that there are no existing files within `$RBENV_ROOT/shims` named "ruby", "rake", or "rspec".  We then run the "rehash" command, assert that it was successful.  Lastly, we assert that listing the contents of the `shims/` sub-directory is successful, and that its output includes "rake", "rspec", and "ruby".
+Here we see the use of the `create_executable` helper function we analyzed at the start of this file.  Our test does the following:
+
+ - We create 4 executable files:
+    - 2 in the "1.8/" version directory (one file named "ruby" and one named "rake") and
+    - 2 in the "2.0/" version directory (one also named "ruby" and one named "rspec").
+ - We then, as a sanity check, assert that there are no existing files within `$RBENV_ROOT/shims` named "ruby", "rake", or "rspec".
+ - We then run the "rehash" command, assert that it was successful.
+ - Lastly, we assert that:
+    - listing the contents of the `shims/` sub-directory is successful, and that
+    - its output includes "rake", "rspec", and "ruby".
 
 Judging by the sanity check and final assertions in this spec, we can deduce that we created the "ruby" file twice (once in each directory) because we wanted to specifically assert that the final output would not include "ruby" twice.
+
+### Removing outdated shims
 
 Next test:
 
@@ -119,7 +241,17 @@ Next test:
 }
 ```
 
-As setup, we make our `shims/` directory and add a file named "oldshim1" to it, which we make executable.  We then create two new executable files in a new directory named "versions/2.0/bin"- one executable named "rake" and the other named "ruby".  When we run `rbenv rehash`, we assert that the command was successful, and that the "oldshim1" file no longer exists.
+This test does the following:
+
+ - As setup, we make our `shims/` directory and add a file named "oldshim1" to it, which we make executable.
+ - We then create two new executable files in a new directory named "versions/2.0/bin":
+    - one executable named "rake" and
+    - the other named "ruby".
+ - When we run `rbenv rehash`, we assert that:
+    - the command was successful, and
+    - the "oldshim1" file no longer exists.
+
+This test shows us that, as part of creating the shims for the "newly-installed" `rake` and `ruby` executables, we also remove shims for any exist that no longer exist in our executables directory (presumably because they've been uninstalled).
 
 Next spec:
 
@@ -144,9 +276,25 @@ Next spec:
 }
 ```
 
-We create a "versions/2.0/" directory with two executable files, one named "unicorn_rails" and one named "rspec-core".  Next we run the "rehash" command.  We then copy the contents of the "rspec-core" file into three identical files, one named "rspec", one named "rails", and one named "uni".  We update the permissions on all 3 cloned files to make them executable.  We then re-run the "rehash" command and assert it was successful.  Lastly, we assert that the 3 cloned files no longer exist.
+This is another test which covers the removal of outdated shims.  It does the following:
 
-I'm actually not sure what the purpose of this spec is.  It doesn't seem to be doing anything different from what the previous spec did.  Perhaps we'll figure it out when we move on to analyzing the command code itself.
+ - create a "versions/2.0/" directory with two executable files:
+    - one named "unicorn_rails" and
+    - one named "rspec-core".
+ - Next we run the "rehash" command, to create the shims for these executables.
+ - We then copy the contents of the "rspec-core" file into three new shims:
+    - one named "rspec",
+    - one named "rails", and
+    - one named "uni".
+ - We then update the permissions on all 3 cloned files to make them executable.
+ - We then re-run the "rehash" command and assert it was successful.
+ - Lastly, we assert that the 3 cloned files no longer exist.
+
+In our test, there are 3 shims in the test (named `rails`, `rake`, and `uni`) which were **not** generated via `rbenv rehash`, and therefore they don't belong to a corresponding executable.  In real-world usage of RBENV, one case where this might happen is if an executable is un-installed.  The shims for these executables are therefore considered "stale".
+
+In the case of our test, let's look at the names of each of the 3 "stale" shims that we create.  We can see that these names all partially (but **not** fully) overlap with the two executables that we created (`unicorn_rails` and `rspec-core`).  This test ensures that a partial name match is not good enough, and that the name must match completely in order for the shim to be preserved.
+
+### When a Ruby binary name includes spaces
 
 Next test:
 
@@ -170,7 +318,17 @@ OUT
 }
 ```
 
-As setup, we create two new sub-directories of the "versions" folder, both containing spaces.  We also create one executable file in each new sub-directory.  As a sanity check, we first assert that there are no shims in our `$RBENV_ROOT` folder associated with these new executables.  We then run the "rehash" command and assert it was successful.  Lastly, we run "ls" on our "shims/" folder and assert that a new shim was created for each of the executable files we created in our setup.  This test ensures that even binaries whose parent folder contains spaces can be shim'ed.
+This test does the following:
+
+ - As setup, we create two new sub-directories of the "versions" folder, both containing spaces.
+ - We also create one executable file in each new sub-directory.
+ - As a sanity check, we first assert that there are no shims in our `$RBENV_ROOT` folder associated with these new executables.
+ - We then run the "rehash" command and assert it was successful.
+ - Lastly, we run "ls" on our "shims/" folder and assert that a new shim was created for each of the executable files we created in our setup.
+
+This test ensures that even binaries whose parent folder contains spaces can be shim'ed.
+
+### Preserving the original value of `IFS`
 
 Next test:
 
@@ -188,29 +346,13 @@ SH
 }
 ```
 
-I think I'm starting to see what the concept of "hooks" means with respect to RBENV.  When I first encountered this spec, I took the liberty of skipping ahead and looking at the code for the `rehash` command itself, and searching for "hooks" in the code.  I found this:
+This test covers [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-rehash#L158-L164){:target="_blank" rel="noopener"}, ensuring that any value of `IFS` passed to a hook is respected.
 
-```
-# Allow plugins to register shims.
-OLDIFS="$IFS"
-IFS=$'\n' scripts=(`rbenv-hooks rehash`)
-IFS="$OLDIFS"
+[Remember](https://web.archive.org/web/20220814065502/https://unix.stackexchange.com/questions/184863/what-is-the-meaning-of-ifs-n-in-bash-scripting){:target="_blank" rel="noopener"}, IFS stands for "internal field separator" and determines which character(s) the shell will use to perform word splitting.
 
-for script in "${scripts[@]}"; do
-  source "$script"
-done
-```
+The test does the following:
 
-The above code is executed just before the meat of the `rehash` command, at the very end of the file:
-
-```
-install_registered_shims
-remove_stale_shims
-```
-
-I've seen code like this before, in other files which accept hooks, but I don't think I understood its full purpose until now.  The job of this code is to run any hook code that's registered for the "rehash" command *just before* running the code for "rehash" itself.  That means the job of a hook in RBENV is to let you modify the environment in which a hook is run, i.e. by changing values of environment variables, therefore potentially affecting the way that the command you hook into is run.
-
-If the above is true, that would explain why the current test is written the way that it is.  We first create a hook for the "rehash" command named "hello.bash", which contains the following executable logic:
+ - We first create a hook for the "rehash" command named "hello.bash", which contains the following executable logic:
 
 ```
 hellos=(\$(printf "hello\\tugly world\\nagain"))
@@ -218,11 +360,16 @@ echo HELLO="\$(printf ":%s" "\${hellos[@]}")"
 exit
 ```
 
-This hook creates a variable named "hellos" and sets it equal to "hello\tugly world\nagain".  This represents the words "hello", "ugly", "world", and "again", separated by (respectively) a tab character, a space character, and a newline character.  The hook then `echo`s an assignment to a variable called `HELLO`.  This assignment statement sets `HELLO` equal to the above string, however it first splits that string based on whatever the current value of the IFS is, and then prefix each newly-split word with the ":" character before printing it.
+ - This hook creates a variable named "hellos" and sets it equal to "hello\tugly world\nagain".
+    - This represents the words "hello", "ugly", "world", and "again", separated by (respectively) a tab character, a space character, and a newline character.
+    - The hook then `echo`s an assignment to a variable called `HELLO`.
+    - This assignment statement sets `HELLO` equal to the above string, however it first splits that string based on whatever the current value of the IFS is, and then prefix each newly-split word with the ":" character before printing it.
+ - The test then runs the "rehash" command, ensuring that we set `IFS` equal to the 3 characters we intend to split on (again, the tab char, the space char, and the newline char).
+ - Lastly, we assert that:
+    - the command ran successfully, and that
+    - the word-splitting had the intended effect of replacing the old string `hello\tugly world\nagain` with the new string `:hello:ugly:world:again`.
 
-[Remember](https://web.archive.org/web/20220814065502/https://unix.stackexchange.com/questions/184863/what-is-the-meaning-of-ifs-n-in-bash-scripting){:target="_blank" rel="noopener"}, IFS stands for "internal field separator" and determines which character(s) the shell will use to perform word splitting.
-
-We then run the "rehash" command, ensuring that we set `IFS` equal to the 3 characters we intend to split on (again, the tab char, the space char, and the newline char).  Lastly, we assert that the command ran successfully and that the word-splitting had the intended effect of replacing the single string "hello\tugly world\nagain" with the array of words (hello ugly world again), and prefixing each string in this array with a ":", before joining these words together and printing out a statement which assigns the variable `HELLO` to this newly-joined string.
+### The `sh-rehash` command
 
 Next test:
 
@@ -235,15 +382,15 @@ Next test:
 }
 ```
 
-This test creates a file under "versions/2.0" named "ruby", and then runs "rbenv sh-rehash".  We then assert that the command ran successfully, and that the printed output contained the string:
+This test creates a file under `/versions/2.0` named `ruby`.  It then runs `rbenv sh-rehash`, making sure to specify `bash` as the shell program for RBENV to use.  We then assert that the command ran successfully, and that the printed output contained the string:
 
 ```
 "hash -r 2>/dev/null || true"
 ```
 
-Lastly, we assert that a shim for our "ruby" executable file was created.
+Lastly, we assert that a shim for `ruby` was created.  The `-x` flag inside `[ ... ]` returns true if the file exists and is executable.
 
-Side note- the "rbenv sh-rehash" command is one we haven't seen before, to my knowledge.  Looks like it has its own file, separate from the "rbenv-rehash" file.  It appears that the only specs for this command are inside the specs for "rbenv-rehash", so we will likely have to analyze the "rbenv-sh-rehash" and "rbenv-rehash" command files together.
+As we can see, the tests for `rbenv-sh-rehash` are in the same spec file as those of `rbenv-rehash`.  That's one reason why we're tackling these two files together.  We'll find out further down how and when `sh-rehash` is invoked.
 
 Last spec:
 
@@ -256,17 +403,13 @@ Last spec:
 }
 ```
 
-This spec performs the same set of assertions as our previous test, but with the RBENV shell set to "fish" instead of "bash".
-
-Side note- I notice that we have "rbenv-sh-rehash" specs for "bash" and "fish", but not for "zsh".  zsh is now the default shell for new Macbooks going forward, so perhaps it makes sense to write a spec for zsh as well?
-
-TODO- new PR to write a spec for zsh.
-
-(stopping here for the day; 55662 words)
+This spec performs the same set of assertions as our previous test, but with the RBENV shell set to `fish` instead of `bash`.
 
 ## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-rehash){:target="_blank" rel="noopener"}
 
-The files "rbenv-sh-rehash" and "rbenv-rehash" are related to each other.  Let's analyze #1 first, and then move on to #2.  First lines of code are familiar:
+As we've discovered from the fact that they share the same test file, the files `rbenv-sh-rehash` and `rbenv-rehash` are related to each other.  We'll analyze `rbenv-sh-rehash` first, and then move on to `rbenv-rehash`.
+
+The first lines of code are familiar:
 
 ```
 #!/usr/bin/env bash
@@ -279,17 +422,20 @@ if [ "$1" = "--complete" ]; then
 fi
 ```
 
-The `bash` shebang.
-Note- no "Usage" or "Summary" instructions here.  This file is likely meant to be for internal use only.
-Setting verbose mode if `RBENV_DEBUG` is set.
-Tab completion instructions.
+ - The `bash` shebang.
+ - This time, there are no "Usage" or "Summary" instructions.  This command is meant to be called by RBENV itself, not by users.
+ - Setting verbose mode if `RBENV_DEBUG` is set.
+ - Tab completion instructions.
+
+### Storing the name of the user's shell
 
 Next line of code:
 
 ```
 shell="$(basename "${RBENV_SHELL:-$SHELL}")"
 ```
-Here we set the variable `shell` equal to the filename (excluding the bath) of either the value of `RBENV_SHELL`, or (if that doesn't exist) the value of `SHELL` as a default.  The `basename` command takes a string like `/path/to/filename.txt` and returns everything after the last `/` character:
+
+Here we set the variable `shell` equal to the filename (excluding the path) of either the value of `RBENV_SHELL`, or (if that doesn't exist) the value of `SHELL` as a default.  According to [the man page](https://web.archive.org/web/20220803201400/https://linuxcommand.org/lc3_man_pages/basename1.html){:target="_blank" rel="noopener"}, the `basename` command takes a string like `/path/to/filename.txt` and returns everything after the last `/` character.  For example:
 
 ```
 $ mkdir -p foo/bar/baz
@@ -298,31 +444,7 @@ $ basename foo/bar/baz/buzz
 
 buzz
 ```
-
-Here's the `man` page for more info:
-
-```
-BASENAME(1)                                                                  General Commands Manual                                                                 BASENAME(1)
-
-NAME
-     basename, dirname – return filename or directory portion of pathname
-
-SYNOPSIS
-     basename string [suffix]
-     basename [-a] [-s suffix] string [...]
-     dirname string [...]
-
-DESCRIPTION
-     The basename utility deletes any prefix ending with the last slash '/' character present in string (after first stripping trailing slashes), and a suffix, if given.  The
-     suffix is not stripped if it is identical to the remaining characters in string.  The resulting filename is written to the standard output.  A non-existent suffix is
-     ignored.  If -a is specified, then every argument is treated as a string as if basename were invoked with just one argument.  If -s is specified, then the suffix is taken
-     as its argument, and all other arguments are treated as a string.
-
-     The dirname utility deletes the filename portion, beginning with the last slash '/' character to the end of string (after first stripping trailing slashes), and writes the
-     result to the standard output.
-
-...
-```
+### Calling `rbenv-rehash`
 
 Next lines:
 
@@ -333,101 +455,11 @@ Next lines:
 rbenv-rehash
 ```
 
-The first question I have is, what is "rbenv shell integration"?  The first line of the comment says "When rbenv shell integration is enabled,...".  To me, this implies that it's possible that sometimes, shell integration is *not* enabled.  Otherwise, the phrase "when shell integration is enabled" translates to "all the time", in which case it's a superfluous statement.  If that were the case, you could drop that clause entirely and just say "Delegate to rbenv-rehash..." etc.  Therefore, my brain tells me to operate under the assumption that it's possible to either enable or disable shell integration depending on the user's preference.
+So `rbenv-sh-rehash` simply delegates to `rbenv-rehash`, but (according to the comments) it also clears out the shell's command lookup cache.
 
-I `grep` for the string "integration" and I see that it occurs in the `README.md` file:
+### Clearing the cache
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-909am.png" width="80%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-OK, so this confirms my suspicion that the user *does* have the option of not using shell integration.  It also tells us that step 3 of the install process contains more info on shell integration:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-910am.png" width="80%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-So since opening a new terminal causes `.zshrc` to be executed (and therefore `eval "$(rbenv init - zsh )" ` to be executed and the `rbenv` shell function to be implemented), the "shell integration" to which the README refers must be a reference to the creation and usage of the `rbenv` shell function.  Perhaps it even refers to all the shell commands (like `rbenv local`, `rbenv global`, etc.) that it exposes.
-
-But how would one use RBENV *without* that function?  I was under the impression that one *had* to use that function; it's part of the install instructions, after all.
-
-The instructions for the `rbenv shell` command say that, if we don't want to use shell integration, we can just set the `RBENV_VERSION` env var ourselves.  But how would that env var be used, if not from the `rbenv` shell function defined in `rbenv-init`?  I thought that function was the gateway to using all of RBENV's Ruby versions, shims, etc.  How would RBENV even read the value of `RBENV_VERSION`, if not from the shell function?
-
-My best guess is that the only remaining value if one *doesn't* install and use the RBENV shell function is that RBENV will still intercept calls that you make to your gem executables, and delegate those calls to the executable for the version of Ruby that you've specified via manually setting `RBENV_VERSION`.  If that's not the case, then there must be something fundamental I'm missing about how RBENV works.  And even if that is the case, I'm still not sure why someone would want to go through all this trouble to avoid using the RBENV shell function and its terminal commands, which seems pretty benign (and even helpful in most cases).
-
-I decide to [search](https://github.com/rbenv/rbenv/search?q=%22shell+integration%22&type=issues){:target="_blank" rel="noopener"} the Github repo's "Commit" and "Issue" histories for "shell integration".  I find [this issue](https://github.com/rbenv/rbenv/issues/1409){:target="_blank" rel="noopener"} containing some additional useful context.  I think it's a pretty good summary of the differences between using RBENV with vs. without shell integration:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-911am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-A couple of the highlights:
-
-> ...shims require no rbenv shell integrations to work—they just want to be present in PATH.
->
-> ...it's absolutely possible to use most rbenv functionality without ever enabling its shell integration. This is all that's needed:
->
-> `export PATH=~/.rbenv/bin:~/.rbenv/shims:"$PATH"`
->
-> Calling most rbenv commands, switching between versions, and executing shims will all work with this approach. Rbenv was intentionally designed to not need shell integrations (unlike RVM).
-
-I feel like this basically confirms my hypothesis that "...RBENV will still intercept calls that you make to your gem executables, and delegate those calls to the executable for the version of Ruby that you've specified via manually setting `RBENV_VERSION`."
-
-But still, why was "RBENV... intentionally designed to not need shell integrations"?  What's so bad about shell integrations that RBENV would intentionally be designed not to need them?
-
-I Google "rbenv vs rvm" and one of the first results I see is [a Reddit thread](https://www.reddit.com/r/rails/comments/f009mb/there_are_two_ruby_version_manager_rvm_vs_rbenv/){:target="_blank" rel="noopener"} comparing the two.  Again, a few highlights:
-
-> I used to use RVM but got bit one too many times by the amount of crap they do to your shell env. Overriding cd is just insane.
->
-> They've also been sloppy with escaping shell arguments. Years ago it took out half of my system directory running some command because it didn't escape the shell arguments and I (stupidly, upon reflection and with the benefit of experience) put my home directory on a partition that had a space in the name and it decided to wipe /Volumes/OSX when my home directory was on /Volumes/OSX Users. Apparently not escaping the space and doing rm -fr /Volumes/OSX Users/jay/.rvm/whatever/the/path/was was not a good idea. From then on I learned not to use spaces in paths of important directory structures.
->
-> (rvm) always overrides cd, as soon as you source it in. That's how it can automatically switch versions when you cd into a directory with a .ruby-version file.
->
-> ...rvm redefines cd into its own function. That's what people mean by being intrusive, it takes over a bunch of core functions
->
-> Rvm was created before bundles so it has a bunch of clever hacks that just aren't needed any more. I think it is better to use something designed around modern ruby, like chruby. You don't need to do much more than mess around with PATH and various GEM environment variables these days, chruby does just that and nothing more.
->
-> RVM was the cat's meow back in the Ruby 1.8/1.9 days (ca. 2003-2007). A decade or so on (2013-2014), rbenv and ruby-install came out, with far less reliance on antique shell or Ruby versions.
-
-FWIW, that same Reddit thread also has a bunch of interesting info about other manager programs, such as `chruby` and `asdf`:
-
-> `chruby` is the least invasive and most well-designed of the bunch.
-
-> We use asdf. https://asdf-vm.com/#/ You can use it to manage loads of languages. We like it because we use the same tool and file to maintain versions for ruby, node, terraform, python.
-
-> Switched to asdf recently and it really is an incredible tool to manage multiple languages.
-
-> Came here to say the same. I'm a polyglot developer and using a single tool for python, ruby, elixir, and erlang (so far) is extremely convenient.
-
-> I've used RVM for ages. As for why, RVM lets you have multiple gem sets with multiple projects on the same version of ruby. That in itself should be a reason to use it.
-
-OK, so this seems to clear up some of my confusion around why the core team would want to give the user an option to avoid shell shenanigans.
-
-One last thing I'd like to do is run an experiment, where I comment out the `eval "$(rbenv init -)"` from my `.zshrc` beforehand, open up a new shell, and try to do a few different things with gems from different Ruby versions.  This might give me a better feel for how people use RBENV without shell integrations turned on.
-
-First I want to check which file contains the RubyGems executable (aka the `gem` command) when RBENV shell integrations are turned on.  I run `type rbenv` followed by `type gem` in an existing terminal and get the following:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-916am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-So in the already-open shell, `rbenv` is the shell function, `gem` is executed by the RBENV shim, and shell integrations are enabled.
-
-Then I comment out the `eval` line in my `.zshrc`, open up a new terminal tab, and re-run the above commands:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-917am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-In the new shell, with the `eval` line commented-out of `.zshrc`, the `rbenv` executable comes from the file that we analyzed earlier, and shell integrations are not enabled, but the `gem` executable is *still* controlled by the RBENV shim.
-
-Based on this, I think it's safe to say that we've confirmed that the baseline value of installing RBENV is that it can control your gem executables based on your Ruby version, and that the `rbenv` shell function is just the cherry on top of the sundae.
-
-(stopping here for the day; 56804 words)
-
-—------------—------------—------------—------------—------------—------------—------------—------------—----
-
-So `rbenv-sh-rehash` simply delegates to `rbenv-rehash`, but it also clears out the shell's command lookup cache (see below):
+That cache clearing happens below:
 
 ```
 case "$shell" in
@@ -440,47 +472,187 @@ fish )
 esac
 ```
 
-Here we inspect the value that we stored in `shell` earlier.  If it's `fish`, we execute a no-op.  Looks like we can't rehash if the user's shell is fish.  If the user's shell is anything else, we `echo` a command that (presumably) the caller of `rbenv-sh-rehash` will execute via `exec`.  This command includes the `hash` builtin, which (per [this page](https://web.archive.org/web/20221004024822/https://www.computerhope.com/unix/bash/hash.htm){:target="_blank" rel="noopener"}) maintains a hash lookup of commands:
+Here we inspect the value that we stored in `shell` earlier.  If it's `fish`, we execute a no-op.  According to the comment, we can't rehash if the user's shell is fish.
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-918am.png" width="80%" style="border: 1px solid black; padding: 0.5em">
-</p>
+If their shell is anything else, we `echo` a snippet of `bash` code that the caller of `rbenv-sh-rehash` will execute via `exec`.  This command includes the `hash` builtin.
 
-One question I have is: where is `rbenv-sh-rehash` called from?  I searched the Github repo for the string `sh-rehash`, but I only found the following code (from the test file we previously examined):
+I'm not familiar with the `hash` command, so I look up its `help` page:
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-919am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
+```
+bash-3.2$ help hash
 
-I search for the earliest commit to this file, and I get:
+hash: hash [-lr] [-p pathname] [-dt] [name ...]
+    For each NAME, the full pathname of the command is determined and
+    remembered...
+```
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-920am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
+OK so we're remembering the full pathname of a command.  Why would we want to do that?
 
-There's not much of a description for this PR, but I do see there's [a linked issue](https://github.com/rbenv/rbenv/issues/119){:target="_blank" rel="noopener"} included.
+I ask ChatGPT what the `hash` command is, and I get the following response:
 
-As a last-ditch effort, I try searching the codebase for "sh-", and I find the following:
+> Me:
+>
+> What is the `hash` command in Bash?
+>
+> ChatGPT:
+>
+> The `hash` command in Bash is a built-in command that is used to maintain a hash table of the locations of executable files. When you execute a command in Bash, the shell needs to search for the command's location in the directories listed in the `PATH` environment variable. This search process can take some time, especially if there are many directories in the `PATH`.
+>
+> The `hash` command helps improve the efficiency of command execution by caching the locations of executables in a hash table. When you run a command, the shell first checks the hash table to see if it has already located the executable. If the command is found in the hash table, the shell directly executes it without searching the `PATH`. This results in faster command execution.
+>
+> Here are some common uses of the `hash` command:
+>
+>  - `hash`: Without any arguments, the `hash` command displays the contents of the hash table, showing the commands and their locations that have been hashed.
+>
+> - `hash -r`: This option resets the hash table, removing all entries. It can be useful if you have updated or installed new executables and want the shell to search for them again.
+>
+> - `hash <command>`: If you provide the name of a command as an argument, the `hash` command locates the command's location and adds it to the hash table. This can be handy if you want to manually update the hash table for a specific command.
+>
+> Overall, the `hash` command in Bash helps improve the performance of command execution by caching the locations of executables, reducing the need for repeated searches in the `PATH` directories.
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-921am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
-</p>
+Got it, so `hash` is a performance optimization to prevent the shell from having to do a `PATH` lookup for the locations of command that it has previously executed.
 
-That's right- there was some "sh-" code in `rbenv-init`!  Refreshing my memory via a look into that file, I see:
+The line which includes the call to `hash` was added as part of [this issue/PR](https://github.com/rbenv/rbenv/issues/119){:target="_blank" rel="noopener"}, which reported that RBENV users occasionally saw their `ruby` executable pointing to the `system` version of Ruby, as opposed to one managed by RBENV.  Adding the `hash -r` block of code that we just analyzed, so that the `hash` table is emptied after every run of `rbenv rehash`, was the fix for this solution.
+
+To double-check what ChatGPT told me, I decide to experiment with `hash`.
+
+### Experiment- the `hash` function
+
+I start by printing out the current hash table, using the `hash` command with no arguments:
+
+```
+bash-3.2$ hash
+
+hits	command
+   1	/Users/myusername/.rbenv/libexec/rbenv
+   2	/usr/bin/man
+```
+
+So far it's just the `rbenv` command and the command to open a `man` page.
+
+Next, I try clearing the table with the `-r` flag:
+
+```
+bash-3.2$ hash -r
+
+bash-3.2$ hash
+
+hash: hash table empty
+```
+
+Great, that worked as expected.
+
+Next, I try to manually add a command to the `hash` table:
+
+```
+bash-3.2$ hash -r
+
+bash-3.2$ hash rbenv
+
+bash-3.2$ hash
+
+hits	command
+   0	/Users/myusername/.rbenv/libexec/rbenv
+```
+
+Awesome.  Now we can manually add commands to the table, if we need to.
+
+Now I'm wondering if the table is automatically populated whenever I enter a command.  I run `rbenv local` followed by `hash` again:
+
+```
+bash-3.2$ hash -r
+
+bash-3.2$ rbenv local
+
+rbenv: no local version configured for this directory
+
+bash-3.2$ hash
+
+hits	command
+   1	/Users/myusername/.rbenv/libexec/rbenv
+```
+
+Great, so we don't have to manually add values to the table; the shell will take care of that for us.
+
+Looks like ChatGPT told us the truth.
+
+One thing I notice is that my usage of the `hash` command itself is not reflected in the table.  I ask ChatGPT about this as well:
+
+> Me:
+>
+> What about builtin functions?  Are they also reflected in the `hash` table?
+>
+> ChatGPT:
+>
+> No, the hash table does not store built-in functions in Bash. The hash command only maintains a hash table for external executable commands.
+>
+> Built-in functions in Bash are part of the shell itself and are not separate executable files. They are implemented directly within the shell's code. As a result, they do not have separate locations in the file system that can be stored in the hash table.
+>
+> When you use a built-in function in Bash, the shell recognizes it and executes it directly without relying on the hash table or searching for a separate executable file. Built-in functions are always available and do not require the shell to perform any file system operations to execute them.
+>
+> So, while the hash command helps with caching and executing external commands efficiently, it does not have any effect on built-in functions in Bash.
+
+I double-check this by Googling for a StackOverflow page, and find [this one](https://web.archive.org/web/20230324115058/https://unix.stackexchange.com/questions/86012/what-is-the-purpose-of-the-hash-command){:target="_blank" rel="noopener"} near the top of the results.  It confirms the above:
+
+> Utilities provided as built-ins to the shell are not reported by hash.
+
+It also tells us when the shell will clear the hash table on its own:
+
+> The table gets cleared on events that obviously invalidate the results (such as modifying `$PATH`).
+
+Furthermore, it tells us some interesting features of `hash` that the `help` page didn't:
+
+> ...it prints out how many times you hit which commands if you type it with no arguments.
+
+To test this, I clear the table and run `rbenv local` again:
+
+```
+bash-3.2$ hash -r
+
+bash-3.2$ hash
+
+hash: hash table empty
+
+bash-3.2$ rbenv local
+
+rbenv: no local version configured for this directory
+
+bash-3.2$ hash
+
+hits	command
+   1	/Users/myusername/.rbenv/libexec/rbenv
+```
+
+I see I've used `rbenv` once since clearing the table.  I run the same `rbenv` command again and re-print the table:
+
+```
+bash-3.2$ rbenv local
+
+rbenv: no local version configured for this directory
+
+bash-3.2$ hash
+
+hits	command
+   2	/Users/myusername/.rbenv/libexec/rbenv
+```
+
+This time, the number next to the path to `rbenv` says `2` instead of `1`.  Pretty cool.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+That's the end of `rbenv-sh-rehash`.
+
+If we remember back to our read-through of `rbenv-init`, we saw that the `rbenv` shell function will run the `sh-` version of a user's command, if that command is either `rehash` or `shell`:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-16mar2023-922am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-Right, so here is where `rbenv sh-rehash` gets called.  If we remember, we check whether the command that the user passed to `rbenv` is one of the two commands inside the `commands` array (i.e. `rehash` or `shell`).  If it is, we execute the code on line 170.  If it's not, we execute line 172.
+So that's where `rbenv-sh-shell` gets called.  Let's move on to "rbenv-rehash".
 
-I'm still confused why we need to call `eval` in one case and `command` in another.  Maybe on line 170 it's somehow necessary to replace the current process with the new process the way `eval` is known to do?  Regardless, this makes me think I've now answered a question I asked awhile ago, i.e. why it was necessary to prefix the `rehash` and `shell` commands with `sh`.  And I *suspect* the answer is because the way those scripts are executed depends on which shell the user is using.  If we're writing a script whose behavior depends on shell commands that vary from one shell to another, we can prefix the filename containing that conditional logic with `sh-` so that current and future devs know that.
+### `rbenv-rehash`
 
-To confirm this theory, I hypothesize that any RBENV command which needed to suss out the user's shell would need to store that shell name in a variable assignment before it could execute `if/else` logic on that shell name.  So I search for the string "shell=" in the RBENV codebase.  The Github search function doesn't distinguish between searching for "shell=" and searching for the word "shell" by itself, so I get a bunch of false positives.  The only files which actually contain "shell=" and are *not* BATS (aka test) files are `rbenv-sh-rehash`, `rbenv-sh-shell`, and `rbenv-init`.  Coincidentally, those are also the only 3 files which contain the string `case "$shell"`.  I think I finally solved the mystery of the `sh-` filename prefix!
-
-Question: why can't we support fish for rehashing?
-
-OK, moving on to "rbenv-rehash".  First lines of code:
+First lines of code:
 
 ```
 #!/usr/bin/env bash
@@ -490,10 +662,12 @@ set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 ```
 
-`bash` shebang
-"Summary" remarks
-`set -e` tells `bash` to exit immediately on first error
-`set -x` tells `bash` to print more verbose output, in this case only if the `RBENV_DEBUG` environment variable was set.
+- `bash` shebang
+- "Summary" remarks
+- `set -e` tells `bash` to exit immediately on first error
+- `set -x` tells `bash` to print more verbose output, in this case only if the `RBENV_DEBUG` environment variable was set.
+
+### Making the `shims/` directory
 
 Next block of code:
 
@@ -505,7 +679,9 @@ PROTOTYPE_SHIM_PATH="${SHIM_PATH}/.rbenv-shim"
 mkdir -p "$SHIM_PATH"
 ```
 
-Here we create two new string variables, and use the first of them to make a new directory if it doesn't already exist.  This new directory will hold RBENV's shims.
+Here we create two new string variables, and use the first of them to make a new directory if it doesn't already exist.  This new directory will hold RBENV's shims.  The 2nd variable will be used later, and will contain the template code that we'll use to build our shims.
+
+### Preventing multiple instances of `rehash` from running
 
 Next block of code:
 
@@ -527,9 +703,9 @@ set -o noclobber
 set +o noclobber
 ```
 
-(stopping here for the day; 57862 words)
-
 Luckily there's a detailed comment which explains the purpose of the code below.  That said, I still want to look up some of the syntax being used here.
+
+#### The `noclobber` option
 
 First off:
 
@@ -537,36 +713,55 @@ First off:
 set -o noclobber
 ```
 
-This turns on the bash `noclobber` option.  According to [this link](https://web.archive.org/web/20210615041918/https://howto.lintel.in/protect-files-overwriting-noclobber-bash/){:target="_blank" rel="noopener"}, `noclobber` option "prevents you from overwriting existing files with the > operator.  If the redirection operator is `>`, and the noclobber option to the set builtin has been enabled, the redirection will fail if the file whose name results from the expansion of word exists and is a regular file. If the redirection operator is `>|`, or the redirection operator is `>` and the noclobber option is not enabled, the redirection is attempted even if the file named by word exists."
+I look up the `help` entry for `set`, a command that we've encountered before.  I see that `-o` is the flag you use when you want to set an option.
 
-OK, that's pretty clear.  Setting `noclobber` implies that we'll be attempting to write to a new file, but we don't want to do that if this file already exists.  We'll find out which file that is on the next line of code, which is:
+The above command turns on the bash `noclobber` option.  According to [this link](https://web.archive.org/web/20210615041918/https://howto.lintel.in/protect-files-overwriting-noclobber-bash/){:target="_blank" rel="noopener"}:
+
+> The `noclobber` option prevents you from overwriting existing files with the `>` operator.
+>
+> If the redirection operator is `>`, and the noclobber option to the `set` builtin has been enabled, the redirection will fail if the file whose name results from the expansion of word exists and is a regular file.
+>
+> If the redirection operator is `>|`, or the redirection operator is `>` and the noclobber option is not enabled, the redirection is attempted even if the file named by word exists.
+
+Setting `noclobber` implies that we'll be attempting to write to a new file, but we don't want to do that if this file already exists.  The name of that file is stored inside `$PROTOTYPE_SHIM_PATH`, which on my machine resolves to `/Users/myusername/.rbenv/shims/.rbenv-shim`.  We attempt to create the file here:
 
 ```
 { echo > "$PROTOTYPE_SHIM_PATH"
 } 2>| /dev/null ||
 ```
 
-First off, the curly brace groups (i.e. `{ ....} ... { ... }`.  This is apparently called "output grouping", [according to Linux.com](https://web.archive.org/web/20220606055633/https://www.linux.com/topic/desktop/all-about-curly-braces-bash/){:target="_blank" rel="noopener"}.  According to them, "...you can also use `{ ... }` to group the output from several commands into one big blob."  An example here:
+#### Output Grouping
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-923am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
-</p>
+We've seen the curly brace groups (i.e. `{ ....} ... { ... }` before.  This is called "output grouping".  [According to Linux.com](https://web.archive.org/web/20220606055633/https://www.linux.com/topic/desktop/all-about-curly-braces-bash/){:target="_blank" rel="noopener"}, "...you can also use `{ ... }` to group the output from several commands into one big blob."
 
-So we're just grouping the output of the commands inside the curly braces, and redirecting *all* their output to the destination immediately following the closing curly braces (i.e. `2>| /dev/null` and `>&2` respectively; more on that later).
+An example here:
 
-Inside the first set of braces, we create a new file with the name "$PROTOTYPE_SHIM_PATH", which on my machine resolves to `/Users/myusername/.rbenv/shims/.rbenv-shim`.  If that command produces any error output, we redirect it to `/dev/null`.  And if that command fails, we use the `||` syntax to do what follows on the subsequent lines of code (see below).
+> The command:
+>
+> ```
+> echo "I found all these PNGs:";
+> find . -iname "*.png";
+> echo "Within this bunch of files:";
+> ls > PNGs.txt
+> ```
+>
+> will execute all the commands but will only copy into the PNGs.txt file the output from the last ls command in the list. However, doing
+>
+> ```
+> {
+>   echo "I found all these PNGs:";
+>   find . -iname "*.png";
+>   echo "Within this bunch of files:";
+>   ls;
+> } > PNGs.txt
+> ```
+> creates the file PNGs.txt with everything, starting with the line “I found all these PNGs:“, then the list of PNG files returned by find, then the line “Within this bunch of files:” and finishing up with the complete list of files and directories within the current directory.
 
-I noticed the use of `echo > <filename>` here, rather than `touch <filename>`, which I thought was the canonical command that is used to create a new, empty file.
+So we're just grouping the output of the commands inside the curly braces, and redirecting their combined output to the destination to `/dev/null`.  We don't care about that output- we only care whether the creation of `$PROTOTYPE_SHIM_PATH` returned a 0 exit code.
 
-From [this StackExchange link](https://web.archive.org/web/20210817014146/https://unix.stackexchange.com/questions/530555/creating-a-file-in-linux-touch-vs-echo){:target="_blank" rel="noopener"}, I see that the difference between "echo >" vs. "touch" is that "touch" will create the file if it doesn't already exist, or update the file's "created_at" and "updated_at" timestamps if it does exist.  In contrast, both "echo >" and "echo >>" will create a file if it doesn't exist.  "echo >" will overwrite the file if it does exist, while "echo >>" will append to the file if it exists.
+If our attempt to create the file produces any error output, we redirect it to `/dev/null` using `2>|`.  Normally, we'd use `2>` without the `|`, but because we have `noclobber` turned on, `2>` won't work.
 
-Based on this info, I think what's happening here is that, with the `noclobber` option set, `echo >` will throw an error if the file exists.  That's what we want to happen, because we're using the file as an indicator that the `rehash` action is in-progress.  The combination of `set -e`, `set -o noclobber`, and `echo > <filename>` means that the script will attempt to create a new file, but if the file already exists, the script will throw an error and then exit.  That achieves the behavior of preventing more than one `rehash` from being performed at once, since presumably we'll delete the file when we're done.
-
-The `2>| /dev/null` code just sends any error output to `/dev/null`.  I search [this link](https://web.archive.org/web/20221005093039/https://www.gnu.org/software/bash/manual/html_node/Redirections.html){:target="_blank" rel="noopener"} for the string `>|`, and I find the following info:
-
-> If the redirection operator is `>`, and the noclobber option to the set builtin has been enabled, the redirection will fail if the file whose name results from the expansion of word exists and is a regular file. If the redirection operator is `>|`, or the redirection operator is `>` and the noclobber option is not enabled, the redirection is attempted even if the file named by word exists.
-
-So the `|` character at the end has the effect of forcing the overwrite to go through, even if `noclobber` is set.  I initially thought the reason for `2>|` here was because we previously set `noclobber` would mean that we wouldn't be able to redirect error output to `/dev/null`, since that file already exists.  However, I try sending output to `/dev/null` with `noclobber` turned on, and I am successful in doing so:
+Note that sending output to `/dev/null`, with `noclobber` turned on, will actually work for some people:
 
 ```
 $ set -o noclobber
@@ -576,23 +771,20 @@ $ echo "foo" > /dev/null
 $
 ```
 
-I see the expected error when I try to overwrite a regular, non `/dev/null` file:
+I researched why this line of code was added to RBENV, and [the PR which added it](https://github.com/rbenv/rbenv/pull/982){:target="_blank" rel="noopener"} says that some versions of `bash` don't permit this behavior.  Your mileage may vary depending on which version of `bash` you have on your machine.
 
-```
-$ set -o noclobber
+FWIW, [I posted a StackExchange question](https://unix.stackexchange.com/questions/720024/is-dev-null-treated-differently-from-other-files-when-the-noclobber-option){:target="_blank" rel="noopener"} asking why this might be happening, and eventually the answer comes back that `/dev/null` is treated differently by `noclobber`, since it's considered a "non-standard file".
 
-$ echo "foo" > /dev/null
+#### `echo >` vs. `touch` to create a file
 
-$ touch bar.txt
+I noticed the use of `echo > <filename>` here, rather than `touch <filename>`, which I thought was the canonical command that is used to create a new, empty file.  I Google "difference between echo and touch in bash", and I find [this StackExchange link](https://web.archive.org/web/20210817014146/https://unix.stackexchange.com/questions/530555/creating-a-file-in-linux-touch-vs-echo){:target="_blank" rel="noopener"}.  The difference is that:
 
-$ echo "foo" > bar.txt
+ - `touch` will create the file if it doesn't already exist, or update the file's "created_at" and "updated_at" timestamps if it does exist.
+ - Both `echo >` and `echo >>` will create a file if it doesn't exist.  `echo >` will overwrite the file if it does exist, while `echo >>` will append to the file if it exists.
 
-zsh: file exists: bar.txt
+Based on the above, I think what's happening here is that we're using the file as a "lock file", i.e. an indicator that the `rehash` action is in-progress.  The combination of `set -e`, `set -o noclobber`, and `echo > <filename>` means that the script will attempt to create a new file, but if the file already exists, the script will throw an error and then exit.  That achieves the behavior of preventing more than one `rehash` from being performed at once, since presumably we'll delete the file when we're done.
 
-$
-```
-
-So I'm a bit stumped on why I'm able to overwrite `/dev/null` even with `noclobber` turned on.  I get why `/dev/null` would be treated differently (because the purpose of `/dev/null` is to allow shell programmers to get rid of unneeded output by redirecting it to a "black hole"), but I didn't see that mentioned in the `noclobber` section of [this docs page](https://web.archive.org/web/20221005093039/https://www.gnu.org/software/bash/manual/html_node/Redirections.html){:target="_blank" rel="noopener"} (section 3.6.2), so I assumed it was undocumented.  [I post a StackExchange question](https://unix.stackexchange.com/questions/720024/is-dev-null-treated-differently-from-other-files-when-the-noclobber-option){:target="_blank" rel="noopener"}, and eventually the answer comes back that yes, in fact, `/dev/null` is treated differently by `noclobber`.
+#### Printing an error message if a rehash is already in progress
 
 Moving on to the next block of code (i.e. what happens after the `||` characters):
 
@@ -606,7 +798,14 @@ Moving on to the next block of code (i.e. what happens after the `||` characters
 } >&2
 ```
 
-If the previous attempt at creating the new file fails, we check whether the `SHIM_PATH` directory is writable.  If it is, we assume that the failure resulted because the file already exists.  If it's not writable, we echo a different error message to that effect.  Either way, we exit with a non-zero return status.  Whichever error message we `echo`, we redirect that message to STDERR via `>&2`.
+If the previous attempt at creating the new file fails, we reach this block of code.  Here we check whether the `SHIM_PATH` directory is writable.
+
+ - If it is, we assume that the failure resulted because the file already exists.
+ - If it's not writable, we echo a different error message to that effect.
+
+Either way, we exit with a non-zero return status.  Whichever error message we `echo`, we redirect that message to `STDERR` via `>&2`.
+
+#### Turning off `noclobber`
 
 Next line of code:
 
@@ -615,6 +814,10 @@ set +o noclobber
 ```
 
 Here we just turn off the `noclobber` option that we turned on before we attempted to create the `PROTOTYPE_SHIM_PATH` file.
+
+That's it for the lock file logic!
+
+### Telling `bash` to clean things up when we're done
 
 Next block of code:
 
@@ -627,7 +830,136 @@ remove_prototype_shim() {
   rm -f "$PROTOTYPE_SHIM_PATH"
 }
 ```
-Here we invoke the `trap` command, which I'm unfamiliar with.  After reading [the docs](https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_12_02.html){:target="_blank" rel="noopener"}, it appears that `trap` lets the user execute arbitrary code when the shell receives one or more specified signals.  In this case, we're telling the shell to call the `remove_prototype_shim` function whenever it receives an EXIT signal (i.e. whenever the process exits, [whether normally or abnormally](https://web.archive.org/web/20220621051014/https://www.putorius.net/using-trap-to-exit-bash-scripts-cleanly.html){:target="_blank" rel="noopener"}).  That function is defined on the next few lines of code, and it force-deletes the temporary `.rbenv-shim` file that's created.  So this is the clean-up functionality we hypothesized about before, where the file is deleted so that subsequent calls to `rbenv rehash` can once again be made.
+Here we invoke the `trap` command.  [The docs](https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_12_02.html){:target="_blank" rel="noopener"} tell us that `trap` lets the user execute arbitrary code when the shell receives one or more specified signals.
+
+In this case, we're telling the shell to call the `remove_prototype_shim` function whenever it receives an `EXIT` signal (i.e. whenever the process exits, [whether normally or abnormally](https://web.archive.org/web/20220621051014/https://www.putorius.net/using-trap-to-exit-bash-scripts-cleanly.html){:target="_blank" rel="noopener"}).  That function is defined on the next few lines of code, and it force-deletes the temporary `.rbenv-shim` file that's created.
+
+This is how the lock file eventually gets deleted, so that subsequent calls to `rbenv rehash` can once again be made.
+
+#### Experiment- using `trap`
+
+I write the following script:
+
+```
+#!/usr/bin/env bash
+
+set -e
+
+cleanup() {
+    echo "Cleanup function called."
+    # Add cleanup commands here
+}
+
+trap cleanup EXIT
+
+# Some other commands or script code
+echo "This is the main part of the script."
+echo "Performing some tasks..."
+
+# Simulating an error condition
+non_existing_command
+
+echo "This line will not be executed due to the error above."
+```
+
+This script does the following:
+
+- Calls `set -e` to exit on the first error.
+- Defines a function called `cleanup()`, which just prints a string (but which could do any arbitrary task we specify)
+- Calls the `trap` builtin, telling the shell to call our `cleanup` function when it receives the `EXIT` signal
+- Prints some arbitrary text to the screen, to prove that our script is running normally
+- Call a known-invalid command to trigger an error (and therefore, because we called `set -e`, an exit)
+- Call `echo` with a string which we know will not print to the screen.
+
+When we run the script, we see:
+
+```
+bash-3.2$ ./foo
+
+This is the main part of the script.
+Performing some tasks...
+./foo: line 17: non_existing_command: command not found
+Cleanup function called.
+```
+
+Because we called `trap cleanup EXIT`, and because our initial call to `set -e` caused the shell to exit (i.e. send an `EXIT` signal) when it encountered an error, we saw our `"Cleanup function called"` script print to the screen.
+
+#### Shell signals
+
+We can use the `trap` command with other shell signals too.  A full list of signals can be printed via the `trap -l` command:
+
+```
+bash-3.2$ trap -l
+ 1) SIGHUP	 2) SIGINT	 3) SIGQUIT	 4) SIGILL
+ 5) SIGTRAP	 6) SIGABRT	 7) SIGEMT	 8) SIGFPE
+ 9) SIGKILL	10) SIGBUS	11) SIGSEGV	12) SIGSYS
+13) SIGPIPE	14) SIGALRM	15) SIGTERM	16) SIGURG
+17) SIGSTOP	18) SIGTSTP	19) SIGCONT	20) SIGCHLD
+21) SIGTTIN	22) SIGTTOU	23) SIGIO	24) SIGXCPU
+25) SIGXFSZ	26) SIGVTALRM	27) SIGPROF	28) SIGWINCH
+29) SIGINFO	30) SIGUSR1	31) SIGUSR2
+```
+
+Note that the above works in `bash`, but not `zsh`.
+
+You'll notice that the "signal" we used in our first `trap` example, i.e. `EXIT`, is not listed in the above signals.  That's because `EXIT` is actually a special "catch-all" that can be used to catch any signal.
+
+Let's try modifying our original `trap` experiment to catch `SIGINT`, a relatively common signal that is triggered when you hit `Ctrl+C` on your keyboard.
+
+I update the script to look like so:
+
+```
+#!/usr/bin/env bash
+
+set -e
+
+cleanup() {
+    echo "Cleanup function called."
+    exit
+    # Add cleanup commands here
+}
+
+trap cleanup SIGINT
+
+# Some other commands or script code
+echo "This is the main part of the script."
+echo "Performing some tasks..."
+
+# Simulating an error condition
+while [ "a" = "a" ]
+do
+  foo="foo"
+done
+
+echo "This line will not be executed due to the error above."
+```
+
+I changed the `trap` call from `EXIT` to `SIGINT`, and replaced the call to `non_existing_command` with a `while` loop that will never terminate by itself.  When I run this script, my terminal hangs:
+
+```
+bash-3.2$ ./foo
+
+This is the main part of the script.
+Performing some tasks...
+```
+
+When I hit `Ctrl-C`, I see the following:
+
+```
+bash-3.2$ ./foo
+
+This is the main part of the script.
+Performing some tasks...
+
+^CCleanup function called.
+bash-3.2$
+```
+
+The output `^CCleanup function called.` represents the output of `Ctrl-C` (i.e. the `^C` part of the output) plus the same output of the `cleanup()` function as before.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+### Finding the path to the RBENV command
 
 Next block of code:
 
@@ -649,71 +981,87 @@ rbenv_path() {
 }
 ```
 
-(stopping here for the day; 58997 words)
+The comments at the top of the function tell us exactly what it does:
 
-This block creates a function named `rbenv_path`.  Inside that function body, we create a local variable named `found`.  We then tell the shell to search `$RBENV_ORIG_PATH` (not `$PATH`) for the filepath of the command `rbenv`, and we set the `found` variable equal to the filepath that is returned.  On my machine, this resolves to `/usr/local/bin/rbenv`.
+> Locates rbenv as found in the user's PATH. Otherwise, returns an absolute path to the rbenv executable itself.
+
+The implementation is as follows.
+
+#### Searching for the path to `rbenv`
+
+```
+local found
+found="$(PATH="$RBENV_ORIG_PATH" command -v rbenv)"
+```
+
+We start by creating a local variable named `found`.  We tell the shell to search `$RBENV_ORIG_PATH` (not `$PATH`) for the filepath of the command `rbenv`.  `RBENV_ORIG_PATH` is set [here](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv#L40){:target="_blank" rel="noopener"}, and represents the original value of `PATH` before RBENV modifies it to add the `libexec/` directory, as well as things like plugins.
+
+We set the `found` variable equal to the first filepath to the `rbenv` executable that we find in our original, un-modified `PATH`.  On my machine, this resolves to `/usr/local/bin/rbenv`.
+
+#### Handling an absolute path
+
+```
+if [[ $found == /* ]]; then
+  echo "$found"
+```
 
 If this `found` value starts with `/` (i.e. if the found path is an absolute path starting from the machine's root directory), then the return value of the `rbenv_path` function is the value of `found`.
 
-If that condition doesn't pass, we next check whether `found` was set to any non-empty value.  If it was, then we make an assumption that the executable was found in the current directory, so we shave any "./" off the beginning of `found`, and prepend it with the full path to the current directory (via the `$PWD` variable).  We then make that newly-constructed path the return value for this function.
+#### Handling non-absolute paths
 
-Lastly, if that 2nd condition also fails, we fall back to looking in RBENV's `BASH_SOURCE` directory, or rather that directory's `/bin/rbenv` sub-directory.  On my machine, the returned value in this case would be `/usr/local/Cellar/rbenv/1.2.0/bin/rbenv`, which is actually quite close to what it would have been before this `rbenv_path` function was added to the codebase (see below).
+```
+elif [[ -n "$found" ]]; then
+  echo "$PWD/${found#./}"
+```
 
-### Tangent- Why `$RBENV_ORIG_PATH` and not `$PATH`?
+If the path doesn't start with `/` but does exist, we make an assumption that the executable was found in the current directory.  Therefore, we shave any "./" off the beginning of `found`, and prepend it with the full path to the current directory (via the `$PWD` variable).  We then print that value to `stdout`.
 
-I was confused about why this `$RBENV_ORIG_PATH` variable was needed, when it seemed like `$PATH` would be the less-surprising choice.  I pulled up [the PR](https://github.com/rbenv/rbenv/pull/1350){:target="_blank" rel="noopener"} which introduced this line of code to find the answer.  If I'm correct in interpreting that PR's description, it looks like the previous way of creating RBENV gem shims included a reference to the `rbenv` executable.  But if that executable was installed by the dependency management tool Homebrew, then the path to that `rbenv` executable would include Homebrew's version #, i.e. `/usr/local/Cellar/rbenv/<HOMEBREW VERSION>/bin/rbenv`.  That hard-coded path in the shim file would work fine as long as the user didn't upgrade their Homebrew version.  But as soon as they *did* upgrade, Homebrew would apparently delete the old directory (that's how I interpret the reference to "Homebrew's auto-cleanup functionality" in the PR description), and that shim would break along with any others with that hard-coded path.
+#### Handling the case where no path was found
 
-This PR was introduced to fix that problem.  Previously, `rbenv rehash` would cause the shim to run:
+```
+else
+  # Assume rbenv isn't in PATH.
+  local here="${BASH_SOURCE%/*}"
+  echo "${here%/*}/bin/rbenv"
+fi
+```
+
+Lastly, if that 2nd condition also fails, we fall back to looking in RBENV's `BASH_SOURCE` directory, which always contains the filepath for the file that's currently being run.  On my machine, the returned value in this case would be `/usr/local/Cellar/rbenv/1.2.0/bin/rbenv`.  [Here](https://web.archive.org/web/20230526150002/https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html){:target="_blank" rel="noopener"} are the docs for the `BASH_SOURCE` variable, as well as many other env vars.
+
+### Why `$RBENV_ORIG_PATH` and not `$PATH`?
+
+I was confused about why this `$RBENV_ORIG_PATH` variable was needed, when it seemed like `$PATH` would be the less-surprising choice.  I pulled up [the PR](https://github.com/rbenv/rbenv/pull/1350){:target="_blank" rel="noopener"} which introduced this line of code to find the answer.
+
+The `rbenv_path` function was added to fix a bug which only presented itself when it was installed with a popular, widely-used package manager called Homebrew (as opposed to, for example, installing RBENV directly from the source code).  The bug worked as follows:
+
+ - When RBENV adds a shim, that shim has to execute the `rbenv` command.  To ensure this could happen even if that command wasn't found in `PATH`, the shim uses the absolute path to the `rbenv` executable file.
+ - When installed via Homebrew, the absolute path to that executable looks like this:
+
+ ```
+ /usr/local/Cellar/rbenv/<VERSION>/libexec/rbenv
+ ```
+
+ - In this path, `<VERSION>` represents the version number of RBENV that the user is currently using.
+ - However, according to [the Homebrew docs](https://web.archive.org/web/20230521074617/https://docs.brew.sh/FAQ){:target="_blank" rel="noopener"}, "Homebrew automatically uninstalls old versions of each formula that is upgraded with brew upgrade, and periodically performs additional cleanup every 30 days."
+ - If I generate a shim for `ruby` using `v1.0` of RBENV, and then I upgrade my RBENV to `v2.0`, the previously-generated shim (which is still in my `$PATH` and will still be executed when I type `ruby` in my terminal) will break, because it's pointing to an absolute filepath which includes the old `v1.0` version of RBENV.
+
+To further explore the bug, I changed the code in `rbenv-rehash` from [this PR](https://github.com/rbenv/rbenv/pull/1350/files){:target="_blank" rel="noopener"} back to its original version, and re-ran `rbenv rehash` to see what shim would be generated.  Previously, `rbenv rehash` would cause the shim to run:
 
 ```
 exec "/usr/local/Cellar/rbenv/<HOMEBREW VERSION>/libexec/rbenv" exec "$program" "$@"
 ```
 
-I know this because I changed the code in `rbenv-rehash` from [this PR](https://github.com/rbenv/rbenv/pull/1350/files){:target="_blank" rel="noopener"} back to its original version, and re-ran `rbenv rehash` to see what shim would be generated.  After this PR's change, the new line of code (at least, in my case) becomes:
+After this PR's change, the new line of code (at least, in my case) becomes:
 
 ```
 exec "/usr/local/bin/rbenv" exec "$program" "$@"
 ```
 
-This `/usr/local/bin/rbenv` file is a symlink to the `..Cellar/rbenv/<HOMEBREW VERSION>/bin/rbenv` file, but pointing to a symlink is fine since Homebrew will (I'm hoping?) update that symlink as part of its version update process.
+So that's how this bug was fixed.  Instead of immediately using the absolute path to `libexec/rbenv` (which contains the version number), RBENV first tries to use any paths specified by a package manager such as Homebrew, including symlinks generated by Homebrew to the correct `rbenv` executable.  It then falls back to the original approach if no such Homebrew-friendly paths were found.
 
-But the question remains- why did we need to change `PATH` as part of this code:
+### Generating the shim
 
-```
-found="$(PATH="$RBENV_ORIG_PATH" command -v rbenv)"
-```
-
-To find out, I added the following log statements to `rbenv-rehash`:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-1035am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-Here we print out what the value of `$PATH` is under the new system (aka `found`), and what it would have been under the old system (aka `found2`).  I also printed what the old path would have been (aka `PATH: $found2`), and what the new path is (aka `PATH2: $RBENV_ORIG_PATH`).  I did this so we could see which directories `command -v` will search in order to find the `rbenv` executable.
-
-When I ran `rbenv rehash` in a new terminal, I saw the following:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-1036am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-With the new value of `PATH`, the first executable `rbenv` file that `command -v` finds is in `/usr/local/bin` (highlighted below):
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-1037am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-So that's the path to the `rbenv` executable that it uses inside the shim logic.  However, with the old `PATH`, the first executable it finds is in `/usr/local/Cellar/rbenv/1.2.0/libexec/`, which it finds here:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-1038am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-Even though `/usr/local/bin` exists in the old `PATH` value, `/usr/local/Cellar/rbenv/1.2.0/libexec/` comes before it in the search of folders, so that's what `command -v` finds first, and that's what ends up getting used.
-
-<div style="border-bottom: 1px solid grey; margin: 3em;"></div>
-
-Next block of code:
+The next block of code **looks** really long, but most of it is code that we've already reviewed:
 
 ```
 # The prototype shim file is a script that re-execs itself, passing
@@ -721,6 +1069,7 @@ Next block of code:
 # hard-linked for every executable and then removed. The linking
 # technique is fast, uses less disk space than unique files, and also
 # serves as a locking mechanism.
+
 create_prototype_shim() {
   cat > "$PROTOTYPE_SHIM_PATH" <<SH
 #!/usr/bin/env bash
@@ -747,7 +1096,9 @@ SH
 }
 ```
 
-This block of code creates a shell function which, when called, `cat`s a multi-line string to the temporary `.rbenv-shim` file, and makes that file executable.  That multi-line string consists of the commands that we analyzed in [this document](https://docs.google.com/document/d/1xG_UdRde-lPnQI7ETjOHPwN1hGu0KqtBRrdCLBGJoU8/edit?usp=sharing){:target="_blank" rel="noopener"}, so we won't rehash that analysis here.  Suffice to say that the shim calls `rbenv exec <program>`, passing any arguments.  This ensures that we're running the version of that program, given our current Ruby version.
+This function creates uses the `cat` command to print a multi-line string to the temporary `.rbenv-shim` file, and makes that file executable.  That's all it does.  Everything from the `<<SH` on the first line of the body to the `SH` on the 2nd-to-last line of the body is a heredoc containing the shim code that we looked at [here](https://docs.google.com/document/d/1xG_UdRde-lPnQI7ETjOHPwN1hGu0KqtBRrdCLBGJoU8/edit?usp=sharing){:target="_blank" rel="noopener"}, so there's no need to go over the code again.
+
+### Removing outdated shims
 
 Next block of code:
 
@@ -755,6 +1106,7 @@ Next block of code:
 # If the contents of the prototype shim file differ from the contents
 # of the first shim in the shims directory, assume rbenv has been
 # upgraded and the existing shims need to be removed.
+
 remove_outdated_shims() {
   local shim
   for shim in "$SHIM_PATH"/*; do
@@ -766,97 +1118,124 @@ remove_outdated_shims() {
 }
 ```
 
-(stopping here for the day; 60016 words)
+The comments here give us a great idea of what's going on.  In this function definition, we compare the prototype shim file with each file in the `SHIM_PATH` directory.  But there's a caveat- we don't actually end up checking each file.
 
-The comments here give us a great idea of what's going on.  In this function definition, we compare each file in `SHIM_PATH` with the prototype shim.  The `diff` shell command will output any difference between two files, as we can see here:
+It **looks like** we do, because we're using a `for` loop, but the comments say we only check "the first shim in the shims directory".  That's because the contents of all the shims are the same, so we can assume that if the first file is the same as the shim file, then the rest are as well.
+
+The tool we use to compare the files is the `diff` command.  Let's see how it works with an experiment.
+
+#### Experiment- the `diff` command
+
+I create a file named `foo`, containing the following text:
 
 ```
-$ echo a > foo.txt
+Hello world
+Foo
+Baz
+```
 
-$ echo a > bar.txt
+I create a 2nd file named `bar, containing some text that's the same and some which is different:
 
-$ diff foo.txt bar.txt
+```
+Hello globe
+Foo
+Bar
+Buzz
+```
 
-$ echo b > bar.txt
+When I run the `diff` command against these two files, I see:
 
-$ diff foo.txt bar.txt
+```
+$ diff foo bar
 
 1c1
-< a
+< Hello world
 ---
-> b
+> Hello globe
+3c3,4
+< Baz
+---
+> Bar
+> Buzz
 
 ```
 
-In our function, we check the following condition:
+ - The first line of output, `1c1`, means that there's a difference between line 1 of `foo` and line 1 of `bar`.
+ - The next 3 lines show the difference between the first line of the two files, with a divider `---` in between the respective files.
+ - The next line, `3c3,4` shows that there's a difference between line 3 of `foo` and lines 3 through 4 of `bar`.
+ - The last block again shows what that difference is.
+
+Lastly, I check the return code of that `diff` command, making sure it's the very next command I run after `diff`:
 
 ```
-! diff "$PROTOTYPE_SHIM_PATH" "$shim" >/dev/null 2>&1;
-```
-
-There are 3 things going on inside this `if` check:
-
- - We run `diff "$PROTOTYPE_SHIM_PATH" "$shim"` to check the diff between two files.  If there is no diff, then the command's exit code will be 0.  If there is a diff, the command's exit status is 1.  We can see an example of that here, where ["$?" is shorthand for the return value of the most recently-executed command](https://web.archive.org/web/20220923100726/https://linuxhint.com/bash-exit-code-of-last-command/){:target="_blank" rel="noopener"}:
-
-```
-$ echo a > foo.txt
-
-$ echo b > bar.txt
-
-$ echo a > baz.txt
-
-$ diff foo.txt baz.txt
-
-$ echo "$?"
-
-0
-
-$ diff foo.txt bar.txt
+$ diff foo bar
 
 1c1
-< a
+< Hello world
 ---
-> b
+> Hello globe
+3c3,4
+< Baz
+---
+> Bar
+> Buzz
 
 $ echo "$?"
 
 1
-
 ```
 
- - We add a `!` in front of this check to negate the result.  So if there is no diff, the "truthy" 0 return code becomes "falsy", and a "falsy" 1 return code becomes "truthy".  More info on how `bash` responds to exit codes in `if` statements can be found [here](https://web.archive.org/web/20220922164846/https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_07_01.html){:target="_blank" rel="noopener"}.
-We send any regular STDOUT output to /dev/null via `>/dev/null`, and we send any STDERR output to STDOUT via `2>&1`.
+So if there is a diff, the exit code will return `1`.
 
- - If we reach the code inside the `if` check, we know that the shell has found a shim file which doesn't match our prototype.  Since the prototype represents the latest version of the shim file, we can conclude that the shim we've found is an older version of the prototype shim, meaning it is out-of-date and can be deleted.  We further assume that if one shim in the `SHIM_PATH` is out of date, they all are.  It's not like the shim we've found could possibly be *more* recent than our prototype, so there's no harm in deleting them all and rebuilding them using the prototype file.  So that's what we do, via the `rm -f "$SHIM_PATH"/*` command.
+I then create two new files, named `baz` and `buzz`, each containing a single character (`"a"`):
 
-The last line of code in this `for` loop is a `break` statement.  Something's confusing here- the `break` statement is *outside* the `for`-loop.  My expectation is that, as soon as we find a shim that differs from the prototype, we `rm -f` the entire `SHIM_PATH` directory and then immediately `break` out of the for-loop.  But we should *only* break out of the `for`-loop *if* we find a mismatch between files.  The way the code is currently written, it appears that we `break` out of the loop *even if we don't* find a mismatch, since the break is outside the `if` check.  Am I reading that right?  Is that what's actually happening here?
+```
+$ echo "a" > baz
 
-To test this, I do an experiment.
+$ echo "a" > buzz
+```
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-1053am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
-</p>
+When I diff them and check the exit code again, I see no diff and a `0` exit code:
 
-Here I do the following:
+```
+$ diff baz buzz
 
- - I create a prototype file containing the character "a",
- - I make a directory named `shims` with 4 text files, 3 of which match the prototype and one of which does not.
- - I then paste an identical `remove_outdated_shims` function into the shell, with only some extra loglines and a counter variable added.
- - I increment the counter before every run and log the count # to the screen.  To perform this increment, I use the "let" syntax, described more [here](https://web.archive.org/web/20220930062328/https://linuxize.com/post/bash-increment-decrement-variable/){:target="_blank" rel="noopener"}.
- - Lastly, I call the function in the terminal with the appropriate env var values set for `$SHIM_PATH` and `PROTOTYPE_SHIM_PATH`.
+$ echo "$?"
 
-As I thought, the counter only outputs once, and we never see the `about to delete all shims` logline, meaning we didn't reach the shim whose contents differ from the prototype.  Unless I'm completely missing something, this *might* be a bug in the code.
+0
+```
 
-I create [a PR for this issue](https://github.com/rbenv/rbenv/pull/1452){:target="_blank" rel="noopener"} and after awhile I get the response that (as I suspected) the placement of the `break` is a performance optimization.  It turns out that it is in fact safe to assume that if the first shim is the same as the prototype, then all of them are.  Furthermore, the functions which appeared to be unused were in fact kept in place for reasons of backwards compatibility with 3rd-party plugins.
+So if there is a difference between two files, `diff` prints that difference and returns a non-zero exit code.  If there's no difference, it prints an empty string and returns a zero exit code.
 
-In retrospect, I feel kind of bad about the length of the description I wrote in this PR.  It's... admittedly very long.  RBENV is a major open-source project, and it's maintained by a handful of people, only one of whom seems to be responding to most of the pull requests.  My process is pretty methodical and detail-oriented, and at the time I felt like I had to walk through that thought process in similar detail, in order to communicate how I reached my conclusions.  But I need to remember that when I write a long description like this, I'm placing a non-trivial burden on the core team to read and grok what I'm saying.  Their mental bandwidth is likely already taxed by the burdens of maintaining the project plus their work and life obligations.  Part of the obligation of submitting a PR is boiling down the proposal to as small of a description as possible, so as to minimize the extra work the core team has to do in order to give it a thumbs-up or -down.
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
-OK, lesson learned.
+Back to our code.  We check the following condition:
+
+```
+if ! diff "$PROTOTYPE_SHIM_PATH" "$shim" >/dev/null 2>&1; then
+```
+
+We run `diff "$PROTOTYPE_SHIM_PATH" "$shim"` to check the diff between two files.  If there is no diff, then:
+
+  - the command's exit code will be 0,
+  - the `if` check will be false (because of the `!` before the `diff` command), and
+  - we will execute the code inside the `if` block.
+
+If there is a diff, the command's exit status is 1, we negate that non-zero status with the `!` symbol, and we skip the `if` block.
+
+Note that we send any output from `diff` to `/dev/null`, because we don't actually care what the diff is, only whether such a diff exists.  We do care if an error happens, however, so we send any `STDERR` output to `STDOUT` via `2>&1`.
+
+If we reach the code inside the `if` check, we know we've found a shim file which doesn't match our prototype.  In that event, it's safe to assume that our prototype shim file contains newer code than our current shims, so we delete the current shims via the `rm -f "$SHIM_PATH"/*` command.
+
+The last line of code in this `for` loop is a `break` statement.  This `break` is what ensures we only check the first shim in the `SHIM_PATH`.  It's a performance optimization which ensures that we only execute one iteration of the `for` loop.  Since all the shims should always be the same, checking each one is superfluous.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next block of code:
 
 ```
 # List basenames of executables for every Ruby version
+
 list_executable_names() {
   local version file
   rbenv-versions --bare --skip-aliases | \
@@ -868,25 +1247,163 @@ list_executable_names() {
 }
 ```
 
-This block implements a function called `list_executable_names`.  Its body creates two local variables, called `version` and `file`.  We then call `rbenv-versions –bare –skip-aliases` and pipe the results to the next line of code.  The `--bare` flag strips out the `system` version and the extra information (such as the source file of the Ruby version setting) which is normally displayed when the flag is not passed.  And the `--skip-aliases` flag ensures that the folders that we use to derive our Ruby versions don't contain any aliases.  We then pipe the list of versions from that output to the `read` command, create a `while` loop with a local variable called `version` for each version output by `rbenv-versions`, iterate over each of the shim files in that version directory, and print out just the filename of the shim.  This "for loop inside a while loop" effectively prints out every shim in every Ruby version that RBENV knows about.  We can prove this by adding some `echo` statements to this function and running `rbenv rehash`.
+This block implements a function called `list_executable_names`.
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-1054am.png" width="80%" style="border: 1px solid black; padding: 0.5em">
-</p>
+The function starts off by creating two local variables, called `version` and `file`.  It calls `rbenv-versions –bare –skip-aliases` and pipes the results to the next command.
 
-The results when we run the command are too long to embed in this page, but can be found [here](/assets/images/screenshot-16mar2023-1056am.png){:target="_blank" rel="noopener"}.
+  - The `--bare` flag strips out the `system` version and any extra information, such as the source file of the Ruby version setting.
+  - The `--skip-aliases` flag ensures that the folders that we use to derive our Ruby versions don't contain any aliases.
 
-TODO- get a larger, higher-res image for the above.
-
-As you can see, we have 3 sets of gems for the 3 versions of Ruby installed on my machine:
+What we're left with is a list of Ruby versions installed by RBENV, as we can see if we test out this command in our terminal:
 
 ```
 $ rbenv versions --bare --skip-aliases
 
 2.7.5
 3.0.0
-3.1.0
 ```
+
+As mentioned before, we then pipe the list of versions to a `while` loop, effectively iterating over each version.  For each item in that output, we use the `read` command to create a local variable called `version` containing that version number.
+
+We then use the `version` variable to create a path to that version's directory of shims:
+
+```
+"${RBENV_ROOT}/versions/${version}/bin/"*
+```
+
+For example, if `version` is `2.7.5`, then the directory looks like `"${RBENV_ROOT}/versions/2.7.5/bin/"*`.  The asterisk at the end indicates that we're using a pattern known as either "filename expansion" or ["globbing"](https://web.archive.org/web/20230317225431/https://tldp.org/LDP/abs/html/globbingref.html){:target="_blank" rel="noopener"}.  When used with a `for` loop like we're doing here, it means that we're iterating over each file in the `${RBENV_ROOT}/versions/2.7.5/bin/` directory.
+
+Lastly, for each file in the directory, we use the parameter expansion pattern `"${file##*/}"` to take just the filename, removing any directory path that precedes it.  So `/Users/myusername/.rbenv/versions/2.7.5/bin/rails` becomes just `rails`.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+So to summarize the `list_executable_names` function- for every version of Ruby we have installed with RBENV, we echo the name of every single one of the gems installed for that Ruby version.
+
+### The `read` builtin
+
+In the above function, we used the `read` builtin to read a version number from `stdin` and assign the value to a variable named `version`.  Since `read` is a builtin, it won't have a `man` entry, so let's look at the first few lines of its `help` entry instead:
+
+```
+read: read [-ers] [-u fd] [-t timeout] [-p prompt] [-a array] [-n nchars] [-d delim] [name ...]
+
+One line is read from the standard input, or from file descriptor FD if the
+-u option is supplied, and the first word is assigned to the first NAME,
+the second word to the second NAME, and so on, with leftover words assigned
+to the last NAME.  Only the characters found in $IFS are recognized as word
+delimiters.  If no NAMEs are supplied, the line read is stored in the REPLY
+variable.
+```
+
+A simplfied way of using this command is shown in the experiment below.
+
+#### Experiment- the `read` command
+
+I make the following `bash` script, called `foo`:
+
+```
+#!/usr/bin/env bash
+
+read foo bar baz
+
+echo "$foo"
+echo "$bar"
+echo "$baz"
+
+echo "Finished!"
+```
+
+When I run `./foo` in my terminal, I see:
+
+<center style="margin-bottom: 3em">
+  <a target="_blank" href="/assets/images/screenshot-16jun2023-1053am.png">
+    <img src="/assets/images/screenshot-16jun2023-1053am.png" width="40%" style="border: 1px solid black; padding: 0.5em">
+  </a>
+</center>
+
+The terminal is waiting for me to type in some input.  I type some words in and hit "Enter":
+
+```
+bash-3.2$ ./foo
+
+Jan Feb March
+
+Jan
+Feb
+March
+Finished!
+```
+
+Next I try to enter more than just 3 words as input:
+
+```
+bash-3.2$ ./foo
+
+Jan Feb March April May June
+
+Jan
+Feb
+March April May June
+Finished!
+```
+
+So when there are more than the expected number of variables passed, `read` will use the last variable to capture any input that remains.
+
+What about when there's no variable names specified?  How will we know what to capture?  The `help` script stated that:
+
+```
+If no NAMEs are supplied, the line read is stored in the REPLY variable.
+```
+
+To test this, I update my script to look like this:
+
+```
+#!/usr/bin/env bash
+
+read
+
+echo "$REPLY"
+
+echo "Finished!"
+```
+
+When I run the script and type some input, I see:
+
+```
+bash-3.2$ ./foo
+
+Foo bar bazz buzzzz
+
+Foo bar bazz buzzzz
+Finished!
+```
+
+So `read` takes input from `STDIN` and stores it in one or more variables, after which you can use those variables for whatever purpose you want.
+
+Lastly, because `read` takes its input from `STDIN`, we can take advantage of that to iterate over each item in a series of input.  Our `list_executable_names` function above did exactly that, and we can recreate its effects to see how this works.
+
+I have a file called `foo` containing the following text:
+
+```
+foo
+bar
+baz
+```
+
+I do the following:
+
+```
+$ cat foo | while read -r buzz; do
+pipe while> echo "hello $buzz"
+pipe while> done
+
+hello foo
+hello bar
+hello baz
+```
+
+We added the string `hello` to each line of our input file.  This is a trivially simply example, but it shows how `read` and `while` loops can be used together to iterate over input.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 Next block of code:
 
@@ -894,6 +1411,7 @@ Next block of code:
 # The basename of each argument passed to `make_shims` will be
 # registered for installation as a shim. In this way, plugins may call
 # `make_shims` with a glob to register many shims at once.
+
 make_shims() {
   local file shim
   for file; do
@@ -903,27 +1421,49 @@ make_shims() {
 }
 ```
 
-I noticed that this function is actually something which was added back in 2011, but whose function call was subsequently removed.  So initially I thought this was an orphan function that doesn't get used at all.  However, I subsequently learned from the PR I linked above that these functions are kept in place for backwards compatibility reasons with plugins.
+This function makes two local variables, one named `file` and one named `shim`.  It then iterates over each of the arguments provided to the function (remember, `for file; do` is short for `for file in "$@"; do`).
 
-This function makes two local variables, one named `file` and one named `shim`.  It then iterates over each of the arguments provided to the function (remember, `for file; do` is short for `for file in "$@"; do`).  For each argument (which seems to correspond to a filepath), we shave off everything except the filename itself, to get the name of the shim.  We then add that shim name to an array of other shim names.
+For each argument, we shave off everything except the filename itself, to get the name of the shim.  We then add that shim name to an array of other shim names.
 
-One new thing that we might be able to learn from this is the `registered_shims+=("$shim")`.  `registered_shims` is an array of strings, and here we're adding a new item to that array.  This is something we've never needed to do until now.  Here's a stripped-down example in my terminal:
+One thing you might notice is that, even though this function is called `make_shims`, it doesn't actually make anything.  It just adds a shim's name to a running list of shims to make.  Normally I'd say that misnamed functions are a problem, but this function and the next one (`register_shim`) are actually no longer used in this file.
+
+I asked about this in a PR, and [the response](https://github.com/rbenv/rbenv/pull/1452#discussion_r990776073){:target="_blank" rel="noopener"} was that, since the `rbenv rehash` command supports plugins, these two functions are kept in-place for backwards compatibility with any plugins that might still use them.
+
+#### Experiment- Arrays in `bash`
+
+The `registered_shims+=("$shim")` might look strange.  `registered_shims` is an array of strings, and here we're adding a new item to that array.  This is something we've never needed to do until now.
+
+Here's a stripped-down example in my terminal:
 
 ```
 bash-3.2$ foo=(1 2 3 4 5)
+```
 
-bash-3.2$ echo "${foo[@]}"
+To create an array, you wrap the items with parentheses and separate them with spaces.
 
-1 2 3 4 5
+To concatenate something to the end of that array, you do a simple `+=` operation and pass the new value, which is also wrapped in parens:
 
+```
 bash-3.2$ foo+=(6)
+```
 
+If we try to print out the array without any special syntax, we'll only see the first of its items in our output:
+
+```
+bash-3.2$ echo $foo
+
+1
+```
+
+To print out each item, we have to use parameter expansion, plus some syntax that looks like `[@]`.  I can't find an official source to tell me what the name of this syntax is, so I'll call it "array expansion":
+
+```
 bash-3.2$ echo "${foo[@]}"
 
 1 2 3 4 5 6
 ```
 
-So to create an array, you wrap the items with parentheses and separate them with spaces.  To concatenate something to the end of that array, you do a simple `+=` operation and pass the new value, which is also wrapped in parens.
+### Registering a shim
 
 Next block of code:
 
@@ -934,12 +1474,15 @@ register_shim() {
 }
 ```
 
-This appeared to be another orphan function, which does the exact same thing we just discussed in the previous block of code.
+This function does the exact same thing we just discussed in the previous block of code- it just adds a single shim name to the running list of shims that is held in the `registered_shims` variable.  Again, like the previous function, this one is also an orphan function that isn't called anywhere.
+
+### Actually installing the shims
 
 Next block of code:
 
 ```
 # Install all the shims registered via `make_shims` or `register_shim` directly.
+
 install_registered_shims() {
   local shim file
   for shim in "${registered_shims[@]}"; do
@@ -949,11 +1492,16 @@ install_registered_shims() {
 }
 ```
 
-(stopping here for the day; 61035 words)
+This new function has a similar setup to the `make_shims` function above, but there is a difference:
 
-This new function has a similar setup to the `make_shims` function above, but there is a difference.  It creates two local variables, but then instead of iterating over the arguments to the function, it iterates over the array of previously-registered shims.  Here, "registered" appears to mean any shim whose name has been added to the `registered_shims` array.  That can happen via either the `register_shim` or the `make_shims` functions, or (further down) [line 155](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-rehash#L155){:target="_blank" rel="noopener"}, which sets the list of shims based on the return value of the `list_executable_names` function.
+ - It creates two local variables, just like `make_shims` does.
+ - But then instead of iterating over the arguments to the function, it iterates over the array of previously-registered shims.
+ - Here, "registered" means any shim whose name has been added to the `registered_shims` array.
+ - That can happen via either the `register_shim` or the `make_shims` functions, or (further down) [line 155](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-rehash#L155){:target="_blank" rel="noopener"}, which sets the list of shims based on the return value of the `list_executable_names` function.
 
-For each of these registered shims, we create a filepath for that shim in the correct directory (`SHIM_PATH`), and then we check if that file exists.  If it doesn't, we create it by duplicating the prototype file and giving the duplicate the name of our new filepath.
+For each of these registered shims, we create a filename string for that shim in the correct directory (`SHIM_PATH`), and then we check if that file exists.  If it doesn't, we create it by duplicating the prototype file and giving the duplicate the name of our new filepath.
+
+### Removing stale shims
 
 Next block of code:
 
@@ -962,6 +1510,7 @@ Next block of code:
 # over the contents of the shims directory. Any file that is present
 # in the directory but has not been registered as a shim should be
 # removed.
+
 remove_stale_shims() {
   local shim
   local known_shims=" ${registered_shims[*]} "
@@ -973,7 +1522,14 @@ remove_stale_shims() {
 }
 ```
 
-The goal of this function is to remove files which point to un-registered shims from `SHIM_PATH`.  This is a clean-up step after the installation process has finished.  We create two local variables, one named `shim` and one named `known_shims`.  We set `known_shims` equal to the return value of the `list_executable_names` function, which we discovered was the stringified name of each shim in each of RBENV's version directories.  Then for each shim in `SHIM_PATH`, we see if that shim's name is included in the list of known shims.  If it's not, we delete it from the filesystem.
+The goal of this function is to remove files which point to un-registered shims from `SHIM_PATH`.  As the comment indicates, this is a clean-up step after the installation process has finished.
+
+- We create two local variables, one named `shim` and one named `known_shims`.
+- We set `known_shims` equal to the contents of `registered_shims`.
+- Then for each shim in `SHIM_PATH`, we check whether that shim's name is included in the list of known shims.
+- If it's not, we delete it from the filesystem.
+
+### Setting the `nullglob` option
 
 Next line of code:
 
@@ -981,18 +1537,27 @@ Next line of code:
 shopt -s nullglob
 ```
 
-As we've seen before, this line sets the `nullglob` option, so that a pattern which doesn't match any files to expand to an empty string, rather than itself.  This is useful when iterating over any and all files in a directory, as we've done in some of the functions we've looked at in this file.
+As we've seen before, this line sets the `nullglob` option.  With this option set, a pattern which doesn't match any files will expand to an empty string, rather than itself.
+
+This is useful when attempting to iterate over all files in a directory, such as [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-rehash#L90){:target="_blank" rel="noopener"} in `remove_outdated_shims`, or [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-rehash#L141){:target="_blank" rel="noopener"} in `remove_stale_shims`.
+
+### Creating the prototype shim file and removing outdated shims
 
 Next block of code:
 
 ```
 # Create the prototype shim, then register shims for all known
 # executables.
+
 create_prototype_shim
 remove_outdated_shims
 ```
 
-Here's where we call the function that creates and populates the contents of the `.rbenv-shim` file, the prototype which is then used to create all the actual shims.  We also call the function which checks whether the shims are out-of-date (via the `diff` command), and removes them if they are.
+Here's where we call the function that creates and populates the contents of the `.rbenv-shim` file, the prototype which is then used to create all the actual shims.
+
+We also call the function which checks whether the shims are out-of-date (via the `diff` command), and removes them if they are.
+
+### Registering the shims
 
 Next block of code:
 
@@ -1001,16 +1566,55 @@ Next block of code:
 registered_shims=( $(list_executable_names | sort -u) )
 ```
 
-Here we populate the `registered_shims` list based on the executable contents of each of RBENV's version directories, and sorts the results.  We also remove any duplicate entries, so that if a shim appears in more than one version directory, we remove the duplicate(s).  This saves us time when checking the existing shim files against known shims.
+Let's come back to the `shellcheck` line a bit later.  For now, we'll focus on the 2nd of the two lines.
 
-If a gem exists in one of these directories, it's considered "registered".
+The outer code (`registered_shims=( ... )`) creates an array variable named `registered_shims`.  As we saw above `foo=()` creates an empty array, and `foo=( ... )` creates a non-empty array, populated with whatever the `...` is, inside the parentheses.
 
-We also disable [this shellcheck rule here](https://www.shellcheck.net/wiki/SC2207){:target="_blank" rel="noopener"}.  This shellcheck rule is designed to This prevents the shell "...from doing unwanted splitting and glob expansion, and therefore avoid(s) problems with output containing spaces or special characters."  It looks like there are two reasons why someone might do this (according to the exceptions listed [here](https://www.shellcheck.net/wiki/SC2207#exceptions){:target="_blank" rel="noopener"}).  The first exception is for when you as the programmer have explicitly set up word splitting according to your requirements, which we don't appear to have done in this file.  Therefore I'm guessing our reason for disabling shellcheck here is related to exception #2, which mentions error handling.  It appears that the `mapfile` utility which shellcheck wants you to use would not raise the needed error if it failed, but we might need an error to be explicitly raised so the user could be alerted that something has gone wrong.
+The code inside those outer parentheses, `$(list_executable_names | sort -u)`, is command substitution.  This code populates the `registered_shims` list with the return value of the `list_executable_names` function we defined above.  That return value is the executable contents of each of RBENV's version directories.
+
+The call to `sort -u` was added as part of [this PR](https://github.com/rbenv/rbenv/pull/636){:target="_blank" rel="noopener"}, whose goal was to speed up the execution of the shim generation process.  `sort -u` eliminates identical executable names from the list of shims to generate, before generating those shims.
+
+So if a person has 10 Ruby versions installed via RBENV, and each version has its own copy of the `rails` gem installed, the code only registers the `rails` gem once.  Which means only one `rails` shim will get created.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Returning to the `shellcheck` line.  This line disables [the shellcheck rule defined here](https://www.shellcheck.net/wiki/SC2207){:target="_blank" rel="noopener"}.  This rule prevents the shell "...from doing unwanted splitting and glob expansion, and therefore avoid(s) problems with output containing spaces or special characters."
+
+Here's the intention behind the rule.  Let's say we have a command, `mycommand`, which generates some output with spaces and special characters:
+
+```
+#!/usr/bin/env bash
+
+foobar() {
+  echo "Hello     world     !"
+}
+```
+
+If we use command substitution to capture the output of this function in an array, it would look like this:
+
+```
+array=( $(foobar) )
+```
+
+The problem is that, because we didn't wrap `$(foobar)` with quotes, the shell splits the words using whitespace as a delimiter.  So our array now has 3 items in it:
+
+```
+Hello
+world
+!
+```
+
+We lost the (intentional) spacing between 'Hello', 'world', and '!'.  Apparently, if we follow shellcheck's guidelines and use either the `mapfile` or `read -a` commands, we would avoid this problem.
+
+The reason we're able to disregard the shellcheck rule here is because we don't expect this scenario to happen.  We know what the output of `list_executable_names | sort -u` will be, and we know it won't include any intentional, excess spaces.
+
+### Executing hook logic
 
 Next block of code:
 
 ```
 # Allow plugins to register shims.
+
 OLDIFS="$IFS"
 IFS=$'\n' scripts=(`rbenv-hooks rehash`)
 IFS="$OLDIFS"
@@ -1020,7 +1624,9 @@ for script in "${scripts[@]}"; do
 done
 ```
 
-We've seen this pattern before.  We pull any hook files for the `rehash` command using `rbenv-hooks rehash`, taking care to split the output of that command correctly based on the anticipated `\n` delimiter, and then re-set IFS back to its original value afterward.  We then iterate over this array of hook filepaths, and source each one.
+We've seen this pattern before.  We pull any hook files for the `rehash` command using `rbenv-hooks rehash`, taking care to split the output of that command correctly based on the anticipated `\n` delimiter, and then re-set IFS back to its original value afterward.  We then iterate over this array of hook filepaths, and `source` each one.
+
+### Installing the new shims and removing the stale ones
 
 Last block of code for this file:
 
@@ -1029,148 +1635,30 @@ install_registered_shims
 remove_stale_shims
 ```
 
-Here we call the function which creates a new shim file for each registered shim (if one doesn't already exist), and the function which removes any file in `SHIM_PATH` if it doesn't correspond to one of our registered shims.  And that's the end of the file!
+Here we call the function which creates a new shim file for each registered shim (if one doesn't already exist).  We also call the function which removes any file in `SHIM_PATH` if it doesn't correspond to one of our registered shims.
 
-After the failure of my last PR and the feedback I received (that the supposedly "disused" functions are kept in place to be backwards-compatible with hooks and plugins), I finally feel motivated enough to try and build a hook of my own, as well as a plugin of my own.  And since we're wrapping up this file, now might be a good time to do it.  I think I can do so by:
+And that's the end of the file!
 
-Creating a source-able file in each of the directories that the `rbenv` main file checks for hooks, and
-Running `rbenv env` every time to see which env vars are available.
+### Why not use symlinks instead of real files?
 
-(stopping here for the day; 62056 words)
+You may have noticed that the files we generate are regular files, generated via the `cp` command.  They are explicitly **not** symlinks, generated via the `ln -s` command.
 
-The first thing I do is go into [the `rbenv` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv){:target="_blank" rel="noopener"} to refresh my memory of how the hook paths are loaded into the shell.  [Here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L86){:target="_blank" rel="noopener"} we see that we construct `RBENV_HOOK_PATH` by concatenating several directories into a single, colon-delimited string.  And [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-hooks#L55){:target="_blank" rel="noopener"} we see `RBENV_HOOK_PATH` being used to populate the `hook_paths` variable in `rbenv-hooks`.  That new variable, in turn, is searched for files that match the pattern `"$path/$RBENV_COMMAND"/*.bash`.  Those bash script filepaths are then `echo`'ed to STDOUT.  For example, if one of the paths in our `RBENV_HOOK_PATHS` env var is `/usr/local/etc/rbenv.d/`, and we're searching for `rehash`-related hooks, then we echo the filepaths of all files ending in ".bash" inside the directory `/usr/local/etc/rbenv.d/rehash/`.   Lastly, [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-rehash#L159){:target="_blank" rel="noopener"} we see that the `echo`'ed filepaths are stored in a variable, which is then iterated over, and each filepath is `source`ed into the shell.
+Why **not** use symlinks?  In other words, we could generate a symlink to point to a single canonical regular shim file, rather than do a full copy of the prototype file into a new shim file.  We learned when we [read the `rbenv` command's code](http://localhost:4000/rbenv/rbenv/resolving-paths){:target="_blank" rel="noopener"} that regular files take up much more space than symlinks.  And because of its smaller file size, generating a symlink would likely be faster than generating a regular file, making our `rehash` command more performant.
 
-I check whether the `/usr/local/etc/rbenv.d/` directory currently exists.  It does not, so I create it as well as the `rehash` subdirectory inside it.  Then I create a bash script named `hello.bash`, and inside it I add the following code;
-
-```
->&2 echo "Hello world!"
-```
-
-Then, I open a new terminal window and type `rbenv rehash`.  I see the following:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-1103am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-OK, so this is a working proof-of-concept on how to get `rbenv rehash` to execute hook-related code.  Now I'm wondering what the possibilities are.  What does this power enable us to do?
-
-One thing we could do is print out all the env vars and functions available to us from within our hook.  I delete the "Hello world!" line and replace it with:
+This was actually the first approach that RBENV took.  I searched for "symlink" in RBENV's Github repo, and I found [this PR](https://github.com/rbenv/rbenv/commit/06228d3583e24b5057516f357f7d0ae802153007){:target="_blank" rel="noopener"} which shows that the (much shorter) `rbenv-rehash` file used to contain this:
 
 ```
->&2 rbenv env
->&2 echo "---------------------------------------------"
->&2 declare -F
-```
-
-The `rbenv env` command comes from [this plugin](https://github.com/ianheggie/rbenv-env/){:target="_blank" rel="noopener"}, which I believe we examined in an earlier section.  According to [TLDP](https://web.archive.org/web/20220824230731/https://tldp.org/LDP/abs/html/declareref.html){:target="_blank" rel="noopener"}, the `declare -f` command is the `bash` way of listing all the functions we have available to us:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-1105am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-When I re-run `rbenv rehash`, I now see the following:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-1106am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-Here we see all the RBENV-specific environment variables available to us, as well as all the functions that we saw defined in the `rbenv-rehash` file.
-
-As a test, I tried copying the `rehash` directory that we created into a new folder, named after a different command which also exposes itself to hooks.  That command is `which`.  I found this command by searching for `rbenv-hooks` in the Github repo.
-
-I had expected to see a similar result, albeit with different `declare -f` functions (and perhaps even different environment variables, if `which` declares any such env vars in its script).  But that's not exactly what happened.  Instead, I see an invite loop occur, where opening up a new terminal tab causes the tab to hang without showing an input prompt.  Eventually I discover that commenting out the first line of `which/hello.bash` stops the infinite loop from occurring:
-
-```
-# >&2 rbenv env
->&2 echo "---------------------------------------------"
->&2 declare -F
-```
-
-As we know, the `rbenv` command gets called by `rbenv init` in my `.zshrc` file, which is initialized by zsh when I open a new tab.  That `rbenv` file, in turn, sources all the plugins, including my `rbenv-env` plugin.  That plugin, in turn, calls `rbenv-which` [here](https://github.com/ianheggie/rbenv-env/blob/042e9ff/bin/rbenv-env#L21){:target="_blank" rel="noopener"}.  Finally, `rbenv-which` calls the `rbenv` shell function, which calls the `rbenv` file, which creates the infinite loop.
-
-OK, so if I uninstall `rbenv env`, then we likely won't have this infinite loop problem anymore.  But if I uninstall that plugin, I will no longer have access to the RBENV-specific env vars that we might need to build some actual functionality into our hook.
-
-But do I really need `rbenv-env` to get those RBENV-specific env vars?  I see [this line here](https://github.com/ianheggie/rbenv-env/blob/042e9ff/bin/rbenv-env#L28){:target="_blank" rel="noopener"} which looks like it does what we want:
-
-```
-/usr/bin/env | egrep '^GEM|^RBENV|^RUBY|^RAILS|^PATH=|^NODE_|^NODENV_|^NPM_'
-```
-
-But why is everything before that needed?  Can we just copy/paste that one line of code into our hook, instead of using the `rbenv-env` hook?  Let's try it.  I update `hello.bash` to include the above line of code:
-
-```
->&2 echo $(/usr/bin/env | egrep '^GEM|^RBENV|^RUBY|^RAILS|^PATH=|^NODE_|^NODENV_|^NPM_')
->&2 echo "---------------------------------------------"
->&2 declare -F
-```
-
-I initially did not wrap the `/usr/bin/env |...` command with `echo $(...)`, but I noticed that my `declare -F` functions weren't being printed out, nor was the `-------` line.  I guessed that this was because running the `egrep` command directly causes the shell to exit immediately when the command is finished, similar to how `exec` works.
-
-I change my code slightly:
-
-```
->&2 IFS=" " foo=$(echo $( /usr/bin/env | egrep '^GEM|^RBENV|^RUBY|^RAILS|^PATH=|^NODE_|^NODENV_|^NPM_' ) )
-for envvar in "${foo[@]}"; do
-  >&2 echo "$envvar"
+for file in ../versions/*/bin/*; do
+  ln -fs ../bin/rbenv-shim "${file##*/}"
 done
->&2 echo "---------------------------------------------"
->&2 declare -F
 ```
 
-I store the results of the `echo | egrep` operation in an array, making sure to set `IFS` to the space character (since I noticed that the env vars on my last attempt were separated by a single space).  Then I iterate over the array and print out each env var separately.  I then get the following for `rbenv rehash`:
+Very quickly, however, [an issue](https://github.com/rbenv/rbenv/issues/6){:target="_blank" rel="noopener"} came up, something to do with a dependency on hard-coded relative pathnames (the issue is light on details).  And the decision was made to replace symlinks with regular files.
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-1107am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
-</p>
+Interestingly, only 2 days later in the repo's history, the core team [made a decision](https://github.com/rbenv/rbenv/commit/fffb29d695141ef84b7517bc0922c8c103456588){:target="_blank" rel="noopener"} to switch from regular files to [hardlinks](https://web.archive.org/web/20220808123308/https://www.gnu.org/software/findutils/manual/html_node/find_html/Hard-Links.html){:target="_blank" rel="noopener"}, a sort of middle ground between symlinks and regular files.
 
-Is this the same thing I got with `rbenv env` instead of the script from my last attempt?
+Unfortunately, that decision created problems of its own.  Hardlinks are not supported by some filesystems, as [this PR](https://github.com/rbenv/rbenv/pull/814){:target="_blank" rel="noopener"} points out.  So the maintainers bit the bullet and switched back to regular files again.  The cost of this was (very slightly) less-performant code, but the benefit was portability across a wider variety of file systems.
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-1108am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
-</p>
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
-No, it's not.  There are env vars in the `rbenv env` output which don't appear in my attempted script.  And this is actually expected, because one of the things that the `rbenv env` script does is *set env vars directly*, for example [here](https://github.com/ianheggie/rbenv-env/blob/042e9ff/bin/rbenv-env#L13){:target="_blank" rel="noopener"} and [here](https://github.com/ianheggie/rbenv-env/blob/042e9ff/bin/rbenv-env#L25){:target="_blank" rel="noopener"}.  That explains why the `PATH` variable is different, and why `RBENV_VERSION` appears in `rbenv-env`'s output, but not in mine.
-
-OK, so now that we know what data and functions are available to us, what can we do with this knowledge?  Can we, for example, alter the behavior of a gem's shim in a meaningful way?
-
-(stopping here for the day; 63063 words)
-
-The code that executes the `rehash` hooks runs just before the `install_registered_shims` and `remove_stale_shims` functions.  So those hooks have the power to influence what happens inside those two functions, by altering the env vars (such as `SHIM_PATH` and `PROTOTYPE_SHIM_PATH`) and variables (such as `registered_shims`) that those functions depend on.
-
-Since `PROTOTYPE_SHIM_PATH` is what's used to create a shim, one thing I could presumably do is reset `PROTOTYPE_SHIM_PATH` to an entirely new shim path, dump an entirely new shim script there, and cause all shims to be created in the image of my new hotness instead of the old and busted.
-
-I re-write the entire `hello.bash` hook so it looks like this:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-1109am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I added line 22 as an example of arbitrary code that we could execute inside the updated shim.  It just `echo`s a statement to the terminal before running the invoked gem.  But if I can get this to happen, then I could potentially do much more.  For example, I could do what lines 8-20 do, which is check whether a specific program is being run.  If it is, I execute code to log the user's keystrokes going forward, before allowing the original program to continue.
-
-The only other line I added was line 29, to remove the outdated shims.  This function was already called once, but now that I've updated the contents of `PROTOTYPE_SHIM_PATH`, I want to run it again so as to update *all* the shims to execute this new code.  This way I won't have to manually delete a specific gem's shim in order to trigger the update.
-
-I happen to know from my earlier explorations that one of the gems installed on my machine is called `bluepill`.  I'm guessing it's either a direct or indirect dependency of the Rails app that my employer's web application is built on, but it doesn't really matter how it got here.  What matters is whether our new code works!
-
-I type "vim `which bluepill`", and I see:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-1110am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-Yep, there's my new code on line 19!
-
-And when I run `bluepill --help`, I see:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-16mar2023-1111am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-You can see on the first line, right after the command I typed, is the text output from our updated shim!
-
-Cool, so now we've made a hook which successfully interacts with our gems!
-
-From here, the possibilities are really endless.  As we discussed, you could update the shims in a gem-specific manner, checking whether a specific gem is being run before executing code.  Or you could do what we did, and execute that code every time, for every gem.  It's up to you- get creative!
-
-I'm feeling a lot better about hooks and plugins now, certainly much better than before we started looking at this file.  Before we move on, I make sure to delete the directory I created, including the `hello.bash` hook.
-
-What's next?
+That's it for this file.  On to the next one.

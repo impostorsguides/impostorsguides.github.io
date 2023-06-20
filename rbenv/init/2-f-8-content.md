@@ -24,7 +24,9 @@ After a lot of searching through the Github issues for the term "shell", I find 
 >
 > Calling most rbenv commands, switching between versions, and executing shims will all work with this approach. Rbenv was intentionally designed to not need shell integrations (unlike RVM).
 
-This `"unlike RVM"` comment at the end tells me that there's something about RVM which the core team didn't like, and which prompted them to design RBENV without the need for shell integrations.  If we knew what this was, it would help answer our question.
+So even without RBENV's shell function, you can still call `rbenv local 2.7.5`, `rbenv version`, etc. as long as your `$PATH` variable includes the above two directories.
+
+The `"unlike RVM"` comment at the end tells me that there's something about RVM which the core team didn't like, and which prompted them to design RBENV without the need for shell integrations.  If we knew what this was, it would help answer our question.
 
 I Google `"rvm vs rbenv"`, and one of the first results I see is [this Reddit thread](https://web.archive.org/web/20220501024630/https://www.reddit.com/r/rails/comments/f009mb/there_are_two_ruby_version_manager_rvm_vs_rbenv/){:target="_blank" rel="noopener"} (NOTE- it's from 2020) which has comments from multiple people on why they switched from RVM to RBENV.
 

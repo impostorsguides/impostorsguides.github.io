@@ -1,7 +1,7 @@
 ---
 layout: page
 category: rbenv-pt-2
-id: 37
+id: 35
 previous-title: "rbenv-version-origin"
 previous-permalink: /rbenv/commands/version-origin
 title: "rbenv-versions"

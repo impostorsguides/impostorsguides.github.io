@@ -2,6 +2,8 @@ First the test file.
 
 ## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-file-write.bats){:target="_blank" rel="noopener"}
 
+### Setting up our working directory
+
 After the `bats` shebang and the loading of `test_helper`, the first block of code is:
 
 ```
@@ -12,6 +14,8 @@ setup() {
 ```
 
 This is the implementation of our `setup` hook, which in this case makes a new directory and navigates into it.
+
+### Sad path- testing a response to incorrect usage
 
 Our first test is:
 
@@ -24,7 +28,11 @@ Our first test is:
 }
 ```
 
-This is a sad-path test.  Judging from the description text, this command always expects two arguments.  Here we run the command with no setup and no arguments, and we assert that the command fails with an error message which tells the user to specify both a filename and a version number.  We then run the command again with two arguments, one of which is an empty string, and again assert that the command fails.
+This is a sad-path test.  According to the test's description, this command always expects two arguments.
+
+We run the command with no setup and no arguments, and we assert that the command fails with an error message which tells the user to specify both a filename and a version number.  We then run the command again with two arguments, one of which is an empty string, and again assert that the command fails.
+
+### Sad path- trying to set a version which isn't installed
 
 Next test:
 
@@ -37,7 +45,14 @@ Next test:
 }
 ```
 
-As a setup step, we assert that the `.ruby-version` file does not exist.  We then run the `version-file-write` command, passing that same `.ruby-version` file as argument #1 and the stringified version number "1.8.7" as argument #2.  We then assert that the command fails with an error message saying the requested version number is not installed.  Lastly, we assert that the `.ruby-version` file has not been created since we last checked for its existence.
+In this test:
+
+- We first assert that the `.ruby-version` file does not exist, as a sanity check.
+- We then run the `version-file-write` command, passing that same `.ruby-version` file as argument #1 and the stringified version number "1.8.7" as argument #2.
+- We then assert that the command fails with an error message saying the requested version number is not installed.
+- Lastly, we assert that the `.ruby-version` file has not been created since we last checked for its existence.
+
+### Happy path- writing to a version file other than `.ruby-version`
 
 Last test:
 
@@ -51,13 +66,21 @@ Last test:
 }
 ```
 
-As a setup step, we create a fake Ruby installation for Ruby v1.8.7, and we assert that a version file named `my-version` does not yet exist.  We then run the command with the `my-version` filename and version "1.8.7" as arguments.  This time we assert that the command was successful and that the contents of the newly-created version file is equal to "1.8.7".  This 2nd assertion implicitly tests that the new version file also, in fact, exists.
+In this test:
+
+- As a setup step, we create a fake Ruby installation for Ruby v1.8.7, and we assert that a version file named `my-version` does not yet exist.
+- We then run the command with the `my-version` filename and version "1.8.7" as arguments.
+- This time we assert that the command was successful and that the contents of the newly-created version file is equal to "1.8.7".
+
+This 2nd assertion implicitly tests that the new version file also, in fact, exists.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
 That's all for the tests, now on to the code itself.
 
 ## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-file-write){:target="_blank" rel="noopener"}
 
-Let's get the following out of the way:
+First up:
 
 ```
 #!/usr/bin/env bash
@@ -67,10 +90,14 @@ set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 ```
 
+As usual, we have:
+
  - `bash` shebang
  - "Usage" comments
- - `set -e` tells the shell to exit when it encounters an error for the first time.
- - `set -x` tells the shell to print verbose output, in this case when the `RBENV_DEBUG` env var has been set.
+ - `set -e` to set "exit-on-error" mode.
+ - `set -x` to set "verbose" mode.
+
+### Setting variables for the version file and version
 
 Next block of code:
 
@@ -81,6 +108,8 @@ RBENV_VERSION="$2"
 
 Here we just store off the first two arguments (aka the version filename and the version number) in appropriately-named variables.
 
+### Handling missing arguments
+
 Next block of code:
 
 ```
@@ -90,7 +119,9 @@ if [ -z "$RBENV_VERSION" ] || [ -z "$RBENV_VERSION_FILE" ]; then
 fi
 ```
 
-If either the two variables we just created are empty (i.e. if the user failed to provide two arguments to the `version-file-write` command), then we print the usage instructions for this file and exit with an error return code.
+If the user failed to provide either the version filename or the version number itself, then we print the usage instructions for this file and exit with an error return code.
+
+### Ensuring the version is installed
 
 Next block of code:
 
@@ -99,27 +130,11 @@ Next block of code:
 rbenv-prefix "$RBENV_VERSION" >/dev/null
 ```
 
-Here we validate that the Ruby version number that the user passed as argument #2 corresponds to a valid Ruby version that exists on the user's machine.  If not, we exit.
+Here we validate that the Ruby version number that the user passed as argument #2 corresponds to a valid Ruby version that exists on the user's machine.
 
-I was curious whether this last statement was actually true or not.  I checked the `rbenv-prefix` command and saw [this block of code](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-prefix#L37){:target="_blank" rel="noopener"} along with the `exit 1` statement on line 39, but I wasn't sure if the `rbenv-prefix` command executed by [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-file-write#L16){:target="_blank" rel="noopener"} was running in a separate process or not, therefore I wasn't sure if that `exit 1` statement would cause just that process or the calling process which is running `rbenv-version-file-write` to be exited.
+If not, an error will be raised, and we'll exit.  We can see this error being raised in the `rbenv-prefix` command, at [this block of code](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-prefix#L37){:target="_blank" rel="noopener"}.
 
-So I did an experiment.  My hypothesis is that, if there is only a single process running both `rbenv-version-file-write` and `rbenv-prefix`, then the `exit 1` command will cause `rbenv-version-file-write` to exit, so no further code after line 16 of `version-file-write` should be executed.  So I placed the following `echo` statement on line 17 of `rbenv-version-file-write`:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-17mar23-905am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I then ran `rbenv version file write foo bar`, knowing that `bar` is not a valid Ruby version and therefore `rbenv-prefix` should run its `exit 1` command.  Sure enough, I see the following:
-
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-17mar23-906am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-Sure enough, I see the expected error message from [this line of code](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-prefix#L38){:target="_blank" rel="noopener"}, but not the output of the `echo` statement I added.
-
-Note that I ran `ls -la` to verify that no version file named `foo` was created.
-
-So unless I'm misunderstanding something, we can conclude that the `exit 1` inside `rbenv-prefix` caused the exit of `rbenv-version-file-write` as well, and that therefore these two commands are running in the same process.
+### Writing the version number to the version file
 
 Last block of code:
 
