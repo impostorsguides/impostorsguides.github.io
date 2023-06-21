@@ -381,4 +381,4 @@ However, I'm not sure why we would print `${RBENV_ROOT}/version` as a last resor
 
 Perhaps the best way to think about the `rbenv version-file` command is to say that it describes where the version number **should be** set, not (necessarily) where it **is being** set.
 
-That's it for the `version-file` file.  Next file.
+That's it for the `version-file` file.  On to the next file.

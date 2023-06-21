@@ -16,3 +16,4 @@ Over the past 20-ish posts, we've learned about:
  - the advantages of testing behavior vs. testing implementation
  - unsetting shell variables via the `unset` command
  - testing whether a variable is set to an empty string using `+x` inside parameter expansion, i.e. `[ -n "\${RBENV_VERSION_OLD+x}" ]`
+ - expanding escape sequences using dollar signs plus single quotes, i.e. `$'\r'`
