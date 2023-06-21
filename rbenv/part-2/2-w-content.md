@@ -377,8 +377,6 @@ If we pass an argument to `rbenv version-file`, that means the user wants to che
 
 So it makes sense that the above `if/else` block wouldn't have the same number of `||` or-checks in the `if` block (when the user **did** specify a directory) that we have if the `else` block (when the user did **not** specify a directory).
 
-However, I'm not sure why we would print `${RBENV_ROOT}/version` as a last resort, at least not without first checking whether that file even **exists**.  It seems misleading to tell the user that their Ruby version is set by `~/.rbenv/version`, when that file potentially doesn't exist.
-
-Perhaps the best way to think about the `rbenv version-file` command is to say that it describes where the version number **should be** set, not (necessarily) where it **is being** set.
+It might seem misleading to tell the user that their Ruby version is set by `~/.rbenv/version`, when that file potentially doesn't exist.  The reason we do so is because, [according to the core team](https://github.com/rbenv/rbenv/discussions/1510){:target="_blank" rel="noopener"}, the intent of the `rbenv version-file` command is to describe where the version number **is expected to be** set, not (necessarily) where it **is being** set.
 
 That's it for the `version-file` file.  On to the next file.
