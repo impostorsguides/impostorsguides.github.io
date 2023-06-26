@@ -17,3 +17,4 @@ Over the past 20-ish posts, we've learned about:
  - unsetting shell variables via the `unset` command
  - testing whether a variable is set to an empty string using `+x` inside parameter expansion, i.e. `[ -n "\${RBENV_VERSION_OLD+x}" ]`
  - expanding escape sequences using dollar signs plus single quotes, i.e. `$'\r'`
+ - how to sort lines in a file using the `sort` command, including how to specify multiple sort keys (with the `-k` flag) and non-default delimiters (with the `-t` flag)

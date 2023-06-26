@@ -244,4 +244,4 @@ If neither of those are true, we print the output of the `version-file` command 
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
-That's a wrap for this command.  On to the next command.
+That's a wrap for this command.  On to the next one.
