@@ -14,3 +14,5 @@ In this section, we learned about:
 - What the difference between the `bin/` and `libexec/` directories are for, according to the Filesystem Hierarchy Standard
 - Testing whether a shell option is turned on via the `[[ -o <optionanme> ]]` syntax
 - How to test the type of a variable using parameter expansion, coupled with the `(t)` parameter
+- How to generate completions for a command in `zsh`, using `compctl -K`
+- How to generate completions for a command in `bash`, using `complete -F`

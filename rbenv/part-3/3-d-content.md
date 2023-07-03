@@ -875,19 +875,47 @@ fi
 
 If the index of the current word is greater than 1, that means the user is attempting tab completions for more than one word.  In other words, they've typed `rbenv` **plus** a sub-command.  In that case, our earlier `if` conditional (`if [ "$COMP_CWORD" -eq 1 ]; then`) would return false, and we would drop into the above `else` block.
 
-Here, we do the following:
+The following table illustrates what happens at each line of code, assuming the user has typed `rbenv versions ` (including a space at the end), and hits the `tab` key:
 
- - Create a local variable named `words`, and store the entire contents of the `COMP_WORDS` array (i.e. all the words the user typed into the terminal).
- - Remove the first word (i.e. `rbenv`) and the last word (i.e. the empty string) from our new `words` array.
- - Create a new local variable named `completions`, with contents equal to the output of `rbenv completions` plus all the words in our newly-truncated `words` array.
-    - For example, if we type `rbenv local` plus a space, and then hit `tab`, then `words` will equal `local`.
-    - Therefore, the contents of our `completions` variable is equal to the output of `rbenv completions local`.
-    - On my machine, that evaluates to:
-    ```
-    --help
-    --unset
-    system
-    2.7.5
-    3.0.0
-    ```
- - We call `compgen -W`, passing that list of completions as our output and narrowing it down to those that match the last word
+| Step | Example |
+|---|---|
+| The user types `rbenv` plus the name of a command (with the empty string at the end), and hits the `tab` key. | The user types `rbenv versions ` plus `tab`. |
+| The variable `word` is initialized to the last item in the user's input. | `word` is initialized to the empty string. |
+
+Then, inside the `else` block:
+
+| Step | Example |
+|---|---|
+| Create a local variable named `words`, and store the entire contents of the `COMP_WORDS` array (i.e. all the words the user typed into the terminal).  | We store the array `[rbenv, versions, ""]` (with the empty string at the end) in the `words` variable. |
+| Remove the first and last words from the `words` array, via `unset "words[0]"` and `unset "words[$COMP_CWORD]"` respectively. | `rbenv` is removed from the beginning, and the empty string is removed from the end.  Now `words` is now equal to the array `[versions]`. |
+| Create a new local variable named `completions`, with contents equal to the output of `rbenv completions` plus all the remaining words in our `words` array. | The value of `completions` is the output of `rbenv completions versions`, or `[--help, --bare, --skip-aliases]`. |
+| Call `compgen -W "$completions" -- "$word"`. | We call `compgen -W "--help --bare --skip-aliases" -- ""`. |
+| Store the result as an array in `COMPREPLY`. | Our result is: `--help --bare --skip-aliases`, with each result on its own line. |
+
+### Setting the completions for the `rbenv` command via `complete`
+
+Last line of code:
+
+```
+complete -F _rbenv rbenv
+```
+
+The `complete` command is a builtin, so to look up the docs, we'll need the `help` command:
+
+```
+bash-3.2$ help complete
+
+complete: complete [-abcdefgjksuv] [-pr] [-o option] [-A action] [-G globpat] [-W wordlist] [-P prefix] [-S suffix] [-X filterpat] [-F function] [-C command] [name ...]
+
+    For each NAME, specify how arguments are to be completed.
+    If the -p option is supplied, or if no options are supplied, existing
+    completion specifications are printed in a way that allows them to be
+    reused as input.  The -r option removes a completion specification for
+    each NAME, or, if no NAMEs are supplied, all completion specifications.
+```
+
+The `complete` command tells `bash` how to determine completions for a given command.  The `-F` flag specifies that `bash` should call a function to populate these completions.  Here we're mapping our new `_rbenv` function to the `rbenv` command, for the purposes of word completion.  This is similar to the `compctl -K _rbenv rbenv` command that we saw in `rbenv.zsh`.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+That's it for the `completions/` directory!  Now on to the next section.
