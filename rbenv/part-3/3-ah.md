@@ -6,8 +6,8 @@ previous-title: "bash.h"
 previous-permalink: /rbenv/infrastructure/bash-h
 title: "src/configure"
 permalink: /rbenv/infrastructure/src-configure
-next-title: Conclusion
-next-permalink: /rbenv/conclusion
+next-title: Infrastructure Summary
+next-permalink: /rbenv/infrastructure/summary
 ---
 
 {% include_relative 3-ah-content.md %}

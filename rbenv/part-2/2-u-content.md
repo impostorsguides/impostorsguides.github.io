@@ -1,11 +1,54 @@
-There's just one more file we have to examine before we can call it a day on the "libexec/" folder.  I see the "test/" directory has its own folder named "libexec", containing a command named `rbenv-echo`.  I `grep` for the usage of this command, and I only see one case, inside [the `rbenv.bats` spec file](https://github.com/rbenv/rbenv/blob/ed1a3a554585799cd0537c6a5678f6c793145b8e/test/rbenv.bats){:target="_blank" rel="noopener"}.  Let's look at the `rbenv-echo` command now.
+
+There's one more file we have to examine before we can call it a day on the `libexec/` folder.  The `test/` directory has its own folder named `libexec`, containing a command named `rbenv-echo`.  This command is only used inside [the `rbenv.bats` spec file](https://github.com/rbenv/rbenv/blob/ ed1a3a554585799cd0537c6a5678f6c793145b8e/test/rbenv.bats){:target="_blank" rel="noopener"}.
+
+Because it's in `test/libexec/` (not regular `libexec/`), that means:
+
+- it's only available to tests, not callable by users, and
+- it doesn't have any tests of its own.
+
+But it's got some interesting syntax, so let's look at it anyway, starting with the "Usage" comments.
+
+## ["Usage" Comments](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/libexec/rbenv-echo#L2){:target="_blank" rel="noopener"}
+
+```
+# Usage: rbenv echo [-F<char>] VAR
+```
+
+There's one required argument (`VAR`), and one optional flag (`-F<char>`).
+
+[Here's an example](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats#L74){:target="_blank" rel="noopener"} of using the command without the `-F` flag:
+
+```
+run rbenv echo "RBENV_HOOK_PATH"
+```
+
+Here, when we run `rbenv echo` **without** the `-F:` flag, we can see that we expect the result to be an unseparated list of paths:
+
+```
+assert_success "${RBENV_ROOT}/rbenv.d:${BATS_TEST_DIRNAME%/*}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
+```
+
+And [here's](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats#L57){:target="_blank" rel="noopener"} and example of using the command with the `-F` flag:
+
+```
+run rbenv echo -F: "PATH"
+```
+
+In this test, we **do** pass the `-F:` flag, and we expect the output to be a **separated** list of paths:
+
+```
+assert_line 0 "${BATS_TEST_DIRNAME%/*}/libexec"
+assert_line 1 "${RBENV_ROOT}/plugins/ruby-build/bin"
+assert_line 2 "${RBENV_ROOT}/plugins/rbenv-each/bin"
+```
+
+We'll see later that `-F:` means we want to interpret the `:` symbol as a field separator, and therefore to separately `echo` each section of the string in between the `:` characters.  For example, `rbenv echo -F: a:b:c` would print `a`, `b`, and `c` on separate lines.
 
 ## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/libexec/rbenv-echo){:target="_blank" rel="noopener"}
 
-```
-#!/usr/bin/env bash
-# Usage: rbenv echo [-F<char>] VAR
+The first and only block of code in this file is:
 
+```
 if [[ $1 == -F* ]]; then
   sep="${1:2}"
   echo "${!2}" | tr "${sep:-:}" $'\n'
@@ -14,38 +57,45 @@ else
 fi
 ```
 
-We have the `bash` shebang and "Usage" comments.
+This is a short but dense block of code.  Let's break it down.
 
-Then we have an `if` conditional, which checks whether the command's first argument starts with "-F".  If it does, then we create a variable named "sep".  Not sure what "sep" refers to; the command we're currently examining appears to be strictly utilitarian in nature (it's only called from within one specific test file), so it's not meant for public consumption and therefore the core team probably felt like they could skimp on readability a bit, since it's just for their own use.  I've done that before as well; they probably didn't expect someone to read every last file the way I'm doing.
-
-At any rate, what are we storing in "sep"?  The `bash` syntax is:
+### Checking whether the user passed the `-F` flag
 
 ```
-"${1:2}"
+if [[ $1 == -F* ]]; then
+  ...
+fi
 ```
 
-To see what happens here, I once again pull up [the GNU "Parameter Expansion" Docs](https://web.archive.org/web/20220905173558/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"}, and search for the string "1:2".  No luck, so I search for "1:".  This time I find the following:
+We have an `if` conditional, which checks whether the command's first argument starts with "-F".
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-17mar23-949am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-
-I Google "set –", and I find [this StackExchange answer](https://web.archive.org/web/20221015064720/https://unix.stackexchange.com/questions/308260/what-does-set-do-in-this-dockerfile-entrypoint){:target="_blank" rel="noopener"} which says that "set --" tells the shell to set everything after "--" as the positional arguments (i.e. the members of "$@").  So the line:
+### If the user **did** pass the flag
 
 ```
-Set – 01234567890abcdefgh
+sep="${1:2}"
 ```
 
-...sets arg "$1" equal to `01234567890abcdefgh`.  The line after that:
+If the argument starts with `-F`, then we create a variable named `sep`.
+
+What are we storing in the new variable?  I ask ChatGPT about the above syntax:
 
 ```
-echo ${1:7}
+The syntax "${1:2}" is a substring expansion in Bash. It allows you to extract
+a portion of a string starting from a specific index.
+
+In this case, ${1:2} extracts a substring from the first argument ($1) starting
+from the third character (index 2). The syntax is variable:offset:length, where
+variable is the name of the variable containing the string, offset is the starting
+index (0-based), and length is an optional parameter indicating the number of
+characters to extract.
+
+Let's break down the components of "${1:2}":
+
+ - ${1}: It references the value of the first argument passed to the script.
+ - :2: It specifies the starting index as 2, indicating that the substring should
+ start from the third character.
+ - The result is the portion of the string from the third character onwards.
 ```
-
-...treats the number `1` in this case as the value of argument "$1", and prints everything starting from the 7th character onward (characters are 0-based here).
-
-This also appears to be what's happening in the case of our code.  We're setting the "sep" variable equal to the value of `rbenv echo`'s first argument.  But not the whole argument- only the section of the argument from character 2 to the end (shaving off the first 2 chars, i.e. the "-F" chars).
 
 We can verify this with an experiment.  I paste the following function in my `bash` terminal:
 
@@ -64,36 +114,78 @@ cdefghijklmnop
 
 We see the first two characters are shaved off, leaving only the chars from position 2 to the end of the string.
 
+So `sep` contains everything from the 3rd character (i.e. `:`) until the end of the first argument.  In our case, `:` is also the last character in the first argument, so `sep` just contains `:`.
+
+### Printing the value of the variable we passed in
+
 The next line of `rbenv-echo` is:
 
 ```
 echo "${!2}" | tr "${sep:-:}" $'\n'
 ```
 
-The first part of this, `echo "${!2}"`, looks strange to me.  I search the GNU Parameter Expansion docs for "!", expecting to get the phone book, but luckily I only get 7 results.  Most of them are in this paragraph:
+The first part of this is `echo "${!2}"`.  It's parameter expansion, but that exclamation mark is something we haven't seen yet, at least not in RBENV.
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-17mar23-950am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
-</p>
+I ask ChatGPT again, and get the following response:
 
-I don't know what a "nameref" is, and therefore I don't know which of the "if" branches in this definition is relevant to our code.  This is a great example of the issue I take with the GNU docs- they're written for people who are already familiar with `bash`.  There is no example code, no links to definitions for jargon (like "nameref"), and no plain-English wording.  It seems to me that, if we want to tell noobies to "read the fucking manual", then we need to write the manual with those noobies in mind.
+```
+It echoes the value of the variable named by the second argument ($2) by using
+indirect variable expansion ("${!2}"), which expands to the value of the variable
+whose name is stored in $2.
+```
 
-OK, rant over.
+So the 2nd argument to `rbenv echo` is the **name** (not the **value**) of a variable.  For example, when we call the following in our test:
 
-I Google "bash parameter expansion exclamation mark", and I find [another StackOverflow link](https://web.archive.org/web/20211211034729/https://unix.stackexchange.com/questions/41292/variable-substitution-with-an-exclamation-mark-in-bash){:target="_blank" rel="noopener"}, which contains the following clarification:
+```
+run rbenv echo -F: "PATH"
+```
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-17mar23-952am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
+The 2nd argument is the literal string "PATH", **not** the value that our `$PATH` environment variable resolves to.
 
-This time we have actual example code.  It looks like the "!" syntax is known as 'indirect expansion", which means you can pass the name of a variable as a stringified argument, and the consumer of the argument will look for a variable with that stringified name, and expand *that variable* instead of the string itself.  That makes sense, given how I saw the `rbenv echo` command being used inside the `rbenv.bats` file:
+So `"${2}"` would resolve to the string "PATH", and we need the `!` character to capture what the `PATH` env var resolves to.  Therefore, we echo `"${!2}"`, not  `"${2}"` or `"$2"`.
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-17mar23-953am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
+I Google "bash indirect parameter expansion", and I get confirmation of ChatGPT's answer via [StackOverflow](https://web.archive.org/web/20230406191600/https://stackoverflow.com/questions/8515411/what-is-indirect-expansion-what-does-var-mean){:target="_blank" rel="noopener"}.
 
-OK, so we `echo` the value of the variable whose name we're passing to `rbenv echo` via the 2nd argument (that's what the "2" in `"${!2}"` means)/  Then we pipe that `echo`'ed value to a command named `tr`.  Specifically, the full command is `tr "${sep:-:}" $'\n'`.  What does this command do?  I type `man tr` in my terminal and get:
+Let's try this for ourselves, with an experiment.
 
+#### Experiment- indirect parameter expansion
+
+I create the following script:
+
+```
+#!/usr/bin/env bash
+
+echo "${1}"
+
+echo "${!1}"
+```
+
+The 1st `echo` line prints out the first argument directly, and the 2nd `echo` line prints out what it would resolve to if treated as a named variable.
+
+I then run the script as follows:
+
+```
+$ FOO='foo bar baz' ./foo FOO
+
+FOO
+foo bar baz
+```
+
+The 1st `echo` line treats the argument as a literal string, and the 2nd one treats it as a variable name that it then resolves to its underlying value.
+
+Great, I think we get it now!
+
+### Splitting the path into separate lines
+
+After we've `echo`ed the value of our variable, we pipe that value to a command named `tr`:
+
+```
+tr "${sep:-:}" $'\n'
+```
+
+What does this command do?  I type `man tr` in my terminal and get:
+
+```
 NAME
      tr – translate characters
 
@@ -104,115 +196,94 @@ SYNOPSIS
      tr [-Ccu] -ds string1 string2
 
 DESCRIPTION
-The tr utility copies the standard input to the standard output with substitution or deletion of selected characters.
+The tr utility copies the standard input to the standard output with substitution
+or deletion of selected characters.
 
-Hoping for some example code, I Google "bash tr command" and find [this link](https://web.archive.org/web/20221029094817/https://linuxhint.com/bash_tr_command/){:target="_blank" rel="noopener"} as the first result.  One of its examples of how to use `tr` is:
+...
 
-<p style="text-align: center">
-  <img src="/assets/images/screenshot-17mar23-954am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-OK, so we're replacing the value:
-
-```
-"${sep:-:}"
+In the first synopsis form, the characters in string1 are translated into the
+characters in string2 where the first character in string1 is translated into
+the first character in string2 and so on.
 ```
 
-...with the value:
+In our case, `"${sep:-:}"` is `string1` and `$'\n'` is `string2`.  So we read from `stdin`, replacing any occurrences of `"${sep:-:}"` with `$'\n'`.
+
+If we refer back to [the docs on shell parameter expansion](https://web.archive.org/web/20220905173558/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"}, we see that `"${sep:-:}"` means:
+
+ - Use the value of `sep`, if it exists.
+ - If `sep` is unset or null, fall back to the character `:`.
+
+The string that we use to replace `sep` is:
 
 ```
 $'\n'
 ```
 
-The value `"${sep:-:}"` looks to me like the syntax we saw earlier, where we provide a variable name as well as a default value if the variable is uninitialized (or initialized to null).  To test this, I do the following in my terminal:
+This syntax is called [ANSI-C quoting](https://web.archive.org/web/20230613061217/https://www.gnu.org/software/bash/manual/html_node/ANSI_002dC-Quoting.html){:target="_blank" rel="noopener"}.  It ensures that `bash` treats the special newline character (`\n`) as a newline, rather than as a literal string.
 
-```
-bash-3.2$ sep="foo"
-
-bash-3.2$ echo "${sep:-:}"
-
-foo
-
-bash-3.2$ sep=
-
-bash-3.2$ echo "${sep:-:}"
-
-:
-```
-
-I think we can conclude that, yes, that is what's happening here.
-
-The string that we replace it with looks to be a simple newline.  I'm a bit confused why we need the leading "$" character, so I try `echo`'ing the newline with and without the dollar sign:
-
-```
-bash-3.2$ echo $'\n'
-
-
-bash-3.2$ echo '\n'
-
-\n
-```
-
-OK, so the dollar sign ensures that we replace "sep" with an actual newline, not an escaped one.
-
-So in summary: the code...
+To summarize: the code...
 
 ```
 echo "${!2}" | tr "${sep:-:}" $'\n'
 ```
 
-...appears to mean that we `echo` the value of the variable whose name is passed in as the 2nd argument, and we replace any occurrences of the value of "sep" (or ":" if "sep" doesn't exist) with a newline.  With that knowledge, it seems like "sep" most likely stands for "separator".
+...means that:
 
-Let's test this hypothesis.  I make the following function and paste it into my terminal:
+ - We print (to `stdout`) the value of the variable whose name is passed in as the 2nd argument.
+ - We pipe that `stdout` output to the `stdin` of the `tr` command.
+ - We use `tr` to replace any occurrences of the value of `sep` (falling back to `:` if `sep` is undefined) with a newline.
+
+Let's test this hypothesis.
+
+#### Experiment- splitting standard input using `tr`
+
+I rewrite my `foo` script to look like the following:
 
 ```
-foo() {
-  sep="${1:2}"
-  echo "${!2}" | tr "${sep:-:}" $'\n'
-}
+#!/usr/bin/env bash
+
+separator="${1:-:}"
+
+tr "${separator}" $'\n'
 ```
 
-I then run the following code:
+I then run the script in my terminal, like so:
 
 ```
-bash-3.2$ bar="foo5bar5baz"
+$ echo "foo:bar:baz" | ./foo
+```
 
-bash-3.2$ foo xy5 bar
+The output I see is:
+
+```
+$ echo "foo:bar:baz" | ./foo
 
 foo
 bar
 baz
-
-bash-3.2$
 ```
 
-I declare a variable named "bar" and set it to the strings "foo", "bar", and "baz", all separated by the character "5".  I then call my "foo" function with the arg "xy5" as my first arg (the "x" and "y" are throw-away characters, similar to "-F" in the original code, because "sep" is defined in a way that it shaves off those first two chars) and the string "bar" as my 2nd arg (because `foo` internally uses indirect expansion to change the string "bar" into the variable "bar", and then expands that variable).  The result is my "foo5bar5baz" string, with the "5" characters replaced with newlines.  I then try this again, but without telling my function to use "5" as a separator:
+Then, I call it again, `echo`ing the same string with a different separator, and passing that new separator as the first argument to `foo`:
 
 ```
-bash-3.2$ foo xy bar
+$ echo "foo5bar5baz" | ./foo 5
+
+foo
+bar
+baz
+```
+
+Changing the separator in the `echo`ed string had the same result, **provided that** I also passed that separator as an argument to `foo`.  If I leave off the argument to `foo`, I no longer see my 3 separate lines:
+
+```
+$ echo "foo5bar5baz" | ./foo
 
 foo5bar5baz
 ```
 
-This time, since we didn't specify "5" as a separator, we just get our original string back, without any newline separation.  Lastly, I change the definition of "bar" to use the ":" character instead of "5", and run the last command again:
+### If the user did **not** pass the flag
 
-```
-bash-3.2$ bar="foo:bar:baz"
-
-bash-3.2$ foo xy bar
-
-foo
-
-bar
-
-baz
-
-bash-3.2$
-```
-
-We once again see our original string, this time split into 3 separate lines according to the default ":" separator.
-
-What happens if we *don't* pass the "-F" flag?  That's handled in the `else` condition:
+What happens if we *don't* pass the `-F` flag to `rbenv echo`?  That's handled in the `else` condition:
 
 ```
 else
@@ -222,6 +293,20 @@ fi
 
 Here we're still using indirect expansion, except this time we perform it on the first argument, not the 2nd one.  But we're still `echo`ing that variable's value to STDOUT.
 
-That's it!  That's the definition of `rbenv echo`.
+So the following invocation in our test...
 
+```
+run rbenv echo "RBENV_HOOK_PATH"
+```
 
+...prints the following result:
+
+```
+"${RBENV_ROOT}/rbenv.d:${BATS_TEST_DIRNAME%/*}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
+```
+
+In other words, we print the un-separated value of `RBENV_HOOK_PATH`, i.e. a sequence of directories which are joined together with the `:` character.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+That's the end of `rbenv echo`, and of the `libexec/` directory.  Let's review what we've learned.
