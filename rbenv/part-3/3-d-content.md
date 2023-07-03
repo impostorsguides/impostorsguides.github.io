@@ -1,18 +1,51 @@
-From the section "How rbenv hooks into your shell", I see one of the things that `rbenv init` does is:
+The `completions/` directory stores scripts which are used to enable word completion in `bash` and `zsh` shells, respectively.  You can activate RBENV's completion logic by adding the proper shell integration command to your shell's config file.
+
+In `bash`, that means adding the code `eval "$(rbenv init - bash)"`  to your `.bashrc` file.  In `zsh`, you'd add `eval "$(rbenv init - zsh)"` to your `.zshrc` file.  From there, `rbenv-init` will `source` the completion files via [this block of code](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-init#L123-L126){:target="_blank" rel="noopener"}:
 
 ```
-Installs autocompletion. This is entirely optional but pretty useful. Sourcing `~/.rbenv/completions/rbenv.bash` will set that up. There is also a `~/.rbenv/completions/rbenv.zsh` for Zsh users.
+completion="${root}/completions/rbenv.${shell}"
+if [ -r "$completion" ]; then
+  printf "source '%s'\n" "$completion"
+fi
 ```
 
-OK, so then what is auto-completion (in the `rbenv` sense)?  Let's take a look at the contents of that folder:
+What about the `fish` shell?  Per [the `fish` shell docs](https://web.archive.org/web/20230523204133/https://fishshell.com/docs/current/completions.html){:target="_blank" rel="noopener"}:
 
-<p style="text-align: center">
-  <img src="/assets/images/contents-of-completions-dir.png" width="70%" alt="Contents of the 'completions/' directory"  style="border: 1px solid black; padding: 0.5em">
-</p>
+> Fish automatically searches through any directories in the list variable `$fish_complete_path`, and any completions defined are automatically loaded when needed.
 
-Only two files.  Maybe inspecting them will give us a clue?
+In other words, `fish` automatically supports certain word completions out-of-the-box, by searching for executables in certain pre-defined directories.
 
-I'm going to start with the file ending in `.zsh`, since that's the shell program I use.
+## Why are completions useful?
+
+Completions are pretty handy if you're searching for a certain command.  For example, in your command line, type `rbenv` and hit the `tab` key.  When I do so, I get the following:
+
+```
+$ rbenv
+
+--version           global              install             root                version             version-name        which
+commands            help                local               shell               version-file        version-origin
+completions         hooks               prefix              shims               version-file-read   versions
+exec                init                rehash              uninstall           version-file-write  whence
+```
+
+These are all the commands that `rbenv` exposes.  If I type `rbenv r` and hit `tab`, I see all the commands which start with `r`:
+
+```
+$ rbenv r
+
+rehash  root
+```
+
+That's completions in a nutshell.  There are two files in the `completions/` directory:
+
+- `rbenv.zsh`, and
+- `rbenv.bash`.
+
+Let's inspect the files in that order.
+
+## `rbenv.zsh`
+
+The code for `rbenv.zsh` looks like so:
 
 ```
 if [[ ! -o interactive ]]; then
@@ -35,429 +68,136 @@ _rbenv() {
 }
 ```
 
-Another bash script to sink our teeth into!  Let's start at the top and dive into lines 1-3 first:
+As usual, we'll break it up into sections.
+
+### Checking whether an option is on
+
+The first 3 lines of code are:
 
 ```
 if [[ ! -o interactive ]]; then
-    return
+  return
 fi
 ```
 
-This is the first time I've seen an exclamation inside a square-bracket or double-bracket conditional before.  From my experience with Ruby, I'm guessing it negates the subsequent conditional statement.  And `man test` seems to support that:
+What does `-o` do?  The `man test` page references an `-o` flag, but it's actually a different flag, i.e. `expression1 -o expression2` is true if *either* `expression1` or `expression2` is true.  We don't have 2 expressions in our case, so we have to search elsewhere for an answer.
 
-<p style="text-align: center">
-  <img src="/assets/images/man-test-bang.png" width="70%" alt="Searching for the exclamation mark in the man entry for the test command"  style="border: 1px solid black; padding: 0.5em">
-</p>
-
-So `! expression` is true if `expression` is false.
-
-What does "-o" do?  I don't see anything in the `man test` page for a flag called `-o`.  [StackOverflow to the rescue](https://web.archive.org/web/20230408143552/https://stackoverflow.com/questions/5897760/what-does-flags-o-and-l-means-in-bash){:target="_blank" rel="noopener"}:
+[StackOverflow comes to the rescue](https://web.archive.org/web/20230408143552/https://stackoverflow.com/questions/5897760/what-does-flags-o-and-l-means-in-bash){:target="_blank" rel="noopener"}:
 
 ```
 -o : True if shell option "OPTIONNAME" is enabled.
 ```
 
-To test this, I run the following in my terminal:
+Let's test the `-o` flag with an experiment.
+
+#### Experiment- the `test` command's `-o` flag
+
+I run the following in my terminal:
 
 ```
 $ set +o verbose
 $ [[ -o verbose ]] && echo "TRUE"
 
+```
+
+In the above code, we use `set +o verbose` to turn the `verbose` option **off**.  The result is that `TRUE` was **not** printed to the screen.
+
+Next, we'll use `set -o verbose` to turn the same option **on**:
+
+```
 $ set -o verbose
 $ [[ -o verbose ]] && echo "TRUE"
 [[ -o verbose ]] && echo "TRUE"
 TRUE
-
-$ set +o foobar
-set: no such option: foobar
 ```
 
-The above tells us that:
+When we turn on the `verbose` option and run our test, we see the test itself (because `verbose` mode means any executed commands will also be printed to the screen), followed by the string `TRUE` that we expected to see.
 
-We can set and unset options (such as "verbose") with our old friend, "set".
-We can check if those options are set or unset by passing "-o" to the "test" command (or the bracket syntax)
-The option that we set/unset must be one of certain values that are recognized by the shell ('verbose' is recognized, but 'foobar' is not)
+### The `interactive` option
 
-(stopped here for the day; 2013 words)
+So we're testing whether a certain option is on, namely the `interactive` option.  What is the 'interactive' option, you ask?  [The Linux Documentation Project](https://web.archive.org/web/20230529202612/https://tldp.org/LDP/abs/html/intandnonint.html){:target="_blank" rel="noopener"} give us an answer:
 
-When we put all the above knowledge together, we see that the first thing this script does is check whether the 'interactive' option is set.  If it's not, we immediately return out of the script.
-
-What is the 'interactive' option, you ask?  [The GNU docs](https://web.archive.org/web/20220727100637/https://www.gnu.org/software/bash/manual/html_node/What-is-an-Interactive-Shell_003f.html){:target="_blank" rel="noopener"} give us an answer:
-
-```
-An interactive shell generally reads from and writes to a user's terminal.
-```
+> An **interactive** shell reads commands from user input on a `tty`. Among other things, such a shell reads startup files on activation, displays a prompt, and enables job control by default. The user can **interact** with the shell.
+>
+> A shell running a script is always a non-interactive shell.
 
 And StackOverflow [fills in some of the gaps](https://web.archive.org/web/20220423122639/https://unix.stackexchange.com/questions/50665/what-is-the-difference-between-interactive-shells-login-shells-non-login-shell){:target="_blank" rel="noopener"} in the above answer:
 
-```
-Interactive: As the term implies: Interactive means that the commands are run with user-interaction from keyboard. E.g. the shell can prompt the user to enter input.
+> Interactive: As the term implies: Interactive means that the commands are run with user-interaction from keyboard. E.g. the shell can prompt the user to enter input.
+>
+> Non-interactive: the shell is probably run from an automated process so it can't assume it can request input or that someone will see the output. E.g., maybe it is best to write output to a log file.
 
-Non-interactive: the shell is probably run from an automated process so it can't assume it can request input or that someone will see the output. E.g., maybe it is best to write output to a log file.
-```
+So we're checking whether we're interacting with the user or with a shell script.  If we're not interacting with a user, we exit out of the `rbenv.zsh` script via the `return` keyword.
 
-Good enough for now.  Next line of code is:
+### Adding completions to the `rbenv` command with the `compctl` keyword
+
+Next line of code is:
 
 ```
 compctl -K _rbenv rbenv
 ```
 
-I don't recognize the `compctl` command, so let's look it up.
+`compctl` is a `zsh` builtin, so we'll need to use the `help` command to view its docs:
 
 ```
-$ man compctl
-No manual entry for compctl
-$ help compctl
-compctl is a shell builtin
+ZSHCOMPCTL(1)       General Commands Manual         ZSHCOMPCTL(1)
+
+NAME
+  zshcompctl - zsh programmable completion
+
+DESCRIPTION
+
+Control the editor's completion behavior according to the supplied set of options...
+
+...
+
+-K function
+    Call the given function to get the completions.  Unless the name starts with an
+    underscore, the function is passed two arguments: the prefix and the suffix of
+    the word on which completion is to be attempted, in other words those characters
+    before the cursor position, and those from the cursor position onwards.  The
+    whole command line can be accessed with the -c and -l flags of the read builtin.
+    The function should set the variable reply to an array containing the completions
+    (one completion per element); note that reply should not be made local to the
+    function.
 ```
 
-<p style="text-align: center">
-  <img src="/assets/images/help-compctl.png" width="70%" alt="help page entry for the `compctl` command"  style="border: 1px solid black; padding: 0.5em">
-</p>
+In summary, `compctl -K` tells the shell that, when trying to autocomplete `rbenv` in the terminal, we first call the `_rbenv` shell function.  That function will set the value of a `reply` shell variable equal to an array of... something (we'll dig into that next).  The instructions explicitly tell us **not** to use the `local` keyword on the `reply` variable.  This way, it will be available outside the `_rbenv` shell function, after it has been set.
 
-The text that looks most relevant is:
+### Declaring the `_rbenv` helper function
 
-```
-Control the editor's completion behavior according to the supplied set of options.  Various editing commands, notably expand-or-complete-word, usually bound to tab, will attempt to complete a word typed by the user, while others, notably delete-char-or-list, usually bound to ^D in EMACS editing mode, list the possibilities; compctl controls what those possibilities are.  They may for example be filenames (the most common case, and hence the default), shell variables, or words from a user-specified list.
-```
-
-OK, so `compctl` appears to help the user alter the behavior of the shell's completion behavior.  But what are shell completions, in layman's terms?  [This blog post](https://web.archive.org/web/20220611155916/https://scriptingosx.com/2019/07/moving-to-zsh-part-5-completions/){:target="_blank" rel="noopener"} appears to be the best answer:
-
-<p style="text-align: center">
-  <img src="/assets/images/blog-article-on-completions.png" width="70%" alt="blog article on tab completions"  style="border: 1px solid black; padding: 0.5em">
-</p>
-
-> Man shells use the tab key (⇥) for completion. When you press that key, the shell tries to guess what you are typing and will complete it, or if the beginning of what you typed is ambiguous, suggest from a list of possible completions.
-
-OK so this does in fact have to do with tab completions from within the terminal.  I still don't feel like I have a good understanding of
-
-For instance, what does that `-K` flag do?  I run `help compctl` again and do a `/` search for `-K`:
-
-<p style="text-align: center">
-  <img src="/assets/images/help-results-for-compctl-k-flag.png" width="70%" alt="help page for compctl, searching for the -K flag"  style="border: 1px solid black; padding: 0.5em">
-</p>
+Next block of code is:
 
 ```
-Call the given function to get the completions.  Unless the name starts with an underscore, the function is passed two arguments...
-```
-
-OK, so `compctl -K _rbenv rbenv` calls the `_rbenv` function.  Since it starts with an underscore, it must not pass the two arguments mentioned above.
-
-SIDE RANT- it would be nicer if the man page was explicit about what happens when the name *does* start with an underscore, instead of just leaving us to guess that's what happens.  Otherwise, how would we know that the # of args passed is zero, and not 1 (or 3)?  Luckily we can guess with confidence that it's zero, since we have code for the `_rbenv` function and can see that its signature takes zero args, but if we didn't have that then we'd be screwed.  This is frustrating for me because it's another example of the user interface of computers being unfriendly to beginners, and it's one reason why it has taken me this long to feel confident spelunking on my own. </endrant>
-
-Unfortunately, I had to resort to watching [a Youtube video](https://www.youtube.com/watch?v=BHxaUP0kz9w&ab_channel=DevInsideYou){:target="_blank" rel="noopener"}.  I say "unfortunately" because, as useful as they sometimes are, they aren't archivable for posterity in the same way that text pages are with services like archive.org and others.  It would be cool if they were archivable in this way, but videos take up a lot of space on a hard drive, and archiving all the world's videos would be prohibitively expensive.  So hopefully the above video link is still available at the time you're reading this.  It was a great video, made by [a guy named Vlad](https://www.linkedin.com/in/agilesteel/?originalSubdomain=ge){:target="_blank" rel="noopener"} who has a channel called [DevInsideYou](https://devinsideyou.com/){:target="_blank" rel="noopener"}.  Although Vlad is a Scala developer and his videos have a distinct Scala bent to them, that didn't interfere with me learning from them at all.
-
-Just in case it's no longer available, I'll summarize what I learned below:
-
- - "A completion is a feature of a shell (zsh, in our case) that allows the shell to finish typing a command for you... this is usually accomplished by hitting the `tab` key, but this is configurable."
- - "It's quite common for shells to dig deeply into command line tools like git, docker, etc. and understand their sub-commands and arguments."
- - "zsh comes with quite a few completions out-of-the-box, but if you have a tool that zsh doesn't know, you can teach it."
- - Lots of examples and demos on tab completions.
- - `$fpath`- an array of directories containing files which contain completion functions.
- - zsh calls these functions "widgets" if you start them with an underscore.
- - There's also `$FPATH` (i.e. all caps) which looks much more like your standard `$PATH` variable (with directories delimited by `:`).
- - If zsh doesn't have a certain completion, there are various ways to get what you need (plugins, write them yourself, etc.), but at the end of the day, they're going to need to live in one of the directories of your `$fpath`.
-
-The video also has links to [the section of the zsh docs related to completions](https://zsh.sourceforge.io/Doc/Release/Completion-System.html#Completion-System){:target="_blank" rel="noopener"}, and a Github repo containing [a README on how to write your own completions](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org){:target="_blank" rel="noopener"}.
-
-After reading a bit of the 2nd link, I feel like I can make an educated guess of what `compctl -K _rbenv rbenv` does: it tells the shell that, when trying to autocomplete `rbenv` in the terminal, we first call the `_rbenv` shell function.  That function will set the value of a `reply` shell variable equal to an array of... something (we'll dig into that next).  What I'm confused about is, why does `reply` appear to be a local shell variable, and not an environment variable which would be available outside this script?
-
-Apparently, it's not!  I did an experiment with the following bash script:
-
-```
-#!/usr/bin/env bash
-
-  _foo() {
-  bar='5'
-  echo $bar
-}
-
-_foo
-echo $bar
-```
-My script calls the `_foo` function at the 2nd-to-last line of code, and then prints the value of `$bar` at the last line of code.  In both cases, the output is `5`.  If `bar` were locally-scoped to just the body of the `_foo` function, I would expect referencing it outside that function to throw an error (or at least print an empty line), but it does not.  Hence, `bar` (and by extension, `reply`) exist outside the scope of the functions they're declared in.
-
-So how do you make a variable local to just its own function scope?  That's what the `local` command does on the first line of code inside the `_rbenv()` function:
-
-```
+_rbenv() {
   local words completions
-```
-According to [Linuxtopia](https://web.archive.org/web/20220628155250/https://www.linuxtopia.org/online_books/advanced_bash_scripting_guide/localvar.html){:target="_blank" rel="noopener"}, "A variable declared as local is one that is visible only within the block of code in which it appears. It has local "scope". In a function, a local variable has meaning only within that function block."
-
-We confirm this when I update my script to make `bar` local:
-
-```
-#!/usr/bin/env bash
-
-  _foo() {
-  local bar='5'
-  echo $bar
-}
-
-_foo
-echo $bar
+  read -cA words
 ```
 
-When I call my script, I only see the output of `_foo` (i.e. one instance of `5` in the output, not two instances).
+We declare the `_rbenv` function.  The implementation starts with the declaration of two local variables- `words` and `completions`.
 
-(stopping here for the day; 3170 words)
+Next we use the `read` command (which we learned about [when discussing the `rbenv versions` command](/rbenv/commands/versions){:target="_blank" rel="noopener"}) to populate the `words` variable.
 
-Next line of code is:
-
-```
-read -cA words
-```
-
-Checking the `help` page for `read`, we see:
-
-<p style="text-align: center">
-  <img src="/assets/images/help-page-for-read-command.png" width="70%" alt="help page for the `read` command"  style="border: 1px solid black; padding: 0.5em">
-</p>
-
-So where do we "read one line" *from*?  Is it from the argument of the function (of which there are none, in our case), from some environment or shell variable whose name is known by people with more experience than me, or somewhere else entirely that I can't even think of because I don't know what I don't know?
-
-Another resource, [LinuxHunt](https://web.archive.org/web/20220629000155/https://linuxhint.com/bash_read_command/){:target="_blank" rel="noopener"}, helps us out:
+Checking the `help` page for the `-c` and `-A` flags for `read`, we see:
 
 ```
-Read is a bash builtin command that reads the contents of a line into a variable. It allows for word splitting that is tied to the special shell variable IFS. It is primarily used for catching user input but can be used to implement functions taking input from standard input.
-...
-Interactive bash scripts are nothing without catching user input. The read builtin provides methods that user input may be caught within a bash script.
-...
-To catch a line of input NAMEs and options are not required by read. When NAME is not specified, a variable named REPLY is used to store user input:
+-c
+-l    These flags are allowed only if called inside a function
+      used for completion (specified with the -K flag to compctl).
+      If the -c flag is given, the words of the current command
+      are read.
 
-{
-echo -n "Type something and press enter: ";
-read;
-echo You typed ${REPLY}
-}
+-A    The first name is taken as the name of an array and all
+      words are assigned to it.
 ```
 
+We read all the words of the command, and store them in an array variable, which in this case is named `words`.
 
-To test out the above example, I try the following experiment script:
+Let's try this for ourselves with an experiment.
 
-```
-#!/usr/bin/env bash
+#### Experiment- building our own word completion for a new command
 
-echo "Please enter your name:";
-read;
-echo "Your name is $REPLY."
-```
-
-The above test works as expected:
-
-```
-$ ./foo
-Please enter your name:
-Richie
-Your name is Richie.
-```
-
-Lastly, a site called [ComputerHope](https://web.archive.org/web/20221001174841/https://www.computerhope.com/unix/bash/read.htm){:target="_blank" rel="noopener"} tells us:
-
-<p style="text-align: center">
-  <img src="/assets/images/computerhope-read-command.png" width="70%" alt="Description of the `read` command from ComputerHope"  style="border: 1px solid black; padding: 0.5em">
-</p>
-
-Cool, so `read` reads from standard input.  That's pretty unsurprising.  And it stores the results in the name of the variable you pass it (in the case of our code, `words`).  This is starting to make sense.
-
-But what do the `-A` and `-c` flags do?  Checking the `help` page again, we see:
-
-<p style="text-align: center">
-  <img src="/assets/images/read-command-a-and-c-flags.png" width="70%" alt="The -A and -c flags for the `read` command"  style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I tried to put together an experiment script here:
-
-```
-#!/usr/bin/env zsh
-
-compctl -K _foo foo
-
-_foo() {
-  foo=(1 2 3 4 5)
-  echo "Please enter your name:";
-  read -cA foo;
-  reply=("$foo")
-}
-
-foo
-```
-
-My theory was that `compctl -K _foo foo` was telling zsh to call the `_foo` function whenever it saw `foo` called in the shell or in a script.  I was expecting to at least see `Please enter your name:` in the terminal, but nothing happened, not even an error.
-
-This is when I decided to try a straight copy-paste of the example code in the `help` page:
-
-```
-$ function whoson { reply=(`users`); }
-$ compctl -K whoson talk
-```
-
-I then tried `which talk` to see if there was already a command named `talk` somewhere.  Turns out there is:
-
-```
-$ which talk
-/usr/bin/talk
-```
-
-I then had the thought that maybe `compctl -K whoson talk` tells zsh to call `whoson` for a list of the auto-complete commands whenever `talk` is called and the user then hits the tab key.  This appears to be what happens:
-
-```
-$ talk myusername myusername myusername
-```
-
-My username appeared everytime I hit the `tab` key.  For the record, the `users` command simply returns `myusername` on my machine, since I'm the only user.
-
-OK, that cleared things up substantially.
-
-I have an idea for a more informed experiment.  I make a subdirectory in my root dir named `~/completions` and I add some `compctl` code to it, along with a function:
-
-```
-#!/usr/bin/env zsh
-
-compctl -K foo grep
-
-foo() {
-  reply=(foo bar baz)
-}
-```
-
-Then I add my new directory to `fpath`:
-
-```
-$ fpath=(~/completions $fpath)
-```
-
-My theory is that `foo`, `bar`, and `baz` should show up as options when I try to tab-complete after typing `grep` in my terminal.  But unfortunately, that's not what happens.  I just see a list of files and directories in my current directory.
-
-Then I try the original `whoson` example again, except I rename `whoson` to `foobar` and change "reply=(`users`)" to "reply=(foo bar baz);".  That works:
-
-<p style="text-align: center">
-  <img src="/assets/images/possible-experiment-results-for-completions-1.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-So why does it work when I paste the commands directly into the terminal, but not when I add a completion file and update my `$fpath`?
-
-I hope it's not some stupid syntax error I made... but it probably is lol.
-
-I open up a brand-new terminal tab and update my $fpath again.  I get the same result- no `foo bar baz` options when I tab-complete, just a list of files/subdirectories.
-
-I add the example code to the completion file I created:
-
-```
-#!/usr/bin/env zsh
-
-function foobar { reply=(foo bar baz); }
-
-foo() {
-  reply=(foo bar baz);
-}
-
-compctl -K foo talk
-compctl -K foobar grep
-```
-
-When I try tab-complete with `grep`, I don't see my `foo bar baz` options either.  So now I'm thinking it's a problem with the way I added the completions file to my $fpath.
-
-I remember that, in addition to $fpath, there's $FPATH.  I try updating $FPATH instead:
-
-```
-$ FPATH="Users/myusername/Workspace/mavenlink/completions:$FPATH"
-$ echo $FPATH
-
-Users/myusername/Workspace/mavenlink/completions:Users/myusername/Workspace/mavenlink/completions:/usr/local/share/zsh/site-functions:/usr/share/zsh/site-functions:/usr/share/zsh/5.8.1/functions
-
-$ grep
-$ talk
-```
-
-With both `grep` and `talk`, I continue to see the directory contents, not `foo bar baz`.
-
-What about if I temporarily copy my completion file into one of the other directories in $fpath?
-
-```
-$ cp completions/_foo /usr/local/share/zsh/site-functions
-$ grep
-$ talk
-```
-
-Still nothing but directory contents.
-
-Then I wonder whether the completion filename has to be the same as the command I'm trying to tab-complete?
-
-```
-$ mv completions/_foo completions/_talk
-$ talk
-```
-
-Still no better.
-
-Just in case the completion file needs to be renamed AND it needs to be moved to the `site-functions` directory above, I try that:
-
-```
-$ mv completions/_talk /usr/local/share/zsh/site-functions
-$ talk
-```
-
-No dice.
-
-I try moving the call to `compctl` from before the function definition, to after it:
-
-```
-#!/usr/bin/env zsh
-
-_foobar() {
-  reply=(foo bar baz)
-}
-
-compctl -K _foobar talk
-```
-
-Still no luck.
-
-I kind of feel like I'm throwing spaghetti at a wall here.  This is where my tendency to give up starts to kick in.  However, I'm writing all this down in order to force myself to power through those moments.  I feel like I have to keep going, but I remember it's OK to take a break until tomorrow if I need to.
-
-I remember [the video I watched yesterday](https://www.youtube.com/watch?v=BHxaUP0kz9w&ab_channel=DevInsideYou){:target="_blank" rel="noopener"}.  And I remember that one of the links in the description was a link to the official ZSH docs, specifically [the section on tab completions](https://web.archive.org/web/20220807190213/https://zsh.sourceforge.io/Doc/Release/Completion-System.html){:target="_blank" rel="noopener"}.
-
-This line of the docs stands out:
-
-<p style="text-align: center">
-  <img src="/assets/images/docs-on-compinit-and-maybe-compdef.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-The current first line of code in my file is a shebang, `#!/usr/bin/env bash`.  Perhaps I need to change it to one of the specified tags?  Perhaps `compdef foobar`?
-
-I make the above replacement, and try again.  Still no luck.  I even try `autoload compinit` and `compinit -i` again (I remember seeing these commands on a StackOverflow answer or a blog article or something), but still no luck.
-
-Further down in the doc, I see:
-
-```
-The function compdef can be used to associate existing completion functions with new commands. For example,
-
-`compdef _pids foo`
-
-uses the function `_pids` to complete process IDs for the command `foo`.
-```
-
-I update the `compdef` statement to say `#compdef _foobar foobar` and try again.  Still no luck.
-
-(stopping here for the night; 4466 words)
-
-As a side note, one point I didn't capture well enough when I was writing the above is that I *was in fact* able to get autocomplete to work by doing the following:
-
- - Creating a new folder called "completions"
- - Creating another new folder called "commands"
- - Adding the "commands" folder to $PATH
- - Creating a file named "_foobar" inside "completions" with the following code:
-
-```
-#!/usr/bin/env bash
-
-function _foobar { reply=(foo bar baz); }
-
-compctl -K _foobar foobar
-```
-
- - Creating a file named "foobar" in "commands" with the following code:
+I make a file called `foobar` in my current directory, containing the following:
 
 ```
 #!/usr/bin/env bash
@@ -466,41 +206,65 @@ echo "Hello"
 echo "args:"
 
 echo "$@"
- ```
- - Running "source completions/_foobar".
-
-The above results in the expected autocomplete behavior when I type in "foobar" and hit "tab":
-
-<p style="text-align: center">
-  <img src="/assets/images/results-of-tab-completion.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-I discovered the above by re-examining the code in the rbenv repo's "libexec/rbenv-init" file, which does something similar [here](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-init#L99){:target="_blank" rel="noopener"}.  Although simply typing `echo "source $filename"` won't by itself source the given $filename (it just prints "source $filename" to your screen), running `eval `echo "source baz/buss"`` does in fact source the file.  And the code inside `rbenv-init` is meant to be wrapped inside a call to `eval`.  In fact, if you try to just run `rbenv init` in your terminal, you're given the following instructions:
-
-```
-$ rbenv init
-# Load rbenv automatically by appending
-# the following to ~/.zshrc:
-
-eval "$(rbenv init - zsh)"
 ```
 
-I think *a lot* of my confusion yesterday and the day before was due to me believing that adding my "completions" directory to $fpath should result in zsh automatically searching in that folder whenever I attempt a tab-complete, coupled with a desire to fully understand everything I had encountered in the docs / StackOverflow posts / Youtube videos I had processed over the last few days.  This tenacity can be useful when trying to solve a difficult problem that's an immediate blocker to my progress, but it can also cause me to stubbornly bang my head against the wall trying to squeeze every last bit of knowledge out of a line of code, no matter how irrelevant it is to my immediate goal.
+It just prints out a few static strings, followed by the arguments it receives.
 
-I still don't know how to get zsh to recognize completion code without `source`'ing the file which contains the call to `compctl -K` (I suspect it has something to do with calling `autoload compinit` and/or `compinit -i`, based on posts I read in a haze of confusion), but that knowledge isn't a blocker to my immediate goal of understanding the `rbenv` repo.  So I decide to save that quest for another day.
+Then I make another file (also in my current directory) named `_foobar`:
 
-Let's move on to the next line of code:
+```
+#!/usr/bin/env bash
+
+function _foobar {
+  reply=(foo bar baz);
+}
+
+compctl -K _foobar foobar
+```
+
+Note that I didn't try to use the `read` command with the `-cA` flags here.  We'll do that further down, in a separate experiment.
+
+I load `_foobar` into memory via `source _foobar`:
+
+```
+$ source _foobar
+```
+
+Then, when I type `./foobar ` in my terminal (with a space at the end) and hit the tab key, the3 words in my `reply` array automatically appear:
+
+```
+$ ./foobar
+
+bar  baz  foo
+```
+
+When I hit `tab` again, the terminal auto-completes with the first option in the list:
+
+```
+$ ./foobar bar
+
+bar  baz  foo
+```
+
+And when I hit `Enter`, my `./foobar` command works as expected:
+
+```
+$ ./foobar bar
+
+Hello
+args:
+bar
+```
+
+Let's move on to the next line of code.
+
+### Checking the length of the commands in the terminal
 
 ```
   if [ "${#words}" -eq 2 ]; then
 ```
-Here we see the `${...}` parameter expansion syntax again.  I look up [the docs for parameter expansion](https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"} again, and search the page for the `#` string, and I see the following:
 
-<p style="text-align: center">
-  <img src="/assets/images/param-expansion-docs-2.png" width="70%" style="border: 1px solid black; padding: 0.5em">
-</p>
-
-So it looks like `#foobar` inside the curly braces is the same as saying "give me the length of the 'foobar' variable".  As an experiment, I try the following in my terminal:
+Referring back to [the docs for parameter expansion](https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"} we see that a `#` before a variable name inside the curly braces resolves to the length of the variable, like so:
 
 ```
 $ foo="foo bar"
@@ -508,7 +272,9 @@ $ echo "${#foo}"
 7
 ```
 
-Makes sense so far.  Since I know (or suspect?) that `words` is an array in the `rbenv` code, I try the following as well:
+We see `7` because the string `foo bar` has 7 characters in it.
+
+And if we pass an array instead of a string, we get the number of items in the array:
 
 ```
 $ foo=(bar baz)
@@ -516,33 +282,62 @@ $ echo "${#foo}"
 2
 ```
 
-Sweet, so zsh is smart enough to alter its method for checking length depending on whether the test subject is a string or an array.
-So our line of code says "If the length of 'words' is equal to 2, then..."
+Therefore, our line of code:
 
-Then what?  Next line of code is:
+```
+if [ "${#words}" -eq 2 ]; then
+```
+
+...says "If the length of `words` is equal to 2, then execute the code inside the `if` block".
+
+### If the user tab-completes with just `rbenv` in the terminal
+
+Next line of code is:
 
 ```
 completions="$(rbenv commands)"
 ```
 
-Looks like we're setting the value of the `completions` variable equal to "$(rbenv commands)".  But I notice something subtle here- we're using parentheses, not curly braces here.  I don't remember seeing this so far.  What's the difference?  Is this still considered parameter expansion?  I search [the parameter expansion docs](https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"} for "$(", but don't find anything.  I Google "dollar sign plus parens zsh" and find [a useful StackOverflow answer](https://web.archive.org/web/20220720215040/https://stackoverflow.com/questions/17984958/what-does-it-mean-in-shell-when-we-put-a-command-inside-dollar-sign-and-parenthe){:target="_blank" rel="noopener"}:
+We set the value of a variable named `completions` equal to the return value of `rbenv commands`, using command substitution.
+
+Does it store the contents as a string, or as an array?
+
+For what it's worth, we don't *really* need to know the answer to this question.  After all, we're not checking the length of the `completions` variable like we do with the `words` variable.  I'm mostly just curious, and I find it helpful to know what data types I'm working with in my variables.
+
+To answer this, I need to know how to print a variable's type in the terminal.  StackOverflow [has the answer](https://web.archive.org/web/20220714213343/https://unix.stackexchange.com/questions/269825/how-can-i-get-a-variables-datatype-in-zsh){:target="_blank" rel="noopener"}:
+
+> You can use `t` parameter expansion flag:
+>
+> ```
+$ print -rl -- ${(t)fpath}
+array-special
+$ a=1
+$ print -rl -- ${(t)a}
+scalar
+$ a=(1 2)
+$ print -rl -- ${(t)a}
+array
+$ typeset -A a
+$ print -rl -- ${(t)a}
+association
+>```
+>
+> Note that you can't distinguish between array of integers or array of strings.
+
+Looks like I need to use parameter expansion, coupled with `(t)` before the variable name.
+
+With that in mind, a quick experiment.
+
+#### Experiment- checking the type of a variable with `(t)`
 
 ```
-Usage of the `$` like `${HOME}` gives the value of `HOME`. Usage of the `$` like `$(echo foo)` means run whatever is inside the parentheses in a subshell and return that as the value. In my example, you would get `foo` since `echo` will write `foo` to standard out
-```
+# sanity check to make sure we get 'array' as expected
 
-Short and sweet.  So in our case, we're storing the return value of `rbenv commands` as the contents of the `completions` local variable.  Does it store the contents as a string, or as an array?  To answer this, I need to know how to print a variable's type in the terminal.  StackOverflow [to the rescue](https://web.archive.org/web/20220714213343/https://unix.stackexchange.com/questions/269825/how-can-i-get-a-variables-datatype-in-zsh){:target="_blank" rel="noopener"}:
-
-<p style="text-align: center">
-  <img src="/assets/images/how-to-print-a-variables-type.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="how to print a variable's type">
-</p>
-
-Looks like I need to use parameter expansion, coupled with `(t)` before the variable name.  With that in mind, a quick experiment:
-
-```
-$ foo=(1 2 3)     # sanity check to make sure we get 'array' as expected
+$ foo=(1 2 3)
 $ echo "${(t)foo}"
 array
+
+# now the actual experiment
 
 $ foo="$(rbenv commands)"
 $ echo "${(t)foo}"
@@ -551,34 +346,11 @@ scalar
 
 Great, so we're storing the output of `rbenv commands` as a single string, not as an array of strings.
 
-At this point, I'm wondering why `2` is the magic number that we're checking against the length here.  Why not 1, or 3?
+### Why are we checking for a length of 2?
 
-To answer this, I want to print out the value of the local variable `words` (as well as its length) to the screen when I try to tab-complete using the `rbenv` command.  But to do this, I have to actually go into my local `rbenv` installation and edit its code.  Exciting, right?
+At this point, I'm wondering why `2` is the magic number that we're checking against the length of `words`.  Why not 1, or 3?
 
-Since I don't know where that code lives, I have to find where it was installed.  I know I installed `rbenv` using `homebrew`, so I Google "homebrew where is package installed".  [The first link](https://web.archive.org/web/20220827131359/https://mkyong.com/mac/where-does-homebrew-install-packages-on-mac/){:target="_blank" rel="noopener"} tells me to check in `/usr/local/Cellar`.  I do so, and I find the directory `/usr/local/Cellar/rbenv/1.2.0/` which includes the `completions` directory and the `rbenv.zsh` file I've been reading in Github.  I open it up and it looks the same as what I've seen so far:
-
-```
-if [[ ! -o interactive ]]; then
-    return
-fi
-
-compctl -K _rbenv rbenv
-
-_rbenv() {
-  local words completions
-  read -cA words
-
-  if [ "${#words}" -eq 2 ]; then
-    completions="$(rbenv commands)"
-  else
-    completions="$(rbenv completions ${words[2,-2]})"
-  fi
-
-  reply=("${(ps:\n:)completions}")
-}
-```
-
-I edit it to include the following 3 `echo` statements after `read -cA words`:
+I edit the `rbenv.zsh` file to include the following 4 `echo` statements after `read -cA words`:
 
 ```
 if [[ ! -o interactive ]]; then
@@ -591,9 +363,10 @@ _rbenv() {
   local words completions
   read -cA words
 
-  echo "inside _rbenv"
-  echo "words: $words"
-  echo "words.length: ${#words}"
+  echo                              # this line is new
+  echo "inside _rbenv"              # this line is new
+  echo "words: $words"              # this line is new
+  echo "words.length: ${#words}"    # this line is new
 
   if [ "${#words}" -eq 2 ]; then
     completions="$(rbenv commands)"
@@ -605,7 +378,7 @@ _rbenv() {
 }
 ```
 
-In order for bash to see the new lines of code, I suspect that I have to re-run `rbenv init`.  I don't think it can hurt to do so, so I go for it:
+In order for the updated completion file to take effect in `zsh`, I have to re-run `rbenv init`:
 
 ```
 $ eval "$(rbenv init - zsh)"
@@ -613,104 +386,121 @@ $ eval "$(rbenv init - zsh)"
 
 Then when I type `rbenv` plus a space and hit `tab`, I see:
 
-<p style="text-align: center">
-  <img src="/assets/images/results-of-tab-complete-1223pm.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="results of tab complete attempt">
-</p>
-
-So the length of `words` is 2 when the user just types `rbenv` with nothing else.  That's unexpected; shouldn't it be a length of 1, since I only typed one word?
-
-At any rate, I follow this up by typing `rbenv foo`, and get the following:
-
-<p style="text-align: center">
-  <img src="/assets/images/results-of-tab-complete-attempt-1225pm.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="results of tab complete attempt">
-</p>
-
-So there's a phantom extra word in the `words` array.  I think I can discover what it is by printing each element in `words`.  I update the completion file to add the following `for` loop below my previous `echo` statements:
-
 ```
-if [[ ! -o interactive ]]; then
-    return
-fi
-
-compctl -K _rbenv rbenv
-
-_rbenv() {
-  local words completions
-  read -cA words
-
-  echo "inside _rbenv"
-  echo "words: $words"
-  echo "words.length: ${#words}"
-
-  for word in "$words[@]";
-  do
-    echo "word: $word"
-    echo "word type: ${(t)word}"
-    echo "word length: ${#word}"
-    echo "---"
-  done
-
-  if [ "${#words}" -eq 2 ]; then
-    completions="$(rbenv commands)"
-  else
-    completions="$(rbenv completions ${words[2,-2]})"
-  fi
-
-  reply=("${(ps:\n:)completions}")
-}
+$ rbenv
+inside _rbenv
+words: rbenv
+words.length: 2
+                                                           rbenv
+--version           global              install             root                version             version-name        which
+commands            help                local               shell               version-file        version-origin
+completions         hooks               prefix              shims               version-file-read   versions
+exec                init                rehash              uninstall           version-file-write  whence
 ```
 
-Note that the `[@]` syntax is something I saw in a previous StackOverflow post, and its function (I believe) is to tell the `for` loop that the value of `$words` is an array, so you can iterate over it.
+So the length of `words` is 2 when the user just types `rbenv` and a space afterward.  This represents the string `rbenv` plus an empty string after the space character.  We can prove this to ourselves by printing each element in `words`.
+
+I update the completion file to add the following `for` loop below my previous `echo` statements:
+
+```
+for word in "$words[@]";
+do
+  echo "word: $word"
+  echo "word type: ${(t)word}"
+  echo "word length: ${#word}"
+  echo "---"
+done
+```
+
+We've seen the `[@]` syntax before; its function is to tell the `for` loop that the value of `$words` is an array, so you can iterate over it.
 
 When I type `rbenv foo bar` and hit tab, I see:
 
-<p style="text-align: center">
-  <img src="/assets/images/results-of-tab-complete-attempt-1244pm.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="results of tab complete attempt">
-</p>
+```
+$ rbenv foo bar baz
+inside _rbenv
+words: rbenv foo bar baz
+words.length: 5
+rbenv
+foo
+bar
+baz
 
-So it looks like the phantom word is an empty string.  Not sure where that comes from or why zsh would pass that empty string to the completion function, but there you go.
+word: rbenv
+word type: scalar
+word length: 5
+---
+word: foo
+word type: scalar
+word length: 3
+---
+word: bar
+word type: scalar
+word length: 3
+---
+word: baz
+word type: scalar
+word length: 3
+---
+word:
+word type: scalar
+word length: 0
+---
+```
 
-Before I close up shop for the day, I make sure to clean up the `echo` statements and the `for` loop I added, returning the completion file to its former state:
+The last iteration of the `for` loop shows up as:
 
 ```
-if [[ ! -o interactive ]]; then
-    return
-fi
-
-compctl -K _rbenv rbenv
-
-_rbenv() {
-  local words completions
-  read -cA words
-
-  if [ "${#words}" -eq 2 ]; then
-    completions="$(rbenv commands)"
-  else
-    completions="$(rbenv completions ${words[2,-2]})"
-  fi
-
-  reply=("${(ps:\n:)completions}")
-}
+word:
+word type: scalar
+word length: 0
 ```
 
-(stopping here for the day; 5659 words)
+It's got a length of zero, and it's a scalar type so it must be either a string or an integer.  Integers can't have a length of 0, so it must be a string.
+
+Before moving on, I make sure to delete all the `echo` statements from `rbenv.zsh`, and re-run the `eval "$(rbenv init - zsh)"` command to reset my word completions.
+
+### If the user asked for completions for a sub-command
 
 Next line of code:
 
 ```
-completions="$(rbenv completions ${words[2,-2]})"
-```
-Again, we're storing a value in the `completions` local variable, but it's a new value now, namely the result of the "rbenv completions" command, plus whatever "words[2, -2]" evaluates to.  Let's see what that is first, then we can add it to "rbenv completions" and plug it into our terminal to see what the final output is.
-
-Recall from the earlier "echo" attempts that "words" was equal to an array of "rbenv", "foo", and "bar".  We don't need to add our "echo"s back to the script; now that we know what the value of "words" was, we should be able to just make a new array in our terminal and play with that:
-
-```
-$ words=(rbenv foo bar baz buzz quox)
-$ echo "$words[2, -2]"
-foo bar baz buzz
+else
+  completions="$(rbenv completions ${words[2,-2]})"
+fi
 ```
 
-So "words[2, -2]" takes the values in the array starting with the 2nd item, and ending at the 2nd-to-last item, inclusive.  The only surprise (for me) is that the terminal accesses an array with an index in a 1-based (not 0-based) fashion:
+Again, we're storing a value in the `completions` local variable, but it's a new value now, i.e. the result of the `rbenv completions` command, plus the value of `${words[2, -2]}`.  Let's start by checking what that value is.
+
+Recall from the earlier `echo` attempts that `words` was equal to an array of `rbenv`, `foo`, `bar`, `baz`, and the empty string `""`.  If we make a new array named `words` in our terminal, we can inspect it using the `${words[2, -2]}` syntax:
+
+```
+$ words=(rbenv foo bar baz "")
+
+~/Workspace/OpenSource/impostorsguides.github.io (main)  $ echo "$words[2, -2]"
+
+foo bar baz
+```
+
+So `${words[2, -2]}` takes the values in the array starting with the 2nd item (skipping `rbenv`), and ending at the 2nd-to-last item (skipping the empty string).
+
+For example, if I type `rbenv local `, we'd reach the `else` block of our code, and the `completions` variable would be set to the output of `rbenv completions local`.  On my machine, that is:
+
+```
+$ rbenv completions local
+
+--help
+--unset
+system
+2.7.5
+3.0.0
+```
+
+In other words, the above 5 strings, joined with newlines into a single string.
+
+#### 1-based arrays in `zsh`
+
+Observant readers will notice that the way to access the 2nd element in the `words` array was with the syntax `[2,...]`, **not** `[1,...]`.  [As StackOverflow notes](https://web.archive.org/web/20220714213343/https://unix.stackexchange.com/questions/269825/how-can-i-get-a-variables-datatype-in-zsh){:target="_blank" rel="noopener"}, array positioning in `zsh` is 1-based:
 
 ```
 $ echo "$words[0]"
@@ -721,274 +511,411 @@ $ echo "$words[2]"
 foo
 ```
 
-At first this was only mildly surprising, but it kinda started to gnaw at me.  This is actually kind of a big difference between programming in my terminal and in literally every other language I've ever worked with.  I could just let this go, but I decide to spike on figuring out what the deal is here.
-
-And I'm glad I did, because [this StackOverflow answer](https://web.archive.org/web/20220818031527/https://stackoverflow.com/questions/50427449/behavior-of-arrays-in-bash-scripting-and-zsh-shell-start-index-0-or-1){:target="_blank" rel="noopener"} made me do a double-take:
-
-<p style="text-align: center">
-  <img src="/assets/images/so-answer-50427449.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="StackOverflow answer on array access in different shells">
-</p>
+This is different from the 0-based indexing you may have encountered in other languages, such as Ruby:
 
 ```
-TL;DR:
- - bash array indexing starts at 0 (always)
- - zsh array indexing starts at 1 (unless option KSH_ARRAYS is set)
-
-To always get consistent behaviour, use:
-
-${array[@]:offset:length}
+irb(main):001:0> foo = [1,2,3]
+=> [1, 2, 3]
+irb(main):002:0> foo[0]
+=> 1
+irb(main):003:0> foo[1]
+=> 2
+irb(main):004:0> foo[2]
+=> 3
 ```
 
-So `bash` accesses arrays the way I would expect, but `zsh` doesn't?  Now I'm getting curious.
+This is something to watch out for when working with arrays in `zsh`.
 
-First, let's confirm whether the latest script experiments above actually do perform differently in `bash`.  We'll do this by putting them inside a script file with a `bash` shebang (which I named `foo`):
+### Storing the completions in `reply`
 
-```
-#!/usr/bin/env bash
-
-words=(rbenv foo bar baz buzz quox)
-echo "$words[2, -2]"
-echo "$words[0]"
-echo "$words[1]"
-echo "$words[2]"
-```
-
-Then, back in the terminal:
-
-```
-$ chmod 777 foo
-$ ./foo
-rbenv[2, -2]
-rbenv[0]
-rbenv[1]
-rbenv[2]
-```
-Well, OK.  So that didn't work as expected- for example, it printed `rbenv[1]` instead of the value stored at the corresponding array position.  I Google "accessing an array in bash", and [it turns out](https://web.archive.org/web/20211201072516/https://tecadmin.net/working-with-array-bash-script/){:target="_blank" rel="noopener"} I just needed to wrap `words[...]` inside curly braces:
-
-<p style="text-align: center">
-  <img src="/assets/images/creating-bash-array.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="Creating an array in bash">
-</p>
-
-I update my script accordingly:
-
-```
-#!/usr/bin/env bash
-
-words=(rbenv foo bar baz buzz quox)
-echo "${words[2, -2]}"
-echo "${words[0]}"
-echo "${words[1]}"
-echo "${words[2]}"
-```
-
-Now when I re-run the script, I see:
-
-```
-$ ./foo
-./foo: line 4: words: bad array subscript
-
-rbenv
-foo
-bar
-```
-
-Hmmm, OK so according to [this link](https://web.archive.org/web/20170309012959/http://askubuntu.com/questions/705126/is-there-a-way-to-specify-a-certain-range-of-numbers-using-array-in-a-script){:target="_blank" rel="noopener"}, the way I'm accessing a range of values in the bash script needs tweaking.  I change the syntax to look like this:
-
-```
-#!/usr/bin/env bash
-
-words=(rbenv foo bar baz buzz quox)
-echo "${words[@][2, -2]}"
-echo "${words[0]}"
-echo "${words[1]}"
-echo "${words[2]}"
-```
-
-
-And I try again:
-
-```
-$ ./foo
-./foo: line 4: -2: substring expression < 0
-rbenv
-foo
-bar
-```
-
-OK, so lines 5 thru 7 worked, but line 4 caused an error (`-2: substring expression < 0`).  So we can't use negative numbers to access a substring in bash?
-
-[It looks like you can](https://web.archive.org/web/20211219125555/https://unix.stackexchange.com/questions/198787/is-there-a-way-of-reading-the-last-element-of-an-array-with-bash){:target="_blank" rel="noopener"}, but only with bash v4.1 or newer.  If I want to do something similar in earlier versions (like v3.2.57,  aka the version on my machine), I need to do something like this:
-
-```
-echo "${words[@]:2:${#words} - 2}"
-```
-
-All of this is just to say, this is another example that I *really* should be doing my experiments in actual script files, not just in the terminal.
-
-At any rate, we're in the file `rbenv.zsh`, so we don't have to worry about the above `bash` syntax because, by the time we've reached the current line of code, we know we're no longer in bash-land.
-
-That said, one of the StackOverflow screenshots above implies that the value of the `KSH_ARRAYS` variable could affect the behavior of `rbenv`'s .zsh script.  I wonder if `rbenv.zsh` accounts for that.  Maybe I could check this by simply adding `KSH_ARRAYS=true` before I run the script, and seeing if the value for `words[1]` changes?
-
-I make a new, stripped-down test script:
-
-```
-#!/usr/bin/env zsh
-
-words=(rbenv foo bar baz buzz quox)
-echo "words[1]: ${words[1]}"
-```
-When I run it, I get:
-
-```
-$ ./foo
-words[1]: rbenv
-```
-
-Next, I try to run it again with the env var prefix I mentioned:
-
-```
-$ KSH_ARRAYS=true ./foo
-words[1]: rbenv
-```
-
-So that didn't work.  After I Googled around a bit for "KSH_ARRAYS", I learned that [KSH_ARRAYS is a zsh option](http://bolyai.cs.elte.hu/zsh-manual/zsh_16.html){:target="_blank" rel="noopener"}, not an environment variable.  I then Googled "how to set zsh options", [I learned](https://web.archive.org/web/20220813020657/https://scriptingosx.com/2019/06/moving-to-zsh-part-3-shell-options/){:target="_blank" rel="noopener"} that you have to use the `setopt` command to set an option, and `unsetopt` to unset it.  I update the script as follows:
-
-```
-#!/usr/bin/env zsh
-
-setopt KSH_ARRAYS
-
-words=(rbenv foo bar baz buzz quox)
-echo "words[1]: ${words[1]}"
-```
-This works!
-
-```
-$ ./foo
-
-words[1]: foo
-```
-
-Now I'm wondering if this phenomenon does, in fact, affect the RBENV tab-completion feature.  I run `vim /usr/local/Cellar/rbenv/1.2.0/completions/rbenv.zsh` again and add the following `echo` call after `read -cA words`:
-
-```
-echo "words[2,-2]: ${words[2,-2]}"
-```
-
-I then run the following in my terminal:
-
-```
-$ unsetopt KSH_ARRAYS
-$ rbenv foo bar baz
-```
-
-When I try to tab-complete after "baz ", I get:
-
-```
-words[2,-2]: foo bar baz
-```
-
-I then set `KSH_ARRAYS` and try again:
-
-```
-$ setopt ksharrays
-$ rbenv foo bar baz
-```
-
-This time, I see:
-```
-words[2,-2]: bar baz
-```
-
-So now I do know for a fact that a zsh user whose `KSH_ARRAYS` zsh option has been set will see weird behavior in their RBENV autocomplete.
-
-Should I make a PR to override it just inside this script to ensure the user's local value doesn't trip up the script?  What would that look like?
-
-Well, I'd have to store the user's current value for that option, then unset it.  Then the script would continue running as per usual.  Then after the script runs, I'd have to set the option back to its original value.
-
-If I can figure out how to do the above, it seems pretty straightforward.  But has this already been thought of and/or tried?  I check the RBENV repo's history for both `KSH_ARRAYS` and `ksharrays` (since [I read that](https://web.archive.org/web/20220813020657/https://scriptingosx.com/2019/06/moving-to-zsh-part-3-shell-options/){:target="_blank" rel="noopener"} "The labels of the options are case insensitive and any underscores in the label are ignored" by the zsh interpreter).  In both cases, I don't see any history:
-
-<p style="text-align: center">
-  <img src="/assets/images/ksh-arrays-history-in-github.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="Searching for `KSH_ARRAYS` history in RBENV's Github repo">
-</p>
-
-I think this means we're good to go!
-
-(stopping here for the day; 6724 words)
-
-OK, so how to store the value and reset it after the script is done?
-
-I come up with the following test script:
-
-<p style="text-align: center">
-  <img src="/assets/images/test-script-102pm11mar.png" width="70%" style="border: 1px solid black; padding: 0.5em" alt="KSH_ARRAYS test script">
-</p>
-
-Lines 3-9 capture the user's original `ksharrays` setting.  Then we unset the option on line 11, then on lines 15-18 we reset it back if the option was originally set.
-
-However when I set the option in the terminal via `setopt ksharrays` and run this script, I don't see the `echo` statements that I expect (`"setting ksharrays_is_set to 1..."` and `"setting the ksharrays option..."`).  When I set the option directly in the script (via a call to `setopt ksharrays` on line 2, directly below the shebang), I do see those `echo` statements.
-
-I also try adding `setopt ksharrays` to both `~/.zshrc` and `~/.zshenv`, and confirming that the `setopt` took effect by running `setopt` without args in my terminal, but no dice.
-
-[I post a question](https://web.archive.org/web/20230408141508/https://unix.stackexchange.com/questions/715638/zsh-why-isnt-my-script-reading-my-option-setting){:target="_blank" rel="noopener"} on StackExchange, and wait for an answer.  In the meantime, I know there must be a difference between my experiment script and the rbenv completion script, because they're behaving in different ways.  My script is not respecting the `ksharrays` option that I'm setting unless it's set directly in the script, while the `echo` statements that I added to the completion script change their output depending on whether `ksharrays` is `set` or `unset`.  So I continue to believe that a PR to the `rbenv` repo is still needed.
-
-Eventually, a StackExchange user [replies to my question](https://unix.stackexchange.com/a/715678/142469){:target="_blank" rel="noopener"} with an answer.  TL;DR- running a shell script from inside your terminal doesn't cause your terminal's zsh options to carry over into the executed shell script.  However, if you've previously defined a tab-complete function via a file that's been `source`'ed, the shell options which are included in the scope of the function aren't picked up until the function is called from your terminal, which (in the case of tab-complete) is when you type in your command and hit tab.
-
-I create a PR (which may or may not even be merged) to prevent a zsh user's errant `KSH_ARRAYS` option from affecting the tab-complete.  PR [here](https://github.com/rbenv/rbenv/pull/1422){:target="_blank" rel="noopener"}.
-
-Honestly, the more I think about this, the more I doubt the RBENV maintainers will give the thumbs-up to my PR.  The whole thing is predicated on the idea that a greater-than-zero number of people will override their `KSH_ARRAYS` option in zsh.  But if no one in the 10+ year history of RBENV has submitted a Github issue about this, it's probably an incredibly small value-add, if it adds value at all.  This PR is purely speculative in nature until someone actually runs into a problem in the wild, therefore the PR could be a solution in search of a problem.
-
-I still want to keep the PR open, because I do think this process has been an educational experience and I'd like that education to continue in the form of feedback from the maintainers.
-
-However, according to [this link](https://web.archive.org/web/20220512071954/https://blog.mads-hartmann.com/2017/08/06/writing-zsh-completion-scripts.html){:target="_blank" rel="noopener"}, the canonical way of setting up a tab completion is to create a file whose directory is one of those listed in `$fpath`.  Right now, it looks like RBENV uses a different approach, i.e. it has pre-existing files in the `completions` directory which include a call to `compctl -K`, and it runs `source` on those files when `rbenv init` is run.  Does it make sense to change the approach to turning on these tab-completions to be more in-line with shell conventions?  For example, for the `zsh` shell, those files could be in a directory which is not initially included in `$fpath`.  When `rbenv init` is run, the code could add the directory to `$fpath`.
-
-Maybe, but I'll save the above idea for another day.
-
-Before I can move on from this file, the last line of code I need to decipher is:
+The last line of code in the file is:
 
 ```
 reply=("${(ps:\n:)completions}")
 ```
 
-Clearly we're setting a (non-local) variable named `reply) equal to `("${(ps:\n:)completions}")`.  What does this evaluate to?
+Clearly we're setting a (non-local) variable named `reply` equal to `("${(ps:\n:)completions}")`.  What does this evaluate to?
 
-It looks similar to the `(t)` syntax, which I've encountered before.  For example, if you want to get the type of the `completions` variable in a parameter expansion, you'd do `${(t)completions}`.
-
-Probably the easiest thing to do first is to `echo` it out and read the output, but I want to get good at finding things in the docs.  Let's start with that, and then print stuff to the terminal if I get stuck.  I find [the docs page](https://web.archive.org/web/20230320043037/https://zsh.sourceforge.io/Doc/Release/Expansion.html){:target="_blank" rel="noopener"} for "Parameter Expansion", and search for `ps:\n`.  I see the following:
+The `(ps:\n:)` syntax at the start of the parameter expansion looks similar to the `(t)` syntax that we encountered earlier.  If we search for `ps:\n` on [the docs page](https://web.archive.org/web/20230320043037/https://zsh.sourceforge.io/Doc/Release/Expansion.html){:target="_blank" rel="noopener"}, we see the following:
 
 > f
 >
 > Split the result of the expansion at newlines. This is a shorthand for 'ps:\n:'.
 
-OK cool, so the syntax in question takes a string containing one or more newlines, and uses those newlines as a delimiter to split the string.
+So the syntax in question takes a string containing one or more newlines, and uses those newlines as a delimiter to split the string into an array.
 
-As a test, I add the following line of code before the call to `reply=`:
-
-```
-  foo="foo\nbar\nbaz\nbuzz"
-  echo "${(ps:\n:)foo}"
-```
-
-When I use tab complete on the partial command `rbenv commands`, I see the following:
+As a test, I run the following code in my `zsh` shell:
 
 ```
-$ rbenv commands
+foo="foo\nbar\nbaz\nbuzz"
+bar=("${(ps:\n:)foo}")
+echo "$bar"
+echo "${(t)bar}"
+```
 
-words[2,-2]: commands
+I see the following output:
+
+```
+$ foo="foo\nbar\nbaz\nbuzz"
+
+$ bar=("${(ps:\n:)foo}")
+
+$ echo "$bar"
+
 foo
 bar
 baz
 buzz
+
+$ echo "${(t)bar}"
+
+array
 ```
 
 Looks good to me!
 
-OK, so this last line of code sets the `reply` variable equal to a list of commands generated from the `if` statement, after having split the commands according to the newline character.
+In summary, the line of code...
 
-I feel like that's good enough to move on!
+```
+reply=("${(ps:\n:)completions}")
+```
 
-I could move from the `rbenv.zsh` file to the `rbenv.bash` file, but I'm feeling kind of burnt-out on tab completions at this point, and am itching to learn about something new.  I'll save the explanation of `rbenv.bash` as an exercise for the reader.
+...splits the output generated from either the `if` or `else` block using the newline `\n` character as a delimiter, and then sets the `reply` variable equal to that array.
 
-If we're done with the `/completions` directory, then let's move on to the next directory in the main project dir: `/libexec`.
+### Summary
 
-We've already encountered this dir in passing, when we looked a the symlink from the `/lib` directory.  We also discovered that `/libexec` is where most of the individual `rbenv` commands live.  Because the files are listed in alphabetical order, the first command file that we encounter happens to be the plan `rbenv` command file.
+To summary `rbenv.zsh`:
+
+ - If we're not running in interactive mode (i.e. if the input is coming from the computer, as opposed to from the user), we exit the script.
+ - Otherwise, we create a completion function named `_rbenv` and use the `compctl -K` command to tell the computer to use this function to generate completion options for the `rbenv` command.
+ - This function reads the input from standard input, which `zsh` feeds it when tab completion is attempted.
+    - If the length of this input indicates that the user hit `tab` after entering only `rbenv`, then `zsh` uses the output of `rbenv commands` as the possible tab completions.
+    - If the length of this input indicates that the user hit tab after entering `rbenv` plus a sub-command (such as `rbenv version` or `rbenv local`), then `zsh` uses the output of `rbenv completions` plus the list of sub-commands the user entered (i.e. the output of `rbenv completions version` or `rbenv completions local`).
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+Let's move on to the `rbenv.bash` file.
+
+## `rbenv.bash`
+
+The entire file looks like this:
+
+```
+_rbenv() {
+  COMPREPLY=()
+  local word="${COMP_WORDS[COMP_CWORD]}"
+
+  if [ "$COMP_CWORD" -eq 1 ]; then
+    COMPREPLY=( $(compgen -W "$(rbenv commands)" -- "$word") )
+  else
+    local words=("${COMP_WORDS[@]}")
+    unset "words[0]"
+    unset "words[$COMP_CWORD]"
+    local completions=$(rbenv completions "${words[@]}")
+    COMPREPLY=( $(compgen -W "$completions" -- "$word") )
+  fi
+}
+
+complete -F _rbenv rbenv
+```
+
+Let's break this down.
+
+### Declaring the function
+
+```
+_rbenv() {
+  ...
+}
+```
+
+We declare the `_rbenv()` function.  In this case, the syntax is exactly the same in `bash` as it is in `zsh`.
+
+### Initializing our list of completions
+
+Next line:
+
+```
+COMPREPLY=()
+```
+
+Here we initialize a variable called `COMPREPLY`, giving it the initial value of an empty array.  [According to the `bash` docs](https://www.gnu.org/software/bash/manual/bash.html#Programmable-Completion){:target="_blank" rel="noopener"}, `COMPREPLY` functions similarly to the `reply` variable in `zsh`:
+
+> `COMPREPLY`
+>
+> An array variable from which Bash reads the possible completions generated by a shell function invoked by the programmable completion facility... Each array element contains one possible completion.
+
+So we can assume that we'll be adding more entries into the `COMPREPLY` array, and that once our function is finished executing, `bash` will use the final value of `COMPREPLY` to populate the completions that we see in our terminal.
+
+### Checking the current word (for which the user wants completions)
+
+Next line:
+
+```
+local word="${COMP_WORDS[COMP_CWORD]}"
+```
+
+Again according to [the docs](https://www.gnu.org/software/bash/manual/bash.html#Programmable-Completion){:target="_blank" rel="noopener"} for `COMP_CWORD`:
+
+> COMP_CWORD
+>
+> An index into ${COMP_WORDS} of the word containing the current cursor position. This variable is available only in shell functions invoked by the programmable completion facilities...
+
+Furthermore, the docs go on to describe `COMP_WORDS` as well:
+
+> COMP_WORDS
+>
+> An array variable consisting of the individual words in the current command line.
+
+We can verify what the docs tell us with an experiment.
+
+#### Experiment- verifying the value of `COMP_CWORD`
+
+I make the following script, called `foo`:
+
+```
+#!/usr/bin/env bash
+
+_foobar() {
+  echo
+  echo "COMP_CWORD: ${COMP_CWORD}"
+  echo "COMP_WORDS: ${COMP_WORDS[@]}"
+  echo "0th word: ${COMP_WORDS[0]}"
+  echo "1st word: ${COMP_WORDS[1]}"
+  echo "2nd word: ${COMP_WORDS[2]}"
+  echo "3rd word: ${COMP_WORDS[3]}"
+  echo "4th word: ${COMP_WORDS[4]}"
+}
+
+complete -F _foobar foo
+```
+
+It prints the following:
+
+- a newline (so that the completion output is not mixed-up with the command I typed)
+- the value of `COMP_CWORD`
+- the value of `COMP_WORDS` (which I happen to know is an array, hence the `[@]` syntax at the end)
+- the 0th through the 4th items stored in `COMP_WORDS`
+
+I then type `source ./foo` in my terminal, followed by `./foo` plus 2 arguments and a space, and I hit `tab`:
+
+```
+bash-3.2$ ./foo bar baz
+
+COMP_CWORD: 3
+COMP_WORDS: ./foo bar baz
+0th word: ./foo
+1st word: bar
+2nd word: baz
+3rd word:
+4th word:
+```
+
+When I cancel out of this and re-type the command with 3 arguments and a space, I see the following:
+
+```
+bash-3.2$ ./foo bar baz buzz
+COMP_CWORD: 4
+COMP_WORDS: ./foo bar baz buzz
+0th word: ./foo
+1st word: bar
+2nd word: baz
+3rd word: buzz
+4th word:
+```
+
+Lastly, I cancel out and re-type the command, but this time I leave off the space at the end:
+
+```
+bash-3.2$ ./foo bar baz buzz
+COMP_CWORD: 3
+COMP_WORDS: ./foo bar baz buzz
+0th word: ./foo
+1st word: bar
+2nd word: baz
+3rd word: buzz
+4th word:
+```
+
+From the above experiment, we learn the following:
+
+- `COMP_CWORD` prints the index of the word that the user is currently typing at the terminal prompt.
+- It uses the space character as a delimiter to determine this index.
+- `COMP_WORDS` is the array of words that the user has typed so far.
+- The current word's text can be derived by indexing into `COMP_WORDS`, using `COMP_CWORD` as the index.
+
+The final point above is what we're doing on the current line of code- grabbing the value of `COMP_WORDS` at index `COMP_CWORD`, and storing it in the local variable `word`.
+
+### If the user wants completions for the main `rbenv` command
+
+Next block of code:
+
+```
+if [ "$COMP_CWORD" -eq 1 ]; then
+```
+
+If the value of `COMP_CWORD` is `1`, that means the user has typed the following in their terminal, and hit the `tab` key:
+
+```
+bash-3.2$ rbenv
+```
+
+In this case, the user is asking for tab completions for the `rbenv` command, **not** for one of its sub-commands.  To generate those tab completions, we execute the code on the next line of code.
+
+### Storing the output of `rbenv commands` as the completion result
+
+Next line:
+
+```
+COMPREPLY=( $(compgen -W "$(rbenv commands)" -- "$word") )
+```
+
+Here we assign a new value to our (currently empty) `COMPREPLY` array.
+
+#### The `compgen` command
+
+The first thing we see is that, inside the `COMPREPLY=( ... )` array assignment, we invoke command substitution with the `compgen` command.  This is a `bash` builtin, and the `help` docs for this command state:
+
+```
+compgen: compgen [-abcdefgjksuv] [-o option] [-A action] [-G globpat] [-W wordlist] [-P prefix] [-S suffix] [-X filterpat] [-F function] [-C command] [word]
+    Display the possible completions depending on the options.  Intended
+    to be used from within a shell function generating possible completions.
+    If the optional WORD argument is supplied, matches against WORD are
+    generated.
+```
+
+From this, we see the following:
+
+ - The `compgen` command is used to display possible completions.
+ - The `-W` flag that we've passed is followed by a "wordlist", or a list of words to match against
+ - The `word` argument is a comparator word which we'll use to narrow down the words in our list of words
+
+For example, if we run the following:
+
+```
+bash-3.2$ compgen -W "foo foobar bar baz" -- foo
+```
+
+Our `wordlist` is `"foo foobar bar baz"`, and our comparator word is `foo`.  From this, we would expect `foo` and `foobar` to match the comparator.  And we'd be right- when we run this, we get:
+
+```
+bash-3.2$ compgen -W "foo foobar bar baz" -- foo
+
+foo
+foobar
+```
+
+What does this mean for RBENV?  Instead of `"foo foobar bar baz"`, our `wordlist` is the output of the `rbenv commands` command.  On my machine, that resolves to:
+
+ ```
+ bash-3.2$ rbenv commands
+
+--version
+commands
+completions
+exec
+global
+help
+hooks
+init
+install
+local
+prefix
+rehash
+root
+shell
+shims
+uninstall
+version
+version-file
+version-file-read
+version-file-write
+version-name
+version-origin
+versions
+whence
+which
+```
+
+And if we're inside the `if` block, the value of `word` will be whatever RBENV command we've supplied.  For example, if we've attempted tab completion after typing `rbenv version`, then `word` will equal `version`.  When I `echo` the `word` variable, type `rbenv version` with no spaces, and hit `tab` once, I see:
+
+```
+bash-3.2$ rbenv version
+word: version
+```
+
+If I hit `tab` a 2nd time, I see:
+
+```
+bash-3.2$ rbenv version
+word: version
+
+word: version
+
+version             version-file        version-file-read   version-file-write  version-name        version-origin      versions
+```
+
+We can see that all the possible commands which were output (i.e. `version`, `version-file`, `version-file-read`, `versions`, etc.) match the string `version`.  Why do we see the contents of `COMPREPLY` printed with two tabs, but not with one?
+
+TODO- what's the difference between one tab and two tabs, in terms of bash completion?
+
+### If the user wants completions for a sub-command of `rbenv`
+
+Next block of code:
+
+```
+else
+  local words=("${COMP_WORDS[@]}")
+  unset "words[0]"
+  unset "words[$COMP_CWORD]"
+  local completions=$(rbenv completions "${words[@]}")
+  COMPREPLY=( $(compgen -W "$completions" -- "$word") )
+fi
+```
+
+If the index of the current word is greater than 1, that means the user is attempting tab completions for more than one word.  In other words, they've typed `rbenv` **plus** a sub-command.  In that case, our earlier `if` conditional (`if [ "$COMP_CWORD" -eq 1 ]; then`) would return false, and we would drop into the above `else` block.
+
+The following table illustrates what happens at each line of code, assuming the user has typed `rbenv versions ` (including a space at the end), and hits the `tab` key:
+
+| Step | Example |
+|---|---|
+| The user types `rbenv` plus the name of a command (with the empty string at the end), and hits the `tab` key. | The user types `rbenv versions ` plus `tab`. |
+| The variable `word` is initialized to the last item in the user's input. | `word` is initialized to the empty string. |
+
+Then, inside the `else` block:
+
+| Step | Example |
+|---|---|
+| Create a local variable named `words`, and store the entire contents of the `COMP_WORDS` array (i.e. all the words the user typed into the terminal).  | We store the array `[rbenv, versions, ""]` (with the empty string at the end) in the `words` variable. |
+| Remove the first and last words from the `words` array, via `unset "words[0]"` and `unset "words[$COMP_CWORD]"` respectively. | `rbenv` is removed from the beginning, and the empty string is removed from the end.  Now `words` is now equal to the array `[versions]`. |
+| Create a new local variable named `completions`, with contents equal to the output of `rbenv completions` plus all the remaining words in our `words` array. | The value of `completions` is the output of `rbenv completions versions`, or `[--help, --bare, --skip-aliases]`. |
+| Call `compgen -W "$completions" -- "$word"`. | We call `compgen -W "--help --bare --skip-aliases" -- ""`. |
+| Store the result as an array in `COMPREPLY`. | Our result is: `--help --bare --skip-aliases`, with each result on its own line. |
+
+### Setting the completions for the `rbenv` command via `complete`
+
+Last line of code:
+
+```
+complete -F _rbenv rbenv
+```
+
+The `complete` command is a builtin, so to look up the docs, we'll need the `help` command:
+
+```
+bash-3.2$ help complete
+
+complete: complete [-abcdefgjksuv] [-pr] [-o option] [-A action] [-G globpat] [-W wordlist] [-P prefix] [-S suffix] [-X filterpat] [-F function] [-C command] [name ...]
+
+    For each NAME, specify how arguments are to be completed.
+    If the -p option is supplied, or if no options are supplied, existing
+    completion specifications are printed in a way that allows them to be
+    reused as input.  The -r option removes a completion specification for
+    each NAME, or, if no NAMEs are supplied, all completion specifications.
+```
+
+The `complete` command tells `bash` how to determine completions for a given command.  The `-F` flag specifies that `bash` should call a function to populate these completions.  Here we're mapping our new `_rbenv` function to the `rbenv` command, for the purposes of word completion.  This is similar to the `compctl -K _rbenv rbenv` command that we saw in `rbenv.zsh`.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+That's it for the `completions/` directory!  Now on to the next section.

@@ -22,7 +22,7 @@ $ rbenv which rails
 
 $ rbenv which ruby
 
-/Users/richiethomas/.rbenv/versions/2.7.5/bin/ruby
+/Users/myusername/.rbenv/versions/2.7.5/bin/ruby
 ```
 
 If you just type `rbenv which` with no command, you get a non-zero exit code and the "Usage" instructions printed to your terminal:

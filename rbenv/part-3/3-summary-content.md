@@ -1,0 +1,18 @@
+In this section, we learned about:
+
+- Github Workflows and the YAML syntax they use:
+  - Establishing a workflow's metadata via directives like `name`, `on`, `push`, `release`, `tags`, etc.
+  - Making one or more jobs for the workflow with the `jobs` directive
+  - Establishing when your job runs, using the `runs-on` directive
+  - What a matrix strategy is, and how to build one using the `strategy` and `matrix` directives
+  - Establishing what steps your job takes, using the `steps` directive
+  - Using pre-written steps, written by you or others, via the `uses` directive
+  - Running arbitrary shell code in a step using the `run` directive
+  - Passing environment variables to a step using the `env` keyword
+  - Running a step only when certain conditions are met, using the `if` directive
+  - Passing arguments to a step using the `with` directive
+- What the difference between the `bin/` and `libexec/` directories are for, according to the Filesystem Hierarchy Standard
+- Testing whether a shell option is turned on via the `[[ -o <optionanme> ]]` syntax
+- How to test the type of a variable using parameter expansion, coupled with the `(t)` parameter
+- How to generate completions for a command in `zsh`, using `compctl -K`
+- How to generate completions for a command in `bash`, using `complete -F`

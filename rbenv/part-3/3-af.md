@@ -2,8 +2,8 @@
 layout: page
 category: rbenv-pt-3
 id: 46
-previous-title: "rubygems_plugin.rb"
-previous-permalink: /rbenv/infrastructure/rubygems_plugin-rb
+previous-title: "The rbenv.d directory"
+previous-permalink: /rbenv/infrastructure/rbenv-d
 title: "Makefile.in"
 permalink: /rbenv/infrastructure/makefile
 next-title: "bash.h"
