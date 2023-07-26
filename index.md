@@ -71,10 +71,6 @@ In these cases, I use Archive.ph instead.  I'm looking for a back-up archiver wh
 
 Also occasionally, I have no choice but to link to a Youtube video.  These links aren't archivable, as far as I know, so I link to the original and pray that the video stays up forever.
 
-## If you like what you read
+## How to contact me
 
-Please consider sharing it on [Hacker News](https://news.ycombinator.com/){:target="_blank" rel="noopener"} or your social media.  It helps me reach more newbie developers.
-
-And / or sign up below to hear when I post something new:
-
-{% include convert_kit_2.html %}
+I'm happy to hear from you!  I can be reached at impostorsguides@mastodon.social.

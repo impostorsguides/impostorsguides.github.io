@@ -52,6 +52,6 @@ These and more questions will be answered in the upcoming soup-to-nuts walk-thro
     - command substitution
     - and many more
 
-Sign up below to get notified when those posts are released!
+## If you like what you've read
 
-{% include convert_kit_2.html %}
+Drop me a line on Mastadon- impostorsguides@mastodon.social.
