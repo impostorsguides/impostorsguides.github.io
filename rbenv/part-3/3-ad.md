@@ -6,8 +6,8 @@ previous-title: "The completions/ directory"
 previous-permalink: /rbenv/infrastructure/completions-directory
 title: "The rbenv.d/ directory"
 permalink: /rbenv/infrastructure/rbenv-d
-next-title: "Makefile.in"
-next-permalink: /rbenv/infrastructure/makefile
+next-title: "src/configure"
+next-permalink: /rbenv/infrastructure/src-configure
 ---
 
 {% include_relative 3-ad-content.md %}
