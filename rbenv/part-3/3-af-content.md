@@ -116,7 +116,9 @@ This time, we don't see the two `echo` statements, or their output, in the termi
 
 ## The RBENV Makefile
 
-Let's now look at the code inside the RBENV version of `Makefile`.  We learned earlier that this file is generated when reading the `configure` script.  `Makefile` looks like this:
+Let's now look at the code inside the RBENV version of `Makefile`.  We learned earlier that this file is generated when reading the `configure` script.  A word of warning: I'm not an expert on C, or the `gcc` compiler for C.  And I don't intend to become one over the course of reading this file.  That would require a huge amount of effort that I'm not prepared to invest, for now.  So in contrast to most other files I've read as part of understanding RBENV, my goal here is to learn just enough to understand how the `Makefile` fits in to the bigger RBENV picture.
+
+With that said, the `Makefile` looks like this:
 
 ```
 CC = gcc
@@ -154,7 +156,197 @@ Let's start with the first rule, since everything before it is just variable dec
 
 ```
 .c.o:
-	@echo "1st command: $(SHOBJ_CC) $(SHOBJ_CFLAGS) $(CCFLAGS) -c -o $@ $<"
-	$(SHOBJ_CC) $(SHOBJ_CFLAGS) $(CCFLAGS) -c -o $@ $<
 ```
 
+What is the `.c.o` syntax?  If we Google ".c.o Makefile", we see [this StackOverflow post](https://web.archive.org/web/20230427182329/https://stackoverflow.com/questions/9233447/what-is-the-makefile-target-c-o-for){:target="_blank" rel="noopener"}, which tells us that:
+
+> It's an old-fashioned suffix rule. The more up-to-date way to do it is to use a pattern rule:
+>
+> `%.o : %.c`
+
+This looks more familiar, i.e. we have two sides of a rule, separated by a colon.  According to [MakefileTutorial.com](https://web.archive.org/web/20230723010515/https://makefiletutorial.com/#-wildcard-1){:target="_blank" rel="noopener"}, the `%` symbol is called a "wildcard".  Here we're using it to state that, for each file with a `.c` extension, we want to make an identical target with a `.o` extension.
+
+What is the commend that this rule executes?
+
+## First `Makefile` rule- building our object file
+
+```
+$(SHOBJ_CC) $(SHOBJ_CFLAGS) $(CCFLAGS) -c -o $@ $<
+```
+
+This command takes advantage of the variables that we declare at the top of the `Makefile`:
+
+```
+SHOBJ_CC = gcc
+SHOBJ_CFLAGS = -fno-common
+DEFS =
+LOCAL_DEFS =
+LOCAL_CFLAGS =
+CFLAGS =
+CCFLAGS = $(DEFS) $(LOCAL_DEFS) $(LOCAL_CFLAGS) $(CFLAGS)
+```
+
+These variable values are used to construct the final command that we run.  For simplicity, we can `echo` the command as a string, to see what it evaluates to.
+
+```
+@echo "1st command: $(SHOBJ_CC) $(SHOBJ_CFLAGS) $(CCFLAGS) -c -o $@ $<"
+$(SHOBJ_CC) $(SHOBJ_CFLAGS) $(CCFLAGS) -c -o $@ $<
+```
+
+We prefix our `echo` command with a `@` symbol to tell `make` not to print the `echo` command itself, just to execute it.
+
+When we run `make`, we get:
+
+```
+$ make
+
+1st command: gcc -fno-common     -c -o realpath.o realpath.c
+...
+```
+
+So `$(SHOBJ_CC) $(SHOBJ_CFLAGS) $(CCFLAGS) -c -o $@ $<` evaluates to:
+
+```
+gcc -fno-common     -c -o realpath.o realpath.c
+```
+
+Let's break this down:
+
+### The `-fno-common` flag
+
+According to [the `gcc` docs](https://web.archive.org/web/20230620054155/https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html){:target="_blank" rel="noopener"}, the `-fno-common` flag tells `gcc` what to do if it finds multiple definitions for the same global variable.  This is the default behavior for `gcc`, but here we're being explicit about the behavior.  By passing this flag, we're telling `gcc` that, if the same global variable is defined more than once, to raise a multiple-definition error so we can investigate and fix the error.
+
+### The `-c` flag
+
+According to `gcc --help`, the `-c` flag tells `gcc` to "Only run preprocess, compile, and assemble steps".  In other words, we're telling `gcc` to only create [object files](https://web.archive.org/web/20230620034536/https://stackoverflow.com/questions/7718299/whats-an-object-file-in-c){:target="_blank" rel="noopener"}, or the individual compiled files that the `gcc` linker later combines into an executable file.  It's unclear to me why we want to do this.  I know the next step in the Makefile is to take the object file and turn it into the `../libexec/rbenv-realpath.dylib` file, but I'm not sure why a regular, non-`dylib` file is insufficient for RBENV's purposes.
+
+### The `-o` flag
+
+Again according to `gcc --help`, the `-o` flag does the following:
+
+```
+-o <file>               Write output to <file>
+```
+
+So we're specifying that we want our output file to be `realpath.o`.  It's unclear to me why we need to specify that the output object file is named `realpath.o`, since when I leave off the `-o realpath.o` flag, I still see that `realpath.o` is the default output filename when passing the `-c` flag (i.e. the default filename appears to be the same as that of the input file, but with a `.o` file extension instead of `.c`).
+
+At any rate, the output of this first `Makefile` rule is `realpath.o`.  When this file is generated, `make` sees that its timestamp is newer than that of `../libexec/rbenv-realpath.dylib` (or if `../libexec/rbenv-realpath.dylib` does not yet exist), then it will execute the 2nd rule in the `Makefile`.
+
+## 2nd `Makefile` rule- building our `.dylib` file
+
+The next rule in the Makefile is:
+
+```
+../libexec/rbenv-realpath.dylib: realpath.o
+	$(SHOBJ_LD) $(SHOBJ_LDFLAGS) $(SHOBJ_XLDFLAGS) -o $@ realpath.o $(SHOBJ_LIBS)
+```
+
+Let's break this up into pieces.
+
+### The rule's target: `../libexec/rbenv-realpath.dylib`
+
+This rule's job is to build a file named `rbenv-realpath.dylib`, which lives in `../libexec/` (aka the directory containing all our RBENV commands).
+
+This is the file which the `rbenv` command uses [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L23){:target="_blank" rel="noopener"} (and other commands use in a similar way) to speed up the `realpath` command.
+
+### The rule's dependency: `realpath.o`
+
+This is the file which the rule depends on in order to build the `.dylib` file.  It is the output file which we just generated in the previous rule.
+
+### The rule's command
+
+The command that this rule executes is:
+
+```
+$(SHOBJ_LD) $(SHOBJ_LDFLAGS) $(SHOBJ_XLDFLAGS) -o $@ realpath.o $(SHOBJ_LIBS)
+```
+
+So that we can see what the variables in this rule resolve to, let's once again print the command by adding a `@echo` statement into the rule:
+
+```
+../libexec/rbenv-realpath.dylib: realpath.o
+	@echo "2nd command: $(SHOBJ_LD) $(SHOBJ_LDFLAGS) $(SHOBJ_XLDFLAGS) -o $@ realpath.o $(SHOBJ_LIBS)"
+	$(SHOBJ_LD) $(SHOBJ_LDFLAGS) $(SHOBJ_XLDFLAGS) -o $@ realpath.o $(SHOBJ_LIBS)
+```
+
+When we delete any `realpath.o` that was generated from previous `make` runs and then re-run `make`, we see:
+
+```
+$ make
+
+1st command: gcc -fno-common     -c -o realpath.o realpath.c
+gcc -fno-common     -c -o realpath.o realpath.c
+2nd command: gcc -dynamiclib -dynamic -undefined dynamic_lookup  -o ../libexec/rbenv-realpath.dylib realpath.o
+gcc -dynamiclib -dynamic -undefined dynamic_lookup  -o ../libexec/rbenv-realpath.dylib realpath.o
+```
+
+We can see from the line which starts with `2nd command:` that the command resolves to:
+
+```
+gcc -dynamiclib -dynamic -undefined dynamic_lookup  -o ../libexec/rbenv-realpath.dylib realpath.o
+```
+
+### The `-dynamiclib` and `-dynamic` flags
+
+There are certain flags and options that we can pass to `gcc` which are specific to [Darwin](https://en.wikipedia.org/wiki/Darwin_(operating_system)){:target="_blank" rel="noopener"}, the core UNIX operating system of macOS.  Since I'm running `make` on a Macbook, the env var `SHOBJ_LDFLAGS` resolves to these Darwin-specific options, thanks to the `shobj-conf` file which the `configure` script ran.
+
+The first flag is `-dynamiclib`.  If we Google around for this flag, we find the docs for those Darwin-specific flags [here](https://web.archive.org/web/20230329044039/https://gcc.gnu.org/onlinedocs/gcc/Darwin-Options.html){:target="_blank" rel="noopener"}.  The entry for `-dynamiclib` looks like so:
+
+```
+-dynamiclib
+
+  When passed this option, GCC produces a dynamic library instead of an executable when linking, using the Darwin libtool command.
+```
+
+We don't want to produce an executable because we're not planning on executing the file directly.  Instead, we're passing the file to `enable -f`, which expects a dynamic library file as input and will load that input file dynamically, i.e. at runtime (as opposed to ahead of time, during compilation).
+
+Similarly, the [Darwin docs](https://archive.ph/1IB29) state the following about this flag:
+
+```
+OPTIONS
+
+   Options that control the kind of output
+
+  ...
+
+  -dynamic
+
+    The default.  Implied by -dynamiclib, -bundle, or -execute
+
+```
+
+This appears to be similar to the `-dynamiclib` flag, in that it tells `gcc` to output a dynamic library instead of an executable.  Not sure why we need both flags, as opposed to just one or the other.
+
+### The `-undefined dynamic_lookup` flag
+
+The same [Darwin docs](https://archive.ph/1IB29) state the following:
+
+```
+-undefined <treatment>
+
+  Specifies how undefined symbols are to be treated.
+  Options are: error, warning, suppress, or dynamic_lookup.  The default is error.
+```
+
+This means that, if `gcc` encounters any symbols it doesn't recognize, it should attempt to look them up at runtime, since by then they may be defined by the time we get to that point.
+
+## 3rd `Makefile` rule- `clean`
+
+The last of the rules in this `Makefile` is:
+
+```
+clean:
+	rm -f *.o ../libexec/*.dylib
+```
+
+Some `Makefile`s specify an optional cleanup rule, which can be run via the `make clean` command.  In this case, the command that we're running is:
+
+```
+rm -f *.o ../libexec/*.dylib
+```
+
+This uses the `rm` command to delete all files ending in `.o`, as well as any `.dylib` (aka dynamic library) files that we created in previous rules.  The `-f` flag says we should perform the deletion without first prompting for confirmation, regardless of the permissions on the files we delete.
+
+<div style="margin: 2em; border-bottom: 1px solid grey"></div>
+
+That's it for the `Makefile`.  Let's move on.

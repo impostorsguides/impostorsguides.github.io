@@ -2,30 +2,15 @@ The next file inside `src/` is `bash.h`.
 
 ## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/bash.h){:target="_blank" rel="noopener"}
 
-So I happen to know from my limited previous experience with C that a ".h" file is a header file.  I look up [the GCC docs on header files](https://web.archive.org/web/20220930083359/https://gcc.gnu.org/onlinedocs/cpp/Header-Files.html){:target="_blank" rel="noopener"}, and read the first few paragraphs:
+I happen to know from my limited previous experience with C that a `.h` file is a header file.  I look up [the GCC docs on header files](https://web.archive.org/web/20220930083359/https://gcc.gnu.org/onlinedocs/cpp/Header-Files.html){:target="_blank" rel="noopener"}, and read the first few paragraphs:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1039am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
-So header files contain C declarations and macro definitions.  But the above is a little too technical for me.  I look at the contents of `bash.h` and i see things like:
+So header files contain C definitions which will be used in multiple files.  They're useful if you want to avoid duplicating the logic contained in the header file everywhere it's needed.  If that logic needs to change, you can make the change in only one place- the header file.
 
-```
-#ifndef __BASH_H__
-#define __BASH_H__
-...
-
-typedef struct word_desc {
-  char *word;
-  int flags;
-} WORD_DESC;
-```
-
-Are these what we mean by "C declarations" and "macro definitions"?
-
-(stopping here; 3238 words)
-
-I Google "why does C use header files" and I find [this StackOverflow post](https://web.archive.org/web/20230309171546/https://stackoverflow.com/questions/19089686/why-do-we-include-header-files-in-c){:target="_blank" rel="noopener"}, which is much clearer.  The first answer I read talks about the benefits of avoiding problems with functions which call each other:
+To get confirmation, I Google "why does C use header files" and I find [this StackOverflow post](https://web.archive.org/web/20230309171546/https://stackoverflow.com/questions/19089686/why-do-we-include-header-files-in-c){:target="_blank" rel="noopener"}, which is much clearer.  The first answer I read talks about the benefits of avoiding problems with functions which call each other:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1040am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
@@ -41,7 +26,35 @@ Another benefit is mentioned in the following answer:
 
 Similar to the previous answer, this 2nd answer also touches on missing function definitions.  However in the comments it also touches on performance issues.  If we use header files, we gather (i.e. compile) all the data definitions and function interfaces together at "compile time", and there's no need to re-compile them later (at "link time").  The fact that we don't have to re-compile means our code can run faster.
 
-OK, I'm feeling pretty good about my understanding of what header files are and the benefits they provide.  Now on to the first lines of code:
+So there are multiple reasons why we might use header files.  In our case, we only have one file that includes `bash.h`- a file named `realpath.c` (which we'll look at later).  Because the logic inside `bash.h` doesn't appear to be used in other files, it's possible that we don't strictly *need* to use the header file strategy here.  Could we have included these declarations directly in `realpath.c`?  I decide to test this with an experiment.
+
+### Experiment- including header logic directly in a C file
+
+In `realpath.c`, I comment out the `include` statement which imports `bash.h`, and paste the contents of `bash.h` directly at the top of `realpath.c`, directly after the next two `include` statements:
+
+
+```
+// #include "bash.h"
+#include <stdlib.h>
+#include <stdio.h>
+
+#ifndef __BASH_H__
+#define __BASH_H__
+
+#define EXECUTION_SUCCESS 0
+#define EXECUTION_FAILURE 1
+#define EX_USAGE 258
+
+#define BUILTIN_ENABLED 1
+
+...
+```
+
+When I run `make clean` followed by `make` inside the `src/` directory, it works fine- the `libexec/rbenv-realpath.dylib` file is successfully built.  This leads me to believe that the authors used the header file strategy more out of convention than necessity (though I could be wrong).
+
+## Ensuring a header file is only included once
+
+On to the first block of code:
 
 ```
 #ifndef __BASH_H__
@@ -50,7 +63,7 @@ OK, I'm feeling pretty good about my understanding of what header files are and 
 #endif
 ```
 
-Again from my very brief prior experience with C, I know that the above code means "if the constant __BASH_H__ isn't defined, then define it".  [Here is some documentation](https://web.archive.org/web/20220130091704/https://www.cprogramming.com/reference/preprocessor/ifndef.html){:target="_blank" rel="noopener"} on `ifndef` and how/why it's used:
+Again from my very brief prior experience with C, I know that the above code means "if the constant __BASH_H__ isn't defined, then define it".  Everything in between `ifndef` and `endif` (i.e. the bulk of the contents of this header file) is only executed if `__BASH_H__` has not yet been defined.  [Here is some documentation](https://web.archive.org/web/20220130091704/https://www.cprogramming.com/reference/preprocessor/ifndef.html){:target="_blank" rel="noopener"} on `ifndef` and how/why it's used:
 
 <center style="margin-bottom: 3em">
   <img src="/assets/images/screenshot-19mar2023-1044am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
@@ -58,7 +71,7 @@ Again from my very brief prior experience with C, I know that the above code mea
 
 The last sentence appears to be what's happening here- we're avoiding the problem of double-inclusion by wrapping the main body of the header file inside an `ifndef` + `endif` block.  I subsequently confirmed this via a question I asked [here](https://unix.stackexchange.com/questions/726043/what-is-the-purpose-of-defining-a-preprocessor-macro-like-bash-h-that-is-onl){:target="_blank" rel="noopener"}, in StackExchange.
 
-Side note- although this website is called "cprogramming.com", it is not considered official C-language documentation.  That's just the website name chosen by the website's admins.  It looks like [there is no official online version of C documentation](https://web.archive.org/web/20220826163755/https://stackoverflow.com/questions/4233925/is-there-something-like-the-official-c-documentation){:target="_blank" rel="noopener"}; the closest thing to official docs is a PDF version of the C99 standard.
+## Defining constants for our `realpath` builtin
 
 Next block of code:
 
@@ -74,7 +87,9 @@ These are more [macro definitions](https://web.archive.org/web/20221014055515/ht
   <img src="/assets/images/screenshot-19mar2023-1046am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
-I think it's safe to wait until we get to `realpath.c` before analyzing exactly what these do.
+We'll wait until we get to `realpath.c` before analyzing exactly what these do.  But judging by their names (`EXECUTION_SUCCESS`, `EXECUTION_FAILURE`, etc.), they appear to be related to the exit status of the more-performant `realpath` implementation.
+
+## Ensuring our new `realpath` builtin is enabled
 
 Next block of code:
 
@@ -84,7 +99,13 @@ Next block of code:
 
 Another macro definition.  This one is also exclusively used by `realpath.c`, so let's punt on exploring this one as well.  There's a chance we may do the same thing for the remaining macros in this file, as well.
 
-Next block:
+## Defining data types for use in the `realpath` builtin
+
+The rest of the code in this header file is a series of definitions for data types which our builtin will use.
+
+### `word_desc`-
+
+Here's the first one:
 
 ```
 typedef struct word_desc {
