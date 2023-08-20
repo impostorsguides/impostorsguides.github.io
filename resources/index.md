@@ -1,8 +1,8 @@
 ---
 layout: default
 title: RBENV
-permalink: /resources/
-path: resources
+permalink: /rbenv/
+path: rbenv
 ---
 
 

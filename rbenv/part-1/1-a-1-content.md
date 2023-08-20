@@ -1,4 +1,6 @@
-I'll start by finding the code that gets executed when running the `bundle` command.  To do that, I'll use the `which` UNIX command.  In [my terminal](https://web.archive.org/web/20230314194621/https://en.wikipedia.org/wiki/Terminal_(macOS)){:target="_blank" rel="noopener"}, I'll type:
+If the goal is to find out what happens when we type `bundle install` into our terminal, then a good place to start is by reading the file which gets executed when running the “bundle“ command.
+
+To find that file, let’s use the “which“ UNIX command. In my terminal, I type the following:
 
 ```
 $ which bundle
@@ -63,29 +65,25 @@ We just did our first of many experiments.  Sometimes these experiments will hel
 
 Either way, I've found them to be a good habit to develop as I write.  They help me double-check my thought process.
 
-## The pain that version managers solve
+## What are version managers?
 
-Back to  `~/.rbenv/`.  This hidden directory houses the logic for my Ruby version manager, which is called [RBENV](https://github.com/rbenv/rbenv){:target="_blank" rel="noopener"}.  Not everyone uses RBENV; other people use [rvm](https://rvm.io/){:target="_blank" rel="noopener"}, [chruby](https://github.com/postmodern/chruby){:target="_blank" rel="noopener"}, [asdf](https://asdf-vm.com/){:target="_blank" rel="noopener"}, or other programs.  But RBENV is quite popular in the Ruby community.  RBENV actually maintains a comparison of popular Ruby version managers [here](https://github.com/rbenv/rbenv/wiki/Comparison-of-version-managers){:target="_blank" rel="noopener"}.
+Back to  `~/.rbenv/`.  This hidden directory houses the logic for my Ruby version manager, which is called [RBENV](https://github.com/rbenv/rbenv){:target="_blank" rel="noopener"}.  RBENV lets me switch between Ruby versions without too much hassle.  This is useful because I have multiple Ruby codebases installed on my machine right now, and they all depend on different versions of Ruby.
 
-RBENV lets me switch between Ruby versions without too much hassle.  This is useful because I have multiple Ruby codebases installed on my machine right now, and they all depend on different versions of Ruby.
+If we have multiple versions of Ruby installed, that means there are multiple programs on our machine which respond to the `ruby` command in our terminal.  Without a Ruby version manager to help us switch between versions, our OS will just pick the first of these programs that it finds, which may or may not be the version our program depends on.
 
-If we have multiple versions of Ruby installed, that means there are multiple programs on our machine which respond to the `ruby` command in our terminal.  Without a Ruby version manager to help us switch between versions, our OS will just pick the first of these programs that it finds.
-
-If we're lucky, the "first version it finds" will be the Ruby version that our program expects.  If we're **not** lucky, it will be a version which doesn't have the methods, classes, etc. that we need (which would cause an error if our program tries to invoke those methods or classes).
-
-A Ruby version manager like RBENV ensures that every time we work on a Ruby project, we're automatically using the version that this project depends on.
+Not everyone uses RBENV; other people use [rvm](https://rvm.io/){:target="_blank" rel="noopener"}, [chruby](https://github.com/postmodern/chruby){:target="_blank" rel="noopener"}, [asdf](https://asdf-vm.com/){:target="_blank" rel="noopener"}, or other programs.  But RBENV is quite popular in the Ruby community.  RBENV actually maintains a comparison of popular Ruby version managers [here](https://github.com/rbenv/rbenv/wiki/Comparison-of-version-managers){:target="_blank" rel="noopener"}.
 
 ## So what's the difference between Bundler and RBENV?
 
-A minute ago, we said:
-
-> Bundler provides "a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed."
+A minute ago, we said that Bundler provides "a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed."
 
 This... sounds a lot like what I just said RBENV does.  So what's the difference between RBENV and Bundler?  Why do I need both?
 
-[Bundler is a dependency management tool.](https://web.archive.org/web/20220911152613/https://www.rubyguides.com/2018/09/ruby-gems-gemfiles-bundler/){:target="_blank" rel="noopener"}  It helps you manage the versions of the **libraries in a given Ruby project** (also known as 'gems').  RBENV, on the other hand, manages the versions of **Ruby on your machine**, across all your projects.  RBENV ensures that your machine is using the version of Ruby that your project depends on, and Bundler ensures that your machine is using the right versions of the libraries that your project depends on.
+[Bundler is a dependency management tool.](https://web.archive.org/web/20220911152613/https://www.rubyguides.com/2018/09/ruby-gems-gemfiles-bundler/){:target="_blank" rel="noopener"}  It helps you manage the versions of the **libraries in a given Ruby project** (also known as 'gems').
 
-More info can be found [here](https://web.archive.org/web/20221210084104/https://www.honeybadger.io/blog/rbenv-rubygems-bundler-path/){:target="_blank" rel="noopener"}, in this excellent summary from Honeybadger.io.
+RBENV, on the other hand, manages the versions of **Ruby on your machine**, across all your projects.  RBENV ensures that your machine is using the version of Ruby that your project depends on, and Bundler ensures that your machine is using the right versions of the libraries that your project depends on.
+
+More info on how these tools all work together can be found [here](https://web.archive.org/web/20221210084104/https://www.honeybadger.io/blog/rbenv-rubygems-bundler-path/){:target="_blank" rel="noopener"}, in this excellent summary from Honeybadger.io.
 
 ## Shims
 
