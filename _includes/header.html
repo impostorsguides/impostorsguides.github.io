@@ -10,6 +10,9 @@
       <nav class="site-nav">
         {% include hamburger-menu.html %}
 
+        {%- for path in site.data.navigation.main -%}
+          <a class="page-link" href="{{ path.url }}">{{ path.title }}</a>
+        {%- endfor -%}
         <div class="trigger">
           {%- for path in page_paths -%}
             {%- assign my_page = site.pages | where: "path", path | first -%}
