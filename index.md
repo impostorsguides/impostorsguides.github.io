@@ -44,3 +44,14 @@ Also occasionally, I have no choice but to link to a Youtube video.  These links
 ## How to contact me
 
 I'm happy to hear from you!  I can be reached at impostorsguides@mastodon.social or at the email above.
+
+## Shout-Outs
+
+This site would not have been possible without inspiration from:
+
+- Julia Evans @ [Wizard Zines](https://wizardzines.com/)
+- Saron Yitbarek @ [CodeNewbie](https://www.codenewbie.org/)
+- Vaidehi Joshi @ [Base.CS](https://medium.com/basecs)
+- Chase Lambert @ [Makefile Tutorial](https://makefiletutorial.com/)
+
+Thanks for paving the way, y'all!
