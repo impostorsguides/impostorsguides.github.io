@@ -7,7 +7,7 @@ path: rbenv
 
 
 <ul class="resources-titles">
-  <li><h2>The Impostor's Guide To RBENV</h2></li>
+  <h2>The Impostor's Guide To The Shell</h2>
   <h3><a href="/rbenv/introduction">Introduction</a></h3>
   <ol type="I">
     <h3><li>Part 1: The RBENV Shim</li></h3>
