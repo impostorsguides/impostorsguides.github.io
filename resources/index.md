@@ -1,8 +1,8 @@
 ---
 layout: default
-title: RBENV
-permalink: /rbenv/
-path: rbenv
+title: The Shell
+permalink: /shell/
+path: shell
 ---
 
 
