@@ -11,7 +11,11 @@
         {% include hamburger-menu.html %}
 
         {%- for path in site.data.navigation.main -%}
-          <a class="page-link" href="{{ path.url }}">{{ path.title }}</a>
+          {% if path.target %}
+            <a class="page-link" href="{{ path.url }}" target="{{ path.target }}">{{ path.title }}</a>
+          {% else %}
+            <a class="page-link" href="{{ path.url }}">{{ path.title }}</a>
+          {% endif %}
         {%- endfor -%}
         <div class="trigger">
           {%- for path in page_paths -%}
