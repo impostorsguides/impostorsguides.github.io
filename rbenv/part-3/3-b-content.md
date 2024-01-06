@@ -373,7 +373,7 @@ What's a "ref" in `git`?
 
 > If you were interested in seeing the history of your repository reachable from commit, say, 1a410e, you could run something like git log 1a410e to display that history, but you would still have to remember that 1a410e is the commit you want to use as the starting point for that history. Instead, it would be easier if you had a file in which you could store that SHA-1 value under a simple name so you could use that simple name rather than the raw SHA-1 value.
 >
-> In Git, these simple names are called “references” or “refs”; you can find the files that contain those SHA-1 values in the `.git/refs` directory.
+> In Git, these simple names are called "references" or "refs"; you can find the files that contain those SHA-1 values in the `.git/refs` directory.
 
 So "git refs" are the way we use human-friendly strings to refer to computer-friendly SHAs.  The `git` docs say that the refs are stored in the `.git/refs` of any project that's been initialized with `git`.  I navigate into my RBENV directory and run `ls .git/refs`, and I see:
 

@@ -76,7 +76,7 @@ So by prepending our directory to `RUBYLIB`, we're indirectly updating Ruby's lo
 
 The above docs also mention that Ruby's load path is referred to with the `$:` syntax.  Googling `Ruby "$:"` reveals that `$:` is shorthand for Ruby's `$LOAD_PATH` environment variable.  If we then Google `"RubyGems LOAD_PATH"` to see how `$LOAD_PATH` is used by RubyGems, we find [the "RubyGems Plugins" page](https://web.archive.org/web/20221013080106/https://guides.rubygems.org/plugins/){:target="_blank" rel="noopener"}, which says:
 
-> RubyGems will load plugins in the latest version of each installed gem or `$LOAD_PATH`. Plugins must be named `‘rubygems_plugin’` (`.rb`, `.so`, etc) and placed at the root of your gem’s `#require_path`. Plugins are installed at a special location and loaded on boot.
+> RubyGems will load plugins in the latest version of each installed gem or `$LOAD_PATH`. Plugins must be named `'rubygems_plugin'` (`.rb`, `.so`, etc) and placed at the root of your gem's `#require_path`. Plugins are installed at a special location and loaded on boot.
 
 So RubyGems will read from `$LOAD_PATH` in order to find the `rubygems_plugin.rb` file.  But in order for it to *find* that file, its directory must be added first.  That's the job of `gem-rehash.bash`- to add `rbenv.d/exec/gem-rehash/rubygems_plugin.rb` to `LOAD_PATH` so that RubyGems can find and execute it.
 
@@ -202,7 +202,7 @@ In the above code snippet, we see the following method calls:
     - "The default directory for binaries" (source [here](https://ruby-doc.org/stdlib-2.6/libdoc/rubygems/rdoc/Gem.html#method-c-default_bindir){:target="_blank" rel="noopener"})
     - On my machine, this evaluates to `/Users/myusername/.rbenv/versions/2.7.5/bin`.
  - `Gem.user_dir`
-    - "Path for gems in the user’s home directory" (source [here](https://ruby-doc.org/stdlib-2.6/libdoc/rubygems/rdoc/Gem.html#method-c-user_dir){:target="_blank" rel="noopener"})
+    - "Path for gems in the user's home directory" (source [here](https://ruby-doc.org/stdlib-2.6/libdoc/rubygems/rdoc/Gem.html#method-c-user_dir){:target="_blank" rel="noopener"})
     - On my machine, this evaluates to `/Users/myusername/.gem/ruby/2.7.0`.
     - Note that this path does not actually exist on my machine!
  - `Gem.bindir`
@@ -271,7 +271,7 @@ But are we actually rescuing anything with this rescue block?
 
 Given [this conversation](https://news.ycombinator.com/item?id=28197331){:target="_blank" rel="noopener"}:
 
-> What I don’t like about backticks in Ruby is that they “ignore” errors in commands you run. It’s up to the program author to remember to check $? for the last executed command’s exit status. And guess how many times the average Ruby script using this feature implements error handling? Usually it’s totally forgotten.
+> What I don't like about backticks in Ruby is that they "ignore" errors in commands you run. It's up to the program author to remember to check $? for the last executed command's exit status. And guess how many times the average Ruby script using this feature implements error handling? Usually it's totally forgotten.
 
 It sounds like the `exit 1` calls inside the `rbenv-rehash` file would not actually cause the backtick syntax to raise an exception, which would need to happen in order for us to reach the code inside this `rescue` block.
 

@@ -1,0 +1,31 @@
+"The most effective debugging tool is still careful thought, coupled with judiciously placed print statements." — Brian Kernighan, [<u>Unix for Beginners</u>](https://web.archive.org/web/20220122011437/https://wolfram.schneider.org/bsd/7thEdManVol2/beginners/beginners.pdf){:target="_blank" rel="noopener"}.
+
+"Don't chase your dreams. Humans are persistence predators. Follow your dreams at a sustainable pace until they get tired and lie down." – [@raven.corvids.club (on BlueSky)](https://bsky.app/profile/raven.corvids.club/post/3k4rcbonfkq2u)
+
+## Disclaimer
+
+This is NOT an official guide to RBENV's codebase. It is not written by any member of the RBENV core team, nor is it endorsed by them in any way. It is simply the educated (and sometimes incorrect) guesses of a journeyman engineer who wants to attain mastery by teaching what he's learning.  Please treat what you read here accordingly.
+
+## Background
+
+What's the first thing that happens when you type `bundle install` into the terminal and hit "Enter"?
+
+This is the question which set me off on this entire project. For those unfamiliar with the `bundle install` command, it comes from the [Bundler library](https://bundler.io/){:target="_blank" rel="noopener"}.  Bundler provides "a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed", according to its website.  
+
+Professionally, I work on a large Rails codebase with many contributors, and `bundle install` is one of the most common commands we find ourselves typing.  I was frustrated that I didn't know how this command worked under-the-hood.  Since I'm a big believer that ["The best way to learn something is to explain it to someone else"](https://ideas.time.com/2011/11/30/the-protege-effect/){:target="_blank" rel="noopener"}, I decided to blog about what I was learning, as I learned it.
+
+The bad news is, I hit a detour early on, and as a result I didn't learn about `bundle` as part of this deep-dive.  I intend to repeat this process with the `bundle` command in a future post.
+
+The good news is, I ended up learning a lot about the UNIX shell, which is (I feel) more broadly-applicable than learning about Bundle.  That's because RBENV contains the code which gets executed **before my machine even reaches the `bundle` command**.  (If you use RBENV as your Ruby version manager, the same can be said about your machine.)  Along the way, I learned a lot about `bash` scripting, the command line, and how to understand the inner workings of the tools you use.
+
+Along the way, I kept a journal of all my wins, my frustrations, my questions, my a-ha moments, etc.  The document you're reading is an edited version of that journal.
+
+## Caveats & Warnings
+
+In this walk-through, I go on many side quests, basically whenever I encounter a concept I'm not familiar with. If you're looking for a linear A-to-Z storyline, this may not be the guide for you.
+
+Also note that this is a beta version of the journal I kept during this journey, and likely has errors.  If you spot something that I got wrong, let me know at `impostorsguides at gmail dot com`, or at the links on the `Contact` page.
+
+## Summary
+
+First thing's first- we need to install RBENV on your machine.  Let's do that next.

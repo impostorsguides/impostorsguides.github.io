@@ -755,7 +755,7 @@ An example here:
 >   ls;
 > } > PNGs.txt
 > ```
-> creates the file PNGs.txt with everything, starting with the line “I found all these PNGs:“, then the list of PNG files returned by find, then the line “Within this bunch of files:” and finishing up with the complete list of files and directories within the current directory.
+> creates the file PNGs.txt with everything, starting with the line "I found all these PNGs:", then the list of PNG files returned by find, then the line "Within this bunch of files:" and finishing up with the complete list of files and directories within the current directory.
 
 So we're just grouping the output of the commands inside the curly braces, and redirecting their combined output to the destination to `/dev/null`.  We don't care about that output- we only care whether the creation of `$PROTOTYPE_SHIM_PATH` returned a 0 exit code.
 

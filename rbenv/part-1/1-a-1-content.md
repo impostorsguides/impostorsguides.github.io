@@ -1,6 +1,6 @@
-If the goal is to find out what happens when we type `bundle install` into our terminal, then a good place to start is by reading the file which gets executed when running the “bundle“ command.
+If the goal is to find out what happens when we type `bundle install` into our terminal, then a good place to start is by reading the file which gets executed when running the "bundle" command.
 
-To find that file, let’s use the “which“ UNIX command. In my terminal, I type the following:
+To find that file, let's use the "which" UNIX command. In my terminal, I type the following:
 
 ```
 $ which bundle

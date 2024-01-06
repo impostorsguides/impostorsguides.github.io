@@ -264,29 +264,29 @@ One final note- when we assert that certain code is printed to the screen (as we
 >
 > <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 >
-> When I test for behavior, I’m saying:
+> When I test for behavior, I'm saying:
 >
-> “I don’t care how you come up with the answer, just make sure that the answer is correct under this set of circumstances.”
+> "I don't care how you come up with the answer, just make sure that the answer is correct under this set of circumstances."
 >
-> When I test for implementation, I’m saying:
+> When I test for implementation, I'm saying:
 >
-> “I don’t care what the answer is, just make sure you do this thing while figuring it out.”
+> "I don't care what the answer is, just make sure you do this thing while figuring it out."
 >
 > \- [LaunchScout.com](https://web.archive.org/web/20230323231337/https://launchscout.com/blog/testing-behavior-vs-testing-implementation){:target="_blank" rel="noopener"}
 >
 > <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 >
-> If I “verify” that my car works by checking for the presence of various parts, then I haven’t really actually verified anything. I haven’t demonstrated that the system under test (the car) actually meets spec (can drive).
+> If I "verify" that my car works by checking for the presence of various parts, then I haven't really actually verified anything. I haven't demonstrated that the system under test (the car) actually meets spec (can drive).
 >
-> If I test the car by actually driving it, then the questions of whether the car has various components become moot. If for example the car can travel down the road, we don’t need to ask if the car has wheels. If it didn’t have wheels it wouldn’t be moving.
+> If I test the car by actually driving it, then the questions of whether the car has various components become moot. If for example the car can travel down the road, we don't need to ask if the car has wheels. If it didn't have wheels it wouldn't be moving.
 >
-> All of our “implementation” questions can be translated into more meaningful “behavior” questions.
+> All of our "implementation" questions can be translated into more meaningful "behavior" questions.
 >
 > - Does it have an ignition? -> Can it start up?
 > - Does it have an engine and wheels? -> Can it drive?
 > - Does it have brakes? -> Can it stop?
 >
-> Lastly, behavior tests are better than implementation tests because behavior tests are more loosely coupled to the implementation. I ask “Can it start up?” instead of “Does it have an engine?” then I’m free to, for example, change my car factory from a gasoline-powered car factory to an electric car factory without having to change the set of tests that I perform. In other words, behavior tests enable refactoring.
+> Lastly, behavior tests are better than implementation tests because behavior tests are more loosely coupled to the implementation. I ask "Can it start up?" instead of "Does it have an engine?" then I'm free to, for example, change my car factory from a gasoline-powered car factory to an electric car factory without having to change the set of tests that I perform. In other words, behavior tests enable refactoring.
 >
 > [Code With Jason](https://web.archive.org/web/20230209001509/https://www.codewithjason.com/testing-implementation-vs-behavior-rails/){:target="_blank" rel="noopener"}
 >
