@@ -3,5 +3,11 @@
 main:
   - title: The Shell
     url: /shell/
+  - title: Blog
+    url: /blog/
+  - title: FAQ
+    url: /faq/
+  - title: Contact
+    url: /contact/
 
 
