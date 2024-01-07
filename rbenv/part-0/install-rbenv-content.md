@@ -5,15 +5,17 @@ As we previously mentioned, the first step is to install RBENV on your machine. 
 
 ## Ensuring you have no other version managers installed
 
-Before we get started, we'll need to make sure you don't have a different Ruby version manager installed, such as RVM.  If you do, that will represent a blocker to your continuing this guide, since you'll have different version managers competing to manage your Ruby version.  This could introduce [unexpected behavior](https://web.archive.org/web/20160715135727/https://stackoverflow.com/questions/35808103/rvm-and-rbenv-on-the-same-machine){:target="_blank" rel="noopener"} and negatively impact your usage of Ruby.
+Admittedly, the best candidates for reading this book are people who already use RBENV as their Ruby version manager.  As you’ll soon see, users of other version managers (such as rvm, asdf, chruby, etc.) will face more and bigger hurdles than users of RBENV (more on why in a minute).
+
+With that in mind, we'll need to make sure you don't have a different Ruby version manager installed, such as RVM.  If you do, that will represent a blocker to your continuing this guide, since you'll have different version managers competing to manage your Ruby version.  This could introduce [unexpected behavior](https://web.archive.org/web/20160715135727/https://stackoverflow.com/questions/35808103/rvm-and-rbenv-on-the-same-machine){:target="_blank" rel="noopener"} and negatively impact your usage of Ruby.
 
 We can check for the most popular Ruby version managers by using the `which` command:
 
 <center style="margin-bottom: 3em">
-  <img src="/assets/images/2024-01-06-1037am.png" width="60%" style="padding: 0.5em">
+  <img src="https://i.ibb.co/DQRLKVQ/2024-01-06-1037am.png" width="60%" style="padding: 0.5em">
 </center>
 
-If you see anything other than "not found" for `which asdf``, `which rvm``, and `which chruby``, you likely have another version manager on your machine.  In that case, you'll need to make a decision about which version manager you want to use.  [RBENV's Github page has a guide](https://github.com/rbenv/rbenv/wiki/Comparison-of-version-managers){:target="_blank" rel="noopener"} on differentiating between the various version managers out there.
+If you see anything other than "not found" for `which asdf`, `which rvm`, and `which chruby`, you likely have another version manager on your machine.  In that case, you'll need to make a decision about which version manager you want to use.  [RBENV's Github page has a guide](https://github.com/rbenv/rbenv/wiki/Comparison-of-version-managers){:target="_blank" rel="noopener"} on differentiating between the various version managers out there.
 
 If you don't have other version managers on your machine, feel free to move on to the next section.  
 
@@ -21,11 +23,13 @@ If you don't have other version managers on your machine, feel free to move on t
 
 Installing RBENV via `brew install rbenv` would be a perfectly fine option for a normal user.  But it won't work for our purposes, because it would leave us without access to RBENV's `.git` directory, and therefore its git history.  That means we couldn't roll back to the specific version of RBENV that I'll be using for this walk-through.  It's important that we work off the same codebase, so let's try another technique- installing from source.
 
-To do this, we'll follow the instructions on [this version of the RBENV Readme file](https://github.com/rbenv/rbenv/tree/e8b7a27ee67a5751b899215b4d35fd86ab552dae#basic-git-checkout){:target="_blank" rel="noopener"}.  First, open your terminal and check whether you already have a directory called "~/.rbenv", by running "ls -la ~/.rbenv":
+To do this, we'll follow the instructions on [this version of the RBENV Readme file](https://github.com/rbenv/rbenv/tree/e8b7a27ee67a5751b899215b4d35fd86ab552dae#basic-git-checkout){:target="_blank" rel="noopener"}.  First, open your terminal and check whether you already have a directory called `~/.rbenv`, by running `ls -la ~/.rbenv`:
 
-<center style="margin-bottom: 3em">
-  <img src="/assets/images/screenshot-2024-01-05-10-23-46.png" width="80%" style="padding: 0.5em">
-</center>
+<!-- <center style="margin-bottom: 3em">
+  <img src="https://i.ibb.co/Qbt8Rg9/screenshot-2024-01-05-10-23-46.png" width="80%" style="padding: 0.5em">
+</center> -->
+
+![some alt text](/Users/richiethomas/Desktop/Workspace/impostorsguides.github.io/assets/images/screenshot-2024-01-05-10-23-46.png)
 
 If this directory does exist, and the command output has a `.git` directory in it, you should be good to go.
 

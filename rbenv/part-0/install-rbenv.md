@@ -4,8 +4,8 @@ category: rbenv-introduction
 id: 2
 title: Installing (or re-installing) RBENV
 permalink: /rbenv/install-rbenv
-next-title: 
-next-permalink: 
+next-title: Dotfiles
+next-permalink: /rbenv/dotfiles
 previous-title: Introduction
 previous-permalink: /rbenv/introduction
 ---
