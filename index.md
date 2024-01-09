@@ -4,7 +4,7 @@ permalink: /
 title: Maybe a 10x engineer could do that, but not me... 😔
 ---
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/sad_puppy_computer.jpg" width="80%" style="padding: 0.5em">
 </center>
 
