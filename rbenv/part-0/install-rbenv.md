@@ -10,4 +10,4 @@ previous-title: Introduction
 previous-permalink: /rbenv/introduction
 ---
 
-{% include_relative install-rbenv-content.md %}
+{% include_relative install-rbenv-content.html %}

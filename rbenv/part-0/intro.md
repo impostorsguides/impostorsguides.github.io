@@ -8,4 +8,4 @@ next-title: Installing (or re-installing) RBENV
 next-permalink: /rbenv/install-rbenv
 ---
 
-{% include_relative intro-content.md %}
+{% include_relative intro-content.html %}
