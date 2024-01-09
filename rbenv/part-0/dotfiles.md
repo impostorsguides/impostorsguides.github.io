@@ -10,4 +10,4 @@ previous-title: Installing (or re-installing) RBENV
 previous-permalink: /rbenv/install-rbenv
 ---
 
-{% include_relative dotfiles-content.md %}
+{% include_relative dotfiles-content.html %}
