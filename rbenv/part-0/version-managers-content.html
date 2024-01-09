@@ -1,0 +1,27 @@
+<header class="post-header">
+  <h1 class="post-title">Version Managers</h1>
+</header>
+
+<p>Back to <code>~/.rbenv/</code>.  This hidden directory houses the logic for my Ruby version manager, which is called <a href="https://github.com/rbenv/rbenv" target="_blank">RBENV</a>. RBENV lets me switch between Ruby versions without too much hassle.</p>
+
+<p>If we have multiple versions of Ruby installed, that means there are multiple programs on our machine which respond to the <code>ruby</code> command in our terminal. Without a Ruby version manager to help us switch between versions, our OS will just pick the first of these programs that it finds, which may or may not be the version our program depends on.</p>
+
+<p>RBENV is a popular choice for managing Ruby versions, but it’s not the only choice.  Others include <a href="https://rvm.io/" target="_blank">rvm</a>, <a href="https://github.com/postmodern/chruby" target="_blank">chruby</a>, <a href="https://asdf-vm.com/" target="_blank">asdf</a>, or other programs.  The core RBENV team actually maintains a comparison of popular Ruby version managers <a href="https://github.com/rbenv/rbenv/wiki/Comparison-of-version-managers" target="_blank">here</a>.</p>
+
+<h2>The difference between Bundler and RBENV</h2>
+
+<p>Earlier, we learned that Bundler provides “a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed.”</p>
+
+<p>This… sounds a lot like what I just said RBENV does.</p>
+
+<p>So what’s the difference between RBENV and Bundler? Why do I need both?</p>
+
+<p><a href="https://web.archive.org/web/20220911152613/https://www.rubyguides.com/2018/09/ruby-gems-gemfiles-bundler/" target="_blank">Bundler is a dependency management tool</a>. It helps you manage the versions of the Ruby libraries <strong>in a specific project folder</strong> (also known as “gems”).</p>
+
+<p>RBENV, on the other hand, manages the versions of Ruby itself, <strong>across all the projects on your machine</strong>. RBENV ensures that your machine is using the version of Ruby that your project depends on, and Bundler ensures that your machine is using the right versions of the libraries that your project depends on.</p>
+
+<p>More info on how these tools all work together can be found <a href="https://web.archive.org/web/20221210084104/https://www.honeybadger.io/blog/rbenv-rubygems-bundler-path/" target="_blank">here</a>, in this excellent summary from Honeybadger.io.</p>
+
+<h2>Wrapping Up</h2>
+
+<p>This chapter was mercifully short.  Next, let’s talk briefly about the idea of shims and shim files.  These are the files that RBENV uses to delegate your command to the correct Ruby version.</p>

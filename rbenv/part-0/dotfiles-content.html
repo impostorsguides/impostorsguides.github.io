@@ -2,53 +2,88 @@
   <h1 class="post-title">Dotfiles</h1>
 </header>
 
-If the goal is to find out what happens when we type `bundle install` into our terminal, then a good place to start is by reading the file which gets executed when running the “bundle“ command. 
-To find that file, let’s use the “which“ UNIX command. In my terminal, I type the following:
+<p>If the goal is to find out what happens when we type <code>bundle install</code> into our terminal, then a good place to start is by reading the file which gets executed when running the <code>bundle</code> command.</p>
 
-Here we see that file containing the “bundle“ command’s logic lives in a directory called “/Users/richiethomas/.rbenv/shims/”, also sometimes referred to in this guide as “~/.rbenv/shims”.
-Dotfiles and dot folders
-The “~/.rbenv/” directory’s name begins with a “.“.  In UNIX, there’s a convention whereby the names of files and folders which are meant to be hidden from view by default are prefixed with a dot.  Unsurprisingly, these are called “dotfiles” or “dot folders”.
-When I say “hidden”, I mean hidden from the “ls“ command.  For example, the following is the contents of my laptop’s home directory, according to the regular “ls” command:
-But there are actually many more files in this folder.  To view them all, we have to pass the “-a” flag to “ls”:Now we see all the dotfiles and dot folders in my home directory.
-Hidden files are helpful in preventing accidental deletion of important data.  Let’s test that out now.
-Experiment- preventing files from being deleted
-I create a temporary directory named “foo/“, and create two files inside of it:
- a hidden file named “.bar”
-a regular file named “baz”
+<p>To find that file, let's use <a href="https://web.archive.org/web/20230308043620/https://linux.die.net/man/1/which" target="_blank">the <code>which</code> UNIX command</a>. In my terminal, I type the following:</p>
 
-Then I run “rm ./foo/*“ and hit the “y” key when prompted for confirmation.  Lastly, I re-run “ls -a foo“:
-We see that the file “baz” is now gone, but the hidden dotfile “.bar” is still there.  So yes, it appears that adding a “.“ prefix to a file can prevent it from being accidentally deleted.
-But what if we really do want to delete our dotfiles?  We simply add a dot before the “*” symbol.  To demonstrate this, I’ll create a 2nd dotfile named “.baz”, and then delete all the dotfiles in my “foo/” folder at once:
+<div class="center">
+  <img src="/assets/images/screenshot-2024-01-091.45pm.png" width="80%" style="padding: 0.5em">
+</div>
 
-As you can see, the “foo/” folder is now truly empty- no more dotfiles.
-Side note- experiments
-We just did our first of many experiments. Sometimes these experiments will help us form a hypothesis of how we think code might work, and then test whether that hypothesis is correct. Other times, we’ll just use them to prove to ourselves that something we’ve read on StackOverflow, ChatGPT, or some random person’s blog is actually correct.
-Making a small update to your shell
+<p>Here we see that file containing the <code>bundle</code> command's logic lives in a directory called <code>/Users/richiethomas/.rbenv/shims/</code>, also sometimes referred to in this guide as <code>~/.rbenv/shims</code>.</p>
 
+<h2>Dotfiles and dot folders</h2>
 
-One last thing we’ll want to do is add a line of code to your shell’s config file, a.k.a. The file which configures your shell every time you open a new tab or window.  We want to add a line which updates your “$PATH” variable to include a specific directory that RBENV contains.
-If you’re running the Bash shell, then your config file lives at:
+<p>The <code>~/.rbenv/</code> directory's name begins with a <code>.</code>.  In UNIX, there's a convention whereby the names of files and folders which are meant to be hidden from view by default are prefixed with a dot.  Unsurprisingly, these are called <a href='https://web.archive.org/web/20230623095245/https://www.freecodecamp.org/news/dotfiles-what-is-a-dot-file-and-how-to-create-it-in-mac-and-linux/'>"dotfiles" or "dot folders"</a>.</p>
 
+<p>When I say "hidden", I mean hidden from the <code>ls</code> command.  For example, the following is the contents of my laptop's home directory, according to the regular <code>ls</code> command (passing the <code>-l</code> flag to list one item per line):</p>
 
-~/.bashrc
+<div class="center">
+  <img src="/assets/images/screenshot-2024-01-09.1.46pm.png" width="100%" style="padding: 0.5em">
+</div>
 
+<p>But there are actually many more files in this folder.  To view them all, we have to add the <code>-a</code> flag to our previously-run command:</p>
+  
+<div class="center">
+  <img src="/assets/images/screenshot-2024-01-09.1.47pm.png" width="100%" style="padding: 0.5em">
+</div>
+  
+<p>Now we see all the dotfiles and dot folders in my home directory.</p>
 
-And if you’re running the Zsh shell (the default on most newer Macs by now), then your config file lives at:
+<p>I know, my dotfiles are a bit less organized than they could be. 😳</p>
 
+<h2>Experiment- preventing files from being deleted</h2>
 
-~/.zshrc
+<p>Hidden files are helpful in preventing accidental deletion of important data.  Let's test that out now.</p>
 
+<p>I create a temporary directory named <code>foo/</code>, and create two files inside of it:</p>
 
-Here’s the line of code you should add, and it should be fine to add it to the end of the file:
+<ul>
+  <li>a hidden file named <code>.bar</code></li>
+  <li>a regular file named <code>baz</code></li>
+</ul>
 
+<div class="center">
+  <img src="/assets/images/screenshot-2024-01-09.2.01pm.png" width="100%" style="padding: 0.5em">
+</div>
 
-PATH="${HOME}/.rbenv/libexec:$PATH"
+<p>Then I run <code>rm ./foo/*</code> and hit the <code>y</code> key when prompted for confirmation.  Lastly, I re-run <code>ls -a foo</code>:<p>
 
+<div class="center">
+  <img src="/assets/images/screenshot-2024-01-09.2.02pm.png" width="100%" style="padding: 0.5em">
+</div>
 
-We’re adding this line of code so that we can modify RBENV’s code in its home directory, and see the changes we make reflected in how RBENV works.  For our change to take effect, you’ll need to open a new Shell tab or window.
-Wrapping Up
+<p>We see that the file <code>baz</code> is now gone, but the hidden dotfile <code>.bar</code> is still there.  So yes, it appears that adding a <code>.</code> prefix to a file can prevent it from being accidentally deleted.</p>
 
-Let’s move on, and talk a bit about the purpose of version managers such as RBENV.
+<p>But what if we really do want to delete our dotfiles?  We simply add a dot before the <code>*</code> symbol.  To demonstrate this, I'll create a 2nd dotfile named <code>.baz</code>, and then delete all the dotfiles in my <code>foo/</code> folder at once:</p>
+
+<div class="center">
+  <img src="/assets/images/screenshot-2024-01-09.2.04pm.png" width="100%" style="padding: 0.5em">
+</div>
+
+<p>As you can see, the <code>foo/</code> folder is now truly empty- no more dotfiles.</p>
+
+<h2>Side note- experiments</h2>
+
+<p>We just did our first of many experiments. Sometimes these experiments will help us form a hypothesis of how we think code might work, and then test whether that hypothesis is correct. Other times, we'll just use them to prove to ourselves that something we've read on StackOverflow, ChatGPT, or some random person's blog is actually correct.</p>
+
+<h2>Making a small update to your shell</h2>
+
+<p>One last thing we'll want to do is add a line of code to your shell's config file, a.k.a. The file which configures your shell every time you open a new tab or window.  We want to add a line which updates your <code>$PATH</code> variable to include a specific directory that RBENV contains.</p>
+
+<p>If you're running the Bash shell, then your config file lives at <code>~/.bashrc</code>.</p>
+
+<p>And if you're running the Zsh shell (the default on most newer Macs by now), then your config file lives at <code>~/.zshrc</code>.</p>
+
+<p>Here's the line of code you should add, and it should be fine to add it to the end of the file:</p>
+
+<pre><code>PATH="${HOME}/.rbenv/libexec:$PATH"</code></pre>
+
+<p>We're adding this line of code so that we can modify RBENV's code in its home directory, and see the changes we make reflected in how RBENV works.  For our change to take effect, you'll need to open a new Shell tab or window.</p>
+
+<h2>Wrapping Up</h2>
+
+<p>Let's move on, and talk a bit about the purpose of version managers such as RBENV.</p>
 
 
 
