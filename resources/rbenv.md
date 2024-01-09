@@ -1,4 +1,4 @@
 ---
-permalink: /rbenv/
+permalink: /shell/
 redirect_to: /shell/
 ---

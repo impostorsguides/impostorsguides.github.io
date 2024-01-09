@@ -5,9 +5,9 @@ id: 48
 previous-title: /rbenv/infrastructure/src-configure
 previous-permalink: src/configure
 title: Infrastructure Summary
-permalink: /rbenv/infrastructure/summary
+permalink: /shell/infrastructure/summary
 next-title: Conclusion
-next-permalink: /rbenv/conclusion
+next-permalink: /shell/conclusion
 ---
 
 {% include_relative 3-summary-content.md %}

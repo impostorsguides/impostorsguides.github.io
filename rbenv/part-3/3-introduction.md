@@ -3,11 +3,11 @@ layout: page
 category: rbenv-pt-3
 id: 40
 previous-title: Commands- Summary
-previous-permalink: /rbenv/commands/summary
+previous-permalink: /shell/commands/summary
 title: "Infrastructure- Introduction"
-permalink: /rbenv/infrastructure/introduction
+permalink: /shell/infrastructure/introduction
 next-title: "The '.github/ directory"
-next-permalink: /rbenv/infrastructure/github-workflows
+next-permalink: /shell/infrastructure/github-workflows
 ---
 
 {% include_relative 3-introduction-content.md %}

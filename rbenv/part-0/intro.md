@@ -3,9 +3,9 @@ layout: page
 category: rbenv-introduction
 id: 1
 title: Introduction
-permalink: /rbenv/introduction
+permalink: /shell/introduction
 next-title: Installing (or re-installing) RBENV
-next-permalink: /rbenv/install-rbenv
+next-permalink: /shell/install-rbenv
 ---
 
 {% include_relative intro-content.html %}

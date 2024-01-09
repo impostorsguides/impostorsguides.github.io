@@ -3,11 +3,11 @@ layout: page
 category: rbenv-introduction
 id: 2
 title: Installing (or re-installing) RBENV
-permalink: /rbenv/install-rbenv
+permalink: /shell/install-rbenv
 next-title: Dotfiles
-next-permalink: /rbenv/dotfiles
+next-permalink: /shell/dotfiles
 previous-title: Introduction
-previous-permalink: /rbenv/introduction
+previous-permalink: /shell/introduction
 ---
 
 {% include_relative install-rbenv-content.html %}

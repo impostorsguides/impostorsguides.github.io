@@ -3,11 +3,11 @@ layout: page
 category: rbenv-pt-3
 id: 46
 previous-title: "The rbenv.d directory"
-previous-permalink: /rbenv/infrastructure/rbenv-d
+previous-permalink: /shell/infrastructure/rbenv-d
 title: "Makefile.in"
-permalink: /rbenv/infrastructure/makefile
+permalink: /shell/infrastructure/makefile
 next-title: "bash.h"
-next-permalink: /rbenv/infrastructure/bash-h
+next-permalink: /shell/infrastructure/bash-h
 ---
 
 {% include_relative 3-af-content.md %}
