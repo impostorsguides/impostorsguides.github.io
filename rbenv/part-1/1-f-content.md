@@ -14,7 +14,7 @@ We saw a regular `bash` for-loop earlier, in our experiment with delimiters and 
 
 If we haven't seen this variable defined yet, does that mean it's defined or built-in by the language?  As usual, Googling turns up [a StackOverflow post](https://web.archive.org/web/20230406161948/https://stackoverflow.com/questions/73134672/linux-shell-for-arg-do){:target="_blank" rel="noopener"}:
 
-<center style="margin-bottom: 3em">
+<center>
   <a href="/assets/images/arg-for-loop.png" target="_blank">
     <img src="/assets/images/arg-for-loop.png" width="90%" alt="What is `arg` in a bash `for` loop?" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -22,7 +22,7 @@ If we haven't seen this variable defined yet, does that mean it's defined or bui
 
 Scrolling down in the answer a bit, we see:
 
-<center style="margin-bottom: 3em">
+<center>
   <a href="/assets/images/arg-for-loop-2.png" target="_blank">
   <img src="/assets/images/arg-for-loop-2.png" width="90%" alt="Omitting `in` in a bash `for` loop?" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -412,7 +412,7 @@ Regarding the 2nd pattern (`--`), I've seen it used in terminal commands before 
 
 What does `--` actually signify?  StackOverflow [saves the day again](https://web.archive.org/web/20220623104640/https://unix.stackexchange.com/questions/11376/what-does-double-dash-mean){:target="_blank" rel="noopener"}:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/double-dash.png">
     <img src="/assets/images/double-dash.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>

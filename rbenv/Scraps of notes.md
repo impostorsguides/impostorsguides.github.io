@@ -61,7 +61,7 @@ As an experiment, I try asking ChatGPT for confirmation of this theory:
 
 <!-- ChatGPT link- https://chat.openai.com/chat/1a2694aa-d446-46b0-a1dd-f40d24377efb -->
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/chat-gpt-why-change-shebang.png">
     <img src="/assets/images/chat-gpt-why-change-shebang.png" width="90%" style="border: 1px solid black; padding: 0.5em" alt="Asking ChatGPT why RBENV changed their shebang from `ruby-local-exec` to `ruby`.">
   </a>
@@ -219,7 +219,7 @@ Since our original Github issue said that the need for the `ruby-local-exec` she
 I type "ruby-local-exec" in Github's search field while inside the Github repository (i.e. while my browser is pointed to `https://github.com/rbenv/rbenv`).  When I do this, the "In this repository" option appears in a dropdown, and I select that.
 
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/ruby-local-exec-search.png">
     <img src="/assets/images/ruby-local-exec-search.png" width="100%" alt="Searching Github for the string 'ruby-local-exec'." style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -227,7 +227,7 @@ I type "ruby-local-exec" in Github's search field while inside the Github reposi
 
 I'm taken to a search results page, which (among other things) indicates that Github found 6 commits with this string present:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/search-results-for-ruby-local-exec.png">
     <img src="/assets/images/search-results-for-ruby-local-exec.png" width="100%" alt="Github Search results for the string 'ruby-local-exec'." style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -236,7 +236,7 @@ I'm taken to a search results page, which (among other things) indicates that Gi
 I click on "Commits" to see which commits those were.  From there, I see a list of git commits, along with their commit messages:
 
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/search-results-for-ruby-local-exec-2.png">
   <img src="/assets/images/search-results-for-ruby-local-exec-2.png" width="100%" alt="Github Search results for the string 'ruby-local-exec'." style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -247,7 +247,7 @@ I click on "Commits" to see which commits those were.  From there, I see a list 
 From there, I'm taken to a list of files, which (in the case of this PR) is just one file- the one we're looking for (`bin/ruby-local-exec`):
 
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/ruby-local-exec-commit.png">
     <img src="/assets/images/ruby-local-exec-commit.png" width="100%" alt="The original commit for the 'ruby-local-exec' file." style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -369,7 +369,7 @@ While trying to answer this question,
 
 A quick Github search in the RBENV repo for `".rbenv-version" ".ruby-version"` (so that I can find PRs which contain both terms) yields 8 results, of which [this PR](https://github.com/rbenv/rbenv/pull/302){:target="_blank" rel="noopener"} is one.  This quote in particular stands out among the comments:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/switch-rbenv-version-to-ruby-version.png">
     <img src="/assets/images/switch-rbenv-version-to-ruby-version.png" width="90%" style="border: 1px solid black; padding: 0.5em" alt="Comments discussing the support of the '.ruby-version' filename over '.rbenv-version'." >
   </a>

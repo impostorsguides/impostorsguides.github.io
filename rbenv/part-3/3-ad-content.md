@@ -236,7 +236,7 @@ Next block of code:
 
 The backtick syntax tells Ruby to execute the terminal command specified inside the backticks.  In this case, we're telling UNIX to execute `rbenv rehash` in the shell.  From the book ["The Ruby Programming Language"](https://books.google.cl/books?id=jcUbTcr5XWwC&pg=PA53&lpg=PA53&dq=ruby+backticks&source=bl&ots=fLIozb7tjF&sig=ACfU3U1zDhjFnvjOQy1jhjp5mu0USP3zkg&hl=en&sa=X&sqi=2&ved=2ahUKEwjUmsW_pP__AhW1LLkGHf7gAcgQ6AF6BQiXARAD#v=onepage&q=ruby%20backticks&f=false){:target="_blank" rel="noopener"}:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-8jul2023-1011am.png">
     <img src="/assets/images/screenshot-8jul2023-1011am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>

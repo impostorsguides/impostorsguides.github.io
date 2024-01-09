@@ -32,7 +32,7 @@ fi
 We recognize the `if` statement and the `[` syntax from earlier.  Here, we're testing whether `"$1"` evaluates to the string `--debug`.  I suspect that `$1` represents the first argument that gets passed to the command, but I'm not sure if the indexing is 0-based or 1-based.  A quick Google search leads me [here](https://web.archive.org/web/20211006091051/https://stackoverflow.com/questions/29258603/what-do-0-1-2-mean-in-shell-script){:target="_blank" rel="noopener"}:
 
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/stackoverflow-answer-positional-arguments.png">
     <img src="/assets/images/stackoverflow-answer-positional-arguments.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -337,7 +337,7 @@ Although we haven't yet reached these lines of code and don't yet know what they
 
 I kept noticing the phrase `xtrace` being thrown around on some of the links I encountered while trying to solve the above.  I Googled "what is xtrace bash", and found [this link](https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_02_03.html){:target="_blank" rel="noopener"}, which says:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/stackoverflow-answer-12mar2023-138pm.png">
     <img src="/assets/images/stackoverflow-answer-12mar2023-138pm.png" width="100%" style="border: 1px solid black; padding: 0.5em" alt="StackOverflow answer about `xtrace`">
   </a>
@@ -363,7 +363,7 @@ So summarizing the first 2 blocks of code: we first check if the user passed `--
 If we look for `RBENV_DEBUG` throughout the codebase, we can see it used in multiple locations:
 
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-24mar2023-623pm.png">
     <img src="/assets/images/screenshot-24mar2023-623pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
   </a>

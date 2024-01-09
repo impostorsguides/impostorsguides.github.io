@@ -1187,7 +1187,7 @@ So we are using the `-k` flag multiple times in order to define multiple sort ke
 
 If we Google `"bash sort keys"`, we get confirmation via [this link](https://web.archive.org/web/20220410153515/https://riptutorial.com/bash/example/31704/sort-by-keys){:target="_blank" rel="noopener"}, from a site called "RIP Tutorial".  I've highlighted the relevant sentence below:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-18mar23-1113am.png">
     <img src="/assets/images/screenshot-18mar23-1113am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>

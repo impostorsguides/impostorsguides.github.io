@@ -102,7 +102,7 @@ create_hook() {
 
 When I run this spec file with `bats test/hooks.bats`, I see `testlog` has been created and contains the following:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-14mar2023-845am.png">
     <img src="/assets/images/screenshot-14mar2023-845am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -131,7 +131,7 @@ So the `0` in `! -t 0` represents a file descriptor.  And this condition says "e
 
 I was still a bit confused by this, so I plugged this block of code into ChatGPT:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-23may2023-128pm.png">
     <img src="/assets/images/screenshot-23may2023-128pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -200,7 +200,7 @@ So we've verified the following:
 
 As a final check, I look for how the `create_hook` function receives its input.  I search for other uses via the Github search field:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-14mar2023-904am.png">
     <img src="/assets/images/screenshot-14mar2023-904am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -401,7 +401,7 @@ Next block of code:
 
 This block of code `echo`s an error message to `STDERR` and returns a non-zero result if the `RBENV_NATIVE_EXT` contains a value.  We did a similar thing in [this line of the `rbenv` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L30){:target="_blank" rel="noopener"}.  For a refresher on why this was added, we can check out [the PR which introduced the change](https://web.archive.org/web/20220722202956/https://github.com/rbenv/rbenv/pull/528){:target="_blank" rel="noopener"}:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-14mar2023-919am.png">
     <img src="/assets/images/screenshot-14mar2023-919am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>

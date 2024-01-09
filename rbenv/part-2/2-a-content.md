@@ -3,7 +3,7 @@ Having finished reading [the code for RBENV's shims](https://docs.google.com/doc
 I see the following directories in the Github repo:
 
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-19mar2023-237pm.png">
     <img src="/assets/images/screenshot-19mar2023-237pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>

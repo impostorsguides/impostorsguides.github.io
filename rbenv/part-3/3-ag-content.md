@@ -4,7 +4,7 @@ The next file inside `src/` is `bash.h`.
 
 I happen to know from my limited previous experience with C that a `.h` file is a header file.  I look up [the GCC docs on header files](https://web.archive.org/web/20220930083359/https://gcc.gnu.org/onlinedocs/cpp/Header-Files.html){:target="_blank" rel="noopener"}, and read the first few paragraphs:
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/screenshot-19mar2023-1039am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
@@ -12,7 +12,7 @@ So header files contain C definitions which will be used in multiple files.  The
 
 To get confirmation, I Google "why does C use header files" and I find [this StackOverflow post](https://web.archive.org/web/20230309171546/https://stackoverflow.com/questions/19089686/why-do-we-include-header-files-in-c){:target="_blank" rel="noopener"}, which is much clearer.  The first answer I read talks about the benefits of avoiding problems with functions which call each other:
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/screenshot-19mar2023-1040am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
@@ -20,7 +20,7 @@ It also mentions the benefits of separating interface (i.e. the function's signa
 
 Another benefit is mentioned in the following answer:
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/screenshot-19mar2023-1043am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
@@ -65,7 +65,7 @@ On to the first block of code:
 
 Again from my very brief prior experience with C, I know that the above code means "if the constant __BASH_H__ isn't defined, then define it".  Everything in between `ifndef` and `endif` (i.e. the bulk of the contents of this header file) is only executed if `__BASH_H__` has not yet been defined.  [Here is some documentation](https://web.archive.org/web/20220130091704/https://www.cprogramming.com/reference/preprocessor/ifndef.html){:target="_blank" rel="noopener"} on `ifndef` and how/why it's used:
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/screenshot-19mar2023-1044am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
@@ -83,7 +83,7 @@ Next block of code:
 
 These are more [macro definitions](https://web.archive.org/web/20221014055515/https://gcc.gnu.org/onlinedocs/cpp/Object-like-Macros.html){:target="_blank" rel="noopener"}.  I was curious where the variables defined by these macros are used, so I searched the codebase for them.  Looks like they're all used in `realpath.c`:
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/screenshot-19mar2023-1046am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
@@ -116,7 +116,7 @@ typedef struct word_desc {
 
 I've seen this syntax before, in a previous attempt to learn C, but I need a refresher.  I Google "what is typedef struct c", and find [this page](https://web.archive.org/web/20221106164811/https://www.educative.io/answers/how-to-use-the-typedef-struct-in-c){:target="_blank" rel="noopener"} (I started by searching directly on [gcc.gnu.org/](https://gcc.gnu.org/){:target="_blank" rel="noopener"}, but couldn't quickly find anything relevant).  Here's a before-and-after example of how `typedef struct` is used in C:
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/screenshot-19mar2023-1048am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
@@ -169,7 +169,7 @@ typedef int sh_builtin_func_t(WORD_LIST *);
 
 This code was confusing to me at first.  I see the use of `typedef` again, but it looks different from when it was used with a struct.  Here we're using it with the keywords `int` and what looks like a function call (`sh_builtin_func_t(WORD_LIST *)`).  I Google "typedef function" and, after reading through a few dead-end pages, I found [this page](https://web.archive.org/web/20230408150124/https://www.includehelp.com/c/typedef-function-pointer.aspx){:target="_blank" rel="noopener"}, which includes the following example code and description:
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/screenshot-19mar2023-1050am.png" width="70%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
@@ -224,7 +224,7 @@ Next I check out [this tutorial](https://web.archive.org/web/20221126125539/http
  - "There are a variety of implementations of Make (i.e. not just GNU Make)..."
  - A Makefile consists of a set of rules. A rule generally looks like this:
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/screenshot-19mar2023-1054am.png" width="50%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
@@ -244,19 +244,19 @@ The previous link also contains [an embedded Youtube video](https://www.youtube.
 
 After reading the above, I've learned a lot.  One last thing I want to learn is what ".c.o:" means here:
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/screenshot-19mar2023-1056am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
 My first thought was that this rule creates a hidden dotfile named "c.o".  But when I ran `make` and did an `ls -la` search for any dotfiles, I didn't find any, so I concluded that this is not correct.  I then Googled 'makefile ".c.o:"', and found [a useful result](https://web.archive.org/web/20230402082435/https://stackoverflow.com/questions/9233447/what-is-the-makefile-target-c-o-for){:target="_blank" rel="noopener"} right away:
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/screenshot-19mar2023-1057am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
 I see the link to the documentation on [old-fashioned suffix rules](https://www.gnu.org/software/make/manual/make.html#Suffix-Rules){:target="_blank" rel="noopener"}, so I go there:
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/screenshot-19mar2023-1058am.png" width="80%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
@@ -284,7 +284,7 @@ clean:
 
 I then run the `configure` script and verify that the new "Makefile" includes the comments:
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/screenshot-19mar2023-1100am.png" width="80%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
@@ -456,7 +456,7 @@ So while we can't be sure what precisely this command is doing (since we don't k
 
 UPDATE: after substantial searching, I Google the phrase "dynamic_lookup gcc", and I find [the following search result](https://github.com/ziglang/zig/issues/8016){:target="_blank" rel="noopener"}:
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/screenshot-19mar2023-1129am.png" width="80%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
@@ -532,7 +532,7 @@ The next day, I realize that the name of the executable, and therefore the name 
 
 When I read the sentence "GCC produces a dynamic library instead of an executable...", I was curious what the difference is between dynamic libraries and executables.  I found [this link](https://web.archive.org/web/20220906073706/https://www.internalpointers.com/post/journey-across-static-dynamic-libraries){:target="_blank" rel="noopener"}, which says the following:
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/screenshot-19mar2023-1136am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
@@ -553,7 +553,7 @@ clean:
 
 This rule seems pretty straightforward, and we can find info on it in [the Make manual](https://web.archive.org/web/20220828164404/https://www.gnu.org/software/make/manual/html_node/Cleanup.html){:target="_blank" rel="noopener"}:
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/screenshot-19mar2023-1138am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </center>
 

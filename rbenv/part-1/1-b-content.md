@@ -148,7 +148,7 @@ Which had [this answer](https://superuser.com/a/885285){:target="_blank" rel="no
 
 This got me wondering *why* a terminal doesn't use file extensions.  So I posted a question on StackOverflow (subsequently closed) on StackOverflow (click to expand):
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-17mar2023-228pm.png">
     <img src="/assets/images/screenshot-17mar2023-228pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>

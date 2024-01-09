@@ -1314,7 +1314,7 @@ echo "Finished!"
 
 When I run `./foo` in my terminal, I see:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-16jun2023-1053am.png">
     <img src="/assets/images/screenshot-16jun2023-1053am.png" width="40%" style="border: 1px solid black; padding: 0.5em">
   </a>

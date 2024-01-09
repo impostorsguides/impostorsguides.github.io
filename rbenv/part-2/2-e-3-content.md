@@ -50,7 +50,7 @@ I Google "curly braces bash", and the first result I get is [this one from Linux
 
 Finally I get to the last section of the article, called "Output Grouping".  It's here that I learn that "...you can also use `{ ... }` to group the output from several commands into one big blob."
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-25mar2023-937am.png">
     <img src="/assets/images/screenshot-25mar2023-937am.png" width="100%" style="border: 1px solid black; padding: 0.5em" alt="...you can also use `{ ... }` to group the output from several commands into one big blob.">
   </a>
@@ -86,7 +86,7 @@ The cool thing here is that, if we redirect the output of our `abort` function t
 
 A website called Guru99 seems to have [some good content on redirection](https://web.archive.org/web/20230309072616/https://www.guru99.com/linux-redirection.html){:target="_blank" rel="noopener"}.  For example:
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/screenshot-25mar2023-1039am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
@@ -98,7 +98,7 @@ But wait, I've also previously seen the `|` character used to send output from o
 
 I Google "difference between < > \| unix", but the special characters confuse Google and I get a bunch of irrelevant results.  I try my luck with ChatGPT, with the understanding that I'll need to double-check its answers after:
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/screenshot-25mar2023-1052am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
@@ -106,7 +106,7 @@ ChatGPT tells me that `>` and `<` are used for "redirection", i.e. sending outpu
 
 Based on this, I Google "difference between redirection and piping unix", and one of the first results I get is [this StackExchange post](https://web.archive.org/web/20220630113310/https://askubuntu.com/questions/172982/what-is-the-difference-between-redirection-and-pipe){:target="_blank" rel="noopener"} which says something quite similar to ChatGPT:
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/screenshot-25mar2023-1101am.png" width="80%" style="border: 1px solid black; padding: 0.5em">
 </center>
 
@@ -270,7 +270,7 @@ else echo "rbenv: $*"
 What does `$*` do?  This time, it's [O'Reilly to the rescue](https://web.archive.org/web/20230323072228/https://www.oreilly.com/library/view/learning-the-bash/1565923472/ch04s02.html){:target="_blank" rel="noopener"}:
 
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-25mar2023-1137am.png">
     <img src="/assets/images/screenshot-25mar2023-1137am.png" width="90%" style="border: 1px solid black; padding: 0.5em" alt="StackOverflow - what does `$*` do?">
   </a>

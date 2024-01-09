@@ -295,7 +295,7 @@ echo "Foo!"
  - I ran `rbenv commands` and verified that `foo` was one of the commands listed.
  - I ran `rbenv foo` and saw "Foo!" printed out to my screen:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-14mar2023-835am.png">
     <img src="/assets/images/screenshot-14mar2023-835am.png" width="50%" style="border: 1px solid black; padding: 0.5em">
   </a>

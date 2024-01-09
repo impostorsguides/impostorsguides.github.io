@@ -246,7 +246,7 @@ I Google "shell options", and one of the first results is [this link](https://we
 
 Further down the link, I see a list of options available to set:
 
-<center style="margin-bottom: 3em">
+<center>
   <a href="/assets/images/screenshot-5apr2023-1013am.png" target="_blank">
     <img src="/assets/images/screenshot-5apr2023-1013am.png" width="95%" style="border: 1px solid black; padding: 0.5em">
   </a>

@@ -63,7 +63,7 @@ To install `fish`, I'll use the Homebrew package manager:
 brew install fish
 ```
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-13mar2023-808am.png">
     <img src="/assets/images/screenshot-13mar2023-808am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -280,7 +280,7 @@ It tells me to copy the code `status --is-interactive; and rbenv init - fish | s
 
 If I were in `bash`, I could print out the shell function by typing `which rbenv`.  I don't know what the equivalent of that is in `fish`, so I Google "print a shell function definition fish".  The first link I find is [this one](https://web.archive.org/web/20230320234416/https://fishshell.com/docs/current/cmds/functions.html){:target="_blank" rel="noopener"}:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-10may2023-938am.png">
     <img src="/assets/images/screenshot-10may2023-938am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -376,7 +376,7 @@ In other words, in the first case, we want to call the `rbenv` shell function, *
 
 I was wondering why this is the case, so I looked up the `git` history for this block of code.  I discovered [this PR from 2011](https://github.com/rbenv/rbenv/pull/57){:target="_blank" rel="noopener"}:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-11may2023-918am.png">
     <img src="/assets/images/screenshot-11may2023-918am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -389,7 +389,7 @@ The goal seems to be to allow shell-specific commands to set and/or modify envir
 
 If we look at [the `fish` docs for the `source` command](https://web.archive.org/web/20230303210037/https://fishshell.com/docs/current/cmds/source.html){:target="_blank" rel="noopener"}, we can see:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-11may2023-926am.png">
     <img src="/assets/images/screenshot-11may2023-926am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>

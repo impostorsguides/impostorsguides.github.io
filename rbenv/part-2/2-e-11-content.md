@@ -109,7 +109,7 @@ In the output `1.2.0-16-gc4395e5`, the `1.2.0` represent the major, minor, and p
 
 You might also be asking what `16-gc4395e5` represents.  I wasn't sure either, and I didn't know what to Google, so I asked ChatGPT:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-2may2023-957am.png">
     <img src="/assets/images/screenshot-2may2023-957am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>

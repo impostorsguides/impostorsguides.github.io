@@ -73,7 +73,7 @@ However, since the shims all have the same exact code, I'd bet that there's a "s
 
 We can search the RBENV codebase for the code from the `if`-block, but first we need to pick which line of code to search for.  I pick a line which I suspect will not be too common in the codebase, giving us a high signal-to-noise ratio in the search results.  Then I use [the `ag` tool](https://github.com/ggreer/the_silver_searcher){:target="_blank" rel="noopener"} to find its location:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/ag-program-equals.png">
     <img src="/assets/images/ag-program-equals.png" width="90%" alt="searching or the shim code">
   </a>
@@ -82,7 +82,7 @@ We can search the RBENV codebase for the code from the `if`-block, but first we 
 Looks like there is only one search result, in a file named `libexec/rbenv-rehash`, and it looks a lot like our original line of code.  Let's have a closer look at that file:
 
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/create-prototype-shim.png">
     <img src="/assets/images/create-prototype-shim.png" width="90%" alt="the 'create-prototype-shim' method in rbenv-rehash">
   </a>
@@ -98,7 +98,7 @@ $ git blame libexec/rbenv-rehash
 
 I've highlighted the results we care about below:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-9apr2023-124pm.png">
     <img src="/assets/images/screenshot-9apr2023-124pm.png" width="100%" alt="output of the `git blame` command for the `libexec/rbenv-rehash` file">
   </a>
@@ -119,7 +119,7 @@ Notice that the SHA (`283e67b5`) is the same for the entire `if`-block.  That's 
 
 I open my web browser and go to Github, where I paste the SHA value I copied from `git blame` into the search bar on the top-left and select "In this repository":
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/searching-github-for-sha.png">
     <img src="/assets/images/searching-github-for-sha.png" width="90%" alt="output of the `git blame` command for the `libexec/rbenv-rehash` file" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -127,7 +127,7 @@ I open my web browser and go to Github, where I paste the SHA value I copied fro
 
 Github says "we couldn't find any code..."...
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-12apr2023-1024am.png">
     <img src="/assets/images/screenshot-12apr2023-1024am.png" width="90%" alt="output of the `git blame` command for the `libexec/rbenv-rehash` file" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -137,7 +137,7 @@ Github says "we couldn't find any code..."...
 
 I right click on each section to open them in new tabs.  First the commit results:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/git-commit-history-for-sha.png">
     <img src="/assets/images/git-commit-history-for-sha.png" width="90%" alt="Github's results for the commit history containing our SHA" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -152,7 +152,7 @@ When the ruby shim is invoked with a script, set RBENV_DIR to the script's dirna
 This sounds similar to our hypothesis.  Let's also check [the issue link](https://github.com/rbenv/rbenv/pull/299){:target="_blank" rel="noopener"}:
 
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/rbenv-issue-page.png">
     <img src="/assets/images/rbenv-issue-page.png" width="90%" alt="The newer Github issue related to the PR which introduced this if-block." style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -168,19 +168,19 @@ Before closing the browser tab, I notice the following at the end of the PR:
 
 Out of curiosity I read through that PR.  Among other things, it contains a conversation which stands out to me:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-10apr2023-1057am.png">
     <img src="/assets/images/screenshot-10apr2023-1057am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-10apr2023-1059am.png">
     <img src="/assets/images/screenshot-10apr2023-1059am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-13apr2023-1135am.png">
     <img src="/assets/images/screenshot-13apr2023-1135am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -196,7 +196,7 @@ My plan is to create two directories with different local Ruby versions, as well
 
 First, I make sure that the version of RBENV that I'm running matches the last of the commits in the PR which added the `if`-block:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-19apr2023-1005am.png">
     <img src="/assets/images/screenshot-19apr2023-1005am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -296,7 +296,7 @@ This is what I'd expect based on reading the core team's PR conversation: each f
 
 Next, I check out the version of the RBENV code just **before** the `if`-block was introduced:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-19apr2023-1009am.png">
     <img src="/assets/images/screenshot-19apr2023-1009am.png" width="100%" style="border: 1px solid black; padding: 0.5em">
   </a>

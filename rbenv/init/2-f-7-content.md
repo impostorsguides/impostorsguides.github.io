@@ -125,7 +125,7 @@ command="${1:-}"
 
 Here we see some parameter expansion.  I feel like I may have seen the `:-` syntax before, but I don't remember what it does.  Referring to the GNU docs and searching for `:-`, I find the following:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-13mar2023-854am.png">
     <img src="/assets/images/screenshot-13mar2023-854am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>

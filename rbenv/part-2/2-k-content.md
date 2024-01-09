@@ -26,7 +26,7 @@ We start by defining a helper function called `create_executable`.  This functio
 
 I'm not sure what the question-mark syntax does, so I pull up [the bash docs on parameter expansion](https://web.archive.org/web/20230525183815/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"}:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-28may2023-834pm.png">
     <img src="/assets/images/screenshot-28may2023-834pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -149,7 +149,7 @@ The one and only regexp that we pass to `sed` is:
 
 Most regexps that I encounter are very specific to the concise use case they're being applied toward, making them notoriously hard to Google unless that use case is a very common one among programmers.  So in this case, I decide to ask ChatGPT what this pattern does:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-29may2023-1209pm.png">
     <img src="/assets/images/screenshot-29may2023-1209pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -473,7 +473,7 @@ Now that I get what `-S` is and why it's useful, I'm wondering what prompted thi
 
 After a bit of digging, I found [this PR](https://github.com/rbenv/rbenv/issues/14){:target="_blank" rel="noopener"} with the following description:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-29may2023-448pm.png">
     <img src="/assets/images/screenshot-29may2023-448pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>

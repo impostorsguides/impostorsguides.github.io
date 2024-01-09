@@ -39,11 +39,14 @@ body {
 /**
  * Set `margin-bottom` to maintain vertical rhythm
  */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.25;
+}
 h1, h2, h3, h4, h5, h6,
 p, blockquote, pre,
 ul, ol, dl, figure,
 %vertical-rhythm {
-  margin-bottom: $spacing-unit * .5;
+  margin-bottom: $spacing-unit * .75;
 }
 
 hr {
@@ -65,10 +68,16 @@ main {
  */
 img {
   max-width: 100%;
-  vertical-align: middle;
 }
 
+div.center {
+  text-align: center;
+  margin-bottom: 3em;
+}
 
+center {
+  margin-bottom: 3em;
+}
 
 /**
  * Figures

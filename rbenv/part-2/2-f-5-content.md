@@ -134,7 +134,7 @@ If the value of `"$shell"` is `fish`, we `echo` a few commands to `stdout`.  The
 
 Both these commands use the `fish` shell's `set` command to set shell variables.  The "-g" flag makes the variable global, and the `-x` flag makes the variable available to child processes.  We're creating one environment variable (`RBENV_SHELL`), and modifying another (`PATH`) to pre-pend it with `${RBENV_ROOT}/shims'` so that the shims which RBENV creates will be findable by our terminal.  More info [here](https://fishshell.com/docs/current/cmds/set.html){:target="_blank" rel="noopener"}.
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-13mar2023-806am.png">
     <img src="/assets/images/screenshot-13mar2023-806am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>

@@ -81,7 +81,7 @@ As the block of code executes, the value of `shell` is populated and then progre
 
 We can see this by adding a bunch of `echo` statements to this block of code, like so:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-13mar2023-725am.png">
     <img src="/assets/images/screenshot-13mar2023-725am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -89,7 +89,7 @@ We can see this by adding a bunch of `echo` statements to this block of code, li
 
 When I run the test, and print out `foo.txt`, I get:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-13mar2023-726am.png">
     <img src="/assets/images/screenshot-13mar2023-726am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>

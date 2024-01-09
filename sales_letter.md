@@ -6,7 +6,7 @@ title: What happens when I type 'bundle install' in the terminal and hit 'Enter'
 permalink: /home
 ---
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/noidea.gif" width="60%" style="padding: 0.5em">
 </center>
 
@@ -31,6 +31,6 @@ And my personal favorite:
 ## "Maybe a principal engineer could understand the internals of that library, but I never could."
 
 
-<center style="margin-bottom: 3em">
+<center>
   <img src="/assets/images/belong.gif" width="60%" style="padding: 0.5em">
 </center>

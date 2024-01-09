@@ -589,7 +589,7 @@ TODO: come up with a guide on how to do some common operations using `sed`, and 
 
 I've decided that the easiest way to understand the subsequent sequence of `awk` commands is to ask ChatGPT what the script does, and then do a series of experiments to test whether ChatGPT led me astray or not.  Here's the initial question I asked, followed by the initial answer.  I'll be diving deeper into each part of the answer in follow-up questions.
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/screenshot-5jun2023-107pm.png">
     <img src="/assets/images/screenshot-5jun2023-107pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>

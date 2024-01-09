@@ -10,7 +10,7 @@ fi
 
 Running `man test` and searching for the `-f` string reveals the following:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/man-test-f.png">
     <img src="/assets/images/man-test-f.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -196,7 +196,7 @@ Note that I search using the `ag` command, which you can learn how to install [h
 
 When I run this search, I see multiple references to it in various code files:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/ag-rbenv-dir.png">
     <img src="/assets/images/ag-rbenv-dir.png" width="90%" alt="Searching the rbenv codebase for RBENV_DIR">
   </a>
@@ -206,7 +206,7 @@ The reference that catches my eye is in the README.md file.  This file will like
 
 Sure enough, I find that it contains the following table:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/rbenv-env-vars.png">
     <img src="/assets/images/rbenv-env-vars.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
@@ -307,7 +307,7 @@ $ ./foo
 
 So `"${arg%/*}"` takes the argument, and trims off the last `/` character and everything after it.  This aligns with what we see if we look up [the GNU docs](https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"}:
 
-<center style="margin-bottom: 3em">
+<center>
   <a target="_blank" href="/assets/images/gnu-docs-param-expansion.png">
     <img src="/assets/images/gnu-docs-param-expansion.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
