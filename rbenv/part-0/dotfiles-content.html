@@ -1,0 +1,59 @@
+<header class="post-header">
+  <h1 class="post-title">Dotfiles</h1>
+</header>
+
+If the goal is to find out what happens when we type `bundle install` into our terminal, then a good place to start is by reading the file which gets executed when running the “bundle“ command. 
+To find that file, let’s use the “which“ UNIX command. In my terminal, I type the following:
+
+Here we see that file containing the “bundle“ command’s logic lives in a directory called “/Users/richiethomas/.rbenv/shims/”, also sometimes referred to in this guide as “~/.rbenv/shims”.
+Dotfiles and dot folders
+The “~/.rbenv/” directory’s name begins with a “.“.  In UNIX, there’s a convention whereby the names of files and folders which are meant to be hidden from view by default are prefixed with a dot.  Unsurprisingly, these are called “dotfiles” or “dot folders”.
+When I say “hidden”, I mean hidden from the “ls“ command.  For example, the following is the contents of my laptop’s home directory, according to the regular “ls” command:
+But there are actually many more files in this folder.  To view them all, we have to pass the “-a” flag to “ls”:Now we see all the dotfiles and dot folders in my home directory.
+Hidden files are helpful in preventing accidental deletion of important data.  Let’s test that out now.
+Experiment- preventing files from being deleted
+I create a temporary directory named “foo/“, and create two files inside of it:
+ a hidden file named “.bar”
+a regular file named “baz”
+
+Then I run “rm ./foo/*“ and hit the “y” key when prompted for confirmation.  Lastly, I re-run “ls -a foo“:
+We see that the file “baz” is now gone, but the hidden dotfile “.bar” is still there.  So yes, it appears that adding a “.“ prefix to a file can prevent it from being accidentally deleted.
+But what if we really do want to delete our dotfiles?  We simply add a dot before the “*” symbol.  To demonstrate this, I’ll create a 2nd dotfile named “.baz”, and then delete all the dotfiles in my “foo/” folder at once:
+
+As you can see, the “foo/” folder is now truly empty- no more dotfiles.
+Side note- experiments
+We just did our first of many experiments. Sometimes these experiments will help us form a hypothesis of how we think code might work, and then test whether that hypothesis is correct. Other times, we’ll just use them to prove to ourselves that something we’ve read on StackOverflow, ChatGPT, or some random person’s blog is actually correct.
+Making a small update to your shell
+
+
+One last thing we’ll want to do is add a line of code to your shell’s config file, a.k.a. The file which configures your shell every time you open a new tab or window.  We want to add a line which updates your “$PATH” variable to include a specific directory that RBENV contains.
+If you’re running the Bash shell, then your config file lives at:
+
+
+~/.bashrc
+
+
+And if you’re running the Zsh shell (the default on most newer Macs by now), then your config file lives at:
+
+
+~/.zshrc
+
+
+Here’s the line of code you should add, and it should be fine to add it to the end of the file:
+
+
+PATH="${HOME}/.rbenv/libexec:$PATH"
+
+
+We’re adding this line of code so that we can modify RBENV’s code in its home directory, and see the changes we make reflected in how RBENV works.  For our change to take effect, you’ll need to open a new Shell tab or window.
+Wrapping Up
+
+Let’s move on, and talk a bit about the purpose of version managers such as RBENV.
+
+
+
+
+
+
+
+
