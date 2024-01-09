@@ -1,3 +1,8 @@
+<header class="post-header">
+  <h1 class="post-title">Installing (or re-installing) RBENV</h1>
+</header>
+
+<div w3-include-html="install-rbenv-title.html"></div>
 
 <p>As we previously mentioned, the first step is to install RBENV on your machine.  I'm writing this tutorial on a Macbook running macOS, and I'll be using macOS-specific installation instructions and commands throughout.</p>
 
@@ -7,15 +12,37 @@
 
 <p>Admittedly, the best candidates for reading this book are people who already use RBENV as their Ruby version manager.  As you’ll soon see, users of other version managers (such as rvm, asdf, chruby, etc.) will face more and bigger hurdles than users of RBENV (more on why in a minute).</p>
 
-<p>With that in mind, we'll need to make sure you don't have a different Ruby version manager installed, such as RVM.  If you do, that will represent a blocker to your continuing this guide, since you'll have different version managers competing to manage your Ruby version.  This could introduce <a href="https://web.archive.org/web/20160715135727/https://stackoverflow.com/questions/35808103/rvm-and-rbenv-on-the-same-machine" target="_blank" rel="noopener">unexpected behavior</a> and negatively impact your usage of Ruby.</p>
+<table>
+  <tr>
+    <th>A</th>
+    <th>B</th>
+    <th>C</th>
+    <th>D</th>
+    <th>E</th>
+  </tr>
+  <tr>
+    <td>Foo</td>
+    <td>Bar</td>
+    <td>Baz</td>
+    <td>Buzz</td>
+    <td>Quox</td>
+  </tr>
+  <tr>
+    <td>Munich</td>
+    <td>Berlin</td>
+    <td>London</td>
+    <td>Sydney</td>
+    <td>New York</td>
+  </tr>
+</table>
 
-<p>Foo bar baz</p>
+<p>With that in mind, we'll need to make sure you don't have a different Ruby version manager installed, such as RVM.  If you do, that will represent a blocker to your continuing this guide, since you'll have different version managers competing to manage your Ruby version.  This could introduce <a href="https://web.archive.org/web/20160715135727/https://stackoverflow.com/questions/35808103/rvm-and-rbenv-on-the-same-machine" target="_blank" rel="noopener">unexpected behavior</a> and negatively impact your usage of Ruby.</p>
 
 <p>We can check for the most popular Ruby version managers by using the <code>which</code> command:</p>
 
-<center style="margin-bottom: 3em">
+<div class="center">
   <img src="/assets/images/2024-01-06-1037am.png" width="60%" style="padding: 0.5em">
-</center>
+</div>
 
 <p>If you see anything other than "not found" for <code>which asdf</code>, <code>which rvm</code>, and <code>which chruby</code>, you likely have another version manager on your machine.  In that case, you'll need to make a decision about which version manager you want to use.  <a href="https://github.com/rbenv/rbenv/wiki/Comparison-of-version-managers" target='_blank' rel='noopener'>RBENV's Github page has a guide</a> on differentiating between the various version managers out there.</p>
 
@@ -23,116 +50,108 @@
 
 <h2>Making sure RBENV is installed correctly</h2>
 
-<p>Installing RBENV via `brew install rbenv` would be a perfectly fine option for a normal user.  But it won't work for our purposes, because it would leave us without access to RBENV's `.git` directory, and therefore its git history.  That means we couldn't roll back to the specific version of RBENV that I'll be using for this walk-through.  It's important that we work off the same codebase, so let's try another technique- installing from source.</p>
+<p>Installing RBENV via <code>brew install rbenv</code> would be a perfectly fine option for a normal user.  But it won't work for our purposes, because it would leave us without access to RBENV's <code>.git</code> directory, and therefore its git history.  That means we couldn't roll back to the specific version of RBENV that I'll be using for this walk-through.  It's important that we work off the same codebase, so let's try another technique- installing from source.</p>
 
-<p>To do this, we'll follow the instructions on <a href='https://github.com/rbenv/rbenv/tree/e8b7a27ee67a5751b899215b4d35fd86ab552dae#basic-git-checkout' target='_blank' rel='noopener'>this version of the RBENV Readme file</a>.  First, open your terminal and check whether you already have a directory called `~/.rbenv`, by running `ls -la ~/.rbenv`:</p>
+<p>To do this, we'll follow the instructions on <a href='https://github.com/rbenv/rbenv/tree/e8b7a27ee67a5751b899215b4d35fd86ab552dae#basic-git-checkout' target='_blank' rel='noopener'>this version of the RBENV Readme file</a>.  First, open your terminal and check whether you already have a directory called <code>~/.rbenv</code>, by running <code>ls -la ~/.rbenv</code>:</p>
 
-<center style="margin-bottom: 3em">
+<div class="center">
   <img src="/assets/images/screenshot-2024-01-05-10-23-46.png" width="80%" style="padding: 0.5em">
-</center>
+</div>
 
-<p>If this directory does exist, and the command output has a `.git` directory in it, you should be good to go.</p>
+<p>If this directory does exist, and the command output has a <code>.git</code> directory in it, you should be good to go.</p>
 
 <p>Another possibility is that the output exists but looks like this:</p>
 
-<center style="margin-bottom: 3em">
+<div class="center">
   <img src="/assets/images/2024-01-06-10.45am.png" width="80%" style="padding: 0.5em">
-</center>
+</div>
 
-<p>Specifically, you run the `ls -la` command and you don't see a `.git` folder included in the output.</p>
+<p>Specifically, you run the <code>ls -la</code> command and you don't see a <code>.git</code> folder included in the output.</p>
 
-<p>That likely means you previously installed RBENV using a package manager like Homebrew.  If this is the case, one option is to simply rename your `/.rbenv` directory as `/.rbenv-old` or something similar:</p>
+<p>That likely means you previously installed RBENV using a package manager like Homebrew.  If this is the case, one option is to simply rename your <code>/.rbenv</code> directory as <code>/.rbenv-old</code> or something similar:</p>
 
-<center style="margin-bottom: 3em">
+<div class="center">
   <img src="/assets/images/2024-01-06-10.51am.png" width="60%" style="padding: 0.5em">
-</center>
+</div>
 
 <p>Then we can install RBENV again via source, by following the instructions on <a href='https://github.com/rbenv/rbenv/tree/e8b7a27ee67a5751b899215b4d35fd86ab552dae#basic-git-checkout' target='_blank' rel='noopener'>this version of the RBENV Readme file</a>.  Run the following command:</p>
 
-<code>
-$ git clone https://github.com/rbenv/rbenv.git ~/.rbenv
-</code>
+<pre><code>$ git clone https://github.com/rbenv/rbenv.git ~/.rbenv</code></pre>
 
-<center style="margin-bottom: 3em">
+<div class="center">
   <img src="/assets/images/2024-01-06-10.53am.png" width="100%" style="padding: 0.5em">
-</center>
+</div>
 
-<p>Once this is done, you should have a fresh installation of RBENV inside `~/.rbenv`, which includes a `.git` directory:</p>
+<p>Once this is done, you should have a fresh installation of RBENV inside <code>~/.rbenv</code>, which includes a <code>.git</code> directory:</p>
 
-<center style="margin-bottom: 3em">
+<div class="center">
   <img src="/assets/images/2024-01-06-10.54am.png" width="100%" style="padding: 0.5em">
-</center>
+</div>
 
 <h2>Ensuring your new RBENV install has your old data</h2>
 
 <p>Next, we'll copy your currently-installed Ruby versions, gems, etc. to this new installation, ensuring that you can continue using RBENV as you have up until now:</p>
 
-<code>
-$ sudo cp -r ~/.rbenv-old/versions \                                                                                     
+<pre><code>$ sudo cp -r ~/.rbenv-old/versions \                                                                                     
 > ~/.rbenv-old/version \                                                                        
 > ~/.rbenv-old/shims \                                                     
 > ~/.rbenv-old/rbenv.d \                                
 > ~/.rbenv-old/completions \       
-> ~/.rbenv
-</code>
+> ~/.rbenv</code></pre>
 
-<center style="margin-bottom: 3em">
+<div class="center">
   <img src="/assets/images/2024-01-06-10.55am.png" width="80%" style="padding: 0.5em">
-</center>
+</div>
 
 <p>Now, the version of RBENV which you installed from source should have any and all gems, installed Ruby versions, selected Ruby version, completions, and hooks that you may have previously installed in your old RBENV version.</p>
 
-<p>If you ever encounter version-related problems with Ruby or RBENV on your machine from now on, you can simply delete the version of RBENV that we just installed, and rename your `~/.rbenv-old` directory back to `~/.rbenv`, and you should be good-to-go.</p>
+<p>If you ever encounter version-related problems with Ruby or RBENV on your machine from now on, you can simply delete the version of RBENV that we just installed, and rename your <code>~/.rbenv-old</code> directory back to <code>~/.rbenv</code>, and you should be good-to-go.</p>
 
 <h2>Rolling back to the correct git commit</h2>
 
-<p>Next, let's navigate into this directory via `cd ~/.rbenv`.</p>
+<p>Next, let's navigate into this directory via <code>cd ~/.rbenv</code>.</p>
 
-<p>We want to make sure that we're all looking at the same code, which means looking at the same git commit.  So we'll create a new branch, separate from your `master` or `main` branch, and point that branch to a specific commit, i.e. the one that I used when I started writing this guide (that commit SHA is `c4395e58201966d9f90c12bd6b7342e389e7a4cb`).</p>
+<p>We want to make sure that we're all looking at the same code, which means looking at the same git commit.  So we'll create a new branch, separate from your <code>master</code> or <code>main</code> branch, and point that branch to a specific commit, i.e. the one that I used when I started writing this guide (that commit SHA is <code>c4395e58201966d9f90c12bd6b7342e389e7a4cb</code>).</p>
 
-<p>I called my new branch `impostorsguides`, but you can call it whatever is easiest for you to remember:</p>
+<p>I called my new branch <code>impostorsguides</code>, but you can call it whatever is easiest for you to remember:</p>
 
-<center style="margin-bottom: 3em">
+<div class="center">
   <img src="/assets/images/2024-01-06-10.57am.png" width="100%" style="padding: 0.5em">
-</center>
+</div>
 
 <p>For future reference, the Github link to this specific version of the RBENV codebase can be found <a href='https://github.com/rbenv/rbenv/tree/c4395e58201966d9f90c12bd6b7342e389e7a4cb' target='_blank' rel='noopener'>here</a>.</p>
 
 <h2>Enabling RBENV's shell function</h2>
 
-<p>We're getting close to the end, but we still have 2 more steps in <a href='https://github.com/rbenv/rbenv/tree/e8b7a27ee67a5751b899215b4d35fd86ab552dae#basic-git-checkout' target='_blank' rel='noopener'>the installation instructions</a>.  Next we have to add some text to our shell's startup script.  This script will create a shell function called `rbenv`, which (for our purposes) will do the same job as if we were running the command from a file.</p>
+<p>We're getting close to the end, but we still have 2 more steps in <a href='https://github.com/rbenv/rbenv/tree/e8b7a27ee67a5751b899215b4d35fd86ab552dae#basic-git-checkout' target='_blank' rel='noopener'>the installation instructions</a>.  Next we have to add some text to our shell's startup script.  This script will create a shell function called <code>rbenv</code>, which (for our purposes) will do the same job as if we were running the command from a file.</p>
 
 <p>The RBENV Readme file tells you how to add the text to your script.  The command you'll copy/paste into your terminal depends on which shell program (bash, zsh, etc.) you're running:</p>
 
-<center style="margin-bottom: 3em">
+<div class="center">
   <img src="/assets/images/2024-01-06-11.01am.png" width="100%" style="padding: 0.5em">
-</center>
+</div>
 
 <p></p>To find out which shell you're running, run the following command:</p>
 
-<code>
-$ echo $SHELL
-</code>
+<pre><code>$ echo $SHELL</code></pre>
 
 <p>In my case, since I'm on a new Mac, my default terminal is Zsh:</p>
 
-<center style="margin-bottom: 3em">
+<div class="center">
   <img src="/assets/images/2024-01-06-11.02am.png" width="50%" style="padding: 0.5em">
-</center>
+</div>
 
 <p>Therefore, I'd paste the following into my terminal:</p>
 
-<code>
-$ echo 'eval "$(~/.rbenv/bin/rbenv init - zsh)"' >> ~/.zshrc
-</code>
+<pre><code>$ echo 'eval "$(~/.rbenv/bin/rbenv init - zsh)"' >> ~/.zshrc</code></pre>
 
-<p>This will add the text `eval "$(~/.rbenv/bin/rbenv init - zsh)"` into a file called `~/.zshrc`, which is run every time I open a new terminal tab.  If your terminal is different from mine (for example, `bash`), the filename will be different from `~/.zshrc` (for example, `~/.bashrc`), but the gist of what's happening is still the same.</p></p>
+<p>This will add the text <code>eval "$(~/.rbenv/bin/rbenv init - zsh)"</code> into a file called <code>~/.zshrc</code>, which is run every time I open a new terminal tab.  If your terminal is different from mine (for example, <code>bash</code>), the filename will be different from <code>~/.zshrc</code> (for example, <code>~/.bashrc</code>), but the gist of what's happening is still the same.</p></p>
 
-<p>Lastly, in order for these changes to take effect, I'll need to do exactly that- open a new terminal tab.  When I do so, and I run `which rbenv`, I see the following shell command definition:</p></p>
+<p>Lastly, in order for these changes to take effect, I'll need to do exactly that- open a new terminal tab.  When I do so, and I run <code>which rbenv</code>, I see the following shell command definition:</p></p>
 
-<center style="margin-bottom: 3em">
+<div class="center">
   <img src="/assets/images/2024-01-06-11.03am.png" width="90%" style="padding: 0.5em">
-</center>
+</div>
 
 <p>If we see the above output, we know RBENV has been successfully installed.</p>
 
