@@ -4,8 +4,8 @@ category: rbenv-introduction
 id: 4
 title: Version Managers
 permalink: /shell/version-managers
-next-title: 
-next-permalink: 
+next-title: Shebangs
+next-permalink: /shell/shebangs
 previous-title: Dotfiles
 previous-permalink: /shell/dotfiles
 ---

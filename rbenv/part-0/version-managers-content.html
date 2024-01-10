@@ -2,26 +2,84 @@
   <h1 class="post-title">Version Managers</h1>
 </header>
 
-<p>Back to <code>~/.rbenv/</code>.  This hidden directory houses the logic for my Ruby version manager, which is called <a href="https://github.com/rbenv/rbenv" target="_blank">RBENV</a>. RBENV lets me switch between Ruby versions without too much hassle.</p>
+<p>Back to <code>~/.rbenv/</code>.  This hidden directory houses the logic for my Ruby version manager, which is called <a href="https://github.com/rbenv/rbenv" target="_blank">RBENV</a>. RBENV lets the user switch between Ruby versions without too much hassle.</p>
 
 <p>If we have multiple versions of Ruby installed, that means there are multiple programs on our machine which respond to the <code>ruby</code> command in our terminal. Without a Ruby version manager to help us switch between versions, our OS will just pick the first of these programs that it finds, which may or may not be the version our program depends on.</p>
 
-<p>RBENV is a popular choice for managing Ruby versions, but it’s not the only choice.  Others include <a href="https://rvm.io/" target="_blank">rvm</a>, <a href="https://github.com/postmodern/chruby" target="_blank">chruby</a>, <a href="https://asdf-vm.com/" target="_blank">asdf</a>, or other programs.  The core RBENV team actually maintains a comparison of popular Ruby version managers <a href="https://github.com/rbenv/rbenv/wiki/Comparison-of-version-managers" target="_blank">here</a>.</p>
+<p>RBENV is a popular choice for managing Ruby versions, but it's not the only choice.  Others include <a href="https://rvm.io/" target="_blank">rvm</a>, <a href="https://github.com/postmodern/chruby" target="_blank">chruby</a>, <a href="https://asdf-vm.com/" target="_blank">asdf</a>, or other programs.  The core RBENV team actually maintains a comparison of popular Ruby version managers <a href="https://github.com/rbenv/rbenv/wiki/Comparison-of-version-managers" target="_blank">here</a>.</p>
 
 <h2>The difference between Bundler and RBENV</h2>
 
-<p>Earlier, we learned that Bundler provides “a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed.”</p>
+<p>Earlier, we learned that Bundler provides "a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed."</p>
 
-<p>This... sounds a lot like what I just said RBENV does.</p>
+<p>This... sounds a lot like what I just said RBENV does.  So what's the difference between RBENV and Bundler? Why do I need both?</p>
 
-<p>So what’s the difference between RBENV and Bundler? Why do I need both?</p>
+<p><a href="https://web.archive.org/web/20220911152613/https://www.rubyguides.com/2018/09/ruby-gems-gemfiles-bundler/" target="_blank">Bundler is a dependency management tool</a>. It helps you manage the versions of the Ruby libraries <strong>in a specific project folder</strong> (also known as "gems").  These gems are the libraries that the project in this folder depends on (a.k.a. "dependencies").</p>
 
-<p><a href="https://web.archive.org/web/20220911152613/https://www.rubyguides.com/2018/09/ruby-gems-gemfiles-bundler/" target="_blank">Bundler is a dependency management tool</a>. It helps you manage the versions of the Ruby libraries <strong>in a specific project folder</strong> (also known as “gems”).</p>
-
-<p>RBENV, on the other hand, manages the versions of Ruby itself, <strong>across all the projects on your machine</strong>. RBENV ensures that your machine is using the version of Ruby that your project depends on, and Bundler ensures that your machine is using the right versions of the libraries that your project depends on.</p>
+<p>RBENV, on the other hand, manages the versions of Ruby itself, <strong>across all the Ruby projects on your machine</strong>. RBENV ensures that your machine is using the version of Ruby that your project depends on, and Bundler ensures that your machine is using the right versions of the libraries that your project depends on.  While Ruby is technically a "dependency" too, it's really more than that.  You can't run a Ruby project without an installed Ruby version, whereas you could still run a Ruby project without a given library (by simply removing the feature or features which depend on that library).</p>
 
 <p>More info on how these tools all work together can be found <a href="https://web.archive.org/web/20221210084104/https://www.honeybadger.io/blog/rbenv-rubygems-bundler-path/" target="_blank">here</a>, in this excellent summary from Honeybadger.io.</p>
 
-<h2>Wrapping Up</h2>
+<h2>What are shims?</h2>
 
-<p>This chapter was mercifully short.  Next, let’s talk briefly about the idea of shims and shim files.  These are the files that RBENV uses to delegate your command to the correct Ruby version.</p>
+<p>As I just mentioned, a Ruby version manager like RBENV ensures that we're using the version of Ruby that our current environment depends on. RBENV accomplishes this task by:</p>
+
+<ul>
+  <li>intercepting your call to the "ruby" command,</li>
+  <li>deciding which Ruby version to use based on the information available to it (more on that later), and then</li>
+  <li>passing the command you entered to the correct Ruby interpreter based on that version.</li>
+</ul>
+
+<p>The file which performs this interception is known as a "shim". Programs that act as shims are <a href="https://stackoverflow.com/questions/2116142/what-is-a-shim" target="_blank">meant to be "transparent"</a>, meaning that you think you're talking to the program you invoked (say, `bundle` if we're running `bundle install`), but the whole time you're really talking to the shim. Similarly, `bundle` thinks it's responding to you, not to a shim.</p>
+
+<p>To quote <a href="https://web.archive.org/web/20230405065304/https://github.com/rbenv/rbenv#how-it-works" target="_blank">RBENV's README file</a>:</p>
+
+<blockquote>
+  “After RBENV injects itself into your <code>PATH</code> at installation time, any invocation of <code>ruby</code>, <code>gem</code>, <code>bundler</code>, or other Ruby-related executable will first activate RBENV. Then, RBENV scans the current project directory for a file named <code>.ruby-version</code>. If found, that file determines the version of Ruby that should be used within that directory. Finally, RBENV looks up that Ruby version among those installed under <code>~/.rbenv/versions/</code>.”
+</blockquote>
+
+<p>Not all version managers work this way.  RVM, for example, works by <a href="https://web.archive.org/web/20230510020715/https://www.sitepoint.com/ruby-version-managers-macos/#rvm" target="_blank">overriding your terminal's <code>cd</code> command</a>.  In fact it was this design choice (and <a href="https://web.archive.org/web/20240109150210/https://github.com/rbenv/rbenv/wiki/Comparison-of-version-managers#rvm" target="_blank">the corresponding trouble it caused</a> for certain users) which led to the development of RBENV in the first place.</p>
+
+<p>The file whose path we discovered earlier (<code>~/.rbenv/shims/bundle</code>) is the shim file for the Bundler gem's <code>bundle</code> command.</p>
+
+<h2>The code for the shim file</h2>
+
+<p>Let's take a look at the shim's code. I type <code>cat ~/.rbenv/shims/bundle</code> into my terminal (to print the file to the screen), and <a href="https://gist.github.com/richiethomas/272b7719f3c75abf6818a8211552004e" target="_blank">what I see is</a>:</p>
+
+<pre><code>$ vim `which bundle`
+
+  1 #!/usr/bin/env bash
+  2 set -e
+  3 [ -n "$RBENV_DEBUG" ] && set -x
+  4 
+  5 program="${0##*/}"
+  6 if [ "$program" = "ruby" ]; then
+  7   for arg; do
+  8     case "$arg" in
+  9     -e* | -- ) break ;;
+ 10     */* )
+ 11       if [ -f "$arg" ]; then
+ 12         export RBENV_DIR="${arg%/*}"
+ 13         break
+ 14       fi
+ 15       ;;
+ 16     esac
+ 17   done
+ 18 fi
+ 19 
+ 20 export RBENV_ROOT="/Users/richiethomas/.rbenv"
+ 21 exec "/opt/homebrew/bin/rbenv" exec "$program" "$@"</code></pre>
+
+<p>Yikes!  That's a spicy meatball!</p>
+
+<p>Explaining this all in detail will require many more chapters.  For now, the important thing is that the above code does NOT come from Bundler itself, but rather RBENV's shim of the `bundle` command.</p>
+
+<p>In fact, if we were to inspect other files in the <code>~/.rbenv/shims/</code> folder, we'd see they look <i>exactly</i> the same! The following files all contain exactly the same code as the above:</p>
+
+<ul>
+  <li><code>~/.rbenv/shims/rails</code></li>
+  <li><code>~/.rbenv/shims/ruby</code></li>
+  <li><code>~/.rbenv/shims/gem</code></li>
+</ul>
+
+<p>In the following chapters, we'll break down the code line-by-line.  By the end, we'll see why all these files can have the same exact code, yet execute different programs.</p>

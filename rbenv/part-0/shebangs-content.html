@@ -1,0 +1,154 @@
+<header class="post-header">
+  <h1 class="post-title">Shebangs</h1>
+</header>
+
+<p>Our first line of code in <a href="https://gist.github.com/richiethomas/272b7719f3c75abf6818a8211552004e" target="_blank">the shim file</a> is:</p>
+
+<pre><code>1 #!/usr/bin/env bash        #  <= we are here
+2 set -e
+3 [ -n "$RBENV_DEBUG" ] && set -x
+4 
+5 program="${0##*/}"
+6 if [ "$program" = "ruby" ]; then
+7   for arg; do
+8     case "$arg" in
+9     -e* | -- ) break ;;
+10     */* )
+11       if [ -f "$arg" ]; then
+12         export RBENV_DIR="${arg%/*}"
+13         break
+14       fi
+15       ;;
+16     esac
+17   done
+18 fi
+19 
+20 export RBENV_ROOT="/Users/richiethomas/.rbenv"
+21 exec "/opt/homebrew/bin/rbenv" exec "$program" "$@"</code></pre>
+
+<p>I run a Google search for the string <code>#!/usr/bin/env bash</code>, and I learn that this line of code is called a <a href="https://web.archive.org/web/20230323182633/https://en.wikipedia.org/wiki/Shebang_(Unix)" target="_blank">"shebang"</a>.</p>
+
+<h2>The shebang line</h2>
+
+<p>In UNIX, a shebang is a special line of code at the top of a script file which tells UNIX which program to use when executing the rest of the file's code. In this case, since the shebang ends in "bash", we're telling UNIX to use the bash shell to evaluate the code.</p>
+
+<p>If you're going to include a shebang, it must be on the first line of the file in order for it to work correctly.</p>
+
+<h2>Different types of shebangs</h2>
+
+<p>Note that you might sometimes see <code>#!/usr/bin/bash</code> as a shebang, instead of <code>#!/usr/bin/env bash</code>.  The difference between these two is that <code>/usr/bin/env</code> does a bit of extra work.  Specifically, it:</p>
+
+<ul>
+  <li>checks your terminal environment for variables,</li>
+  <li>sets them, and then</li>
+  <li>runs your command.</li>
+</ul>
+
+<p>If we type <code>env</code> into our terminals, we can see a list of the environment variables that <code>#!/usr/bin/env</code> will set.  The following is a partial list, based on running <code>env</code> on my machine:</p>
+
+<pre><code>$ env
+TERM_PROGRAM=Apple_Terminal
+SHELL=/bin/zsh
+TERM=xterm-256color
+TMPDIR=/var/folders/n9/35wcp_ps2l919c07czwh504c0000gn/T/
+TERM_PROGRAM_VERSION=452
+TERM_SESSION_ID=563FA0D2-24E2-4FDE-9DE4-D7E6D9E58123
+USER=richiethomas
+...</code></pre>
+
+<p>Using the <code>#!/usr/bin/env bash</code> shebang instead of <code>#!/usr/bin/bash</code> <a href="https://web.archive.org/web/20230716084854/https://unix.stackexchange.com/questions/29608/why-is-it-better-to-use-usr-bin-env-name-instead-of-path-to-name-as-my" target="_blank">has both its pros and cons</a>.</p>
+
+<h3>Pros of <code>#!/usr/bin/env bash</code></h3>
+
+<p>On the one hand, using this shebang means that your script doesn't depend on Bash residing in a specific folder on the user's machine.  This is because <code>#!/usr/bin/env bash</code> tells macOS "Hey, check the directories listed in your <code>$PATH</code> environment variable for the 'bash' executable, and use the first one you find to run code which follows."</p>
+
+<p>Note- we'll talk more about environment variables, and specifically the <code>$PATH</code> env var, later on.</p>
+
+<p>If we use the <code>/usr/bin/bash</code> shebang, then whoever runs our script must have Bash installed in their <code>/usr/bin/</code> directory. But that's not a safe bet. For example, my <code>bash</code> executable is installed at <code>/bin/bash</code>, with no <code>/usr/</code> prefix. If we load <code>$PATH</code> into our environment via the <code>/usr/bin/env bash</code> shebang, then UNIX will search through all the directories in <code>$PATH</code> until it finds Bash. More directories in our <code>$PATH</code> means more chances to find a working <code>bash</code> executable.</p>
+
+<h3>Cons of using <code>#!/usr/bin/env bash</code></h3>
+
+<p>Since using <code>#!/usr/bin/env bash</code> means that macOS will find the first version of Bash that it finds, this means that your users could potentially be using different versions of Bash.  This could cause your program to behave in unexpected ways, depending on how different those versions are.</p>
+
+<p>The links <a href="https://web.archive.org/web/20230326212656/https://www.baeldung.com/linux/bash-shebang-lines" target="_blank">here</a> and <a href="https://web.archive.org/web/20230316084258/https://stackoverflow.com/questions/16365130/what-is-the-difference-between-usr-bin-env-bash-and-usr-bin-bash" target="_blank">here</a> contain additional info on the differences between the two types of shebangs, including some cases where you might not want to use <code>/usr/bin/env bash"</code>.</p>
+
+<h2>Why do we need any shebang at all?</h2>
+
+<p>Hypothetically, we <i>could</i> leave the shebang out from this file. But somehow we have to tell UNIX which program to use when running the file. If we don't do so in the file itself (i.e. by using a shebang), we'd have to do so when we type the command into the terminal. So instead of typing <code>bundle install</code> in the command line, we'd have to type the following every time:</p>
+
+<pre><code>$ /usr/bin/env bundle install</code></pre>
+
+<p>Or:</p>
+
+<pre><code>$ /bin/bash bundle install</code></pre>
+
+<p>Using a shebang not only saves us a few keystrokes, but it's also one less thing that we humans can mess up when manually typing our command into the terminal.</p>
+
+<h2>Non-<code>bash</code> shebangs</h2>
+
+<p>As I mentioned before, the string "bash" at the end of the shebang tells UNIX to use Bash when interpreting the code which follows.  But Bash is not the only interpreter we can tell UNIX to use for a script that we write.</p>
+
+<p>The only reason the code uses the <code>bash</code> shebang here is because the subsequent code is written in Bash. If they had written it in Ruby, they could have used a Ruby shebang (i.e. <code>#!/usr/bin/env ruby</code>) instead. In fact, let's try doing exactly that, as an experiment.</p>
+
+<h2>Experiment- writing our own shebang</h2>
+
+<p>We start by writing a regular Ruby script with a ".rb" file extension. We'll name the file <code>hello.rb</code>, and the file will include the following code:</p>
+
+<pre><code># hello.rb
+
+puts "Hello, world!"</code></pre>
+
+<p>When we run <code>ruby hello.rb</code> from the command line, we get:</p>
+
+<pre><code>$ ruby hello.rb 
+Hello, world!
+$</code></pre>
+
+<p>What happens if we don't use the <code>ruby</code> command, instead just running the file as if it were an executable?</p>
+
+<pre><code>$ ./hello.rb
+zsh: permission denied: ./hello.rb
+$</code></pre>
+
+<p>OK, well this is just because we haven't yet updated the file permissions to <a href="https://askubuntu.com/questions/229589/how-to-make-a-file-e-g-a-sh-script-executable-so-it-can-be-run-from-a-termi" target="_blank">make the file executable</a>. That's a step we'll need to do whenever we make a brand-new file.</p>
+
+<p>We do that with the <code>chmod</code> command, passing <code>+x</code> to tell UNIX to set the file's execution permission.  Let's do that, and then try to re-run the file:</p>
+
+<pre><code>$ chmod +x hello.rb 
+~/Desktop/Workspace/impostorsguides.github.io (main)  $ ./hello.rb 
+./hello.rb: line 1: puts: command not found
+$</code></pre>
+
+<p>Now we have a new error, which is telling us that UNIX doesn't recognize the command <code>puts</code>. That's because <code>puts</code> is a Ruby command, and we haven't yet told UNIX that we want to use Ruby.</p>
+
+<p>Lastly, let's add a Ruby-specific shebang to the top of the file:</p>
+
+<pre><code>#!/usr/bin/env ruby
+
+puts "Hello, world!"</code></pre>
+
+<p>Now, when we re-run the file, we get:</p>
+
+<pre><code>$ ./hello.rb 
+Hello, world!
+$</code></pre>
+
+<p>Success!  We've told bash which interpreter we want to use, meaning that we no longer need to use the <code>ruby</code> command at the terminal prompt.</p>
+
+<p>A Github gist of the above <code>hello.rb</code> file can be found <a href="https://gist.github.com/richiethomas/36a4b5bb683219fb76f139a9c542891e" target="_blank">here</a>.</p>
+
+<h2>File extensions vs. shebangs</h2>
+
+<p>Our file includes a <code>.rb</code> file extension at the end, but the terminal doesn't use that extension when deciding how to interpret the file. I came across <a href="https://web.archive.org/web/20211027134850/https://superuser.com/questions/267632/file-extension-for-file-to-be-run-by-terminal" target="_blank">this StackOverflow post</a> while looking for documentation on this question.  <a href="https://web.archive.org/web/20211027134850/https://superuser.com/questions/267632/file-extension-for-file-to-be-run-by-terminal#answer-885285" target="_blank">One of the answers</a> states:</p>
+
+<blockquote>
+On OS X (and U*x generally), the name of the file doesn't matter at all. What matters is that it needs to have executable permission (chmod +x file) and a correct shebang line.
+</blockquote>
+
+<p>This is one big difference between Windows and UNIX. The former takes the approach of <a href="https://superuser.com/questions/266268/where-in-the-registry-does-windows-store-with-which-program-to-open-certain-file" target="_blank">using the file extension</a> to determine which program to use when executing a given file. This means Windows application developers have to tell the OS which file extensions their application can open. The benefit of the Windows approach is that no shebang is required in the file itself.</p>
+
+<p>UNIX, on the other hand, doesn't use such a registry, at least not when directly running scripts from the terminal. This means that the author of a file (rather than the author of an application) gets to decide how to open their file. Different philosophies, different trade-offs.</p>
+
+<h2>Moving On</h2>
+
+<p>Earlier we used the <code>chmod +x</code> command, but didn't dive into it at all.  Let's do that now.</p>
