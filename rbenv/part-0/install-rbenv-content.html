@@ -16,9 +16,13 @@
 
 <p>We can check for the most popular Ruby version managers by using the <code>which</code> command:</p>
 
-<div class="center">
-  <img src="/assets/images/2024-01-06-1037am.png" width="60%" style="padding: 0.5em">
-</div>
+<pre><code>$ which asdf
+asdf not found
+$ which rvm
+rvm not found
+$ which chruby
+chruby not found
+$ </code></pre>
 
 <p>If you see anything other than "not found" for <code>which asdf</code>, <code>which rvm</code>, and <code>which chruby</code>, you likely have another version manager on your machine.  In that case, you'll need to make a decision about which version manager you want to use.  <a href="https://github.com/rbenv/rbenv/wiki/Comparison-of-version-managers" target='_blank' rel='noopener'>RBENV's Github page has a guide</a> on differentiating between the various version managers out there.</p>
 
@@ -30,41 +34,89 @@
 
 <p>To do this, we'll follow the instructions on <a href='https://github.com/rbenv/rbenv/tree/e8b7a27ee67a5751b899215b4d35fd86ab552dae#basic-git-checkout' target='_blank' rel='noopener'>this version of the RBENV Readme file</a>.  First, open your terminal and check whether you already have a directory called <code>~/.rbenv</code>, by running <code>ls -la ~/.rbenv</code>:</p>
 
-<div class="center">
-  <img src="/assets/images/screenshot-2024-01-05-10-23-46.png" width="80%" style="padding: 0.5em">
-</div>
+<pre><code>$ ls -la ~/.rbenv
+total 80
+drwxr-xr-x  18 root          staff    576 Jan  9 14:11 .
+drwxr-x---+ 36 richiethomas  staff   1152 Jan 10 12:23 ..
+drwxr-xr-x  13 root          staff    416 Jan  9 14:11 .git
+drwxr-xr-x   3 root          staff     96 Jan  9 14:11 .github
+-rw-r--r--   1 root          staff     97 Jan  9 14:10 .gitignore
+-rw-r--r--   1 root          staff     35 Jan  9 14:10 .vimrc
+-rw-r--r--   1 root          staff   3390 Jan  9 14:10 CODE_OF_CONDUCT.md
+-rw-r--r--   1 root          staff   1058 Jan  9 14:10 LICENSE
+-rw-r--r--   1 root          staff  18411 Jan  9 14:11 README.md
+drwxr-xr-x   3 root          staff     96 Jan  9 14:10 bin
+drwxr-xr-x   4 root          staff    128 Jan  9 14:11 completions
+drwxr-xr-x  27 root          staff    864 Jan  9 14:11 libexec
+drwxr-xr-x   3 root          staff     96 Dec 23 11:37 rbenv.d
+drwxr-xr-x  39 root          staff   1248 Jan  9 14:35 shims
+drwxr-xr-x   7 root          staff    224 Jan  9 14:11 src
+drwxr-xr-x  28 root          staff    896 Jan  9 14:11 test
+-rw-r--r--   1 root          staff      6 Dec 23 11:38 version
+drwxr-xr-x   5 root          staff    160 Dec 23 11:38 versions
+$ </code></pre>
 
-<p>If this directory does exist, and the command output has a <code>.git</code> directory in it, you should be good to go.</p>
+<p>If this directory does exist, <strong>and</strong> if the command output includes a <code>.git/</code> directory in it like it does above, you should be good to go.</p>
 
 <p>Another possibility is that the output exists but looks like this:</p>
 
-<div class="center">
-  <img src="/assets/images/2024-01-06-10.45am.png" width="80%" style="padding: 0.5em">
-</div>
+<pre><code>$ ls -la ~/.rbenv
+total 8
+drwxr-xr-x   5 richiethomas  staff   160 Jan 10 12:56 .
+drwxr-x---+ 37 richiethomas  staff  1184 Jan 10 12:56 ..
+drwxr-xr-x  15 richiethomas  staff   480 Jan 10 12:56 shims
+-rw-r--r--   1 richiethomas  staff     6 Jan 10 12:57 version
+drwxr-xr-x   3 richiethomas  staff    96 Jan 10 12:48 versions
+$ </code></pre>
 
 <p>Specifically, you run the <code>ls -la</code> command and you don't see a <code>.git</code> folder included in the output.</p>
 
 <p>That likely means you previously installed RBENV using a package manager like Homebrew.  If this is the case, one option is to simply rename your <code>/.rbenv</code> directory as <code>/.rbenv-old</code> or something similar:</p>
 
-<div class="center">
-  <img src="/assets/images/2024-01-06-10.51am.png" width="60%" style="padding: 0.5em">
-</div>
+<pre><code>$ mv ~/.rbenv/ ~/.rbenv-old</code></pre>
 
-<p>If you get a <code>Permission denied</code> error, you may need to add <code>sudo</code> to the front of the above command in order to rename the folder.</p>
+<p>If you get a <code>Permission denied</code> error, you may need to add <code>sudo</code> to the front of the above command (and enter your password when prompted) in order to rename the folder:</p>
+
+<pre><code>$ sudo mv ~/.rbenv/ ~/.rbenv-old
+Password:
+$ </code></pre>
 
 <p>After the old RBENV folder is renamed, we can install RBENV again via source, by following the instructions on <a href='https://github.com/rbenv/rbenv/tree/e8b7a27ee67a5751b899215b4d35fd86ab552dae#basic-git-checkout' target='_blank' rel='noopener'>this version of the RBENV Readme file</a>.  Run the following command:</p>
 
-<pre><code>$ git clone https://github.com/rbenv/rbenv.git ~/.rbenv</code></pre>
+<pre><code>$ git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+Cloning into '/Users/richiethomas/.rbenv'...
+remote: Enumerating objects: 3270, done.
+remote: Counting objects: 100% (420/420), done.
+remote: Compressing objects: 100% (218/218), done.
+remote: Total 3270 (delta 234), reused 327 (delta 188), pack-reused 2850
+Receiving objects: 100% (3270/3270), 662.28 KiB | 258.00 KiB/s, done.
+Resolving deltas: 100% (2024/2024), done.
+$ </code></pre>
 
-<div class="center">
-  <img src="/assets/images/2024-01-06-10.53am.png" width="100%" style="padding: 0.5em">
-</div>
 
 <p>Once this is done, you should have a fresh installation of RBENV inside <code>~/.rbenv</code>, which includes a <code>.git</code> directory:</p>
 
-<div class="center">
-  <img src="/assets/images/2024-01-06-10.54am.png" width="100%" style="padding: 0.5em">
-</div>
+<pre><code>$ ls -la ~/.rbenv
+total 80
+drwxr-xr-x  18 richiethomas  staff    576 Jan 10 13:03 .
+drwxr-x---+ 37 richiethomas  staff   1184 Jan 10 13:03 ..
+drwxr-xr-x  12 richiethomas  staff    384 Jan 10 13:03 .git
+-rw-r--r--   1 richiethomas  staff     47 Jan 10 13:03 .gitattributes
+drwxr-xr-x   4 richiethomas  staff    128 Jan 10 13:03 .github
+-rw-r--r--   1 richiethomas  staff     97 Jan 10 13:03 .gitignore
+-rw-r--r--   1 richiethomas  staff     35 Jan 10 13:03 .vimrc
+-rw-r--r--   1 richiethomas  staff   3390 Jan 10 13:03 CODE_OF_CONDUCT.md
+-rw-r--r--   1 richiethomas  staff   1058 Jan 10 13:03 LICENSE
+-rw-r--r--   1 richiethomas  staff    163 Jan 10 13:03 Makefile
+-rw-r--r--   1 richiethomas  staff  12636 Jan 10 13:03 README.md
+drwxr-xr-x   3 richiethomas  staff     96 Jan 10 13:03 bin
+drwxr-xr-x   4 richiethomas  staff    128 Jan 10 13:03 completions
+drwxr-xr-x  27 richiethomas  staff    864 Jan 10 13:03 libexec
+drwxr-xr-x   3 richiethomas  staff     96 Jan 10 13:03 rbenv.d
+drwxr-xr-x   3 richiethomas  staff     96 Jan 10 13:03 share
+drwxr-xr-x   4 richiethomas  staff    128 Jan 10 13:03 src
+drwxr-xr-x  28 richiethomas  staff    896 Jan 10 13:03 test
+$ </code></pre>
 
 <h2>Ensuring your new RBENV install has your old data</h2>
 
@@ -75,11 +127,9 @@
 > ~/.rbenv-old/shims \                                                     
 > ~/.rbenv-old/rbenv.d \                                
 > ~/.rbenv-old/completions \       
-> ~/.rbenv</code></pre>
+> ~/.rbenv
+$ </code></pre>
 
-<div class="center">
-  <img src="/assets/images/2024-01-06-10.55am.png" width="80%" style="padding: 0.5em">
-</div>
 
 <p>Now, the version of RBENV which you installed from source should have any and all gems, installed Ruby versions, selected Ruby version, completions, and hooks that you may have previously installed in your old RBENV version.</p>
 
@@ -93,9 +143,11 @@
 
 <p>I called my new branch <code>impostorsguides</code>, but you can call it whatever is easiest for you to remember:</p>
 
-<div class="center">
-  <img src="/assets/images/2024-01-06-10.57am.png" width="100%" style="padding: 0.5em">
-</div>
+<pre><code>$ git checkout -b impostorsguides
+Switched to a new branch 'impostorsguides'
+~/.rbenv (impostorsguides)  $ git reset --hard c4395e58201966d9f90c12bd6b7342e389e7a4cb
+HEAD is now at c4395e5 Merge pull request #1418 from uraitakahito/patch-0
+$ </code></pre>
 
 <p>For future reference, the Github link to this specific version of the RBENV codebase can be found <a href='https://github.com/rbenv/rbenv/tree/c4395e58201966d9f90c12bd6b7342e389e7a4cb' target='_blank' rel='noopener'>here</a>.</p>
 
@@ -105,9 +157,28 @@
 
 <p>The RBENV Readme file tells you how to add the text to your script.  The command you'll copy/paste into your terminal depends on which shell program (bash, zsh, etc.) you're running:</p>
 
-<div class="center">
-  <img src="/assets/images/2024-01-06-11.01am.png" width="100%" style="padding: 0.5em">
-</div>
+<blockquote>
+2. Configure your shell to load rbenv:
+
+For <strong>bash</strong>:
+
+Ubuntu Desktop users should configure <code>~/.bashrc</code>:
+
+<pre><code>echo 'eval "$(~/.rbenv/bin/rbenv init - bash)"' >> ~/.bashrc</code></pre>
+
+On other platforms, bash is usually configured via ~/.bash_profile:
+
+<pre><code>echo 'eval "$(~/.rbenv/bin/rbenv init - bash)"' >> ~/.bash_profile</code></pre>
+
+For <strong>Zsh</strong>:
+
+<pre><code>echo 'eval "$(~/.rbenv/bin/rbenv init - zsh)"' >> ~/.zshrc</code></pre>
+
+For <strong>Fish shell</strong>:
+
+<pre><code>echo 'status --is-interactive; and ~/.rbenv/bin/rbenv init - fish | source' >> ~/.config/fish/config.fish</code></pre>
+
+</blockquote>
 
 <p>To find out which shell you're running, run the following command:</p>
 
@@ -115,9 +186,9 @@
 
 <p>In my case, since I'm on a new Mac, my default terminal is Zsh:</p>
 
-<div class="center">
-  <img src="/assets/images/2024-01-06-11.02am.png" width="50%" style="padding: 0.5em">
-</div>
+<pre><code>$ echo $SHELL
+/bin/zsh
+$</code></pre>
 
 <p>Therefore, I'd paste the following into my terminal:</p>
 
@@ -127,9 +198,20 @@
 
 <p>Lastly, in order for these changes to take effect, I'll need to do exactly that- open a new terminal tab.  When I do so, and I run <code>which rbenv</code>, I see the following shell command definition:</p>
 
-<div class="center">
-  <img src="/assets/images/2024-01-06-11.03am.png" width="90%" style="padding: 0.5em">
-</div>
+<pre><code>$ which rbenv
+rbenv () {
+  local command
+  command="${1:-}" 
+  if [ "$#" -gt 0 ]
+  then
+    shift
+  fi
+  case "$command" in
+    (rehash | shell) eval "$(rbenv "sh-$command" "$@")" ;;
+    (*) command rbenv "$command" "$@" ;;
+  esac
+}
+$</code></pre>
 
 <p>If we see the above output, we know RBENV has been successfully installed.</p>
 
