@@ -1,0 +1,81 @@
+<header class="post-header">
+  <h1 class="post-title">File Permissions</h1>
+</header>
+
+<p>Why is it necessary to run <code>chmod +x</code> on our file, before we can execute it? Why can't a user execute their own file by default?  I couldn't find an answer to this question from Google, so <a href="https://web.archive.org/web/20230406160905/https://stackoverflow.com/questions/75627561/my-umask-output-is-022-why-cant-i-execute-a-file-i-just-created-without-c/" target="_blank">I asked StackOverflow</a>.</p>
+
+<p>The question I asked involves a command called <code>umask</code> which isn't super-important here. The gist of my question was "Why can't a file's creator execute a file without jumping through hoops with <code>chmod</code>?"" The answer came about in the comments below one of the answers:</p>
+
+<blockquote>Because most files are data, and this is <i>generally</i> safer in the unknown broader context. The folk designing the system built it to be easy for me to do quick scripting work, especially on a dedicated private machine, but also easy for sysadmins to manage if the machine is a highly networked production system where very few people should be creating new scripts. When in doubt, a more conservative decision is safer, and the risk tolerances of end users vary <i>wildly</i>.</blockquote>
+
+<p>Because UNIX is <a href="https://web.archive.org/web/20230331054614/https://en.wikipedia.org/wiki/Multi-user_software" target="_blank">multi-user</a> in nature, it needs to account for the scenario where a user gains access to a system that they shouldn't have access to, and writes a malicious script that they then try to execute. Because they don't have permission to execute the script without authorization from the system's administrator, they are prevented from doing so. This, in a nutshell, is why we have to <code>chmod</code> our scripts every time.</p>
+
+<h2>Experiment- updating a file's permissions</h2>
+
+<p>File permissions are divided into 3 different categories- one for the file's owner, one for the group that the user belongs to, and one for everybody else. The <code>+x</code> flag for <code>chmod</code> actually updates the executable permissions for all 3 of those groups, not just for the file's creator. We can see this in action by running an experiment.</p>
+
+<p>In a scratch / sandbox directory, we create a new file called <code>foo</code>, then inspect its permissions:</p>
+
+<pre><code>$ touch foo
+$ ls -la foo
+-rw-r--r--  1 richiethomas  staff  0 Jan 11 10:36 foo
+$ </code></pre>
+
+<p>The thing we want to focus on in this output is the <code>-rw-r--r--</code> section. According to <a href="https://web.archive.org/web/20221006191132/https://mason.gmu.edu/~montecin/UNIXpermiss.htm" target="_blank">this source</a>, the first <code>-</code> means that what we're looking at are file permissions, not directory permissions. If we were looking at directory permissions, the leading <code>-</code> would be replaced with a <code>d</code>.</p>
+
+<p>Characters 2-4 (i.e. <code>rw-</code>) are for the first permissions category (i.e. the file creator). Characters 5-7 (<code>r–</code>) are for users in the same <a href="https://web.archive.org/web/20211206154949/https://docs.oracle.com/cd/E19120-01/open.solaris/819-2379/userconcept-35906/index.html" target="_blank">user group</a> as the file's creator, and characters 8-10 (also <code>r–</code>) are for everyone else. In each of these bunches of 3 characters, <code>r</code> means that group can read the file, <code>w</code> means they can write to it, and <code>x</code> means they can execute it.</p>
+
+<p>Let's run <code>chmod +x foo</code> and then re-run <code>ls -l foo</code>:</p>
+
+<pre><code>$ chmod +x foo
+$ ls -l foo 
+-rwxr-xr-x  1 richiethomas  staff  0 Jan 11 10:36 foo
+$ </code></pre>
+
+<p>As we can see, now each permissions category has <code>x</code> (i.e. executable permissions) turned on.</p>
+
+<p>We can also use <code>chmod</code> in a bitwise fashion, passing numbers instead of <code>+x</code> or similar arguments.  We pass a sequence of 3 numbers:</p>
+
+<ul>
+  <li>The 1st number stands for the permissions we'll give to the creator.</li>
+  <li>The 2nd number stands for the permissions we'll give to group members.</li>
+  <li>The 3rd number stands for the permissions we'll give to others.</li>
+</ul>
+
+<p>The number 1 means we're granting execution permissions.  2 means we're granting write permissions, and 4 means we're granting read permissions.  If we want to grant a combination of these permissions, we just add the representative numbers together.</p>
+
+<p>Suppose we wanted to give the creator execution-only permissions to <code>foo</code>, and revoke permissions for everyone else.  We can call <code>chmod 100 foo</code>, like so:</p>
+
+<pre><code>$ ls -l
+total 0
+-rwxr-xr-x  1 richiethomas  staff  0 Jan 11 10:36 foo
+
+$ chmod 100 foo
+
+$ ls -l        
+total 0
+---x------  1 richiethomas  staff  0 Jan 11 10:36 foo
+
+$ </code></pre>
+
+<p>Here we see the "before" and "after" states of our <code>foo</code> file.</p>
+
+<p>Now let's say we want to grant all 3 permissions to the creator, but only read and write permissions to group members and others.  We'd run <code>chmod 766 foo</code>, like so:</p>
+
+<pre><code>$ ls -l
+total 0
+---x------  1 richiethomas  staff  0 Jan 11 10:36 foo
+
+$ chmod 766 foo
+
+$ ls -l
+total 0
+-rwxrw-rw-  1 richiethomas  staff  0 Jan 11 10:36 foo
+
+$ </code></pre>
+
+<p>Again, we see the "before" and "after" states of <code>foo</code>.</p>
+
+<h2>Moving On</h2>
+
+<p>Let's now return to the <code>/usr/bin/env</code> command in our shebang, and specifically to the environment variables which are loaded by that command.</p>
