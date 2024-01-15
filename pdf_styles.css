@@ -87,6 +87,7 @@ blockquote {
 	font-style: italic;
 	margin-bottom: 2em;
 	margin-top: 2em;
+	border-left: 3px solid lightgray;
 }
 
 /** * Code formatting */
