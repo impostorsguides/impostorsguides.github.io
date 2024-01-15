@@ -1,0 +1,213 @@
+<header class="post-header">
+  <h1 class="post-title">The <code>set</code> Command</h1>
+</header>
+
+<p>If you're using Bash as your shell, you should be able to run <code>help set</code> without any problems.  If you're using the Zsh shell (i.e. the standard shell on a Mac), the <code>help</code> command is not enabled by default.  I recommend you simply open a new Bash shell from within Zsh (by typing <code>bash</code> at your prompt) if you need to use the <code>help</code> command.</p>
+
+<p>There are other ways to solve this problem, including solutions which save you from opening Bash first every time.  But implementing these would be a digression from our main goal of understanding <code>set</code>, and I want to keep our forward momentum going, so I've moved my discussion of these options to the Appendix.</p>
+
+<h2>Parsing the output of <code>help set</code></h2>
+
+<p>Assuming you were successfully able to run <code>help set</code> from a Bash terminal window, let's see what it tells us:</p>
+
+<pre><code>set [ {+|-}options | {+|-}o [ option_name ] ] ... [ {+|-}A [ name ] ]
+[ arg ... ]
+    Set the options for the shell and/or set the positional 
+    parameters, or declare and set an array.  If the -s option  
+    is  given, it  causes the specified arguments to be sorted 
+    before assigning them to the positional parameters (or to 
+    the array name if -A is used).   With  +s  sort  arguments 
+    in descending order. For the meaning of the other flags, 
+    see  zshoptions(1).  Flags may be specified by name using 
+    the -o option. If no option name is supplied with -o, the 
+    current option states are printed: see the description of 
+    setopt below for more information on the format.  With +o 
+    they are printed in a form that can be used as input to the 
+    shell.</code></pre>
+
+<p>From the first paragraph, we see the following:</p>
+
+<pre><code>Set the options for the shell and/or set the positional 
+parameters, or declare and set an array.</code></pre>
+
+<p>So we're setting "options". But that's pretty vague. What options are we talking about?</p>
+
+<h2>Shell Options</h2>
+
+<p>If we Google "shell options", one of the first results should be from <a href="https://web.archive.org/web/20230315104403/https://tldp.org/LDP/abs/html/options.html" target="_blank">The Linux Documentation Project</a>:</p>
+
+<blockquote>
+  <h3>Chapter 33. Options</h3>
+
+  <p>Options are settings that change shell and/or script behavior.</p>
+  
+<p>The set command enables options within a script. At the point in the script where you want the options to take effect, use <code>set -o option-name</code> or, in short form, <code>set -option-abbrev</code>. These two forms are equivalent.</p>
+
+<pre><code>#!/bin/bash
+
+set -o verbose
+# Echoes all commands before executing.</code></pre>
+
+<pre><code>#!/bin/bash
+
+set -v
+# Exact same effect as above.</code></pre>
+
+<p>To disable an option within a script, use <code>set +o option-name</code> or <code>set +option-abbrev</code>.</p>
+</blockquote>
+
+<p>Further down the link, I see a list of options available to set:</p>
+
+<blockquote><table>
+  <tr>
+    <th>Abbreviation</th>
+    <th>Name</th>
+    <th>Effect</th>
+  </tr>
+  <tr>
+    <td>-e</td>
+    <td>errexit</td>
+    <td>Abort script at first error, when a command exits with non-zero status...</td>
+  </tr>
+</table></blockquote>
+
+<p>So running <code>set -e</code> tells the script to exit as soon as "a command exits with a non-zero status".  What does that mean?</p>
+
+<h2>Exit Statuses</h2>
+
+<p>Shell scripts need a way to communicate whether they've completed successfully or not to their caller. The way this happens is via exit codes. We return an exit code via typing <code>exit</code> followed by a number. If the script completed successfully, that number is zero. Otherwise, we return a non-zero number which indicates the type of error that occurred during execution. <a href="https://web.archive.org/web/20230322083153/https://tldp.org/LDP/abs/html/exit-status.html" target="_blank">This link</a> from The Linux Documentation Project says:</p>
+
+<blockquote>A successful command returns a 0, while an unsuccessful one returns a non-zero value that usually can be interpreted as an error code. Well-behaved UNIX commands, programs, and utilities return a 0 exit code upon successful completion, though there are some exceptions.</blockquote>
+
+<p>Why does the link say "well-behaved" in this context?  That's because a script author is encouraged to observe convention by including an exit code in their script.  But nothing forces them to do so- they are free to disregard this convention, possibly to the detriment of the script's users.</p>
+
+<p>We can return different non-zero exit codes to indicate different errors.  For example, according to <a href="https://web.archive.org/web/20230202185938/https://www.gnu.org/software/bash/manual/html_node/Exit-Status.html" target="_blank">the GNU docs on exit codes</a>:</p>
+
+<ul>
+  <li>"If a command is not found, the child process created to execute it returns a status of <code>127</code>. If a command is found but is not executable, the return status is <code>126</code>."</li>
+  <li>"All builtins return an exit status of <code>2</code> to indicate incorrect usage, generally invalid options or missing arguments."</li>
+  <li>"When a command terminates on a fatal signal whose number is N, Bash uses the value <code>128+N</code> as the exit status."</li>
+</ul>
+
+<h2>Exiting immediately vs. continuing execution</h2>
+
+<p>Back to <code>set -e</code>.  What the docs are saying is that, if you add <code>set -e</code> to your bash script and an error occurs, the program exits immediately, as opposed to continuing on with the execution.</p>
+
+<p>OK, but... why do we need <code>set -e</code> for that?  When I write a script in another language and an error occurs, the interpreter exits immediately. Is the helpfile implying that a Bash program would just continue executing if you leave out <code>set -e</code> and an error occurs?</p>
+
+<p>Let's try an experiment to figure it out.</p>
+
+<h3>Experiment- "exit-early" mode</h3>
+
+<p>I make 2 Bash scripts, one called <code>foo</code> and one called <code>bar</code>. <code>foo</code> looks like so:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+set -e
+
+./bar
+
+echo "foo ran successfully"</code></pre>
+
+<p>It does the following:</p>
+
+<ul>
+  <li>declares the script as a "bash" script</li>
+  <li>calls <code>set -e</code> in the theory that this will cause any error to prevent the script from continuing</li>
+  <li>runs the <code>./bar</code> script, and</li>
+  <li>prints a summary line, to prove we've reached the end of the script</li>
+</ul>
+
+<p>In theory, if an error occurs when running <code>./bar</code>, our execution should stop and we shouldn't see "foo ran successfully" as output.</p>
+
+<p>Meanwhile, <code>bar</code> looks like so:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+echo "Inside bar; about to crash..."
+
+exit 1</code></pre>
+
+<p>It does the following:</p>
+<ul>
+  <li>declares the script as a Bash script (just like in <code>foo</code>)</li>
+  <li>prints a logline, to prove we're now inside <code>bar</code>, and</li>
+  <li>triggers a non-zero exit code (i.e. an error)</li>
+</ul>
+
+<p>I run "chmod +x" on both of these scripts, as we've done before, to make sure they're executable. Then I run "./foo" in my terminal:</p>
+
+<pre><code>$ ./foo
+Inside bar; about to crash...
+$ </code></pre>
+
+<p>We did <strong>not</strong> see the summary line from <code>foo</code> printed to the screen. This indicates that the execution inside <code>foo</code> halted once the <code>bar</code> script ran into the non-zero exit code.</p>
+
+<p>I also run <code>$?</code> immediately after running <code>./foo</code>.  The <code>$?</code> syntax returns the exit code of the most recent command run in the terminal:</p>
+
+<pre><code>$ echo "$?"
+1
+$ </code></pre>
+
+<p>We get 1, which is what we'd expect.</p>
+
+<p>Now let's comment out <code>set -e</code> from <code>foo</code>:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+# set -e
+
+./bar
+
+echo "foo ran successfully"
+</code></pre>
+
+<p>Now when we re-run <code>./foo</code>, we see the following:</p>
+
+<pre><code>$ ./foo    
+Inside bar; about to crash...
+foo ran successfully
+$ </code></pre>
+
+<p>This time, we do see the summary logline from <code>foo</code>. This tells us that the script's execution continues, even though we're still getting the same non-zero exit code from the <code>bar</code> script.</p>
+
+<p>And when we re-run <code>echo "$?"</code>, we now see <code>0</code>:</p>
+
+<pre><code>$ echo "$?"
+0
+$ </code></pre>
+
+<p>Based on this experiment, we can conclude that <code>set -e</code> does, in fact, prevent execution from continuing when the script encounters an error.</p>
+
+<h2>Why isn't <code>set -e</code> the default?</h2>
+
+<p>But our earlier question remains- why must a developer explicitly include <code>set -e</code> in their bash script? Why is this not the default?</p>
+
+<p>This question is a little opinion-based, and also involves some historical context.  For both of these reasons, it's unlikely the answer will be found in the <code>man</code> or <code>help</code> pages.  <a href="https://web.archive.org/web/20211127123237/https://stackoverflow.com/questions/13468481/when-to-use-set-e" target="_blank">Let's check StackOverflow</a> instead.</p>
+
+<p>One answer says:</p>
+
+<blockquote><p>Yes, you should always use it...  <code>set -e</code> should have been the default. The potential for disaster is just too high.</p></blockquote>
+
+<p>But another answer says:</p>
+
+<blockquote><p>If your script code checks for errors carefully and properly where necessary, and handles them in an appropriate manner, then you probably don't ever need or want to use <code>set -e</code>.</p>
+
+<p>...</p>
+<p>Note that although <code>set -e</code> is supposed to cause the shell to exit IFF any untested command fails, it is wise to turn it off again when your code is doing its own error handling as there can easily be weird cases where a command will return a non-zero exit status that you're not expecting, and possibly even such cases that you might not catch in testing, and where sudden fatal termination of your script would leave something in a bad state.</p></blockquote>
+
+<p>Here, <a href="https://web.archive.org/web/20231228020319/https://en.wikipedia.org/wiki/If_and_only_if#Distinction_from_&quot;if&quot;_and_&quot;only_if&quot;" target="_blank">"IFF" means "if and only if"</a>.</p>
+
+<p>In addition, we find <a href="https://web.archive.org/web/20230217095302/https://serverfault.com/questions/143445/what-does-set-e-do-and-why-might-it-be-considered-dangerous" target="_blank">this post</a>:</p>
+
+<blockquote><p>Be careful of using <code>set -e</code> in init.d scripts. Writing correct <code>init.d</code> scripts requires accepting various error exit statuses when daemons are already running or already stopped without aborting the <code>init.d</code> script, and common <code>init.d</code> function libraries are not safe to call with <code>set -e</code> in effect. For <code>init.d</code> scripts, it's often easier to not use <code>set -e</code> and instead check the result of each command separately.</p></blockquote>
+
+<p>From reading the answers, I gather that the reason <code>set -e</code> is not the default is probably because the UNIX authors wanted to give developers more fine-grained control over whether and how to handle different kinds of exceptions.  <code>set -e</code> halts your program immediately whenever any kind of error is triggered, so you don't have to explicitly catch each kind of error separately. Depending on the program you're writing, this might be considered a feature or a bug; it appears to be a matter of preference.</p>
+
+<h2>Wrapping Up</h2>
+
+<p>One last cool thing about <code>set -e</code> is that it's not an all-or-nothing operation.  If there's one particular section of your script where you would want to exit immediately if an error happens, but the rest of the script doesn't fit that description, then you can call <code>set -e</code> just before that one section of code, and call <code>set +e</code> right after it.  Again, from <a href="https://web.archive.org/web/20230217095302/https://serverfault.com/questions/143445/what-does-set-e-do-and-why-might-it-be-considered-dangerous" target="_blank">this post</a>:</p>
+
+<blockquote><p>It should be noted that <code>set -e</code> can be turned on and off for various sections of a script. It doesn't have to be on for the whole script's execution. It could even be conditionally enabled.</p></blockquote>
+
+<p>That concludes our look at <code>set -e</code>. Let's move on to the next line of code.</p>

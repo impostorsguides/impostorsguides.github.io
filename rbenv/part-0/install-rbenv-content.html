@@ -10,7 +10,7 @@
 
 <h2>Ensuring you have no other version managers installed</h2>
 
-<p>Admittedly, the best candidates for reading this book are people who already use RBENV as their Ruby version manager.  As you’ll soon see, users of other version managers (such as rvm, asdf, chruby, etc.) will face more and bigger hurdles than users of RBENV (more on why in a minute).</p>
+<p>Admittedly, the best candidates for reading this book are people who already use RBENV as their Ruby version manager.  As you'll soon see, users of other version managers (such as rvm, asdf, chruby, etc.) will face more and bigger hurdles than users of RBENV (more on why in a minute).</p>
 
 <p>With that in mind, we'll need to make sure you don't have a different Ruby version manager installed, such as RVM.  If you do, that will represent a blocker to your continuing this guide, since you'll have different version managers competing to manage your Ruby version.  This could introduce <a href="https://web.archive.org/web/20160715135727/https://stackoverflow.com/questions/35808103/rvm-and-rbenv-on-the-same-machine" target="_blank" rel="noopener">unexpected behavior</a> and negatively impact your usage of Ruby.</p>
 
@@ -214,6 +214,14 @@ rbenv () {
 $</code></pre>
 
 <p>If we see the above output, we know RBENV has been successfully installed.</p>
+
+<h2>What is an <code>rc</code> dotfile?</h2>
+
+<p>When you open a new terminal tab or window in Zsh, one of the first things that happens is that Zsh runs a few setup scripts. One of these scripts is located at <code>.zshrc</code>. This file is where you'd put configuration options that you'd want to run on every new terminal tab or window.</p>
+
+<p>There are other setup scripts which get loaded as well, such as <code>~/.zshenv</code>.  But <code>~/.zshrc</code> is the one I interact with most.  Zsh will run these scripts in a specific order, and there are <a href="https://web.archive.org/web/20230724164024/https://unix.stackexchange.com/questions/71253/what-should-shouldnt-go-in-zshenv-zshrc-zlogin-zprofile-zlogout" target="_blank">conventions around what you should put in each file</a>.</p>
+
+<p>Other shells have similar <code>rc</code> files (ex.- Bash has <code>~/.bashrc</code>). The <code>rc</code> in <code>.zshrc</code> stands for "run commands" or "run control", depending on <a href="https://web.archive.org/web/20230320050723/https://unix.stackexchange.com/questions/3467/what-does-rc-in-bashrc-stand-for" target="_blank">who you ask</a>.</p>
 
 <h2>Summary</h2>
 

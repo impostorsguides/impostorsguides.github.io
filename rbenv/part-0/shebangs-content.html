@@ -2,29 +2,34 @@
   <h1 class="post-title">Shebangs</h1>
 </header>
 
-<p>Our first line of code in <a href="https://gist.github.com/richiethomas/272b7719f3c75abf6818a8211552004e" target="_blank">the shim file</a> is:</p>
+<p>If you recall, <a href="https://gist.github.com/richiethomas/272b7719f3c75abf6818a8211552004e" target="_blank">our shim file</a> looks like this:</p>
 
-<pre><code>1 #!/usr/bin/env bash        #  <= we are here
-2 set -e
-3 [ -n "$RBENV_DEBUG" ] && set -x
-4 
-5 program="${0##*/}"
-6 if [ "$program" = "ruby" ]; then
-7   for arg; do
-8     case "$arg" in
-9     -e* | -- ) break ;;
-10     */* )
-11       if [ -f "$arg" ]; then
-12         export RBENV_DIR="${arg%/*}"
-13         break
-14       fi
-15       ;;
-16     esac
-17   done
-18 fi
-19 
-20 export RBENV_ROOT="/Users/richiethomas/.rbenv"
-21 exec "/opt/homebrew/bin/rbenv" exec "$program" "$@"</code></pre>
+<pre><code>#!/usr/bin/env bash
+set -e
+[ -n "$RBENV_DEBUG" ] && set -x
+
+program="${0##*/}"
+if [ "$program" = "ruby" ]; then
+  for arg; do
+    case "$arg" in
+    -e* | -- ) break ;;
+    */* )
+      if [ -f "$arg" ]; then
+        export RBENV_DIR="${arg%/*}"
+        break
+      fi
+      ;;
+    esac
+  done
+fi
+
+export RBENV_ROOT="/Users/richiethomas/.rbenv"
+exec "/opt/homebrew/bin/rbenv" exec "$program" "$@"
+</code></pre>
+
+<p>Which means the first line of code is:</p>
+
+<pre><code>#!/usr/bin/env bash</code></pre>
 
 <p>I run a Google search for the string <code>#!/usr/bin/env bash</code>, and I learn that this line of code is called a <a href="https://web.archive.org/web/20230323182633/https://en.wikipedia.org/wiki/Shebang_(Unix)" target="_blank">"shebang"</a>.</p>
 

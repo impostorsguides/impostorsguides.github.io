@@ -1,0 +1,79 @@
+<header class="post-header">
+  <h1 class="post-title">Verbose Mode</h1>
+</header>
+
+<p>Returning to <a href="https://gist.github.com/richiethomas/489d8678a582e8a7193ad9122c9eaa4d#file-bundle-shim-line-3-L3" target="_blank">line 3 of the shim code</a>:</p>
+
+<pre><code>[ -n <code>$RBENV_DEBUG</code> ] && set -x </code></pre>
+
+<p>If the <code>[ -n <code>$RBENV_DEBUG</code> ]</code> condition returns <code>true</code>, the <code>&&</code> syntax ensures that we then execute the 2nd half of this line of code: <code>set -x</code>. If that condition returns false, we exit early and don't evaluate <code>set -x</code>.</p>
+
+<p>We know about <code>set</code> already, but what does the <code>-x</code> flag do?</p>
+
+<p>I don't see anything helpful when searching the output of <code>man set</code> or <code>help set</code>, so I refer back to <a href="https://web.archive.org/web/20230315104403/https://tldp.org/LDP/abs/html/options.html" target="_blank">the table of flags for <code>set</code></a> which I first found when looking up the meaning of <code>-e</code>:</p>
+
+<table>
+  <tr>
+    <th>Abbreviation</th>
+    <th>Name</th>
+    <th>Effect</th>
+  </tr>
+  <tr>
+    <td>-v</td>
+    <td>verbose</td>
+    <td>Print each command to stdout before executing it</td>
+  </tr>
+  <tr>
+    <td>-x</td>
+    <td>xtrace</td>
+    <td>Similar to -v, but expands commands</td>
+  </tr>
+</table>
+
+<p>The description for <code>-x</code> says "Similar to -v, but expands commands".  In turn, the description for <code>-v</code> says "Print each command to stdout before executing it".  Based on this, it sounds like we're setting our shell to "debug mode". Which would make sense, given the 2nd half of the condition only executes if we've set a variable named <code>RBENV_DEBUG</code>.</p>
+
+<p>Let's see if that's what happens.</p>
+
+<h2>Experiment- the <code>set -x</code> command</h2>
+
+<p>I edit my <code>foo</code> script to contain the following code:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+set -x
+
+echo "foo"
+
+echo "bar"</code></pre>
+
+<p>As you can see, this script includes <code>set -x</code> at the top.</p>
+
+<p>When I run this script, I see the following:</p>
+
+<pre><code>$ ./foo
++ echo foo
+foo
++ echo bar
+bar
+$</code></pre>
+
+<p>The lines with <code>+</code> in front of them appear to be the lines which are printed out as a result of <code>set -x</code>. The lines without <code>+</code> are lines that would have printed out anyway (i.e. as a result of the <code>echo</code> commands I included in the script).</p>
+
+<p>Now, when I comment out <code>set -x</code> and re-run the script, I see:</p>
+
+<pre><code>$ ./foo
+foo
+bar
+$ </code></pre>
+
+<p>Now we don't see the lines beginning with <code>+</code> anymore.</p>
+
+<p>From this, we can conclude that <code>set -x</code> prints each line of code that is run, just as our docs described.</p>
+
+<p>So to summarize, line 3 of the shim file tells us that we will print each command as it is executed, but only if we set the <code>$RBENV_DEBUG</code> environment variable to equal any non-empty string value.</p>
+
+<h2>Wrapping Up</h2>
+
+<p>As we can see, verbose mode is useful if you want to see which lines of code get executed just before an error occurs.  To make full use of this, <code>set -x</code> should be used in conjunction with <code>set -e</code>, so that an exception is raised and the program immediately exits.  This makes it easier to zero in on where the error occurred- just scroll to the end of the output for <code>set -x</code>.</p>
+
+<p>Let's move on to the next line of code.</p>

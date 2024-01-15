@@ -1,0 +1,148 @@
+<header class="post-header">
+  <h1 class="post-title">Parameter Expansion, Part 1</h1>
+</header>
+
+<p>Moving on to <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L5" target="_blank">the next line of code</a>:</p>
+
+<pre><code>program="${0##*/}"</code></pre>
+
+<p>We declare a variable named <code>program</code>, so it looks like we're trying to store the name of the program whose command we're running. Let's see whether we're right with an experiment.</p>
+
+<h2>Experiment- what string are we storing?</h2>
+
+<p>I edit the shim file (<code>~/.rbenv/shims/bundle</code>) to add the <code>echo</code> statement just beneath the declaration of the <code>program</code> variable.  This prints the value of the <code>program</code> variable to the screen:</p>
+
+<pre><code>#!/usr/bin/env bash
+set -e
+[ -n "$RBENV_DEBUG" ] && set -x
+
+program="${0##*/}"
+
+echo "program name: $program"    #  <= I added this line
+
+if [ "$program" = "ruby" ]; then
+  for arg; do
+    case "$arg" in
+    -e* | -- ) break ;;
+    */* )
+      if [ -f "$arg" ]; then
+        export RBENV_DIR="${arg%/*}"
+        break
+      fi
+      ;;
+    esac
+  done
+fi
+
+export RBENV_ROOT="/Users/richiethomas/.rbenv"
+exec "/opt/homebrew/bin/rbenv" exec "$program" "$@"</code></pre>
+
+<p>The <code>$</code> in <code>program name: $program</code> tells Bash that we want to print the value of the <code>program</code> variable, as opposed to the string "program".</p>
+
+<p>Then I run <code>bundle version</code> in my terminal, and I see the following:</p>
+
+<pre><code>$ bundle version
+program name: bundle
+Bundler version 2.3.14 (2022-05-18 commit 467ad58a7c)
+$ </code></pre>
+
+<p>We see <code>program name: bundle</code> before our expected output of the Bundler version number. Just to be safe, I do the same experiment with the shim for the <code>ruby</code> command (i.e. <code>~/.rbenv/shims/ruby</code>).  When I run <code>ruby --version</code>, I see the following:</p>
+
+<pre><code>$ ruby --version
+program name: ruby
+ruby 3.2.2 (2023-03-30 revision e51014f9c0) [arm64-darwin23]
+$ </code></pre>
+
+<p>Same thing- it printed the name of the first command I entered into the terminal, followed by my Ruby version.</p>
+
+<p>Before moving on, I delete my <code>echo</code> commands from both the <code>bundle</code> and <code>ruby</code> shims.</p>
+
+<h2>Syntax In Parameter Expansion</h2>
+
+<p>But what is this weird syntax which evaluates to the name of the program? After Googling the exact string <code>${0##*/}</code>, I find <a href="https://web.archive.org/web/20150926110359/https://unix.stackexchange.com/questions/214465/what-does-prog-0-mean-in-a-bash-script/214469" target="_blank">this StackOverflow link</a>, which says:</p>
+
+<blockquote>
+  <p><code>$0</code> is the name and path that this script was executed with. For example, if you call <code>/usr/bin/example.sh</code>, then <code>$0</code> will be <code>/usr/bin/example.sh</code>. If your current working directory is <code>/usr</code>, and you call the same script with <code>./bin/example.sh</code>, then <code>$0</code> will be <code>./bin/example.sh</code>.</p>
+
+  <p>As for the <code>#</code>, this means to expand <code>$0</code> after removing the previously specified prefix. In this case the previously specified prefix is the <code>*/</code> glob. A single <code>#</code> is non-greedy, so after it matches the first <code>*/</code> glob, it will stop. So it will remove the first <code>/</code> and everything before it. Two <code>#</code>'s mean to greedily remove all <code>*/</code>. So it will find remove all <code>/</code> and everything that comes before them.</p>
+</blockquote>
+
+<p>The answer says we're dealing with something called "parameter expansion", and works as follows:</p>
+
+<ul>
+  <li><code>$0</code> will evaluate to the path of the file that we're executing.</li>
+  <li>We can modify it by the use of <code>#</code> and <code>*/</code> inside the curly braces.</li>
+</ul>
+
+<p>Let's test how <code>$0</code> is affected by this parameter expansion syntax.</p>
+
+<h2>Experiment- reproducing the effects of parameter expansion</h2>
+
+<p>I create a directory named <code>foo/bar/</code>, containing a file named <code>baz</code>, and <code>chmod</code> the file so it will execute.  The <code>-p</code> flag after <code>mkdir</code> just creates the <code>bar/</code> directory as well as any in-between directories (i.e. <code>foo/</code>) which don't already exist:</p>
+
+<pre><code>$ mkdir -p foo/bar
+$ touch foo/bar/baz
+$ chmod +x foo/bar/baz
+$ </code></pre>
+
+<p>I open up <code>baz</code> and I type the following:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+echo "$0"</code></pre>
+
+<p>Then I run it, and I see the following:</p>
+
+<pre><code>$ ./foo/bar/baz
+./foo/bar/baz
+$ </code></pre>
+
+<p>The output was <code>./foo/bar/baz</code>, meaning we've verified that we can reproduce the <code>$0</code> behavior described in the StackOverflow post.</p>
+
+<p>On a hunch, I try wrapping <code>$0</code> in curly braces, to see if its output will change</p>
+
+<pre><code>#!/usr/bin/env bash
+
+echo "${0}"</code></pre>
+
+<p>When I execute this updated version of <code>./foo/bar/baz</code>, it displays the same output as before:</p>
+
+<pre><code>$ ./foo/bar/baz
+./foo/bar/baz
+$ </code></pre>
+
+<p>So <code>$0</code> and <code>${0}</code> seem to be functionally equivalent.</p>
+
+<p>Now to test the 2nd part of the answer, about removing prefixes.  I'll first try the same syntax as in the StackOverflow answer (i.e. <code>##*/</code>):</p>
+
+<pre><code>#!/usr/bin/env bash
+
+echo "${0##*/}"</code></pre>
+
+<p>When I run it, I see:</p>
+
+<pre><code>$ ./foo/bar/baz   
+baz
+$ </code></pre>
+
+<p>So without the <code>##*/</code> syntax, we get <code>./foo/bar/baz</code> as our output. With this new syntax, we get just <code>baz</code> as the output. Therefore, adding <code>##*/</code> inside the curly braces had the effect of removing the leading "./foo/bar/" from <code>./foo/bar/baz</code>.</p>
+
+<p>Out of curiosity, what happens when I remove one of the two <code>#</code> symbols?</p>
+
+<pre><code>#!/usr/bin/env bash
+
+echo "${0#*/}"</code></pre>
+
+<p>Running the above returns:</p>
+
+<pre><code>$ ./foo/bar/baz
+foo/bar/baz
+$ </code></pre>
+
+<p>Now we see <code>foo/bar/baz</code>. The <code>foo/bar/</code> prefix is no longer missing, but the leading <code>./</code> before <code>foo/</code> has been removed.</p>
+
+<p>This is expected. The StackOverflow answer mentions that including only one <code>#</code> will cause the parameter expansion to stop after matching the first case of its search pattern. In our case, this means the first <code>/</code> character plus anything before it.</p>
+
+<p>So one <code>#</code> will cause <code>./</code> to be removed, while two <code>##</code> will cause <code>./foo/bar/</code> to be removed.</p>
+
+<p>For more info on parameter expansion, <a href="https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html" target="_blank">this link</a> contains the GNU docs for parameter expansion, including a much more complete list of the syntax and its capabilities.</p>

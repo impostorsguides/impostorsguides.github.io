@@ -1,0 +1,160 @@
+<header class="post-header">
+  <h1 class="post-title">Conditional Logic</h1>
+</header>
+
+<p>Moving on to <a href="https://gist.github.com/richiethomas/489d8678a582e8a7193ad9122c9eaa4d#file-bundle-shim-line-3-L3" target="_blank">line 3 of the code</a>:</p>
+
+<pre><code>[ -n "$RBENV_DEBUG" ] && set -x</code></pre>
+
+<h2>Tests and Conditions</h2>
+
+<p>The bracket syntax (i.e. <code>[ -n "$RBENV_DEBUG" ]</code>, or more generally, <code>[ ... ]</code>) is one way to write conditional logic in bash.  The syntax is actually a synonym for the <code>test</code> command.  If we run <code>man [</code> or <code>man test</code> in the terminal, we see the following:</p>
+
+<pre><code>TEST(1)              General Commands Manual             TEST(1)
+
+  NAME
+        test, [ – condition evaluation utility
+
+  SYNOPSIS
+        test expression
+        [ expression ]
+
+  DESCRIPTION
+        The test utility evaluates the expression and, if it 
+        evaluates to true, returns a zero (true) exit status; 
+        otherwise it returns 1 (false).  If there is no 
+        expression, test also returns 1 (false).</code></pre>
+
+
+<p>Let's run an experiment to see how this syntax works.</p>
+
+<h2>Experiment- the <code>[ ... ]</code> and <code>test</code> commands</h2>
+
+<p>I create a new file named <code>./foo</code> containing the following:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+[ 5 == 5 ] && echo "[ 5 == 5 ]";</code></pre>
+
+<p>The <code>&&</code> in between the test condition and the echo string means that, if our test is true, we will continue executing the <code>echo</code> command.  If our bracket syntax condition returns false, the execution will stop before the <code>echo</code> command, and nothing will be printed to the screen.</p>
+
+<p>I run <code>chmod +x foo</code> so I can execute the script, then <code>./foo</code>:</p>
+
+<pre><code>$ ./foo       
+[ 5 == 5 ]
+$ </code></pre>
+
+<p>I then add a new test with the condition to <code>5 == 6</code> to make sure the <code>else</code> clause also works:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+[ 5 == 5 ] && echo "[ 5 == 5 ]";
+
+[ 5 == 6 ] && echo "[ 5 == 6 ]";</code></pre>
+
+<p>When I run it, I see:</p>
+
+<pre><code>$ ./foo       
+[ 5 == 5 ]
+$ </code></pre>
+
+<p>The string <code>[5 == 6 ]</code> does not appear, indicating that this condition is falsy, as we'd expect.</p>
+
+<p>I then update the script to use the test command instead of the square brackets, and repeat the experiment:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+[ 5 == 5 ] && echo "[ 5 == 5 ]";
+
+[ 5 == 6 ] && echo "[ 5 == 6 ]";
+
+test 5 == 5 && echo "test 5 == 5";
+
+test 5 == 6 && echo "test 5 == 6";</code></pre>
+
+<p>Same results:</p>
+
+<pre><code>$ ./foo   
+[ 5 == 5 ]
+test 5 == 5
+$ </code></pre>
+
+<p>So as expected, we saw that <code>test</code> and <code>[ ... ]</code> produce the same results.</p>
+
+<p>Now what about the <code>-n</code> flag?</p>
+
+<h2>Passing flags to <code>[</code></h2>
+
+<p>When looking for docs on a certain flag for a command, we can usually just read the docs for the command itself. In this case, I search for <code>-n</code> in the <code>man</code> page for <code>test</code>:</p>
+
+<pre><code>-n string     True if the length of string is nonzero.</code></pre>
+
+<p>So <code>[ -n "$RBENV_DEBUG" ]</code> is truthy if the length of <code>$RBENV_DEBUG</code> is greater than zero (i.e. if the string is not empty).</p>
+
+<p>Let's see if <code>-n</code> behaves the way we expect.</p>
+
+<h2>Experiment- the <code>-n</code> flag</h2>
+
+<p>First I run the following directly in my terminal:</p>
+
+<pre><code>$ FOO='foo'
+$ [ -n "$FOO" ] && echo "Hi"
+Hi
+$ [ -n "$BAR" ] && echo "Hi"
+$ [ -n "" ] && echo "Hi" 
+$ </code></pre>
+
+<p>So using the <code>-n</code> flag to test the length of <code>$FOO</code> resulted in printing "Hi" to the screen because <code>$FOO</code> has a greater-than-zero string length. But <code>$BAR</code> and <code>""</code> both do not, so nothing was printed in those two cases.</p>
+
+<p>This all works as expected. Then, out of curiosity, I removed the double-quotes from <code>$BAR</code>:</p>
+
+<pre><code>$ [ -n $BAR ] && echo "Hi" 
+Hi
+$ </code></pre>
+
+<p>Removing the quotes caused "Hi" to be printed. This was unexpected. Since <code>$BAR</code> hadn't been set, I expected nothing to be printed to the screen.</p>
+
+<p>Lastly, I removed <code>$BAR</code> entirely:</p>
+
+<pre><code>$ [ -n ] && echo "Hi"     
+Hi
+$ </code></pre>
+
+<p>Since I don't pass any value at all to the flag, I would expect the length of the non-existent "string" to be zero.</p>
+
+<p>Why are the last two cases not returning the results I expect?</p>
+
+<p>In this case, StackOverflow comes through with an answer <a href="https://web.archive.org/web/20230406161647/https://unix.stackexchange.com/questions/400889/why-isnt-n-false-like-n/400895" target="_blank">here</a>:</p>
+
+<blockquote><p><strong><code>[ -n ]</code> does not use the -n test.</strong></p>
+<p>The <code>-n</code> in <code>[ -n ]</code> is not a test at all. When there is only one argument between <code>[</code> and <code>]</code>, that argument is a string that is tested to see if it is empty. Even when that string has a leading <code>-</code>, it is still interpreted as an operand, not a test. Since the string <code>-n</code> is not empty (it contains two characters, <code>-</code> and <code>n</code>, not zero characters), <code>[ -n ]</code> evaluates to true.</p></blockquote>
+
+<p>...and again <a href="https://archive.ph/Hk4g2#selection-1397.13-1455.75" target="_blank">here</a>:</p>
+
+<blockquote><p>You need to quote your variables. Without quotes you are writing <code>test -n</code> instead of <code>test -n "expression"</code>. The test command has no idea that you provided a variable that expanded to nothing.</p></blockquote>
+
+<p>So when double-quotes are absent, the script thinks the test is equal to <code>[ -n ]</code>, which the interpreter reads as an operand of length 2, which is why it returns true. This is true whether I'm running <code>[ -n ]</code> or <code>[ -n $BAR ]</code>.</p>
+
+<h2>Experiment- difference between single- and double-quotes</h2>
+
+<p>Another question about the bracket syntax: what would happen if I used single-quotes instead of double-quotes? Does that matter? Time for another experiment.</p>
+
+<p>Since I've already defined my <code>$FOO</code> variable in my terminal tab, I <code>echo</code> it in the same terminal tab, and I see the following result:</p>
+
+<pre><code>$ echo "$FOO"
+foo
+$ </code></pre>
+
+<p>Next I try the same thing, but I replace the double-quotes with single-quotes</p>
+
+<pre><code>$ echo '$FOO'
+$FOO
+$ </code></pre>
+
+<p>So when using single-quotes instead of double-quotes, the shell doesn't expand the variable into its underlying value. It just treats the variable name as a string literal, and in this case we echo that string to the terminal.</p>
+
+<h2>Wrapping Up</h2>
+
+<p>So that's the first half of line 3 of the shim file (the part before the <code>&&</code>).  If the <code>$RBENV_DEBUG</code> environment variable contains a value (i.e. if it's non-empty), then our condition is true.</p>
+
+<p>But what happens if our condition is true?  We'll look at that next.</p>
