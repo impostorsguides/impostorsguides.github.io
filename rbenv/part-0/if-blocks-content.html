@@ -1,0 +1,195 @@
+<header class="post-header">
+  <h1 class="post-title"><code>if</code>-blocks</h1>
+</header>
+
+<p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L6" target="_blank">Next line of code</a>:</p>
+
+<pre><code>if [ "$program" = "ruby" ]; then
+  ...
+fi</code></pre>
+
+<p>We already know what the bracket syntax does.  We also know we need double-quotes to expand our <code>$program</code> variable safely.  And the <code>if ... then</code> syntax is likely to be readable even without Bash experience.  <code>fi</code> is just the way to close an <code>if</code> statement in Bash.</p>
+
+<p>So the purpose of this <code>if</code> check is to ensure the subsequent code only gets executed if the user typed <code>ruby</code> into the terminal as the program name.  We'll review that subsequent code in the next chapter, but there are also some interesting things to note about this line of code.</p>
+
+<p>Bash also supports <code>elif</code> and <code>else</code> in <code>if</code>-blocks.  Let's see how they're used.</p>
+
+<h2>Experiment- <code>if</code>-blocks in Bash</h2>
+
+<p>I write the following script:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+arg="$1"
+
+if [ "$arg" == "foo" ]; then
+  echo 'foo';
+elif [ "$arg" == "bar" ]; then
+  echo 'bar';
+else
+  echo "Unrecognized param"
+fi</code></pre>
+
+<p>We capture the first argument and store it in the variable <code>arg</code>.  If <code>arg</code> equals "foo", we print "foo".  If it equals "bar", we print "bar".  Otherwise, we print "Unrecognized param".</p>
+
+<p>When I run this in my terminal, I get:</p>
+
+<pre><code>$ ./foo foo
+foo
+$ ./foo bar
+bar
+$ ./foo baz
+Unrecognized param
+$ </code></pre>
+
+<p>Nothing too surprising here.</p>
+
+<h2>Comparing numbers in an <code>if</code>-block</h2>
+
+<p>One thing to note is that, if we want to compare two numbers in a "greater-than", "less-than", or "equal-to" situation, you should use <code>-gt</code>, <code>-lt</code>, or <code>-eq</code> respectively.  You should <i>not</i> use <code>></code>, <code><</code> to compare numbers with single bracket syntax.</p>
+
+<p>To demonstrate what happens, I rewrite my <code>foo</code> script to the following:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+arg="$1"
+
+if [ "$arg" > 1 ]; then
+  echo '> 1';
+elif [ "$arg" < -5 ]; then
+  echo '< -5';
+else
+  echo "Unrecognized param"
+fi</code></pre>
+
+<p>Everything works fine when I run <code>./foo 5</code>, but when I run <code>./foo -10</code>, I get an unexpected result:</p>
+
+<pre><code>$ ./foo 5
+> 1
+$ ./foo -10
+> 1
+$ </code></pre>
+
+<p>That's because, according to <code>man test</code>, Bash is treating <code>-10</code> and <code>5</code> as strings, not as numbers:</p>
+
+<blockquote>
+  <p>s1 = s2</p>
+  <p>True if the strings s1 and s2 are identical.</p>
+  <p>s1 != s2</p>
+  <p>True if the strings s1 and s2 are not identical.</p>
+  <p>s1 < s2</p>
+  <p>True if string s1 comes before s2 based on the binary value of their characters.</p>
+
+<p>s1 > s2</p>
+<p>True if string s1 comes after s2 based on the binary value of their characters.</p></blockquote>
+
+<p>To tell Bash to treat these as integers instead, <code>man</code>suggests we use <code>-gt</code> and <code>-lt</code> instead:</p>
+
+<blockquote>
+  <p>n1 -eq n2</p>
+  <p>True if the integers n1 and n2 are algebraically equal.</p>
+  <p>n1 -ne n2</p>
+  <p>True if the integers n1 and n2 are not algebraically equal.</p>
+  <p>n1 -gt n2</p>
+  <p>True if the integer n1 is algebraically greater than the integer n2.</p>
+  <p>n1 -ge n2</p>
+  <p>True if the integer n1 is algebraically greater than or equal to the integer n2.</p>
+  <p>n1 -lt n2</p>
+  <p>True if the integer n1 is algebraically less than the integer n2.</p>
+  <p>n1 -le n2</p>
+  <p>True if the integer n1 is algebraically less than or equal to the integer n2.</p>
+</blockquote>
+
+<p>Let's change our script to use <code>-gt</code> and <code>-lt</code> instead:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+arg="$1"
+
+if [ "$arg" -gt 1 ]; then
+  echo '> 1';
+elif [ "$arg" -lt -5 ]; then
+  echo '< -5';
+else
+  echo "Unrecognized param"
+fi</code></pre>
+  
+<p>Now, it works as expected:</p>
+
+<pre><code>$ ./foo 5
+> 1
+$ ./foo -10
+< -5
+$</code></pre>
+
+<p>Note that <code><</code> and <code>></code> <i>do</i> work as number comparators if you use the double-bracket syntax <code>[[</code> instead of the single-bracket syntax <code>[</code>.  Changing <code>foo</code> to this...</p>
+
+<pre><code>#!/usr/bin/env bash
+
+arg="$1"
+
+if [[ "$arg" > 1 ]]; then
+  echo '> 1';
+elif [[ "$arg" < -5 ]]; then
+  echo '< -5';
+else
+  echo "Unrecognized param"
+fi</code></pre>
+
+<p>...results in this when we run it:</p>
+
+<pre><code>$ ./foo 5
+> 1
+$ ./foo -10
+< -5
+$ </code></pre>
+
+<p>But as we'll see below, <code>[[</code> is not POSIX-compliant, so your script might be less-portable than you want it to be as a result of this change.</p>
+
+<H2>Equals signs- single vs. double</H2>
+
+<p>One thing I notice in <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L6" target="_blank">this line of code</a> is the use of single-equals as a comparison check. In Ruby, single-equals are used for assignments, and double-equals are used for comparisons. This doesn't appear to be the case in Bash, at least not inside the <code>[ ... ]</code> brackets.</p>
+
+<p>I Google "double vs single equals bash", and the first result that appears is <a href="https://unix.stackexchange.com/questions/72039/whats-the-difference-between-single-and-double-equal-signs-in-shell-compari" target="_blank">this StackOverflow post</a>. I learn that the following are all equivalent in Bash:</p>
+
+<pre><code>[[ $x == "$y" ]]
+[[ $x = "$y" ]]
+[ "$x" == "$y" ]
+[ "$x" = "$y" ]</code></pre>
+
+<p>Additionally, we know that <code>[ ... ]</code> and <code>test</code> are all equivalent in Bash, so we can add the following two commands to the above list:</p>
+
+<pre><code>test "$a" = "$b"
+test "$a" == "$b"</code></pre>
+
+<h2>Brackets- single vs. double</h2>
+
+<p>In the above examples from StackOverflow, I notice that some of the code uses single-brackets (<code>[ ... ]</code>), and some use double-brackets (<code>[[ ... ]]</code>). I'm curious if there's any meaningful difference between these two, so I Google "single vs double-brackets bash".</p>
+
+<p>The first result I find is <a href="https://unix.stackexchange.com/questions/49007/when-should-i-use-vs-in-bash-single-vs-double-brackets" target="_blank">a StackOverflow post</a> titled "When should I use <code>[</code> vs <code>[[</code> in Bash (single vs double brackets)?".  The answers say that the single-bracket <code>[ ... ]</code> syntax is part of the POSIX standard, and is therefore more portable to other shells.</p>
+
+<blockquote><p>Only <code>[</code> (<code>test</code>) is in POSIX. You won't find <code>[[</code> specified in POSIX except as a reserved word that implementations may use. Bash does indeed use <code>[[</code> as an enhanced <code>test</code> operator, and if you are writing scripts targeted specifically for bash, always use <code>[[</code> because it is much more powerful than <code>[</code> and safer to use as well. If, however, you are targeting POSIX sh, you need to use [, and make sure to quote arguments and not use more than 4 arguments to <code>[</code>.</p></blockquote>
+
+<p>On the other hand, while <code>[[ ... ]]</code> is not POSIX-compliant (it is used by Bash and a few other shells such as Zsh and Ksh, but not by all shells), it uses syntax which is considered safer and cleaner.</p>
+
+<blockquote><p>Single bracket is the traditional form, and is often implemented as an external command. Double bracket is a Bash (and Ksh and Zsh) extension, is not in POSIX, and has the advantage of cleaner syntax (see below) and not using a separate process.</p></blockquote>
+
+<p>The advice seems to be, if you're writing scripts specifically for Bash, use <code>[[ ... ]]</code>. But if you need a guarantee that your script will work with any POSIX-compliant shell, you should use <code>[ ... ]</code> instead.</p>
+
+<h2>What is POSIX?</h2>
+
+<p>The above answer made a big deal about the POSIX-compatitibility of <code>[</code> vs. <code>[[</code>.  But what even is POSIX?</p>
+
+<p>If we Google "What is POSIX", one of the results is <a href="https://web.archive.org/web/20240113054352/https://stackoverflow.com/questions/1780599/what-is-the-meaning-of-posix" target="_blank">another StackOverflow post</a>.  The top-rated answer from that post says:</p>
+
+<blockquote>
+  <p>POSIX is a family of standards, specified by the IEEE, to clarify and make uniform the application programming interfaces (and ancillary issues, such as command line shell utilities) provided by Unix-y operating systems.</p>
+
+  <p>When you write your programs to rely on POSIX standards, you can be pretty sure to be able to port them easily among a large family of Unix derivatives (including Linux, but not limited to it!); if and when you use some Linux API that's not standardized as part of Posix, you will have a harder time if and when you want to port that program or library to other Unix-y systems (e.g., MacOSX) in the future.</p>
+</blockquote>
+
+<p>So POSIX defines the standards that determine how users talk to computers (aka "user-level APIs") and also how one part of the computer talks to another part (aka the "system-level APIs").  Some shells (like Bash and Zsh) are POSIX-compliant, and if you write shell scripts using those languages, you can be confident that they'll run on a variety of machines.  Other shells (such as Fish) are not POSIX-compliant, and you have less of a guarantee that scripts written for these shells will be be widely-portable.</p>
+
+<h2>Wrapping Up</h2>
+
+<p>Next, let's examine the <code>for</code>-loop which lives inside the <code>if</code> block.</p>

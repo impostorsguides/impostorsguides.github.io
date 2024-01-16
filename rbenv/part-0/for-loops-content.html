@@ -1,0 +1,94 @@
+<header class="post-header">
+  <h1 class="post-title"><code>for</code>-loops</h1>
+</header>
+
+<p>Moving onto the <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L7" target="_blank">next line of code</a>:</p>
+
+<pre><code>for arg; do
+  ...
+done</code></pre>
+
+<p>We saw a regular Bash <code>for</code>-loop earlier, in our experiment with delimiters and the <code>IFS</code> variable. This loop is a bit weird, though, because we haven't yet seen an <code>arg</code> variable explicitly defined by the code. Yet here it is, all the same.</p>
+
+<p>If we haven't seen this variable defined yet, does that mean it's defined or built-in by the language? As usual, Googling turns up <a href="https://web.archive.org/web/20230406161948/https://stackoverflow.com/questions/73134672/linux-shell-for-arg-do" target="_blank">a StackOverflow post</a>:</p>
+
+<blockquote>
+  <p>It's a special way of handling command-line options using for loop.</p>
+  <p>It's equivalent to:</p>
+
+  <pre><code>for arg in "$@"; do
+  ...</code></pre>
+
+    <p>It's not specific to bash. It's defined in POSIX:</p>
+</blockquote>
+
+<p>Scrolling down in the answer a bit, we see:</p>
+
+<blockquote><p>Omitting:</p>
+  <code>in word ...</code>
+  <p>shall be equivalent to:</p>
+  <code>in "$@"</code>
+</blockquote>
+
+<p>The above statement implies that <code>$@</code> expands to the list of arguments provided to the script. Let's see if that's true with another experiment.</p>
+
+<h2>Experiment- what does <code>$@</code> evaluate to?</h2>
+
+<p>I write a new script (again named simply <code>foo</code>):</p>
+
+<pre><code>#!/usr/bin/env bash
+
+echo "$@"</code></pre>
+
+<p>Running the script with some random arguments, we get:</p>
+
+<pre><code>$ ./foo bar baz buzz
+bar baz buzz
+$</code></pre>
+
+<p>Changing the script a bit:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+for arg in "$@";
+do
+  echo "$arg"
+done</code></pre>
+
+<p>Running this, we get:</p>
+
+<pre><code>$ ./foo bar baz buzz
+bar
+baz
+buzz
+$</code></pre>
+
+<p>They print on separate lines this time, because now we're iterating over them with the <code>for</code> loop and making a separate call to <code>echo</code> for each arg, instead of printing them all at once via <code>$@</code>.</p>
+
+<p>And finally, testing whether we can eliminate <code>in $@</code>:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+for arg;
+do
+  echo "$arg"
+done</code></pre>
+
+<p>Running this results in:</p>
+
+<pre><code>$ ./foo bar baz buzz
+bar
+baz
+buzz
+$ </code></pre>
+
+<p>Awesome! Nothing changed, meaning that the in <code>$@</code> bit is optional in this case.</p>
+
+<p>So we learned:</p>
+
+<ul>
+  <li><code>$@</code> stands for the arguments that you pass to the script</li>
+  <li>If you write a <code>for</code> loop but leave off the <code>in ___</code> part, bash defaults to using <code>$@</code></li>
+</ul>
+
+<p>Let's move on to the next line of code.</p>
