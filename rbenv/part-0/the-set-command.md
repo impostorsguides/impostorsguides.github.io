@@ -4,8 +4,8 @@ category: rbenv-introduction
 id: 9
 title: The set Command
 permalink: /shell/set-command/
-next-title: Conditional Logic
-next-permalink: /shell/conditional-logic/
+next-title: The test Command
+next-permalink: /shell/test-command/
 previous-title: The man Command
 previous-permalink: /shell/man-command
 ---
