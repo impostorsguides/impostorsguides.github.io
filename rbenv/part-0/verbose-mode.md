@@ -4,8 +4,8 @@ category: rbenv-introduction
 id: 11
 title: Verbose Mode
 permalink: /shell/verbose-mode/
-next-title: Parameter Expansion, Part 1
-next-permalink: /shell/parameter-expansion-pt-1/
+next-title: Setting the Name of the User's Program
+next-permalink: /shell/user-program-name/
 previous-title: The test Command
 previous-permalink: /shell/test-command/
 ---

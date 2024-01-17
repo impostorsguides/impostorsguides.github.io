@@ -1,0 +1,165 @@
+<header class="post-header">
+  <h1 class="post-title"><code>case</code> Statements</h1>
+</header>
+
+<p>Moving on to <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L8" target="_blank">the next line</a>:</p>
+
+<pre><code>case "$arg" in
+  ...
+esac</code></pre>
+
+<p>If you know another programming language, you're familiar with the concept of case statements- they're a form of conditional branching, not entirely different from the if-blocks that we saw earlier. Let's familiarize ourselves with the way Bash in particular handles them.</p>
+
+<h2>Bash docs on <code>case</code></h2>
+
+<p>I try <code>help case</code> in my Bash terminal, and get the following:</p>
+
+<pre><code>bash-3.2$ help case
+  case: case WORD in [PATTERN [| PATTERN]...) COMMANDS ;;]... esac
+      Selectively execute COMMANDS based upon WORD matching PATTERN.  The
+      `|' is used to separate multiple patterns.
+  bash-3.2$ </code></pre>
+
+<p>It's pretty short, and doesn't tell me much more than I already know.</p>
+
+<h2>Example of Bash's <code>case</code></h2>
+
+<p>However, <a href="https://web.archive.org/web/20220820011836/https://linuxize.com/post/bash-case-statement/" target="_blank">this link</a> has a good explanation of Bash's case statement syntax. It's much too long to copy/paste in its entirety, but there's a lot of good stuff in it.</p>
+
+<p>Here is a specific example of a <code>case</code> statement that the above article provides, which we can use to deconstruct how they work in Bash:</p>
+
+<pre><code>#!/bin/bash
+
+echo -n "Enter the name of a country: "
+read COUNTRY
+
+echo -n "The official language of $COUNTRY is "
+
+case $COUNTRY in
+
+  Lithuania)
+    echo -n "Lithuanian"
+    ;;
+
+  Romania | Moldova)
+    echo -n "Romanian"
+    ;;
+
+  Italy | "San Marino" | Switzerland | "Vatican City")
+    echo -n "Italian"
+    ;;
+
+  *)
+    echo -n "unknown"
+    ;;
+esac</code></pre>
+
+<p>We open, of course, with the <code>case</code> keyword, followed by the case expression and the <code>in</code> keyword. The statement ends with the <code>esac</code> keyword.</p>
+
+<p>Each case is defined by one or more patterns included on the same line, separated by the <code>|</code> operator.  The <code>)</code> operator terminates a pattern list.  A pattern can include <a href="https://web.archive.org/web/20220820011901/https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html" target="_blank">special characters</a> to take advantage of pattern matching.</p>
+
+<p>A pattern and its associated commands are known as a clause.  Each clause must be terminated with <code>;;</code>.  It is a common practice to use the wildcard asterisk symbol <code>*</code> as a final pattern to define the default case. This pattern will always match.</p>
+
+<p>The commands corresponding to the first pattern that matches the expression are executed.  If no pattern is matched, the return status is zero.  Otherwise, the return status is the exit status of the executed commands (aka the clause).</p>
+
+<p>For the most part, compared to (for example) a Javascript or Ruby case statement, the only thing that's likely to be new here is the syntax.  There are a few differences, such as <a href="https://unix.stackexchange.com/questions/577603/possible-to-match-multiple-conditions-in-one-case-statement" target="_blank">when you want to purposely fall through from one case statement to the next</a>, but we won't need to know about that for the purposes of grokking RBENV.</p>
+
+<h2>Experiment- building a simple <code>case</code> statement</h2>
+
+<p>To solidify our understanding of how “bash” handles case statements, let’s build a simple one here. I start by updating my “foo” script to look like the following:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+echo "$@"</code></pre>
+
+<p>I then run it as follows, to make sure it works:</p>
+
+<pre><code>$ ./foo 1
+1
+$ </code></pre>
+
+<p>Next, I wrap the existing code inside a “case” statement with only the default case implemented:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+case "$@" in
+  *)
+    echo "$@"
+    ;;
+esac</code></pre>
+
+I run it again with the same arguments, to make sure nothing has changed:
+
+<pre><code>$ ./foo 1
+1
+$ </code></pre>
+
+<p>Next, I add a few non-default conditions:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+case "$@" in
+  "1")
+    echo "One"
+    ;;
+  "2")
+    echo "Two"
+    ;;
+  "3")
+    echo "Three"
+    ;;
+  *)
+    echo "$@"
+    ;;
+esac</code></pre>
+
+<p>When I test the different edge cases, I get:</p>
+
+<pre><code>$ ./foo 1
+One
+$ ./foo 2
+Two
+$ ./foo 3
+Three
+$ ./foo 4
+4
+$ 
+</code></pre>
+
+<p>Lastly, I try adding a clause with more than one pattern:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+case "$@" in
+  "1")
+    echo "One"
+    ;;
+  "2")
+    echo "Two"
+    ;;
+  "3")
+    echo "Three"
+    ;;
+  "4" | "5")
+    echo "Either four or five"
+    ;;
+  *)
+    echo "$@"
+    ;;
+esac</code></pre>
+
+<p>When I run it, I get:</p>
+
+<pre><code>$ ./foo 4
+Either four or five
+$ ./foo 5
+Either four or five
+$ ./foo 6
+6
+</code></pre>
+
+<p>No surprises so far- all the examples worked the way we’d expect.</p>
+
+<h2>Moving On</h2>
+
+<p>Let’s move on to the first case block in RBENV’s shim file.</p>

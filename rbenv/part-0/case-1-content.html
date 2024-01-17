@@ -1,0 +1,117 @@
+<header class="post-header">
+  <h1 class="post-title">Case 1: When we don't care about the args</h1>
+</header>
+
+<p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L9" target="_blank">Next line of code</a>:</p>
+
+<pre><code>    -e* | -- ) break ;;</code></pre>
+
+<p>This is the first block of our case statement.</p>
+
+<h2>Breaking early, depending on the args to Ruby</h2>
+
+<p>In the earlier list of bullet points, I mentioned that "A pattern can have <a href="https://web.archive.org/web/20220820011901/https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html" target="_blank">special characters</a>."  This clause is an example of the use of such special characters.</p>
+
+<p>We see two patterns (<code>-e*</code> and <code>--</code>), separated by the <code>|</code> character, then terminated by the <code>)</code> character.  If the current argument in the iteration matches either pattern, we exit the <code>for</code>-loop (i.e. we <code>break</code>). Otherwise, we check the next clause in the case statement.</p>
+
+<p>In the above link, the asterisk <code>*</code> is listed as one of the "special characters" available in Bash case statements:</p>
+
+<blockquote><p>*</p><p>Matches any string, including the null string.</p></blockquote>
+
+<p>This makes me suspect that any text starting with <code>-e</code> (followed by zero or more characters) would fit the <code>-e*</code> pattern. To find out if that's true, let's do an experiment.</p>
+
+<h2>Experiment- the <code>-e*</code> flag in a case statement</h2>
+
+<p>I write the following script:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+for arg; do
+  case "$arg" in
+    -e* ) echo "Pattern matched on arg $arg; exiting..."
+    break ;;
+    * )
+      echo "arg $arg does not match" ;;
+  esac
+done
+
+echo "outside the for loop"</code></pre>
+
+<p>This is a simplified version of the original case statement. It iterates over the list of args, and does the following:</p>
+
+<ul>
+  <li>If an arg matches <code>-e*</code>, we <code>echo</code> a test string and <code>break</code> out of the loop.</li>
+  <li>Otherwise, we just <code>echo</code> the arg itself and keep iterating until we've handled all the arguments.</li>
+  <li>When we're done with the <code>for</code>-loop, we echo "Outside the for loop" to indicate that the script is finished.</li>
+</ul>
+
+<p>I then run the following in my terminal:</p>
+
+<pre><code>$ ./foo bar -ebaz buzz
+arg bar does not match
+Pattern matched on arg -ebaz; exiting...
+outside the for loop
+$ </code></pre>
+
+<p>The script prints our first arg, and then "Pattern matched on arg -ebaz; exiting…", then skips the third arg "buzz". This is because <code>-ebaz</code> starts with <code>-e</code>, which matched the <code>break</code> condition of <code>-e*</code>.</p>
+  
+<p>Lastly, we printed "Outside the for loop" to prove that <code>break</code>'ing only terminates the iterations of the <code>for</code>-loop, as opposed to the entire script.</p>
+
+<p>Next, I run the same command, but I pass <code>-e</code> instead of <code>-ebaz</code>:</p>
+
+<pre><code>$ ./foo bar -e buzz   
+arg bar does not match
+Pattern matched on arg -e; exiting...
+outside the for loop
+$ </code></pre>
+
+<p>We see a similar result, even when the arg we're trying to match is just <code>-e</code> by itself, with no subsequent characters.</p>
+
+<p>Based on this result, we can safely say that we were correct, and the <code>-e*</code> flag returns true if a given string starts with <code>-e</code> and has zero or more characters after.</p>
+
+<p>So now we know what the shim does when the <code>-e</code> and <code>--</code> flags are passed.  But why are these flags considered special?</p>
+
+<h2>Ruby's <code>-e</code> flag</h2>
+
+<p>Since this case statement clause is located inside the <code>if</code>-block which ensures that <code>$program</code> is equal to <code>ruby</code>, we know that the <code>-e</code> flag is intended for use with the <code>ruby</code> command:</p>
+
+<pre><code>if [ "$program" = "ruby" ]; then
+  ...</code></pre>
+
+<p>To figure out what the <code>-e</code> flag actually does, I run <code>ruby --help</code> and searched for the <code>-e</code> entry.</p>
+
+<p>As it turns out, this flag lets you execute Ruby code directly in your terminal, without having to pass a filename to the Ruby interpreter:</p>
+
+<pre><code>$ ruby --help           
+Usage: ruby [switches] [--] [programfile] [arguments]
+...
+  -e 'command'    one line of script. Several -e's allowed. Omit [programfile]
+...</code></pre>
+  
+<p>For example:</p>
+
+<pre><code>$ ruby -e "puts 'Hello'"
+Hello
+$ </code></pre>
+
+<p>So passing Ruby code directly to the <code>ruby</code> interpreter in your terminal (via the <code>-e</code> flag) is one of the two scenarios which will cause RBENV to assume that any subsequent args are meant to be positional args, not flags to the <code>ruby</code> command itself.</p>
+
+<h2>The <code>--</code> flag</h2>
+
+<p>The 2nd pattern which could cause this same behavior is <code>--</code>.  To tell us why, StackOverflow <a href="https://web.archive.org/web/20220623104640/https://unix.stackexchange.com/questions/11376/what-does-double-dash-mean" target="_blank">saves the day again</a>:</p>
+
+<blockquote>
+  <p>...a double dash (<code>--</code>) is used in most Bash built-in commands and many other commands to signify the end of command options, after which only positional arguments are accepted.</p>
+
+  <p>Example use: Let's say you want to grep a file for the string <code>-v</code> - normally <code>-v</code> will be considered the option to reverse the matching meaning (only show lines that do not match), but with <code>--</code> you can grep for the string <code>-v</code> like this:</p>
+
+  <pre><code>grep -- -v file</code></pre>
+</blockquote>
+
+<p>The above post tells us that everything before <code>--</code> is meant to be a flag, and everything after that is an argument to the script itself.</p>
+
+<p>This clause, as well as the conditions it matches (<code>-e*</code> or <code>--</code>), imply that everything else which comes afterward is an argument that tells the <code>ruby</code> command what to process, not a flag which tells the script how to process it.</p>
+
+<h2>Moving On</h2>
+
+<p>Let's move on to the next block of code.</p>
