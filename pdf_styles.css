@@ -88,6 +88,7 @@ blockquote {
 	margin-bottom: 2em;
 	margin-top: 2em;
 	border-left: 3px solid lightgray;
+	page-break-inside: avoid;
 }
 
 /** * Code formatting */
@@ -114,6 +115,7 @@ pre > code {
 
 /** * Tables */
 table {
+	page-break-inside: avoid;
 	margin-bottom: 30px;
 	width: 100%;
 	text-align: left;
