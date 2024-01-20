@@ -35,7 +35,7 @@ exec "/opt/homebrew/bin/rbenv" exec "$program" "$@"
 
 <h2>The shebang line</h2>
 
-<p>In UNIX, a shebang is a special line of code at the top of a script file which tells UNIX which program to use when executing the rest of the file's code. In this case, since the shebang ends in "bash", we're telling UNIX to use the bash shell to evaluate the code.</p>
+<p>In UNIX, a shebang is a special line of code at the top of a script file which tells UNIX which program to use when executing the rest of the file's code. In this case, since the shebang ends in Bash, we're telling UNIX to use the bash shell to evaluate the code.</p>
 
 <p>If you're going to include a shebang, it must be on the first line of the file in order for it to work correctly.</p>
 
@@ -91,7 +91,7 @@ USER=richiethomas
 
 <h2>Non-<code>bash</code> shebangs</h2>
 
-<p>As I mentioned before, the string "bash" at the end of the shebang tells UNIX to use Bash when interpreting the code which follows.  But Bash is not the only interpreter we can tell UNIX to use for a script that we write.</p>
+<p>As I mentioned before, the string Bash at the end of the shebang tells UNIX to use Bash when interpreting the code which follows.  But Bash is not the only interpreter we can tell UNIX to use for a script that we write.</p>
 
 <p>The only reason the code uses the <code>bash</code> shebang here is because the subsequent code is written in Bash. If they had written it in Ruby, they could have used a Ruby shebang (i.e. <code>#!/usr/bin/env ruby</code>) instead. In fact, let's try doing exactly that, as an experiment.</p>
 

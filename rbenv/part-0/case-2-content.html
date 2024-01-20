@@ -1,0 +1,161 @@
+<header class="post-header">
+  <h1 class="post-title">Case 2: When the argument is a filepath</h1>
+</header>
+
+<p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L10" target="_blank">Next block of code</a>:</p>
+
+<pre><code>    */* )</code></pre>
+
+<p>This is clause #2 of our case statement, with <code>*/*</code> as the pattern that the case statement will match against.</p>
+
+<p>One difference I notice is that this is not the same as a "catch-all" default case; the <code>*/* )</code> pattern here doesn't exactly match the <code>* )</code> pattern in the example code we read earlier.</p>
+
+<p>Instead, it looks like this pattern searches for a forward-slash, surrounded on either side with zero or more characters. The one thing I can think of which would match that pattern is a file path. Let's check that with an experiment.</p>
+
+<h2>Experiment: matching the <code>*/*</code> pattern</h2>
+
+<p>Let's make a Bash script which looks like this:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+for arg; do
+  case "$arg" in
+    */* )
+      echo "match: $arg";
+      ;;
+    * )
+      echo "not a match: $arg";
+      ;;
+  esac
+done
+</code></pre>
+
+<p>When I run the above with a few different arguments, I get the following results:</p>
+
+<pre><code>$ ./foo 1 2 3 a/b /a b/ / ''
+not a match: 1
+not a match: 2
+not a match: 3
+match: a/b
+match: /a
+match: b/
+match: /
+not a match: 
+$ </code></pre>
+
+<p>I sent my <code>./foo</code> script the following arguments:</p>
+<ul>
+  <li>3 arguments with no forward slashes (just 3 random numbers, "1", 2", and "3").</li>
+  <li>4 arguments containing a forward slash in various positions</li>
+  <li>an empty string, ''</li>
+</ul>
+
+<p>When I run the script:</p>
+
+<ul>
+  <li>the first group of 3 patterns don't match</li>
+  <li>the second group of 4 patterns do match</li>
+  <li>the final empty string does not match</li>
+</ul>
+
+<p>So yes, it appears to be looking for strings which match the <code>/</code> symbol with zero or more characters of text on either side.</p>
+
+<p>But just because it looks like a valid filepath, doesn't mean it is one. So how do we know it's a file?</p>
+
+<p>We'll answer that question next.</p>
+
+<h2>Detecting Filepaths</h2>
+
+<p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L11" target="_blank">The next line of code</a> is:</p>
+
+<pre><code>if [ -f "$arg" ]; then
+  ...
+fi</code></pre>
+
+<p>Running <code>man test</code> and searching for the <code>-f</code> string reveals the following:</p>
+
+<pre><code>$ man test | ag -- -f
+  -f file       True if file exists and is a regular file.
+$ </code></pre>
+
+<p>It says that <code>[ -f "$file" ]</code> returns true "if <code>file</code> exists and is a regular file".  In other words, our case statement matches if the arg <i>could be</i> a filepath, and we then verify that it actually <i>is</i> a file by using <code>[ -f "$arg" ]</code>.</p>
+
+<p>To test whether the <code>-f</code> flag behaves the way I think it does, we can update our <code>foo</code> script from earlier to look like the following:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+for arg; do
+  case "$arg" in
+    */* )
+      echo "could be a filepath: $arg";
+      if [ -f "$arg" ]; then
+        echo "is definitely a filepath";
+      else
+        echo "turns out, not a filepath";
+      fi
+      ;;
+    * )
+      echo "not a match: $arg";
+      ;;
+  esac
+  echo "-----"
+done</code></pre>
+
+<p>Then I create an empty file named <code>bar</code> in my current directory:</p>
+
+<pre><code>$ touch bar
+$ </code></pre>
+
+<p>I do this so that I have a file in my directory that will return true for the test <code>[ -f "./bar" ]</code>.</p>
+
+<p>Lastly, I run the <code>foo</code> script with a few arguments, and I see the following:</p>
+
+<pre><code>$ ./foo 1 2 3 a/b /a b/ / '' ./bar foo
+  not a match: 1
+  -----
+  not a match: 2
+  -----
+  not a match: 3
+  -----
+  could be a filepath: a/b
+  turns out, not a filepath
+  -----
+  could be a filepath: /a
+  turns out, not a filepath
+  -----
+  could be a filepath: b/
+  turns out, not a filepath
+  -----
+  could be a filepath: /
+  turns out, not a filepath
+  -----
+  not a match: 
+  -----
+  could be a filepath: ./bar
+  is definitely a filepath
+  -----
+  not a match: foo
+  -----
+$ </code></pre>
+
+<p>As expected, the arguments which are known to not match a file in my current directory (i.e. "a/b", "/b", "a/", and "/") result in the output "turns out, is not a filepath". My "./bar" argument, which is known to match a file, results in the output "is definitely a filepath".</p>
+
+<h2>Only matching certain filepaths</h2>
+
+<p>But wait, the last argument "foo" also matches a filepath, i.e. the <code>./foo</code> script we're running!</p>
+
+<p>The case statement doesn't recognize it as a match, because it doesn't have a "/" in its argument.  But it is a file. Since this case statement closely matches the one in RBENV's shim, does that imply the RBENV shim is also skipping some filepaths?  And if so, is that on purpose, or should it in fact be treating them as matches?</p>
+
+<p>The short answer is that yes, we are skipping files which don't have a <code>/</code> in them.  That's because we can assume that files which don't have a <code>/</code> in them are in our current directory.</p>
+  
+<p>I'm skipping ahead a bit, but the purpose of this part of the <code>case</code> statement is to set an environment variable called <code>RBENV_DIR</code>.  This environment variable controls where RBENV searches for a file called <code>.ruby-version</code>, which tells it which version of Ruby to use.  We only want to set that environment variable <i>from within the shim</i> if the Ruby script we're running lives somewhere <i>other than</i> in our current directory.</p>
+
+<p>So for example, if we're currently in <code>~/foo/</code>, but we're running <code>ruby ~/bar/baz.rb</code>, then we want RBENV to use the <code>.ruby-version</code> file inside <code>~/bar/</code>, <i>not</i> the <code>.ruby-version</code> file inside <code>~/foo/</code>.</p>
+
+<p>The other scenario is that we're running a script which is located <i>inside</i> our current directory, i.e. we're inside <code>~/foo/</code> and we want to run <code>ruby ~/foo/buzz.rb</code>.  In that case, we assume that the <code>.ruby-version</code> file also lives in the current directory, in which case we'll rely on the code for the <code>rbenv</code> command itself.  That code is located in another file, and we'll cover it in a future chapter.</p>
+
+<h2>Wrapping Up</h2>
+
+<p>Don't worry if you weren't able to put this together yourself, just based on the code we've read up to this point.  I wasn't able to either, and it wasn't until I read the code for the <code>rbenv</code> file that this all came together for me.  One important skill that I've had to develop over the course of reading open-source code is the ability to capture my open questions in a document, and set them aside until I've read more code and have more knowledge of all the moving parts.</p>
+
+<p>Let's move on.</p>

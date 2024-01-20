@@ -2,7 +2,7 @@
   <h1 class="post-title">Case 1: When we don't care about the args</h1>
 </header>
 
-<p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L9" target="_blank">Next line of code</a>:</p>
+<p>Now that we've learned how <code>case</code> statements work in Bash, we're better able to interpret the <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L9" target="_blank">next line of code</a>:</p>
 
 <pre><code>    -e* | -- ) break ;;</code></pre>
 
@@ -53,7 +53,7 @@ Pattern matched on arg -ebaz; exiting...
 outside the for loop
 $ </code></pre>
 
-<p>The script prints our first arg, and then "Pattern matched on arg -ebaz; exiting…", then skips the third arg "buzz". This is because <code>-ebaz</code> starts with <code>-e</code>, which matched the <code>break</code> condition of <code>-e*</code>.</p>
+<p>The script prints our first arg, and then "Pattern matched on arg -ebaz; exiting...", then skips the third arg "buzz". This is because <code>-ebaz</code> starts with <code>-e</code>, which matched the <code>break</code> condition of <code>-e*</code>.</p>
   
 <p>Lastly, we printed "Outside the for loop" to prove that <code>break</code>'ing only terminates the iterations of the <code>for</code>-loop, as opposed to the entire script.</p>
 

@@ -1,0 +1,23 @@
+<header class="post-header">
+  <h1 class="post-title">Executing The User's Command</h1>
+</header>
+
+<p>We've arrived at <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L21" target="_blank">the final line of code in the shim</a>:</p>
+
+<pre><code>exec "/Users/richiethomas/.rbenv/libexec/rbenv" exec "$program" "$@"</code></pre>
+
+<h2>Confirming The Correct RBENV Version</h2>
+
+<p>For what it's worth, this line will look a bit different on your machine than it does on mine, since the username that appears in the filepath in this line (“richiethomas”) will be different.  But the majority of it should look similar, assuming you're using the same version of RBENV that I am (“1.2.0-16-gc4395e5”).  To make sure this is true, run the following in your Bash terminal:</p>
+
+<pre><code>bash-3.2$ rbenv --version
+rbenv 1.2.0-16-gc4395e5
+bash-3.2$ </code></pre>
+
+<p>You should see <code>rbenv 1.2.0-16-gc4395e5</code> as the output.  If not, you may need to re-install RBENV, as per the instructions <a href="/shell/install-rbenv" target="_blank">here</a>.</p>
+
+<h2>What command are we running?</h2>
+
+<p>On the last line of code in the shim, we’re running a command called “exec”.  We’ll get to what it does in a minute, but first let’s print out the arguments that we’re passing, so we can make more sense of the command.</p>
+
+<p>Above the last line of code, I add the following:</p>

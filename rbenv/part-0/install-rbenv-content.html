@@ -75,12 +75,6 @@ $ </code></pre>
 
 <pre><code>$ mv ~/.rbenv/ ~/.rbenv-old</code></pre>
 
-<p>If you get a <code>Permission denied</code> error, you may need to add <code>sudo</code> to the front of the above command (and enter your password when prompted) in order to rename the folder:</p>
-
-<pre><code>$ sudo mv ~/.rbenv/ ~/.rbenv-old
-Password:
-$ </code></pre>
-
 <p>After the old RBENV folder is renamed, we can install RBENV again via source, by following the instructions on <a href='https://github.com/rbenv/rbenv/tree/e8b7a27ee67a5751b899215b4d35fd86ab552dae#basic-git-checkout' target='_blank' rel='noopener'>this version of the RBENV Readme file</a>.  Run the following command:</p>
 
 <pre><code>$ git clone https://github.com/rbenv/rbenv.git ~/.rbenv
@@ -122,7 +116,7 @@ $ </code></pre>
 
 <p>Next, we'll copy your currently-installed Ruby versions, gems, etc. to this new installation, ensuring that you can continue using RBENV as you have up until now:</p>
 
-<pre><code>$ sudo cp -r ~/.rbenv-old/versions \                                                                                     
+<pre><code>$ cp -r ~/.rbenv-old/versions \                                                                                     
 > ~/.rbenv-old/version \                                                                        
 > ~/.rbenv-old/shims \                                                     
 > ~/.rbenv-old/rbenv.d \                                
@@ -214,6 +208,117 @@ rbenv () {
 $</code></pre>
 
 <p>If we see the above output, we know RBENV has been successfully installed.</p>
+
+<h2>Generating an RBENV shim</h2>
+
+<p>The last thing we should do is make sure our Ruby version and its associated gems will be managed by RBENV (not by the system).  To do this, we'll attempt to install a Ruby version, followed by a Ruby gem</p>
+
+<p>Run <code>brew install ruby-build</code> to install the <code>rbenv install</code> command.  This is the program which enables RBENV to install new versions of Ruby.</p>  If it was successful, you should see something like the following:
+
+<pre><code>==> Downloading https://ghcr.io/v2/homebrew/core/ruby-build/manifests/20240119
+  ##################################################################################################################################################### 100.0%
+  ==> Fetching ruby-build
+  ==> Downloading https://ghcr.io/v2/homebrew/core/ruby-build/blobs/sha256:61f4463a727fd0e6434db47da818bc3184c0788cba906e1083743329aa288641
+  ##################################################################################################################################################### 100.0%
+  ==> Pouring ruby-build--20240119.all.bottle.tar.gz
+  🍺  /opt/homebrew/Cellar/ruby-build/20240119: 599 files, 316.5KB
+  ==> Running `brew cleanup ruby-build`...
+  Disable this behaviour by setting HOMEBREW_NO_INSTALL_CLEANUP.
+  Hide these hints with HOMEBREW_NO_ENV_HINTS (see `man brew`).
+  Removing: /Users/richiethomas/Library/Caches/Homebrew/ruby-build--20231225... (65.2KB)</code></pre>
+
+<p>When that's done, run <code>rbenv install 3.2.2</code> (or some other current version of Ruby).  This may take a few minutes to complete.  When that's done, run <code>rbenv version 3.2.2</code> (or the version # you just installed) to ensure that this version is the one you're currently using.</p>
+
+<p>You should see something like the following as output:</p>
+
+<pre><code>...
+==> Downloading ruby-3.2.2.tar.gz...
+-> curl -q -fL -o ruby-3.2.2.tar.gz https://cache.ruby-lang.org/pub/ruby/3.1/ruby-3.2.2.tar.gz
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                  Dload  Upload   Total   Spent    Left  Speed
+100 19.1M  100 19.1M    0     0  8803k      0  0:00:02  0:00:02 --:--:-- 8811k
+==> Installing ruby-3.2.2...
+ruby-build: using readline from homebrew
+ruby-build: using libyaml from homebrew
+-> ./configure "--prefix=$HOME/.rbenv/versions/3.2.2" "--with-openssl-dir=$HOME/.rbenv/versions/3.2.2/openssl" --enable-shared --with-readline-dir=/opt/homebrew/opt/readline --with-libyaml-dir=/opt/homebrew/opt/libyaml --with-ext=openssl,psych,+
+-> make -j 14
+-> make install
+==> Installed ruby-3.2.2 to /Users/richiethomas/.rbenv/versions/3.2.2</code></pre>
+
+<p>Next, run <code>rbenv global 3.2.2</code> to tell RBENV to use your newly-installed Ruby version as the default global version (instead of using the version which came pre-installed on your machine):</p>
+
+<pre><code>$ rbenv global 3.2.2
+$ rbenv global
+3.2.2
+</code></pre>
+
+<p>Next, run <code>gem install bundler</code> to make sure that this version of Ruby has the Bundler gem installed.</p>
+
+<p>Lastly, run <code>which bundle</code> to make sure that the directory that appears is <code>~/.rbenv/shims/bundle</code>.  You should see something like:</p>
+
+<pre><code> $ which bundle
+/Users/richiethomas/.rbenv/shims/bundle
+$ </code></pre>
+
+<p>If you see this, that means the bundle command corresponds to a shim in your RBENV directory, and you are good to go!</p>
+
+<p>If, instead, you see something like...</p>
+
+<pre><code> $ which bundle
+/usr/bin/bundle
+$ </code></pre>
+
+<p>...this means your Bundler gem is still controlled by your system, not by RBENV.  If that's the case, verify that the <code>~/.rbenv/shims</code> folder comes before <code>/usr/bin/</code> in your <code>$PATH</code> variable:</p>
+
+<pre><code>$ echo -e ${PATH//:/\\n}
+/Users/richiethomas/.rbenv/bin
+/Users/richiethomas/.rbenv/shims
+/usr/local/lib/ruby/gems/2.6.0/bin
+/opt/homebrew/bin
+/opt/homebrew/sbin
+/usr/local/bin
+/System/Cryptexes/App/usr/bin
+/usr/bin
+/bin
+/usr/sbin
+/sbin
+...
+</code></pre>
+
+<p>If it doesn't, you likely need to add the following to your <code>~/.bashrc</code> file (if you're using Bash as your terminal):</p>
+
+<pre><code>eval "$(~/.rbenv/bin/rbenv init - bash)"
+PATH="/Users/richiethomas/.rbenv/bin:$PATH"</code></pre>
+
+<p>Or if you're using Zsh (the default shell on MacOS), you'll add the following to your <code>~/.zshrc</code> file:</p>
+
+<pre><code>eval "$(~/.rbenv/bin/rbenv init - zsh)"
+PATH="/Users/richiethomas/.rbenv/bin:$PATH"</code></pre>
+
+<p>Then open a new terminal tab and re-run which bundle.  If you still see <code>/usr/bin/bundle</code>, check the file permissions of both the <code>~/.rbenv/shims</code> folder and the shims within this folder, by running:</p>
+
+<pre><code>$ ls -la ~/.rbenv
+total 80
+drwxr-xr-x  18 root  staff    576 Jan 20 10:50 .
+drwxr-x---+ 41 root  staff   1312 Jan 20 11:42 ..
+...
+drwxr-xr-x  39 root  staff   1248 Jan 20 11:16 shims
+...
+</code></pre>
+
+<pre><code>$ ls -la ~/.rbenv/shims
+total 296
+drwxr-xr-x  39 root  staff  1248 Jan 20 11:16 .
+drwxr-xr-x  18 root  staff   576 Jan 20 10:50 ..
+-rwxr-xr-x   1 root  staff   409 Jan 20 11:03 bootsnap
+-rwxr-xr-x   1 root  staff   409 Jan 20 11:03 bundle
+-rwxr-xr-x   1 root  staff   409 Jan 20 11:03 bundler
+...
+</code></pre>
+
+<p>You should see your UNIX username to the left of <code>staff</code>, <strong>not</strong> <code>root</code> (as above).  If you do in fact see <code>root</code> next to <code>staff</code>, then it's possible your directory and file permissions are preventing the shim from being executable.  In which case, verify that you cloned the RBENV repository via the <code>git clone</code> command, <strong>not</strong> <code>sudo git clone</code>.</p>
+
+<p>After running this last step, I opened a new terminal tab and re-ran which bundle, and I finally saw my expected output: <code>/Users/richiethomas/.rbenv/shims/bundle</code>.</p>
 
 <h2>What is an <code>rc</code> dotfile?</h2>
 
