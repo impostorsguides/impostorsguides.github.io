@@ -1,16 +1,29 @@
-<header class="post-header">
-  <h1 class="post-title">Installing (or re-installing) RBENV</h1>
-</header>
+---
+layout: post
+permalink: /blog/installing-rbenv-from-source/
+title: Installing (or re-installing) RBENV
+excerpt_separator: <!--more-->
+createdAt: 1-5-2024
+---
 
-<div w3-include-html="install-rbenv-title.html"></div>
+<div>
+  <figure style="float: left; width: 50%; margin: 0 25px 10px 0">
+    <img src="/assets/images/fox-dog-cat.jpeg" width="100%" alt="Foxes evolved because nature accidentally installed cat software on a dog operating system.">
+  </figure>
+</div>
 
-<p>As we previously mentioned, the first step is to install RBENV on your machine.  I'm writing this tutorial on a Macbook running macOS, and I'll be using macOS-specific installation instructions and commands throughout.</p>
+<p>If you want to follow along with some of the RBENV-specific experiments I describe on this site, the first step is to install RBENV on your machine.</p>
 
-<p><strong>Even if you're already an RBENV user</strong>, you'll want to read this chapter, since there's a good chance you'll need to re-install RBENV from source (as opposed to via Homebrew or similar).</p>
+<p><strong>Even if you've already installed RBENV</strong>, you'll want to read this post, since there's a good chance you'll need to re-install RBENV from source (as opposed to via Homebrew or similar).</p>
+
+<!--more-->
+<p>If you'd rather not do this, you can still follow along with the RBENV code via <a href="https://github.com/rbenv/rbenv/tree/c4395e58201966d9f90c12bd6b7342e389e7a4cb" target="_blank">its Github repo</a>, or by cloning said repo to your machine.  You'll still be able to perform any experiment we do in this guide which isn't RBENV-specific.</p>
+
+<p>I'm writing this tutorial on a Macbook running macOS, and I'll be using macOS-specific installation instructions and commands throughout.</p>
 
 <h2>Ensuring you have no other version managers installed</h2>
 
-<p>Admittedly, the best candidates for reading this book are people who already use RBENV as their Ruby version manager.  As you'll soon see, users of other version managers (such as rvm, asdf, chruby, etc.) will face more and bigger hurdles than users of RBENV (more on why in a minute).</p>
+<p>Admittedly, the best candidates for reading this guide are people who already use RBENV as their Ruby version manager.  As you'll soon see, users of other version managers (such as rvm, asdf, chruby, etc.) will face more and bigger hurdles than users of RBENV (more on why in a minute).</p>
 
 <p>With that in mind, we'll need to make sure you don't have a different Ruby version manager installed, such as RVM.  If you do, that will represent a blocker to your continuing this guide, since you'll have different version managers competing to manage your Ruby version.  This could introduce <a href="https://web.archive.org/web/20160715135727/https://stackoverflow.com/questions/35808103/rvm-and-rbenv-on-the-same-machine" target="_blank" rel="noopener">unexpected behavior</a> and negatively impact your usage of Ruby.</p>
 
@@ -24,7 +37,7 @@ $ which chruby
 chruby not found
 $ </code></pre>
 
-<p>If you see anything other than "not found" for <code>which asdf</code>, <code>which rvm</code>, and <code>which chruby</code>, you likely have another version manager on your machine.  In that case, you'll need to make a decision about which version manager you want to use.  <a href="https://github.com/rbenv/rbenv/wiki/Comparison-of-version-managers" target='_blank' rel='noopener'>RBENV's Github page has a guide</a> on differentiating between the various version managers out there.</p>
+<p>If you see anything other than "not found" for <code>which asdf</code>, <code>which rvm</code>, and <code>which chruby</code>, you likely have another version manager on your machine.  In that case, you'll need to make a decision about which version manager you want to use.  <a href="https://github.com/rbenv/rbenv/wiki/Comparison-of-version-managers" target='_blank' rel='noopener'>RBENV's Github page has a guide</a> on the pros and cons of the various version managers out there.</p>
 
 <p>If you don't have other version managers on your machine, feel free to move on to the next section.</p>
 
@@ -36,24 +49,24 @@ $ </code></pre>
 
 <pre><code>$ ls -la ~/.rbenv
 total 80
-drwxr-xr-x  18 root          staff    576 Jan  9 14:11 .
-drwxr-x---+ 36 richiethomas  staff   1152 Jan 10 12:23 ..
-drwxr-xr-x  13 root          staff    416 Jan  9 14:11 .git
-drwxr-xr-x   3 root          staff     96 Jan  9 14:11 .github
--rw-r--r--   1 root          staff     97 Jan  9 14:10 .gitignore
--rw-r--r--   1 root          staff     35 Jan  9 14:10 .vimrc
--rw-r--r--   1 root          staff   3390 Jan  9 14:10 CODE_OF_CONDUCT.md
--rw-r--r--   1 root          staff   1058 Jan  9 14:10 LICENSE
--rw-r--r--   1 root          staff  18411 Jan  9 14:11 README.md
-drwxr-xr-x   3 root          staff     96 Jan  9 14:10 bin
-drwxr-xr-x   4 root          staff    128 Jan  9 14:11 completions
-drwxr-xr-x  27 root          staff    864 Jan  9 14:11 libexec
-drwxr-xr-x   3 root          staff     96 Dec 23 11:37 rbenv.d
-drwxr-xr-x  39 root          staff   1248 Jan  9 14:35 shims
-drwxr-xr-x   7 root          staff    224 Jan  9 14:11 src
-drwxr-xr-x  28 root          staff    896 Jan  9 14:11 test
--rw-r--r--   1 root          staff      6 Dec 23 11:38 version
-drwxr-xr-x   5 root          staff    160 Dec 23 11:38 versions
+drwxr-xr-x  18 richiethomas          staff    576 Jan  9 14:11 .
+drwxr-x---+ 36 richiethomas          staff   1152 Jan 10 12:23 ..
+drwxr-xr-x  13 richiethomas          staff    416 Jan  9 14:11 .git
+drwxr-xr-x   3 richiethomas          staff     96 Jan  9 14:11 .github
+-rw-r--r--   1 richiethomas          staff     97 Jan  9 14:10 .gitignore
+-rw-r--r--   1 richiethomas          staff     35 Jan  9 14:10 .vimrc
+-rw-r--r--   1 richiethomas          staff   3390 Jan  9 14:10 CODE_OF_CONDUCT.md
+-rw-r--r--   1 richiethomas          staff   1058 Jan  9 14:10 LICENSE
+-rw-r--r--   1 richiethomas          staff  18411 Jan  9 14:11 README.md
+drwxr-xr-x   3 richiethomas          staff     96 Jan  9 14:10 bin
+drwxr-xr-x   4 richiethomas          staff    128 Jan  9 14:11 completions
+drwxr-xr-x  27 richiethomas          staff    864 Jan  9 14:11 libexec
+drwxr-xr-x   3 richiethomas          staff     96 Dec 23 11:37 rbenv.d
+drwxr-xr-x  39 richiethomas          staff   1248 Jan  9 14:35 shims
+drwxr-xr-x   7 richiethomas          staff    224 Jan  9 14:11 src
+drwxr-xr-x  28 richiethomas          staff    896 Jan  9 14:11 test
+-rw-r--r--   1 richiethomas          staff      6 Dec 23 11:38 version
+drwxr-xr-x   5 richiethomas          staff    160 Dec 23 11:38 versions
 $ </code></pre>
 
 <p>If this directory does exist, <strong>and</strong> if the command output includes a <code>.git/</code> directory in it like it does above, you should be good to go.</p>
@@ -69,7 +82,7 @@ drwxr-xr-x  15 richiethomas  staff   480 Jan 10 12:56 shims
 drwxr-xr-x   3 richiethomas  staff    96 Jan 10 12:48 versions
 $ </code></pre>
 
-<p>Specifically, you run the <code>ls -la</code> command and you don't see a <code>.git</code> folder included in the output.</p>
+<p>Specifically, you run the <code>ls -la</code> command and you <strong>don't</strong> see a <code>.git</code> folder included in the output.</p>
 
 <p>That likely means you previously installed RBENV using a package manager like Homebrew.  If this is the case, one option is to simply rename your <code>/.rbenv</code> directory as <code>/.rbenv-old</code> or something similar:</p>
 
@@ -114,7 +127,7 @@ $ </code></pre>
 
 <h2>Ensuring your new RBENV install has your old data</h2>
 
-<p>Next, we'll copy your currently-installed Ruby versions, gems, etc. to this new installation, ensuring that you can continue using RBENV as you have up until now:</p>
+<p>Next, we'll copy your currently-installed Ruby versions, gems, etc. to this new installation, ensuring that you can continue using RBENV as you did before:</p>
 
 <pre><code>$ cp -r ~/.rbenv-old/versions \                                                                                     
 > ~/.rbenv-old/version \                                                                        
@@ -320,14 +333,6 @@ drwxr-xr-x  18 root  staff   576 Jan 20 10:50 ..
 
 <p>After running this last step, I opened a new terminal tab and re-ran which bundle, and I finally saw my expected output: <code>/Users/richiethomas/.rbenv/shims/bundle</code>.</p>
 
-<h2>What is an <code>rc</code> dotfile?</h2>
-
-<p>When you open a new terminal tab or window in Zsh, one of the first things that happens is that Zsh runs a few setup scripts. One of these scripts is located at <code>.zshrc</code>. This file is where you'd put configuration options that you'd want to run on every new terminal tab or window.</p>
-
-<p>There are other setup scripts which get loaded as well, such as <code>~/.zshenv</code>.  But <code>~/.zshrc</code> is the one I interact with most.  Zsh will run these scripts in a specific order, and there are <a href="https://web.archive.org/web/20230724164024/https://unix.stackexchange.com/questions/71253/what-should-shouldnt-go-in-zshenv-zshrc-zlogin-zprofile-zlogout" target="_blank">conventions around what you should put in each file</a>.</p>
-
-<p>Other shells have similar <code>rc</code> files (ex.- Bash has <code>~/.bashrc</code>). The <code>rc</code> in <code>.zshrc</code> stands for "run commands" or "run control", depending on <a href="https://web.archive.org/web/20230320050723/https://unix.stackexchange.com/questions/3467/what-does-rc-in-bashrc-stand-for" target="_blank">who you ask</a>.</p>
-
 <h2>Summary</h2>
 
-<p>Now that we've installed RBENV and are pointing to the right version, let's move on.</p>
+<p>Now that we've installed RBENV and are pointing to the right version, you'll be able to replicate any experiments that we run on the RBENV code itself, such as adding log statements to the code so we can see what happens during RBENV's execution.</p>

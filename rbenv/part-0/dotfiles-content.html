@@ -75,6 +75,14 @@ $</code></pre>
   
 <p>Ignoring the fact that my dotfiles are a lot less organized than they could be lol, we now see all the dotfiles and dot folders in my home directory.</p>
 
+<h2>What is an <code>rc</code> dotfile?</h2>
+
+<p>When you open a new terminal tab or window in Zsh, one of the first things that happens is that Zsh runs a few setup scripts. One of these scripts is located at <code>.zshrc</code>. This file is where you'd put configuration options that you'd want to run on every new terminal tab or window.</p>
+
+<p>There are other setup scripts which get loaded as well, such as <code>~/.zshenv</code>.  But <code>~/.zshrc</code> is the one I interact with most.  Zsh will run these scripts in a specific order, and there are <a href="https://web.archive.org/web/20230724164024/https://unix.stackexchange.com/questions/71253/what-should-shouldnt-go-in-zshenv-zshrc-zlogin-zprofile-zlogout" target="_blank">conventions around what you should put in each file</a>.</p>
+
+<p>Other shells have similar <code>rc</code> files (ex.- Bash has <code>~/.bashrc</code>). The <code>rc</code> in <code>.zshrc</code> stands for "run commands" or "run control", depending on <a href="https://web.archive.org/web/20230320050723/https://unix.stackexchange.com/questions/3467/what-does-rc-in-bashrc-stand-for" target="_blank">who you ask</a>.</p>
+
 <h2>Experiment- preventing files from being deleted</h2>
 
 <p>Hidden files are helpful in preventing accidental deletion of important data.  Let's test that out now.</p>

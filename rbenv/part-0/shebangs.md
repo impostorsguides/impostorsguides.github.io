@@ -6,8 +6,8 @@ title: Shebangs
 permalink: /shell/shebangs
 next-title: File Permissions
 next-permalink: /shell/file-permissions
-previous-title: Version Managers
-previous-permalink: /shell/version-managers
+previous-title: Introduction
+previous-permalink: /shell/introduction
 ---
 
 {% include_relative shebangs-content.html %}

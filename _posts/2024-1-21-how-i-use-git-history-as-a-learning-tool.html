@@ -1,0 +1,590 @@
+---
+layout: post
+permalink: /blog/how-i-use-git-history-to-beat-impostor-syndrome/
+title: How I Use Github To Beat Impostor's Syndrome
+excerpt_separator: <!--more-->
+createdAt: 1-21-2024
+---
+
+<div>
+  <figure style="float: right; width: 50%; margin: 0 0 5px 25px">
+    <img src="/assets/images/iStock-462007567.jpg" width="100%" alt="Random fence in a field, which apparently serves little to no purpose.">
+    <figcaption style="text-align: center;">Why is this fence here?  What is it even doing?</figcaption>
+  </figure>
+</div>
+
+<p>I recently wrote <a href="/shell" target="_blank">a line-by-line walk-through of the RBENV shim</a> for <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4" target="_blank">the <code>bundle</code> command</a> (actually, the RBENV shim for every gem, since they're all the same code).  The goal was to be able to explain what the syntax of each line of code does.</p>
+
+<p>But there's an order-of-magnitude difference between knowing what a piece of code does, vs. knowing how and why it got to that point. Reading the repo's git history is one way to reach that 2nd level of understanding.</p>
+
+<!--more-->
+
+<p>While I'm not proposing to read the entire git history of this repo (although the more of it we read, the more context we'd have), I do think it'd be a useful exercise to read some of its history.  Specifically, enough history to answer a question we had from the walk-through, i.e. why there's a need for <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L6-L18">this <code>if</code>-block, which takes up 2/3 of the code in the shim file</a>.</p>
+
+<h2>Prelude: Chesterton's Fence</h2>
+
+<p>There's <a href="https://fs.blog/chestertons-fence/" target="_blank">a principle called "Chesterton's Fence"</a> which I've found to be quite helpful in programming (and in life in general).  It states the following:</p>
+
+<blockquote><p>There exists in such a case a certain institution or law; let us say, for the sake of simplicity, a fence or gate erected across a road. The more modern type of reformer goes gaily up to it and says, “I don’t see the use of this; let us clear it away.” To which the more intelligent type of reformer will do well to answer: “If you don’t see the use of it, I certainly won’t let you clear it away. Go away and think. Then, when you can come back and tell me that you do see the use of it, I may allow you to destroy it.”</p></blockquote>
+
+<p>In other words, "Don't tear down a fence until you know why it was built in the first place."</p>
+
+<p>This principle has come in handy more times than I can count in programming.  If I don't understand why a certain code block is present in the codebase, and if it strikes me as problematic in some way, I might be tempted to make a PR to remove it or replace it with something I think is "better".  Chesterton's Fence tells me to reserve judgement on this code, and to hold off on making that PR, until I know the thought process which led to its introduction in the first place.</p>
+
+<p>The below is an illustration of just how I do this.  Especially when a codebase is old, and many contributors have come and gone over time, Github becomes an important (and possibly the only) tool that we as engineers have to communicate with each other across space and time.</p>
+
+<p>I hope you're able to take something from the process I outline below, and use it to glean some additional context on your team's codebase.</p>
+
+<h2>What We Know So Far</h2>
+
+<p>In case you haven't read the deep-dive, here's the code for the <code>if</code>-block:</p>
+
+<pre><code>if [ "$program" = <code>ruby</code> ]; then
+  for arg; do
+    case "$arg" in
+    -e* | -- ) break ;;
+    */* )
+      if [ -f "$arg" ]; then
+        export RBENV_DIR="${arg%/*}"
+        break
+      fi
+      ;;
+    esac
+  done
+fi</code></pre>
+  
+<p>And here's our working knowledge of what this code does.</p>
+
+<p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L6" target="_blank">The <code>if</code> clause itself</a> checks whether the command that the user entered (i.e. the command that RBENV is intercepting via this shim) is the <code>ruby</code> command.  If it is, we proceed with the logic inside the <code>if</code>-clause.  If it's not, we skip that logic entirely.</p>
+
+<p>Inside the <code>if</code> clause is <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L7">a <code>for</code>-loop</a>, which iterates over each argument passed to the <code>ruby</code> shim.  For each argument, we check its value via <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L8" target="_blank">a <code>case</code> statement</a>.</p>
+
+<p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L9">If the argument is either <code>-e</code> or <code>--</code></a>, we break out of the <code>for</code>-loop, since these two arguments indicate that any subsequent arguments are parameters and are unrelated to the shim's business.</p>
+
+<p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L10" target="_blank">If the argument is a string containing a <code>/</code> character</a>, however, we next check if that <code>*/*</code> string <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L11" target="_blank">represents a path to a file in our filesystem</a>. If it does not, we do nothing.  If it does, however, <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L12" target="_blank">we set an environment variable</a> called <code>RBENV_DIR</code> which is equal to that filepath, minus the file name itself (in other words, the parent directory of that file).  We then <code>break</code> out of the <code>for</code>-loop, indicating that we don't care about any subsequent arguments.</p>
+
+<p>But why do we need to do all the above?</p>
+
+<h2>Purpose of the <code>RBENV_DIR</code> environment variable</h2>
+
+<p>In <a href="https://web.archive.org/web/20230408051543/https://github.com/rbenv/rbenv#how-it-works" target="_blank">the "How It Works" section of the README file</a>, we see that if you pass the <code>ruby</code> command a filename to run, RBENV will look for a file named <code>.ruby-version</code> in the same directory as that of the filename you pass:</p>
+
+<blockquote><p>After rbenv injects itself into your PATH at installation time, any invocation of <code>ruby</code>, <code>gem</code>, <code>bundler</code>, or other Ruby-related executable will first activate rbenv. Then, rbenv scans the current project directory for a file named <code>.ruby-version</code>. If found, that file determines the version of Ruby that should be used within that directory. Finally, rbenv looks up that Ruby version among those installed under <code>~/.rbenv/versions/</code>.</p></blockquote>
+  
+<p>This is true <i>even if that directory is not the one you're in now</i>. That's important, because that 2nd directory may have its own <code>.ruby-version</code> file, possibly containing a different Ruby version from the one you're currently using.</p>
+
+<p>Putting these pieces together, we can hypothesize that this clause handles the situation where you're running a Ruby file from a different directory than the one you're in, and this directory may have its own (potentially different) Ruby version.</p>
+
+<p>Let's find the PR which added the <code>if</code>-block, and see if it confirms our theory.</p>
+
+<h3>Quick note- <code>.ruby-version</code> vs. <code>.rbenv-version</code></h3>
+
+<p>As mentioned, RBENV sometimes uses on a file called <code>.ruby-version</code> to do its job. However, when we dig into the history of the <code>if</code>-block, we'll be looking at an earlier version of RBENV in which it instead used a file called <code>.rbenv-version</code>. This file performed the same function, but <a href="https://github.com/rbenv/rbenv/pull/302#issuecomment-11785236" target="_blank">per this comment thread</a>, the filename made it harder for folks who used RBENV to collaborate with folks who used other Ruby version managers.</p>
+
+<p>Because of this, the core team subsequently switched from using <code>.rbenv-version</code> to <code>.ruby-version</code>. So if you see me referring to both filenames and get confused, just know that they had the same purpose.</p>
+
+<h2>Finding the right git SHA</h2>
+
+<p>In order to find this PR, we need to know its SHA number ("SHA" stands for "Simple Hashing Algorithm").  The SHA is a unique identifier that git uses to refer to a specific commit. Once we have this, we can plug it into Github's search bar, pull up the corresponding PR and any associated Github Issues, and review any relevant discussions (which might give us more context).</p>
+
+<p>Note that this is not a git tutorial, and that git knowledge is a prerequisite for moving forward.  If you're not yet familiar with git, the official git docs contain <a href="https://git-scm.com/docs/gittutorial" target="_blank">a great tutorial here</a>.</p>
+
+<h3>Attempting to run <code>git blame</code> on the shim file</h3>
+
+<p>Normally we could just use <code>git blame <filename></code> to get this SHA directly from the line of code in our file. But if we try that here, we see the following:</p>
+
+<pre><code>~/.rbenv (master)  $ git blame `which bundle`          
+fatal: no such path 'shims/bundle' in HEAD
+~/.rbenv (master)  $</code></pre>
+
+<p>The error <code>no such path 'shims/bundle'</code> in HEAD appears because the shim directory <code>~/.rbenv/shims</code> is included in <a href="https://git-scm.com/docs/gitignore" target="_blank">RBENV's .gitignore file</a>, meaning the shims are not stored in a git repo (and hence don't have their own SHA). We can confirm this by looking at RBENV's <code>.gitignore</code> file.  If we run the following in our terminal...</p>
+
+<pre><code>$ vim ~/.rbenv/.gitignore</code></pre>
+
+<p>...we'll see the following file contents:</p>
+
+<pre><code>/plugins
+/shims
+/version
+/versions
+/sources
+/cache
+/libexec/*.dylib
+/src/Makefile
+/src/*.o
+/gems</code></pre>
+
+<p>That <code>/shims</code> folder on line 2 is the parent directory for our <code>bundle</code> command.  RBENV doesn't track the contents of the <code>shims/</code> directory because each user's machine will have a different set of Ruby gems installed, meaning the filenames inside each user's <code>shims/</code> directory will be different.</p>
+
+<h3>Trying again- looking for where the code lives</h3>
+
+<p>However, we know that the shims all have the same exact code, and also that new shim files are generated every time we install a new gem.  Given this knowledge, I'd bet that there's a "shim factory" somewhere in the RBENV codebase, which auto-generates a new file whenever a new gem is installed.</p>
+
+<p>One strategy to find this shim factory is to search the RBENV codebase for an arbitrary piece of code from the shim file.  But first we need to pick which line of code to search for. I pick a line which I suspect will not be too common in the codebase, giving us a high signal-to-noise ratio in our search results. Then I use <a href="https://github.com/ggreer/the_silver_searcher" target="_blank">the <code>ag</code> tool</a> to find its location:</p>
+
+<pre><code>$ cd ~/.rbenv/
+
+$ ag 'program" = <code>ruby</code>'
+
+libexec/rbenv-rehash
+65:if [ "\$program" = <code>ruby</code> ]; then
+
+$</code></pre>
+
+<p>Looks like there is only one search result, in a file named <code>libexec/rbenv-rehash</code>, and it looks quite promising:</p>
+
+<pre><code>53 # The prototype shim file is a script that re-execs itself, passing
+54 # its filename and any arguments to `rbenv exec`. This file is
+55 # hard-linked for every executable and then removed. The linking
+56 # technique is fast, uses less disk space than unique files, and also
+57 # serves as a locking mechanism.
+58 create_prototype_shim() {
+59   cat > "$PROTOTYPE_SHIM_PATH" <<\SH
+60 #!/usr/bin/env bash
+61 set -e
+62 [ -n "\$RBENV_DEBUG" ] && set -x
+63     
+64 program="\${0##*/}"
+65 if [ "\$program" = <code>ruby</code> ]; then
+66   for arg; do
+67     case "\$arg" in
+68     -e* | -- ) break ;;
+69     */* )
+70       if [ -f "\$arg" ]; then
+71         export RBENV_DIR="\${arg%/*}"
+72         break
+73       fi
+74       ;;
+75     esac
+76   done
+77 fi
+79 export RBENV_ROOT="$RBENV_ROOT"
+80 exec "$(rbenv_path)" exec "\$program" "\$@"
+81 SH
+82   chmod +x "$PROTOTYPE_SHIM_PATH"
+83 }</code></pre>
+
+<p>The code we searched for lives inside a function called <code>create_prototype_shim()</code>. That sounds a lot like the "shim factory" we hypothesized!</p>
+
+<p>We now have a pretty confident guess about where in the RBENV codebase the <code>if</code>-block comes from.  Next let's look at the git history for that file.</p>
+
+<h2>Running <code>git blame</code> on the correct file</h2>
+
+<p>I copy the filepath for <code>rbenv-rehash</code> and run <code>git blame</code> on it (docs on this command <a href="https://web.archive.org/web/20230327142152/https://git-scm.com/docs/git-blame" target="_blank">here</a>):</p>
+
+<pre><code>$ git blame libexec/rbenv-rehash</code></pre>
+
+<p>You should see <a href="https://github.com/rbenv/rbenv/blame/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-rehash" target="_blank">something like this</a>:</p>
+  
+<pre><code>$ git blame libexec/rbenv-rehash                  
+6938692c libexec/rbenv-rehash (Andreas Johansson 2011-08-12 11:33:45 +0200   1) #!/usr/bin/env bash
+37eca782 libexec/rbenv-rehash (Sam Stephenson    2012-12-29 22:05:04 -0600   2) # Summary: Rehash rbenv shims (run this after installing executables)
+4c19dc22 libexec/rbenv-rehash (Sam Stephenson    2012-12-29 12:06:20 -0600   3) 
+6938692c libexec/rbenv-rehash (Andreas Johansson 2011-08-12 11:33:45 +0200   4) set -e
+0632325a libexec/rbenv-rehash (Sam Stephenson    2011-09-12 10:11:59 -0500   5) [ -n "$RBENV_DEBUG" ] && set -x
+...</code></pre>
+  
+<p>And if you keep scrolling down, eventually you should see our <code>create_prototype_shim</code> function:</p>
+
+<pre><code>...
+fffb29d6 libexec/rbenv-rehash (Sam Stephenson    2011-08-03 22:57:27 -0500  58) create_prototype_shim() {
+dd8a005c libexec/rbenv-rehash (Sam Stephenson    2011-08-15 01:16:13 -0500  59)   cat > "$PROTOTYPE_SHIM_PATH" <<\SH
+6938692c libexec/rbenv-rehash (Andreas Johansson 2011-08-12 11:33:45 +0200  60) #!/usr/bin/env bash
+6938692c libexec/rbenv-rehash (Andreas Johansson 2011-08-12 11:33:45 +0200  61) set -e
+283e67b5 libexec/rbenv-rehash (Sam Stephenson    2012-12-27 13:41:55 -0600  62) [ -n "\$RBENV_DEBUG" ] && set -x
+...</code></pre>
+
+<p>If you don't, make sure the RBENV repository you're in is pointing to git SHA # <code>c4395e58201966d9f90c12bd6b7342e389e7a4cb</code> when you run the above command.</p>
+
+<p>If you've never run <code>git blame</code> before, you might think this output is quite hard to parse.  Let's learn what it all means.</p>
+
+<h3>Interpreting the results of <code>git blame</code></h3>
+
+<p>Using line 64 as an example, we see the following:</p>
+
+<pre><code>283e67b5 libexec/rbenv-rehash (Sam Stephenson    2012-12-27 13:41:55 -0600  64) program="\${0##*/}"</code></pre>
+
+<ul>
+  <li>"283e67b5"- this is the first 8 characters of the SHA that we're looking for. This is what we'll plug into Github's search box.</li>
+  <li>"libexec/rbenv-rehash"- this is the filename we're looking at, in the form of "path/to/filename" relative to our current directory.</li>
+  <li>"(Sam Stephenson"- this is the name of the person who authored the commit. This is where the command <code>git blame</code> gets its name- we want to know "who to blame" (or praise, as the case may be).</li>
+  <li>"2012-12-27 13:41:55 -0600"- this is the date that the code was committed to the repository.</li>
+  <li>"64)"- this is the line number of the code in the file itself.</li>
+  <li>"program="\${0##*/}""- finally, this is the line of code itself.</li>
+</ul>
+
+<p>As I mentioned, what we care about is the left-most column. It contains the first 8 characters of the commit's unique identifier (also called a SHA) which introduced each line of code. This isn't the full SHA, just a snippet, but it's almost certainly long enough to make any collisions with other commits unlikely.</p>
+
+<p>Notice also that the SHA ("283e67b5") is the same for the entire <code>if</code>-block. That's lucky for us- it means that this code was all added to the repo at the same time, and gives me more confidence that this is the SHA we want. If there were many different SHAs, each with different commit dates, it would be more of a slog to search each one until we found the PR we want.</p>
+
+<h2>Reading the SHA's history on Github</h2>
+
+<p>Now that we have our SHA, I open my web browser and go to Github, where I paste the SHA value I copied from <code>git blame</code> into the search bar on the top-left and select "In this repository" (click the images to enlarge in a new window):</p>
+
+<center>
+  <a target="_blank" href="/assets/images/screenshot-2024-01-21-11.26am.png">
+    <img src="/assets/images/screenshot-2024-01-21-11.26am.png" width="90%" alt="Searching for SHA # 283e67b5 on Github's homepage.">
+  </a>
+</center>
+
+<p>Hitting <code>Enter</code> and moving to the search results page, we see Github says "we couldn't find any code"...</p>
+
+<center>
+  <a target="_blank" href="/assets/images/screenshot-2024-01-21-11.35am.png">
+    <img src="/assets/images/screenshot-2024-01-21-11.35am.png" width="90%" alt="No code results found for SHA # 283e67b5 on Github's search page.">
+  </a>
+</center>
+
+<p>...but that message is irrelevant for us. We're not looking for code; we're looking for a PR. And on the left-hand side, we can see that Github did find one issue and one commit containing this SHA:</p>
+
+<center>
+  <a target="_blank" href="/assets/images/screenshot02024-01-21-11.39am.png">
+    <img src="/assets/images/screenshot02024-01-21-11.39am.png" width="70%" alt="Close-up of Github search results, showing one commit and one pull request which match the SHA we searched for.">
+  </a>
+</center>
+
+<p>I right click on each section to open them in new tabs. </p>
+
+<h3>Reading the Github commit</h3>
+
+<p>First, <a href="https://github.com/rbenv/rbenv/commit/283e67b57e8ab0bbbe504aab6866729b0035186a" target="_blank">the commit results</a>:</p>
+
+<center>
+  <a target="_blank" href="/assets/images/screenshot-2024-01-21-11.42am.png">
+    <img src="/assets/images/screenshot-2024-01-21-11.42am.png" width="100%" alt="The git commit which matches the SHA we searched for.">
+  </a>
+</center>
+
+<p>Reconstructing the commit message (which was truncated due to its length), we can see at the top that the commit message for this commit was:</p>
+
+<pre><code>When the ruby shim is invoked with a script, set RBENV_DIR to the script's dirname</code></pre>
+
+<p>This sounds similar to our hypothesis.</p>
+
+<h2>Reading the Github Issue</h2>
+
+<p>Let's also check <a href="https://github.com/rbenv/rbenv/pull/299" target="_blank">the issue link</a>:</p>
+
+<center>
+  <a target="_blank" href="/assets/images/screenshot-2024-01-21-11.46am.png">
+    <img src="/assets/images/screenshot-2024-01-21-11.46am.png" width="100%" alt="The Github issue which matches the SHA we searched for.">
+  </a>
+</center>
+
+<p>The description says:</p>
+
+<blockquote><p>This branch adjusts the behavior of the ruby shim, when invoked with the path to a Ruby script as an argument, to set RBENV_DIR to the directory of the given script. It should, in effect, remove the need for the ruby-local-exec shebang line.</p></blockquote>
+
+<p>While I don't yet understand the reference to "ruby-local-exec", the rest of it sounds pretty close to what we hypothesized.</p>
+
+<h3>Following the Github conversation history</h3>
+
+<p>Before closing the browser tab, I notice the following at the end of the PR:</p>
+
+<blockquote><p>See previous discussion at <a href="https://github.com/rbenv/rbenv/pull/298" target="_blank">#298</a></p></blockquote>
+
+<p>Out of curiosity I read through that PR. Among other things, it contains <a href="https://github.com/rbenv/rbenv/pull/298#issuecomment-11698517" target="_blank">a conversation which stands out to me</a>:</p>
+
+<center>
+  <a target="_blank" href="/assets/images/screenshot-2024-01-21-11.57am.png">
+    <img src="/assets/images/screenshot-2024-01-21-11.57am.png" width="100%" alt="A comment from Mislav Marohnić explaining why he would consider it surprising behavior if RBENV used the Ruby version of a local directory instead of the current directory, if those two directories were different.">
+  </a>
+</center>
+
+<p>Mislav (a member of the RBENV core team) says that he would consider it to be surprising behavior if:</p>
+
+<ul>
+  <li>he was in one directory,</li>
+  <li>he ran a Ruby script in a separate directory, and </li>
+  <li>the Ruby script used the Ruby version of the 2nd directory.</li>
+</ul>
+
+<p>Replying to Mislav, another contributor (Jeremy) <a href="https://github.com/rbenv/rbenv/pull/298#issuecomment-11699902" target="_blank">disagrees that this would be surprising behavior</a>, saying that adding a <code>.rbenv-version</code> file to a project is like declaring a Ruby dependency.</p>
+
+<center>
+  <a target="_blank" href="/assets/images/screenshot-2024-01-21-12.00pm.png">
+    <img src="/assets/images/screenshot-2024-01-21-12.00pm.png" width="100%" alt="A reply to Mislav's comment from Jeremy, saying that adding a .rbenv-version file to a project is like declaring a dependency for that project, therefore making it unsurprising behavior for RBENV to use that project's declared Ruby version.">
+  </a>
+</center>
+
+<p>Finally, Sam Stephenson (the lead developer of the RBENV project) chimes in to specify <a href="https://github.com/rbenv/rbenv/pull/298#issuecomment-11710825" target="_blank">what the order of precedence needs to be</a> when checking for a Ruby version:</p>
+
+<center>
+  <a target="_blank" href="/assets/images/screenshot-2024-01-21-12.04pm.png">
+    <img src="/assets/images/screenshot-2024-01-21-12.04pm.png" width="100%" alt="Sam Stephenson's comment on the order of operations that RBENV should use for deriving a project's Ruby version.">
+  </a>
+</center>
+
+<ul>
+  <li>The shell's version (i.e. if a user has set "RBENV_VERSION" directly in their shell)</li>
+  <li>The version inside the script's local directory.</li>
+  <li>The version inside the user's current directory.</li>
+  <li>The user's global Ruby version (set in "~/.rbenv/version" or by the "rbenv version <version_number>" command).</li>
+</ul>
+
+<p>I get the impression that, at the time this conversation took place, this was not yet how RBENV worked in practice. If that's true, this could represent another reason why the <code>if</code>-block was an improvement over the previous version of the shim. Let's try to reproduce this behavior, for educational purposes.</p>
+
+<h2>Testing our hypothesis about the <code>if</code>-block</h2>
+
+<p>My plan is to create two directories with different local Ruby versions, as well as a 3rd Ruby version set globally (i.e. for all other directories except for these two new ones) to avoid conflicts with the versions in these 2 directories. Then I'll test which version of Ruby is picked up by RBENV inside each directory.</p>
+
+<h3>Making sure we're at the right starting point</h3>
+
+<p>First, I make sure that the version of RBENV that I'm running (i.e. the SHA that I'm pointing to in my <code>~/.rbenv</code> directory) matches the last of the commits in the PR which added the <code>if</code>-block:</p>
+
+<center>
+  <a target="_blank" href="/assets/images/screenshot-2024-01-21-12.25pm.png">
+    <img src="/assets/images/screenshot-2024-01-21-12.25pm.png" width="100%" alt="The list of commits for the PR which introduced the 'if'-block in the shim code.  The specific commit that we want to roll back to is highlighted.">
+  </a>
+</center>
+
+<p>Above we can see that the last of the SHAs in the PR which introduced the <code>if</code>-block is <code>339e331</code>.  That's the one we want.</p>
+
+<pre><code>~/.rbenv (impostorsguides)  $ git co 339e331f1dcdbbe3659981968e081492817023ed   
+Note: switching to '339e331f1dcdbbe3659981968e081492817023ed'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+HEAD is now at 339e331 Ensure outdated shims are removed first when rehashing
+
+$ </code></pre>
+
+<p>Here we navigate into the <code>~/.rbenv</code> directory, and run <code>git checkout 339e331</code> to roll back our RBENV installation to the commit we want. I then check out a new git branch with a descriptive name so that I can quickly hop back to this version of the code if I need to:</p>
+
+<pre><code>~/.rbenv (v0.4.0~26^2)  $ git co -b just-after-if-block
+Switched to a new branch 'just-after-if-block'
+~/.rbenv (just-after-if-block)  </code></pre>
+
+<h3>Re-generating the shims using our new code</h3>
+
+<p>Next, because we're now pointing to a much older commit, I suspect the shim code may have changed.  So I open up a new terminal tab, so as to re-trigger the RBENV shell integration.</p>
+
+<p>Next, I delete and re-create all the shims in RBENV's <code>shims/</code> directory, to make sure my shim code matches my current version of RBENV:</p>
+
+<pre><code>$ rm -rf shims/*
+zsh: sure you want to delete all 37 files in /Users/richiethomas/.rbenv/shims [yn]? y
+~/.rbenv (just-after-if-block)  $ rbenv rehash
+~/.rbenv (just-after-if-block)  $</code></pre>
+
+<p>I verify that the shim for the <code>ruby</code> command looks the way I expect:</p>
+
+<pre><code>~/.rbenv (just-after-if-block)  $ cat `which ruby`
+#!/usr/bin/env bash
+set -e
+[ -n "$RBENV_DEBUG" ] && set -x
+
+program="${0##*/}"
+if [ "$program" = <code>ruby</code> ]; then
+  for arg; do
+    case "$arg" in
+    -e* | -- ) break ;;
+    */* )
+      if [ -f "$arg" ]; then
+        export RBENV_DIR="${arg%/*}"
+        break
+      fi
+      ;;
+    esac
+  done
+fi
+
+export RBENV_ROOT="/Users/richiethomas/.rbenv"
+exec rbenv exec "$program" "$@"
+~/.rbenv (just-after-if-block) $ </code></pre>
+
+<p>The only difference between our original shim and this new shim is that the <code>exec</code> statements at the bottom are different.  We see <code>exec rbenv exec</code> instead of <code>exec "/Users/richiethomas/.rbenv/libexec/rbenv" exec</code>.  This is because we've rolled back to an earlier version of RBENV, which generated a different prototype shim.  The important thing is that we still see the <code>if</code>-block, and that its code is the same as in our original shim.</p>
+
+<h3>Setting up 3 different Ruby versions</h3>
+
+<p>Next, I navigate into a directory which I know doesn't have an RBENV version file in it.  In the RBENV version that we've rolled back to, the file name is <code>.rbenv-version</code>, i.e. at this point in time the core team hadn't yet switched to using <code>.ruby-version</code>.</p>
+
+<p>Once I'm in my new directory, I set a global Ruby version with a number which I know is already installed:</p>
+
+<pre><code>$ cd ~/Desktop/Workspace/scratch 
+~/Desktop/Workspace/scratch ()  $ rbenv local
+rbenv: no local version configured for this directory
+~/Desktop/Workspace/scratch ()  $ rbenv global
+3.2.2
+~/Desktop/Workspace/scratch ()  $ rbenv local 3.1.0
+~/Desktop/Workspace/scratch ()  $ rbenv local
+3.1.0
+~/Desktop/Workspace/scratch ()  $</code></pre>
+
+<p>Setting a "global" version number will make this the default Ruby version on my machine, but this default can be over-ridden for specific project directories.  This is what we'll do next.  I do this because I want to avoid a situation where my <code>.rbenv-version</code> file contains the same version number as the global version number, which could make it confusing as to what the source of the version number was.</p>
+
+<p>Next, I make two project directories, named <code>foo/</code> and <code>bar/</code> respectively, with each containing a <code>.rbenv-version</code> file with a version number that is different from my global Ruby version.  My <code>foo/</code> directory contains Ruby version <code>3.0.0</code>:</p>
+
+<pre><code>~/Desktop/Workspace/scratch ()  $ mkdir foo
+~/Desktop/Workspace/scratch ()  $ echo "3.0.0" > foo/.rbenv-version
+~/Desktop/Workspace/scratch ()  $ </code></pre>
+
+<p>And my <code>bar/</code> directory contains Ruby version <code>2.7.5</code>:</p>
+
+<pre><code>~/Desktop/Workspace/scratch ()  $ mkdir bar
+~/Desktop/Workspace/scratch ()  $ echo 2.7.5 > bar/.rbenv-version
+~/Desktop/Workspace/scratch ()  $ </code></pre>
+
+<p>The <code>></code> symbol after the <code>echo</code> command means that, instead of printing my string to the screen, we're sending it to a file named <code>.rbenv-version</code> inside the <code>foo/</code> and <code>bar/</code> directories.  If this file doesn't yet exist (which it doesn't, because we just created those directories), then we create it.  This is called redirection, and we'll cover it in more detail in a future section.</p>
+
+<h3>Printing the Ruby version</h3>
+
+<p>I then create two files named <code>foo/foo.rb</code> and <code>bar/bar.rb</code>. The 2 files do the same thing- they simply print the version of Ruby that the interpreter is using:</p>
+
+<pre><code>~/Desktop/Workspace/scratch ()  $ echo "puts RUBY_VERSION" > foo/foo.rb
+~/Desktop/Workspace/scratch ()  $ echo "puts RUBY_VERSION" > bar/bar.rb
+~/Desktop/Workspace/scratch ()  $ </code></pre>
+
+<p>I navigate into <code>bar/</code> and run <code>bar.rb</code>:</p>
+
+<pre><code>$ cd bar 
+~/Desktop/Workspace/scratch/bar ()  $ ruby bar.rb 
+2.7.5
+~/Desktop/Workspace/scratch/bar ()  $ </code></pre>
+
+<p>Then, <i>while still inside bar</i>, I run <code>foo/foo.rb</code>:</p>
+
+<pre><code>~/Desktop/Workspace/scratch/bar ()  $ ruby ../foo/foo.rb 
+3.0.0
+~/Desktop/Workspace/scratch/bar ()  $ </code></pre>
+
+<p>This is what I'd expect based on reading the core team's PR conversation: each file uses the Ruby version pinned by its respective <code>.rbenv-version</code> file, regardless of where I am when I run it.</p>
+
+<h3>Repeating the process, before the <code>if</code>-block was added</h3>
+
+<p>Next, I find the SHA of the version of the RBENV code just before the if-block was introduced:</p>
+
+<center>
+  <a target="_blank" href="/assets/images/screenshot-2024-01-21-12.41pm.png">
+    <img src="/assets/images/screenshot-2024-01-21-12.41pm.png" width="100%" alt="The list of commits for the PR which introduced the 'if'-block in the shim code.  The specific commit that we want to roll back to is highlighted.">
+  </a>
+</center>
+
+<p>I then check out that SHA in my repo, giving this another descriptive branch name:</p>
+
+<pre><code>~/.rbenv (just-after-if-block)  $ git co -f 6c1fb9ffd062ff04607d2e0f486067eaf6e48d1e~
+Note: switching to '6c1fb9ffd062ff04607d2e0f486067eaf6e48d1e~'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+HEAD is now at c3fe192 use ruby-build
+~/.rbenv (v0.4.0~29)  $ git co -b just-before-if-block                     
+Switched to a new branch 'just-before-if-block'
+~/.rbenv (just-before-if-block)  $ </code></pre>
+
+<p>Once again, I delete and re-build my shims</p>
+
+<pre><code>$ rm -rf shims/*
+zsh: sure you want to delete all 37 files in /Users/richiethomas/.rbenv/shims [yn]? y
+
+~/.rbenv (just-before-if-block)  $ rbenv rehash
+~/.rbenv (just-before-if-block)  $ </code></pre>
+
+<p>I verify that my ruby shim no longer has the if-block:</p>
+
+<pre><code>~/.rbenv (just-before-if-block)  $ cat `which ruby`
+#!/usr/bin/env bash
+set -e
+export RBENV_ROOT="/Users/richiethomas/.rbenv"
+exec rbenv exec "${0##*/}" "$@"
+~/.rbenv (just-before-if-block)  $ </code></pre>
+
+<p>We see the if-block is gone. That's what we want.</p>
+
+<p>Now, back in my <code>bar/</code> directory, I re-run both <code>bar.rb</code> and <code>../foo/foo.rb</code>:</p>
+
+<pre><code>~/Desktop/Workspace/scratch/bar ()  $ ruby bar.rb 
+2.7.5
+~/Desktop/Workspace/scratch/bar ()  $ ruby ../foo/foo.rb 
+2.7.5
+~/Desktop/Workspace/scratch/bar ()  $ </code></pre>
+
+<p>With the <code>if</code>-block removed, we now see that the Ruby version for <code>foo</code> does not reflect the version number specified in its <code>.rbenv-version</code> file if we run <code>foo.rb</code> from within the <code>bar/</code> directory.</p>
+
+<p>But if we navigate from <code>bar/</code> into its sibling <code>foo/</code> and run <code>foo.rb</code>, it changes back to the version we expect, <code>3.0.0</code>:</p>
+
+<pre><code>~/Desktop/Workspace/scratch/bar ()  $ cd ../foo
+~/Desktop/Workspace/scratch/foo ()  $ ruby foo.rb   
+3.0.0
+~/Desktop/Workspace/scratch/foo ()  $ </code></pre>
+
+<h2>Conclusion: our hypothesis was correct</h2>
+
+<p>So we can see that one of the things that the <code>if</code>-block does is help pin the Ruby version of a file we run based on the <code>.rbenv-version</code> file in the same directory. Judging by the conversation in the PR, this seems to be what the core team intended.  Speaking for myself, it's also what I as a user would expect the behavior to be, so I can understand why they did what they did.</p>
+
+<p>Before moving on, I make sure to clean up the mess I made:</p>
+
+<pre><code>~/Desktop/Workspace/scratch/foo ()  $ cd ~/.rbenv 
+~/.rbenv (just-before-if-block)  $ git co impostorsguides
+Switched to branch 'impostorsguides'
+~/.rbenv (impostorsguides)  $ git branch -D just-before-if-block just-after-if-block
+Deleted branch just-before-if-block (was c3fe192).
+Deleted branch just-after-if-block (was 339e331).
+~/.rbenv (impostorsguides)  $ </code></pre>
+
+<p>Lastly, I delete my old shims and run <code>rbenv rehash</code> to re-build them using my desired RBENV version.  I then verify that those shim contain the <code>if</code>-block and otherwise look the way we expect:</p>
+
+<pre><code>~/.rbenv (impostorsguides)  $ rm -rf shims/*
+zsh: sure you want to delete all 37 files in /Users/richiethomas/.rbenv/shims [yn]? y
+
+~/.rbenv (impostorsguides)  $ rbenv rehash
+
+~/.rbenv (impostorsguides)  $ cat `which ruby`
+
+#!/usr/bin/env bash
+set -e
+[ -n "$RBENV_DEBUG" ] && set -x
+
+program="${0##*/}"
+if [ "$program" = <code>ruby</code> ]; then
+  for arg; do
+    case "$arg" in
+    -e* | -- ) break ;;
+    */* )
+      if [ -f "$arg" ]; then
+        export RBENV_DIR="${arg%/*}"
+        break
+      fi
+      ;;
+    esac
+  done
+fi
+
+export RBENV_ROOT="/Users/richiethomas/.rbenv"
+exec "/Users/richiethomas/.rbenv/bin/rbenv" exec "$program" "$@"
+~/.rbenv (impostorsguides)  $ </code></pre>
+
+<p>Now everything looks as it should here.</p>
+
+<h2>Takeaways</h2>
+
+<p>At the risk of getting on top of my soapbox, I hope that one of your take-aways from reading the above is to make sure your team's PRs contain detailed context.  If the RBENV core team was not dilligent and thorough in its discussion of the pros and cons of the approach they ended up taking, none of the above learning would have been possible, and we would have been left in the dark about their intentions.  In a production environment serving a large user base, the consequences of this could be significant.</p>
+
+<p>But it's not all bad news.  If teams maintain a policy of leaving detailed remarks on PRs and Github issues, the result is that they empower their members to answer their own questions, instead of needing to reach out to others for answers (which may or may not be possible, due to coworkers taking PTO, leaving the company, taking sick days, etc.).  This results in fewer interruptions, better-informed decisions, and faster feature delivery.</p>
+
+<p>On that note, thanks for joining me on this deep-dive into the history of the RBENV shim.  I hope this was somewhat useful to you.  </p>
