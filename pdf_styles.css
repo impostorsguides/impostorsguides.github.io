@@ -80,6 +80,7 @@ a {
 
 /** * Blockquotes */
 blockquote {
+	clear: both;
 	line-height: 1.75em;
 	color: var(--minima-brand-color);
 	padding-left: 15px;

@@ -89,6 +89,7 @@ figure > img {
 
 figcaption {
   font-size: $small-font-size;
+  margin-bottom: 2em;
 }
 
 
@@ -148,6 +149,7 @@ a {
  * Blockquotes
  */
 blockquote {
+  clear: both;
   color: $brand-color;
   border-left: 4px solid $border-color-01;
   padding-left: $spacing-unit * .5;

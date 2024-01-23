@@ -256,6 +256,15 @@
   }
 }
 
+.blog-roll {
+  display: grid;
+  grid-template-columns: 100%;
+
+  li {
+    list-style-type: none;
+  }
+}
+
 .post-content {
   margin-bottom: $spacing-unit;
 
@@ -287,11 +296,8 @@
   h6 {
     @include relative-font-size(1.0625);
   }
-
-  ul li {
-    list-style-type: none;
-  }
 }
+
 
 
 .social-media-list {
