@@ -1,0 +1,226 @@
+---
+layout: post
+permalink: /blog/what-are-processes/
+title: What Are Processes?
+excerpt_separator: <!--more-->
+createdAt: 8 Jan, 2024
+---
+
+<div>
+  <figure style="float: left; width: 40%; margin: 0 25px 10px 0">
+    <img src="/assets/images/pesto-food-processor.jpg" width="100%" alt="Picture of a food processor making pesto, because it has the word 'process' in it and because I'm hungry right now.">
+    <figcaption style="text-align: center;">Picture of a food processor making pesto, because it has the word 'process' in it and because I'm hungry right now.</figcaption>
+  </figure>
+</div>
+
+<p>In my post about RBENV's use of the <code>exec</code> command, I briefly touched on the concept of processes.  But I didn't go deep into what those are, because there's a lot to talk about on that topic and I wanted to keep the focus on RBENV and its shim file.</p>
+
+<p>I'm using this post as a chance to circle back and address the questions that I still had after writing the earlier post.</p>
+
+<!--more-->
+
+<h2>Processes 101</h2>
+
+<p>Not knowing the first thing about processes, I Google “what is a process in unix” and <a href="https://web.archive.org/web/20230306013812/https://www.techtarget.com/whatis/definition/process" target="_blank">the first result is from TechTarget.com</a>:</p>
+
+<blockquote>
+  <h3>What is a process?</h3>
+  <p>A process is an instance of a program running in a computer. It is close in meaning to task , a term used in some operating systems. In UNIX and some other operating systems, a process is started when a program is initiated (either by a user entering a shell command or by another program).</p>
+  
+  <p>Like a task, a process is a running program with which a particular set of data is associated so that the process can be kept track of. An application that is being shared by multiple users will generally have one process at some stage of execution for each user.</p>
+
+  <p>A process can initiate a subprocess, which is a called a child process (and the initiating process is sometimes referred to as its parent ). A child process is a replica of the parent process and shares some of its resources, but cannot exist if the parent is terminated.</p>
+
+  <p>Processes can exchange information or synchronize their operation through several methods of interprocess communication ( IPC ).</p>
+</blockquote>
+
+<p>The post makes the following statements:</p>
+
+<ul>
+  <li>“A process is an instance of a program running in a computer.”  That’s a useful starting point.</li>
+  <li>“...a process is started when a program is initiated (either by a user entering a shell command or by another program).”  Also good to know.</li>
+  <li>“...a process is a running program with which a particular set of data is associated so that the process can be kept track of.”  OK, so there’s some sort of data associated with said process.  We don’t yet know what, but we’ll find out below.</li>
+  <li>“A process can initiate a subprocess, which is a called a child process (and the initiating process is sometimes referred to as its parent ).”  That kind of sounds like what we’re doing by calling the “exec” command at the end of our shim.</li>
+  <li>“A child process is a replica of the parent process and shares some of its resources, but cannot exist if the parent is terminated.”  OK, so if a parent process ends, any and all sub-processes end as well.</li>
+</ul>
+
+<p>Another useful search result comes from TheUnixSchool.com:</p>
+
+<blockquote>
+  <h3>What is a process in UNIX / Linux?</h3>
+
+  <p>A process is a program in execution in memory or in other words, an instance of a program in memory. Any program executed creates a process. A program can be a command, a shell script, or any binary executable or any application. However, not all commands end up in creating process, there are some exceptions. Similar to how a file created has properties associated with it, a process also has lots of properties associated to it.</p>
+</blockquote>
+
+<p>From this link, we additionally learned that:</p>
+
+<ul>
+  <li>“Any program executed creates a process.  A program can be a command, a shell script, or any binary executable or any application.”  So we’ve now got some examples of things that, when executed, create a process.</li>
+  <li>“A process has some properties associated to it:”  It goes on to list some of the data associated with a process,, such as a PID, a PPID, etc.</li>
+  <li>“ps is the Unix / Linux command which lists the active processes and its status. By default, it lists the processes belonging to the current user being run from the current terminal.”  So “ps” is a command we can use to see which processes are currently running.</li>
+</ul>
+
+<p>Let’s try running the “ps” command, as an experiment.</p>
+
+<h2>Experiment- the “ps” command</h2>
+
+<p>I run “ps” in my terminal, with no flags or anything, and I get the following result:</p>
+
+<pre><code>$ ps
+  PID TTY           TIME CMD
+79086 ttys000    0:00.45 -zsh
+11532 ttys001    0:03.01 -zsh
+84187 ttys002    0:00.02 -zsh
+84230 ttys002    2:35.21 /Users/richiethomas/.rbenv/versions/3.2.2/bin/jekyll serve    
+84259 ttys002    0:05.82 /Users/richiethomas/.rbenv/versions/3.2.2/lib/ruby/gems/3.2.0/gems/sass-embedded-1.58.3/ext/sass/sass_embedded/src/dart /Users/ric
+84275 ttys002    0:04.03 /Users/richiethomas/.rbenv/versions/3.2.2/lib/ruby/gems/3.2.0/gems/rb-fsevent-0.11.2/bin/fsevent_watch --format=otnetstring --late
+87369 ttys003    0:00.49 -zsh
+88303 ttys004    0:00.22 -zsh
+86832 ttys005    0:00.17 -zsh
+83972 ttys006    0:00.54 -zsh
+95428 ttys007    0:00.43 -zsh
+95767 ttys008    0:00.26 -zsh
+ 7959 ttys009    0:00.40 -zsh
+26703 ttys011    0:00.07 -zsh
+$ </code></pre>
+
+<p>If I pipe these results to “wc -l” to count the lines, I see I have 16 processes open:</p>
+
+<pre><code>~ ()  $ ps | wc -l
+16
+~ () $</code></pre>
+
+<p>Side note- if you think that’s too many, you should see how many web browser tabs I have open.  I need help. 😵‍💫</p>
+
+<p>Each line has:</p>
+
+<ul>
+  <li>a PID (“The unique id of the process”, according to article #2 above)</li>
+  <li>a TTY (“The terminal from which the process or command is executed.”, again from the same article)</li>
+  <li>A TIME (“CPU time (including both user and system time)”, according to the “man ps” output), and</li>
+  <li>A CMD (“The command which is executed.”, from the article).</li>
+</ul>
+
+<p>Most of them say “-zsh” next to them, as indicated by the “CMD” column.  That’s because I happen to have a lot of terminal windows open right now, most of which aren’t doing anything.  Maybe you can relate? 😜</p>
+
+<h2>Ending a process</h2>
+
+<p>Let’s see what happens if we close one of the “zsh” terminal tabs.  I do so, and re-run the above command:</p>
+
+<pre><code>~ ()  $ ps | wc -l
+  16
+~ ()  $ ps | wc -l
+  15
+~ ()  $ </code></pre>
+
+<p>We went from 16 to 15 terminal processes.  Not unexpected.</p>
+
+<p>If you’re curious, the non-”zsh” processes I’m running are:</p>
+
+<ul>
+  <li><code>/Users/richiethomas/.rbenv/versions/3.2.2/bin/jekyll serve</code>- this is the server I'm using to run the blog you're reading on my local machine.</li>
+  <li><code>/Users/richiethomas/.rbenv/versions/3.2.2/lib/ruby/gems/3.2.0/gems/sass-embedded-1.58.3/ext/sass/sass_embedded/src/dart /Users/ric</code>- I <i>think</i> this process is in charge of compiling my Jekyll blog's SASS into CSS.</li>
+  <li><code>/Users/richiethomas/.rbenv/versions/3.2.2/lib/ruby/gems/3.2.0/gems/rb-fsevent-0.11.2/bin/fsevent_watch --format=otnetstring --late</code>- I'm pretty sure this process is in charge of watching for changes to my Jekyll blog's project files, and compiling them without me having to restart my blog server every time.</li>
+</ul>
+
+<p>If I kill my Jekyll server by navigating to its terminal and hitting “Cmd-C”, we go from 15 processes to 12.  Here’s before:</p>
+
+<pre><code>$ ps | wc -l
+15
+~ ()  $ </code></pre>
+
+<p>And here’s after:</p>
+
+<pre><code>$ ps | wc -l
+12
+$ </code></pre>
+
+<p>By ending the <code>jekyll serve</code> process, our process count dropped from 15 to 12.  So one terminal can potentially be running multiple processes.</p>
+
+<h2>The “kill” command</h2>
+
+<p>But “Ctrl-C” is not the only way to kill a process.  If we have a terminal which is frozen or something, and we know the PID of the process which it’s running, we can use the “kill” command to terminate that process.  Let’s pretend our first “zsh” process above was frozen, and we couldn’t just close that tab like we did before.  We can run “ps”, get the process number, and run “kill” on it:</p>
+
+<pre><code>$ ps
+  PID TTY           TIME CMD
+79086 ttys000    0:00.51 -zsh
+11532 ttys001    0:03.01 -zsh
+10492 ttys002    0:01.09 /Users/richiethomas/.rbenv/versions/3.2.2/bin/jekyll serve    
+10507 ttys002    0:00.03 /Users/richiethomas/.rbenv/versions/3.2.2/lib/ruby/gems/3.2.0/gems/sass-embedded-1.58.3/ext/sass/sass_embedded/src/dart /Users/ric
+10520 ttys002    0:00.00 /Users/richiethomas/.rbenv/versions/3.2.2/lib/ruby/gems/3.2.0/gems/rb-fsevent-0.11.2/bin/fsevent_watch --format=otnetstring --late
+84187 ttys002    0:00.03 -zsh
+88303 ttys004    0:00.22 -zsh
+86832 ttys005    0:00.17 -zsh
+83972 ttys006    0:00.54 -zsh
+95428 ttys007    0:00.43 -zsh
+95767 ttys008    0:00.26 -zsh
+ 7959 ttys009    0:00.40 -zsh
+26703 ttys011    0:00.07 -zsh
+~ ()  $ kill -9 26703
+~ ()  $ ps
+  PID TTY           TIME CMD
+79086 ttys000    0:00.52 -zsh
+11532 ttys001    0:03.01 -zsh
+10492 ttys002    0:01.09 /Users/richiethomas/.rbenv/versions/3.2.2/bin/jekyll serve    
+10507 ttys002    0:00.03 /Users/richiethomas/.rbenv/versions/3.2.2/lib/ruby/gems/3.2.0/gems/sass-embedded-1.58.3/ext/sass/sass_embedded/src/dart /Users/ric
+10520 ttys002    0:00.00 /Users/richiethomas/.rbenv/versions/3.2.2/lib/ruby/gems/3.2.0/gems/rb-fsevent-0.11.2/bin/fsevent_watch --format=otnetstring --late
+84187 ttys002    0:00.03 -zsh
+88303 ttys004    0:00.22 -zsh
+86832 ttys005    0:00.17 -zsh
+83972 ttys006    0:00.54 -zsh
+95428 ttys007    0:00.43 -zsh
+95767 ttys008    0:00.26 -zsh
+ 7959 ttys009    0:00.40 -zsh
+~ ()  $ </code></pre>
+
+<p>Now if I look through all my terminal tabs, I eventually find this one:</p>
+
+<pre><code> ~ $ 
+[Process completed]</code></pre>
+
+<p>According to the “man” entry for this command, the “-9” flag makes the “kill” command non-ignorable.  It does this by sending a “SIGKILL” signal to the process, which causes the process to exit forcefully, and without any cleanup occurring.  This is important, because <a href="https://askubuntu.com/a/184079" target="_blank">this can result in data loss</a>.</p>
+
+<p>If you first want to give your process a chance to clean up after itself, you can just leave out the “-9” flag.  This is generally safer.  However, if we try this, we see:</p>
+
+<pre><code>$ ps
+  PID TTY           TIME CMD
+79086 ttys000    0:00.52 -zsh
+11532 ttys001    0:03.01 -zsh
+10492 ttys002    0:02.90 /Users/richiethomas/.rbenv/versions/3.2.2/bin/jekyll serve    
+10507 ttys002    0:00.10 /Users/richiethomas/.rbenv/versions/3.2.2/lib/ruby/gems/3.2.0/gems/sass-embedded-1.58.3/ext/sass/sass_embedded/src/dart /Users/ric
+10520 ttys002    0:00.02 /Users/richiethomas/.rbenv/versions/3.2.2/lib/ruby/gems/3.2.0/gems/rb-fsevent-0.11.2/bin/fsevent_watch --format=otnetstring --late
+84187 ttys002    0:00.03 -zsh
+88303 ttys004    0:00.22 -zsh
+86832 ttys005    0:00.18 -zsh
+83972 ttys006    0:00.54 -zsh
+95428 ttys007    0:00.43 -zsh
+95767 ttys008    0:00.26 -zsh
+ 7959 ttys009    0:00.40 -zsh
+
+~ ()  $ kill 7959
+
+~ ()  $ ps
+  PID TTY           TIME CMD
+79086 ttys000    0:00.52 -zsh
+11532 ttys001    0:03.01 -zsh
+10492 ttys002    0:02.90 /Users/richiethomas/.rbenv/versions/3.2.2/bin/jekyll serve    
+10507 ttys002    0:00.10 /Users/richiethomas/.rbenv/versions/3.2.2/lib/ruby/gems/3.2.0/gems/sass-embedded-1.58.3/ext/sass/sass_embedded/src/dart /Users/ric
+10520 ttys002    0:00.02 /Users/richiethomas/.rbenv/versions/3.2.2/lib/ruby/gems/3.2.0/gems/rb-fsevent-0.11.2/bin/fsevent_watch --format=otnetstring --late
+84187 ttys002    0:00.03 -zsh
+88303 ttys004    0:00.22 -zsh
+86832 ttys005    0:00.19 -zsh
+83972 ttys006    0:00.54 -zsh
+95428 ttys007    0:00.43 -zsh
+95767 ttys008    0:00.26 -zsh
+ 7959 ttys009    0:00.40 -zsh
+
+~ () $</code></pre>
+
+<p>I tried running “kill 7959, meaning we’d be sending a “SIGTERM” signal to process 7959 instead of a “SIGKILL” signal.  But then, when I re-ran “ps” to see if the process had indeed disappeared, it turns out it had not.</p>
+
+<p>I re-ran <code>ps</code> several times, in case the <code>kill</code> command was just taking its time, but the process was still alive even after several minutes.  This is a case where we’d want the “-9” flag, assuming it was important enough to kill this particular process.</p>
+
+<h2>Wrapping Up</h2>
+
+<p>Now we know a little bit about processes.  But we still have another question to contend with.  What’s the difference between “exec” and “fork”?  Let’s tackle that next.</p>
+
