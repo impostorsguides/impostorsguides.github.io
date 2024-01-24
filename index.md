@@ -1,7 +1,7 @@
 ---
 layout: home
 permalink: /
-title: Maybe a 10x engineer could do that, but not me... 😔
+title: Maybe a 10x engineer could grok that code, but not me... 😔
 ---
 
 <center>

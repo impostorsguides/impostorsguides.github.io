@@ -41,9 +41,13 @@ My first choice for these archived links is usually [The Wayback Machine](https:
 
 Also occasionally, I have no choice but to link to a Youtube video.  These links aren't archivable, as far as I know, so I link to the original and pray that the video stays up forever.
 
+## Want to support me?
+
+Instead, please consider supporting the Internet Archive / Wayback Machine.  This site makes liberal use of their link archiving feature, without which it would be a much poorer offering.  You can find [their "Donate" page here](https://archive.org/donate?origin=iawww-TopNavDonateButton){:target="_blank" rel="noopener"}.
+
 ## How to contact me
 
-I'm happy to hear from you!  I can be reached at impostorsguides@mastodon.social or at the email above.
+I'm happy to hear from you!  I can be reached at impostorsguides [at] gmail [dot] com.
 
 ## Shout-Outs
 
