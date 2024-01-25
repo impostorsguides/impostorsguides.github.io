@@ -30,7 +30,7 @@ I'm feeling more confident about grokking codebases, now that I've finished read
 
 ## Something else entirely?
 
-Is there something you'd like me to cover?  Reach out to me on [Twitter](https://www.twitter.com/impostorsguides){:target="_blank" rel="noopener"} or email me at [impostorsguides] at {gmail} dot [com].
+Is there something you'd like me to cover?  Reach out to me on [Twitter](https://www.twitter.com/impostorsguides){:target="_blank" rel="noopener"} or email me at [impostorsguides] at {gmail}.
 
 ## It's Your Call
 

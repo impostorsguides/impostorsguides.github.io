@@ -9,7 +9,7 @@ permalink: /contact/
 You can reach me on the platforms below:
 
 ### Email:
-`impostorsguides [at] gmail [dot] com`
+`impostorsguides [at] gmail`
 ### Discord
 Link [here](https://discord.gg/n7Sgv6UD){:target="_blank"}.
 ### LinkedIn

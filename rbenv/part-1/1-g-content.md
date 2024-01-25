@@ -275,7 +275,7 @@ So our current line of code creates an environment variable called `RBENV_DIR`, 
 
 The short answer is that the child shell is used by RBENV to detect which Ruby version is the right one, and then run the original command corresponding to the shim that's being executed (i.e. `bundle` or whatever).
 
-A deeper answer would require an explanation of how the RBENV codebase works as a whole, which is beyond the scope of this post.  However, I've already written a deeper dive into the codebase, with experiments, beginner-friendly explanations, etc. similar to this series.  Let me know [via Twitter](https://twitter.com/impostorsguides){:target="_blank" rel="noopener"} or via email (`impostorsguides at gmail dot com`) if you would find that valuable.  If enough people are interested, I'll post it.
+A deeper answer would require an explanation of how the RBENV codebase works as a whole, which is beyond the scope of this post.  However, I've already written a deeper dive into the codebase, with experiments, beginner-friendly explanations, etc. similar to this series.  Let me know [via Twitter](https://twitter.com/impostorsguides){:target="_blank" rel="noopener"} or via email (`impostorsguides [at] gmail`) if you would find that valuable.  If enough people are interested, I'll post it.
 
 In the meantime, what do the contents of the `RBENV_DIR` variable look like?  To answer that, we have to know what the following resolves to:
 
