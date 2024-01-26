@@ -260,8 +260,13 @@
   display: grid;
   grid-template-columns: 100%;
 
-  li {
+  li.blog-post-item {
     list-style-type: none;
+    list-style-position: inside;
+
+    ul {
+      margin-bottom: 2em;
+    }
   }
 }
 
