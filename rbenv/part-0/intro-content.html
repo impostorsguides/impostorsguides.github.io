@@ -16,7 +16,7 @@
 
 <p>What's the first thing that happens when you type `bundle install` into the terminal and hit "Enter"?</p>
 
-<p>This is the question which set me off on this entire project. For those unfamiliar with the `bundle install` command, it comes from the <a href="https://bundler.io/" target="_blank">Bundler library</a>.  Bundler provides "a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed", according to its website.</p>
+<p>This is the question which set me off on this entire project. For those unfamiliar with the `bundle install` command, it comes from the <a href="https://web.archive.org/web/20240126020236/https://bundler.io/" target="_blank">Bundler library</a>.  Bundler provides "a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed", according to its website.</p>
 
 <p>Professionally, I work on a large Rails codebase with many contributors, and `bundle install` is one of the most common commands we find ourselves typing.  I was frustrated that I didn't know how this command worked under-the-hood.  Since I'm a big believer that <a href="https://ideas.time.com/2011/11/30/the-protege-effect/" target="_blank">"The best way to learn something is to explain it to someone else"</a>, I decided to blog about what I was learning, as I learned it.</p>
 
@@ -80,9 +80,17 @@ exec "/Users/richiethomas/.rbenv/bin/rbenv" exec "$program" "$@"</code></pre>
 <ul>
   <li>the file's path is <code>/Users/richiethomas/.rbenv/shims/bundle</code>, which includes <code>.rbenv</code>.</li>
   <li>there are a few RBENV-specific references in the code, including environment variables named <code>RBENV_DIR</code> and <code>RBENV_ROOT</code>.</li>
+  <li>if we were to inspect other files in the <code>~/.rbenv/shims/</code> folder, we'd see they all look <i>exactly</i> the same! The following files all contain exactly the same code as the above:
+      <ul>
+        <li><code>~/.rbenv/shims/rails</code></li>
+        <li><code>~/.rbenv/shims/ruby</code></li>
+        <li><code>~/.rbenv/shims/gem</code></li>
+      </ul>
+    </li>
 </ul>
 
-<p>As we'll come to learn, RBENV (and some other Ruby version managers) work by intercepting your call to the <code>ruby</code> command (or any other Ruby-specific command), doing some work to figure out which Ruby version you want to use, and then making sure that this Ruby version is used by the command you've typed.</p>
+
+<p>In the following chapters, we'll break down the code line-by-line.  By the end, we'll see why all these files can have the same exact code, yet execute different programs.  We'll also see that RBENV (and some other Ruby version managers) work by intercepting your call to the <code>ruby</code> command (or any other Ruby-specific command), doing some work to figure out which Ruby version you want to use, and then making sure that this Ruby version is used by the command you've typed.</p>
 
 <h2>Moving On</h2>
 

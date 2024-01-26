@@ -8,16 +8,128 @@
 
 <h2>Confirming The Correct RBENV Version</h2>
 
-<p>For what it's worth, this line will look a bit different on your machine than it does on mine, since the username that appears in the filepath in this line (“richiethomas”) will be different.  But the majority of it should look similar, assuming you're using the same version of RBENV that I am (“1.2.0-16-gc4395e5”).  To make sure this is true, run the following in your Bash terminal:</p>
+<p>For what it's worth, this line will look a bit different on your machine than it does on mine, since the username that appears in the filepath in this line ("richiethomas") will be different.  But the majority of it should look similar, assuming you're using the same version of RBENV that I am (<code>1.2.0-16-gc4395e5</code>).  To make sure this is true, run the following in your Bash terminal:</p>
 
 <pre><code>bash-3.2$ rbenv --version
 rbenv 1.2.0-16-gc4395e5
 bash-3.2$ </code></pre>
 
-<p>You should see <code>rbenv 1.2.0-16-gc4395e5</code> as the output.  If not, you may need to re-install RBENV, as per the instructions <a href="/shell/install-rbenv" target="_blank">here</a>.</p>
+<p>You should see <code>rbenv 1.2.0-16-gc4395e5</code> as the output.  If not, you may need to re-install RBENV <strong>from source</strong> (i.e. not from Homebrew or similar), as per the instructions <a href="/shell/install-rbenv" target="_blank">here</a>.</p>
 
 <h2>What command are we running?</h2>
 
-<p>On the last line of code in the shim, we’re running a command called “exec”.  We’ll get to what it does in a minute, but first let’s print out the arguments that we’re passing, so we can make more sense of the command.</p>
+<p>On the last line of code in the shim, we're running a command called <code>exec</code>.  We'll get to what it does in a minute, but first let's print out the arguments that we're passing, so we can make more sense of the command.</p>
 
 <p>Above the last line of code, I add the following:</p>
+
+<pre><code>export RBENV_ROOT="/Users/richiethomas/.rbenv"
+echo "program: $program"
+echo "args: $@"
+exec "/Users/richiethomas/.rbenv/bin/rbenv" exec "$program" "$@"</code></pre>
+
+<p>Next, I run the following command:</p>
+
+<pre><code>$ bundle --version
+program: bundle
+args: --version
+Bundler version 2.3.14
+$ </code></pre>
+
+<p>Since the program we're running is <code>bundle</code> and the single argument we're passing is <code>--version</code>, the full command we're running is:</p>
+
+<pre><code>exec /Users/richiethomas/.rbenv/libexec/rbenv exec bundle --version</code></pre>
+
+<p>Before moving on, I make sure to remove the 2 echo statements that I added to my bundle shim.</p>
+
+<h2>The <code>exec</code> Command</h2>
+
+<p>What does the <code>exec</code> command at the start of the line do? I first try <code>man exec</code> but I get the "General Commands Manual", indicating that this is a builtin command. I then log into a Bash shell and try <code>help exec</code>, where I see:</p>
+
+<pre><code>bash-3.2$ help exec
+exec: exec [-cl] [-a name] file [redirection ...]
+    Exec FILE, replacing this shell with the specified program.
+    If FILE is not specified, the redirections take effect in this
+    shell.  If the first argument is `-l', then place a dash in the
+    zeroth arg passed to FILE, as login does.  If the `-c' option
+    is supplied, FILE is executed with a null environment.  The `-a'
+    option means to make set argv[0] of the executed process to NAME.
+    If the file cannot be executed and the shell is not interactive,
+    then the shell exits, unless the shell option `execfail' is set.
+bash-3.2$ </code></pre>
+
+<p>We're executing a file (i.e. a command), "replacing this shell with the specified program.". What does that mean?</p>
+
+<p>I Google "what is exec in bash", and one of the first links I find is this one, from <a href="https://web.archive.org/web/20230323171516/https://www.computerhope.com/unix/bash/exec.htm" target="_blank">a site called ComputerHope</a>:</p>
+
+<blockquote>
+  <h3>Bash exec builtin command</h3>
+  <p>On Unix-like operating systems, exec is a builtin command of the Bash shell. It lets you execute a command that completely replaces the current process. The current shell process is destroyed, and entirely replaced by the command you specify.</p>
+  <p>...</p>
+  <h3>Description</h3>
+  <p>exec is a critical function of any Unix-like operating system. Traditionally, the only way to create a new process in Unix is to fork it. The fork system call makes a copy of the forking program. The copy then uses exec to execute the child process in its memory space.</p>
+</blockquote>
+
+<p>To be honest, that explanation creates more questions for me than it answers:</p>
+
+<ul>
+  <li>What's a "process"?</li>
+  <li>What's the difference between forking a process and replacing the current process with the new one (i.e. what <code>exec</code> does)?</li>
+  <li>Why use <code>exec</code> over forking, or vice-versa?</li>
+</ul>
+
+<p>It was clear at this point that I needed some background info on processes before I could proceed further.  The best resource I found was <a href="https://web.archive.org/web/20230522095527/https://homepages.uc.edu/~thomam/Intro_Unix_Text/Process.html">this page from the University of Cincinatti</a>, which does a great job of explaining processes in beginner-friendly terms, and answers the first two questions above.</p>
+
+<p>Rather than copy/paste the whole page, I'll direct you to open and read it yourself.  Feel free to skip the section called "Password Verification" unless you're curious, since it isn't immediately relevant to our discussion here.  However the section after that, called "Introduction to the Shell", is worth reading.</p>
+
+<p>FYI, I also wrote <a href="/blog/what-are-processes/" target="_blank">a separate blog post called "What Are Processes?"</a>, containing some additional information and experiments based on the things I learned in the above article.</p>
+
+<p>Armed with this new information, let's try using <code>exec</code> ourselves.</p>
+
+<h2>Experiment- trying out the "exec" command</h2>
+
+<p>Directly in my terminal, I run:</p>
+
+<pre><code>$ exec ruby -e 'puts 5+5' 
+10
+
+[Process completed]</code></pre>
+
+<p>The final output I see in my terminal tab is "[Process completed]", and I can no longer run any commands in this tab. I have to close this tab and open a new one to resume entering commands in the terminal.</p>
+
+<p>Now we know what it looks like when "the shell exits when the command is complete".</p>
+
+<h2>Using <code>exec</code> in the RBENV shim</h2>
+
+<p>So that's what the shell builtin <code>exec</code> command does. But the line of code we're looking at is:</p>
+
+<pre><code>exec /Users/richiethomas/.rbenv/libexec/rbenv bundle install foo bar baz</code></pre>
+
+<p>This means we're running the builtin exec command, and passing it the <code>/Users/richiethomas/.rbenv/libexec/rbenv</code> filepath.  Remember what we read in the <code>help exec</code> output above: <code>exec</code> technically takes a filepath as an argument.  It's just that, if we were to run <code>exec rbenv</code> instead of <code>exec /Users/richiethomas/.rbenv/libexec/rbenv</code>, the terminal would look up the filepath for <code>rbenv</code> by iterating through <code>$PATH</code>.</p>
+
+<p>Since we don't know what the user's <code>$PATH</code> contains, we don't know whether the version it would find first is the version of <code>rbenv</code> that lives at <code>/Users/richiethomas/.rbenv/libexec/rbenv</code>.  We specifically want to run that version, so we specify its filepath in order to bypass this <code>$PATH</code> lookup.</p>
+
+<h2>The <code>rbenv exec</code> command</h2>
+
+<p>We'll dive deeper into what <code>rbenv exec</code> does in a future section, but let's get a quick preview of what it does.  A good way to do that is to check whether <code>rbenv exec</code> accepts a <code>--help</code> flag:</p>
+
+<pre><code>$ rbenv exec --help
+Usage: rbenv exec <command> [arg1 arg2...]
+
+Runs an executable by first preparing PATH so that the selected Ruby
+version's `bin' directory is at the front.
+
+For example, if the currently selected Ruby version is 1.9.3-p327:
+  rbenv exec bundle install
+
+is equivalent to:
+  PATH="$RBENV_ROOT/versions/1.9.3-p327/bin:$PATH" bundle install
+
+$ </code></pre>
+
+<p>Translating the above, <code>rbenv exec</code> ensures that, the first directory UNIX finds when it checks <code>$PATH</code> for a directory containing the command we entered is the one containing the version of Ruby you have set as your current version.</p>
+
+<h2>Wrapping Up</h2>
+
+<p>If you're still confused about processes, <code>exec</code>, and <code>fork</code>, you're probably not alone.  Check out <a href="https://web.archive.org/web/20230522095527/https://homepages.uc.edu/~thomam/Intro_Unix_Text/Process.html" target="_blank">the link I mentioned above from University of Cincinatti</a>, as well as <a href="/blog/what-are-processes" target="_blank">my follow-up blog post on processes</a>.</p>
+
+<p>In the meantime, let's move on.</p>
