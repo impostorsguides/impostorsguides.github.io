@@ -1,0 +1,41 @@
+---
+layout: post
+permalink: /blog/what-is-a-shim/
+title: What Is A Shim?
+excerpt_separator: <!--more-->
+createdAt: 12 Jan, 2024
+---
+
+<div>
+  <figure style="float: right; width: 50%; margin: 0 0 10px 25px ">
+    <img src="/assets/images/low-alcohol-cocktail.jpeg" width="100%" alt="Book cover- 'The Art of the Shim: Low-Alcohol Cocktails To Keep You Level'">
+    <figcaption style="text-align: center;">Apparently, a shim is also a low-alcohol cocktail, especially one served at breakfast.</figcaption>
+  </figure>
+</div>
+
+<p>RBENV ensures that we're using the version of Ruby that our current environment depends on.  It does this by:</p>
+
+<ul>
+  <li>intercepting your call to the <code>ruby</code> command,</li>
+  <li>deciding which Ruby version to use based on the information available to it, and then</li>
+  <li>passing the command you entered to the correct Ruby interpreter based on that version.</li>
+</ul>
+
+<p>This behavior (intercepting a message, handling it in some way, and then passing it on to its intended receiver) is a common pattern in software.  A file, program, or library which does this is sometimes known as a "shim".</p>
+
+<!--more-->
+  
+<p>Programs that act as shims are <a href="https://stackoverflow.com/questions/2116142/what-is-a-shim" target="_blank">meant to be "transparent"</a>, meaning that you think you're talking to the program you invoked (say, Bundler if we're running <code>bundle install</code>), but the whole time you're really talking to the shim. Similarly, Bundler thinks it's responding to you, not to a shim.</p>
+
+<h2>How RBENV Behaves Like A Shim</h2>
+
+<p>To quote <a href="https://web.archive.org/web/20230405065304/https://github.com/rbenv/rbenv#how-it-works" target="_blank">RBENV's README file</a>:</p>
+
+<blockquote><p>“After RBENV injects itself into your <code>$PATH</code> at installation time, any invocation of <code>ruby</code>, <code>gem</code>, <code>bundler</code>, or other Ruby-related executable will first activate RBENV.  Then, RBENV scans the current project directory for a file named <code>.ruby-version</code>.</p>
+<p>If found, that file determines the version of Ruby that should be used within that directory. Finally, RBENV looks up that Ruby version among those installed under <code>~/.rbenv/versions/</code>.”</p>
+</blockquote>
+
+<p>So RBENV inserts itself in-between you and (for example) the <code>ruby</code> command.  It does this by altering the <code>$PATH</code> environment variable, adding its own version of the <code>ruby</code> command in front of the canonical version.  This way, it makes itself the recipient of your call to the <code>ruby</code> command.  From there, it can do its job of selecting the correct version of Ruby, and passing your call to <i>that</i> version.</p>
+
+<p>The file whose code we read in Part 1 of <a href="/shell" target="_blank">"The Impostor's Guide To The Shell"</a> (<code>~/.rbenv/shims/bundle</code>) is the shim file for the Bundler gem's <code>bundle</code> command.</p>
+

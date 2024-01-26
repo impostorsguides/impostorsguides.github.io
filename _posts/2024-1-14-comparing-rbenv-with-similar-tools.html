@@ -1,0 +1,48 @@
+---
+layout: post
+permalink: /blog/comparing-rbenv-with-similar-tools/
+title: Comparing RBENV with similar tools
+excerpt_separator: <!--more-->
+createdAt: 14 Jan, 2024
+---
+
+<div>
+  <figure style="float: left; width: 40%; margin: 0 25px 10px 0">
+    <img src="/assets/images/tools.jpg" width="100%" alt="A wall full of tools.">
+    <!-- <figcaption style="text-align: center;">How do you do, fellow kids?</figcaption> -->
+  </figure>
+</div>
+
+<p>A little while ago, I wrote a thing called <a href="/shell/" target="_blank">"The Impostor's Guide To The Shell"</a>, where I describe how I taught myself the basics of shell scripting by reading the codebase of a program called <a href="https://github.com/rbenv/rbenv" target="_blank">RBENV</a>.</p>
+  
+<p>RBENV is a version manager for the Ruby programming language.  It's a popular choice for managing Ruby versions, but it's not the only choice.  Others include <a href="https://rvm.io/" target="_blank">rvm</a>, <a href="https://github.com/postmodern/chruby" target="_blank">chruby</a>, <a href="https://asdf-vm.com/" target="_blank">asdf</a>, or other programs.</p>
+
+<!--more-->
+
+<p>Most people just use the same version manager that their team does.  But if your team is new and deciding which version manager to use (or if you're a solo engineer and don't have a team), it can be difficult to differentiate between these different options.</p>
+
+<p>In addition, you may have heard of other "managers", such as Bundler.  It's easy to get confused about the difference between version managers and other types of package managers.  Let's learn about the difference between all these different tools in our toolbelt.</p>
+
+<h2>RBENV vs. other version managers</h2>
+
+<p>In my blog post <a href="/blog/what-is-a-shim" target="_blank">"What Is A Shim?"</a>, I describe how RBENV uses the concept of a "shim" to intercept your call to (for example) the <code>ruby</code> command in your terminal.  Once it has done this, it can select the correct version of Ruby to use based on your project's settings, and then pass your call to <code>ruby</code> on to that correct version.</p>
+
+<p>Not all version managers work this way.  RVM, for example, works by <a href="https://web.archive.org/web/20230510020715/https://www.sitepoint.com/ruby-version-managers-macos/#rvm" target="_blank">overriding your terminal's <code>cd</code> command</a>.  In fact it was this design choice (and <a href="https://web.archive.org/web/20240109150210/https://github.com/rbenv/rbenv/wiki/Comparison-of-version-managers#rvm" target="_blank">the corresponding trouble it caused</a> for certain users) which led to the development of RBENV in the first place.</p>
+
+
+<p>The core RBENV team actually maintains a comparison of popular Ruby version managers <a href="https://github.com/rbenv/rbenv/wiki/Comparison-of-version-managers" target="_blank">here</a>.</p>
+
+<h2>RBENV vs. Bundler</h2>
+
+<p>According to its <a href="https://web.archive.org/web/20240126020236/https://bundler.io/" target="_blank">homepage</a>, Bundler provides "a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed."</p>
+
+<p>This... sounds a lot like what I just said RBENV does.  So what's the difference between RBENV and Bundler? Why do I need both?</p>
+
+<p><a href="https://web.archive.org/web/20220911152613/https://www.rubyguides.com/2018/09/ruby-gems-gemfiles-bundler/" target="_blank">Bundler is a dependency management tool</a>. It helps you manage the versions of the Ruby libraries <strong>in a specific project folder</strong> (also known as "gems").  These gems are the libraries that the project in this folder depends on (a.k.a. "dependencies").</p>
+
+<p>RBENV, on the other hand, manages the versions of Ruby itself, <strong>across all the Ruby projects on your machine</strong>. RBENV ensures that your machine is using the version of Ruby that your project depends on, and Bundler ensures that your machine is using the right versions of the libraries that your project depends on.</p>
+
+<p>While Ruby is technically a "dependency" too, it's really more than that.  You can't run a Ruby project without an installed Ruby version, whereas you could still run a Ruby project without a given library (by simply removing the feature or features which depend on that library).</p>
+
+<p>More info on how these tools all work together can be found <a href="https://web.archive.org/web/20221210084104/https://www.honeybadger.io/blog/rbenv-rubygems-bundler-path/" target="_blank">here</a>, in this excellent summary from Honeybadger.io.</p>
+

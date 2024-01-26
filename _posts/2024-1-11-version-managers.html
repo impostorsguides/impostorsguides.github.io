@@ -1,0 +1,47 @@
+---
+layout: post
+permalink: /blog/version-managers/
+title: What is a version manager?
+excerpt_separator: <!--more-->
+createdAt: 11 Jan, 2024
+---
+
+<div>
+  <figure style="float: left; width: 40%; margin: 0 25px 10px 0">
+    <img src="/assets/images/tswift.jpeg" width="100%" alt="Artistic rendition of Taylor Swift's '1989 (Taylor's Version)' album cover.">
+    <figcaption style="text-align: center;">How do you do, fellow kids?</figcaption>
+  </figure>
+</div>
+
+<p>When I describe RBENV as a "version manager", I mean it helps developers switch between Ruby versions without too much hassle.</p>
+
+<p>If we have multiple versions of Ruby installed, that means there are multiple programs on our machine which respond to the <code>ruby</code> command in our terminal.  Without a Ruby version manager to help us switch between versions, our OS will just pick the first of these programs that it finds, which may or may not be the version our program depends on.</p>
+
+<!--more-->
+
+<p>But why would you need multiple versions of Ruby on your machine?  Why not just always use the most-recent version?</p>
+
+<h2>Multiple Ruby versions on one machine</h2>
+
+<p>Let's say your team uses the microservices approach, as opposed to the monolith approach.  Over the years, you and your coworkers have created multiple Rails apps which all have a single responsibility, and which all talk to each other using API calls:</p>
+
+<ul>
+  <li>The oldest microservice is responsible for processing e-commerce orders, and was created back when Ruby <code>v2.7.0</code> was the latest version.</li>
+  <li>Another microservice is the notifications service, which was created just after Ruby released <code>v3.0.0</code>.</li>
+  <li>Lastly, you have a microservice for aggregating data for the purpose of producing analytics reports on your company's sales trends.  This is the most recent service, and was created using Ruby <code>v3.3.0</code>.</li>
+</ul>
+
+<p>Ideally, you could simply upgrade the Ruby versions on the two older apps so that they also use Ruby <code>v3.3.0</code>.  However, that's not always easy to do.  Oftentimes, a version upgrade involves fixing your codebase to account for breaking changes that are introduced by the newer version you're upgrading to.  These can take awhile to fix.</p>
+
+<p>Additionally, technical priorities such as version upgrades take a back seat to product concerns such as releasing new features, bugfixes, etc.  So we often have to live with older versions, at least temporarily.</p>
+
+<h2>What would life be like without a version manager?</h2>
+
+<p>Without a version manager, your options are both limited and unappealing.  For example, you could...</p>
+  
+<ul>
+  <li>...rely on a single global Ruby version (the downsides of which are described in detail <a href="https://web.archive.org/web/20230108114936/https://betterprogramming.pub/developers-use-a-version-manager-ecb36fde91c7" target="_blank">here</a>), or</li>
+  <li>...maintain separate commands for each Ruby versions (i.e. invoke <code>ruby330</code>, <code>ruby275</code>, etc. from the command line depending on which version you want to execute), which can be error-prone.</li>
+</ul>
+
+<p>A version manager does all this work for you, without any manual effort on your part beyond declaring a version file that the manager can read from.</p>
