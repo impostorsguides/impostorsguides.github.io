@@ -14,9 +14,15 @@ Have you ever said this before?  Then you're not alone.
 ## What if you were the go-to expert on your team for how the internals of your framework, library, etc. worked?
 
 
-What if you knew the internals of your most commonly-used open-source tools (Rails, Ruby, MySQL, etc.) so well that you could write your team's code accordingly?
+What if your teammates considered you the go-to expert on how your libraries work, because you know their internals so thoroughly?
 
-Even better, what if you didn't have to worry about your tools becoming obsolete in the face of the next new thing, because you had a repeatable process for learning those tools too?
+What if you could confidently explain how the internals of a language like Ruby or Rails work, to job interviewers, teammates, and anyone else?
+
+What if you never again had to worry about your team adopting a new library, because you had a repeatable process for learning the internals of any codebase you want?
+
+What if you had the ability to not only read and learn from code from world-class open-source developers, but contribute to it as well, in effect becoming one of their peers?
+
+Would you still feel like an impostor then?
 
 ## How do you build a house?  One brick at a time.  
 ## How do you grok a codebase?  One line of code at a time.
