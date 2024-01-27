@@ -13,19 +13,15 @@ createdAt: 16 Jan, 2024
   </figure>
 </div>
 
-<p>If the goal is to find out what happens when we type <code>bundle install</code> into our terminal, then a good place to start is by reading the file which gets executed when running the <code>bundle</code> command.</p>
+<p>In my <a href="/shell" target="_blank">deep-dive write-up of how RBENV works</a>, my first step was to find out where (i.e. in which file) the command's logic lived.  It turned out that it lived in a shim file, which in turn lived inside the <code>~/.rbenv</code> directory.  But I didn't explain what the <code>~/.rbenv</code> directory is, and more specifically, why it starts with a <code>.</code> character.</p>
 
-<p>To find that file, let's use <a href="https://web.archive.org/web/20230308043620/https://linux.die.net/man/1/which" target="_blank">the <code>which</code> UNIX command</a>. In my terminal, I type the following:</p>
+<p>This post will try to answer that question, i.e. why do some files and directories start with a dot?</p>
+
 <!--more-->
-<pre><code>$ which bundle
-/Users/richiethomas/.rbenv/shims/bundle
-$</code></pre>
-
-<p>Here we see that file containing the <code>bundle</code> command's logic lives in a directory called <code>/Users/richiethomas/.rbenv/shims/</code>, also sometimes referred to in this guide as <code>~/.rbenv/shims</code>.</p>
 
 <h2>Dotfiles and dot folders</h2>
 
-<p>The <code>~/.rbenv/</code> directory's name begins with a <code>.</code>.  In UNIX, there's a convention whereby the names of files and folders which are meant to be hidden from view by default are prefixed with a dot.  Unsurprisingly, these are called <a href='https://web.archive.org/web/20230623095245/https://www.freecodecamp.org/news/dotfiles-what-is-a-dot-file-and-how-to-create-it-in-mac-and-linux/' target="_blank">"dotfiles" or "dot folders"</a>.</p>
+In UNIX, there's a convention whereby the names of files and folders which are meant to be hidden from view by default are prefixed with a dot.  Unsurprisingly, these are called <a href='https://web.archive.org/web/20230623095245/https://www.freecodecamp.org/news/dotfiles-what-is-a-dot-file-and-how-to-create-it-in-mac-and-linux/' target="_blank">"dotfiles" or "dot folders"</a>.</p>
 
 <p>When I say "hidden", I mean hidden from the <code>ls</code> command.  For example, the following is the contents of my laptop's home directory, according to the regular <code>ls</code> command (passing the <code>-l</code> flag to list one item per line):</p>
 
@@ -88,7 +84,11 @@ $</code></pre>
 
 <h2>What is an <code>rc</code> dotfile?</h2>
 
-<p>When you open a new terminal tab or window in Zsh, one of the first things that happens is that Zsh runs a few setup scripts. One of these scripts is located at <code>.zshrc</code>. This file is where you'd put configuration options that you'd want to run on every new terminal tab or window.</p>
+<p>When you install RBENV from source, one of the steps you have to take is <a href="https://github.com/rbenv/rbenv?tab=readme-ov-file#basic-git-checkout" target="_blank">"(c)onfigure your shell to load RBENV"</a>.  You do this by updating a certain file in your home directory to include a certain command.  For the Bash shell, this file is <code>~/.bashrc</code>.  For the Zsh shell, this is the <code>~/.zshrc</code> file.</p>
+
+<p>We see from the filenames that both of these files are dotfiles.  But what is the significance of the <code>rc</code> at the end of these filenams?</p>
+
+<p>When you open a new terminal tab or window in Zsh (the now-default shell for Macs), one of the first things that happens is that Zsh runs a few setup scripts. One of these scripts is that <code>~/.zshrc</code> file. This file is where you'd put configuration options that you'd want to run on every new terminal tab or window.  The same is true for Bash's <code>~/.bashrc</code> file.</p>
 
 <p>There are other setup scripts which get loaded as well, such as <code>~/.zshenv</code>.  But <code>~/.zshrc</code> is the one I interact with most.  Zsh will run these scripts in a specific order, and there are <a href="https://web.archive.org/web/20230724164024/https://unix.stackexchange.com/questions/71253/what-should-shouldnt-go-in-zshenv-zshrc-zlogin-zprofile-zlogout" target="_blank">conventions around what you should put in each file</a>.</p>
 
@@ -132,27 +132,9 @@ $</code></pre>
 
 <p>As you can see, the <code>foo/</code> folder is now truly empty- no more dotfiles.</p>
 
-<h2>Side note- experiments</h2>
-
-<p>We just did our first of many experiments. Sometimes these experiments will help us form a hypothesis of how we think code might work, and then test whether that hypothesis is correct. Other times, we'll just use them to prove to ourselves that something we've read on StackOverflow, ChatGPT, or some random person's blog is actually correct.</p>
-
-<h2>Making a small update to your shell</h2>
-
-<p>One last thing we'll want to do is add a line of code to your shell's config file, a.k.a. the file which configures your shell every time you open a new tab or window.  We want to add a line which updates your <code>$PATH</code> variable to include a specific directory that RBENV contains.</p>
-
-<p>If you're running the Bash shell, then your config file lives at <code>~/.bashrc</code>.</p>
-
-<p>And if you're running the Zsh shell (the default on most newer Macs by now), then your config file lives at <code>~/.zshrc</code>.</p>
-
-<p>Here's the line of code you should add, and it should be fine to add it to the end of the file:</p>
-
-<pre><code>PATH="${HOME}/.rbenv/libexec:$PATH"</code></pre>
-
-<p>We're adding this line of code so that we can modify RBENV's code in its home directory, and see the changes we make reflected in how RBENV works.  For our change to take effect, you'll need to open a new Shell tab or window.</p>
-
 <h2>Wrapping Up</h2>
 
-<p>Let's move on, and talk a bit about the purpose of version managers such as RBENV.</p>
+<p>That's a very basic introduction to dotfiles.  For a much deeper dive into how dotfiles are used in a professional environment, check out <a href="https://thoughtbot.com/upcase/videos/intro-to-dotfiles" target="_blank">this guide from thoughtbot</a>.</p>
 
 <div id="photo-attribution">
   <h4>Photo Attribution</h4>

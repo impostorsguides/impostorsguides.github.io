@@ -14,13 +14,13 @@
 
 <h2>Background</h2>
 
-<p>What's the first thing that happens when you type `bundle install` into the terminal and hit "Enter"?</p>
+<p>What's the first thing that happens when you type <code>bundle install</code> into the terminal and hit "Enter"?</p>
 
-<p>This is the question which set me off on this entire project. For those unfamiliar with the `bundle install` command, it comes from the <a href="https://web.archive.org/web/20240126020236/https://bundler.io/" target="_blank">Bundler library</a>.  Bundler provides "a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed", according to its website.</p>
+<p>This is the question which set me off on this entire project. For those unfamiliar with the <code>bundle install</code> command, it comes from the <a href="https://web.archive.org/web/20240126020236/https://bundler.io/" target="_blank">Bundler library</a>.  Bundler provides "a consistent environment for Ruby projects by tracking and installing the exact gems and versions that are needed", according to its website.</p>
 
-<p>Professionally, I work on a large Rails codebase with many contributors, and `bundle install` is one of the most common commands we find ourselves typing.  I was frustrated that I didn't know how this command worked under-the-hood.  Since I'm a big believer that <a href="https://ideas.time.com/2011/11/30/the-protege-effect/" target="_blank">"The best way to learn something is to explain it to someone else"</a>, I decided to blog about what I was learning, as I learned it.</p>
+<p>Professionally, I work on a large Rails codebase with many contributors, and <code>bundle install</code> is one of the most common commands we find ourselves typing.  I was frustrated that I didn't know how this command worked under-the-hood.  Since I'm a big believer that <a href="https://ideas.time.com/2011/11/30/the-protege-effect/" target="_blank">"The best way to learn something is to explain it to someone else"</a>, I decided to blog about what I was learning, as I learned it.</p>
 
-<p>As it happens, my deep-dive took me on a detour into the code for my Ruby version manager, named RBENV.  RBENV creates shim files for every Ruby command you enter, including “bundle”, and the first file I encountered ended up being this shim.</p>
+<p>As it happens, my deep-dive took me on a detour into the code for my Ruby version manager.  That version manager, named RBENV, creates shim files for every Ruby command you enter, including <code>bundle</code>.  Therefore, the first file I encountered in my deep-dive was this shim.</p>
 
 <p>In the process of exploring this shim file (and RBENV’s code in general), I ended up learning a lot about the UNIX shell and Bash, the language RBENV is written in.  This might actually be more broadly-applicable than learning about Bundle, since Bash is much more broadly-used than Bundle.</p>
 
@@ -28,24 +28,26 @@
 
 <h2>Starting Our Journey</h2>
 
-<p>If we want to figure out what happens when we type “bundle install”, a good place to start is looking for where the “bundle” command lives.  I did this by running “which bundle” in my terminal.  I found the following:</p>
+<p>If we want to figure out what happens when we type <code>bundle install</code>, a good place to start is looking for where the <code>bundle</code> command lives.  I did this by running <code>which bundle</code> in my terminal.  I found the following:</p>
 
 <pre><code>$ which bundle
 /Users/richiethomas/.rbenv/shims/bundle
 $ </code></pre>
 
-<p>By default, the “which” command gives us just the first executable filepath it finds which matches the parameter we pass it (in this case, that parameter is “bundle”).  If we pass the “-a” flag, it will give us every executable filepath:</p>
+<p>By default, the <code>which</code> command gives us just the first executable filepath it finds which matches the parameter we pass it (in this case, that parameter is <code>bundle</code>).  If we pass the <code>-a</code> flag, it will give us every executable filepath:</p>
 
 <pre><code>$ which -a bundle
 /Users/richiethomas/.rbenv/shims/bundle
 /usr/bin/bundle
 $ </code></pre>
 
-<p>Here we see that there are two executable filepaths in total, and that the one located at /Users/richiethomas/.rbenv/shims/ is found before the one located at /usr/bin/bundle.  The filepath that is found first is the one that our computer will use to run our command, so this is the filepath we should inspect if we want to know what our machine is doing.</p>
+<p>Here we see that there are two executable filepaths in total, and that the one located at <code>/Users/richiethomas/.rbenv/shims/</code> is found before the one located at <code>/usr/bin/bundle</code>.  The filepath that is found first is the one that our computer will use to run our command, so this is the filepath we should inspect if we want to know what our machine is doing.</p>
+
+<p>Note- if you're wondering why <code>~/.rbenv/</code> begins with a dot, I go into more detail about that <a href="/blog/what-are-dotfiles/" target="_blank">here</a>.</p>
 
 <h2>Inspecting the filepath we found</h2>
 
-<p>For my code editor, I sometimes use VS Code and sometimes use vim as my editor, and I have a terminal command named “code” which will open up a filepath I pass in VS Code.  So I run the following in my terminal:</p>
+<p>For my code editor, I sometimes use VS Code and sometimes use vim as my editor, and I have a terminal command named <code>code</code> which will open up a filepath I pass in VS Code.  So I run the following in my terminal:</p>
 
 <pre><code>$ code /Users/richiethomas/.rbenv/shims/bundle</code></pre>
 
