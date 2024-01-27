@@ -1,0 +1,164 @@
+---
+layout: post
+permalink: /blog/what-are-dotfiles/
+title: What Are Dotfiles?
+excerpt_separator: <!--more-->
+createdAt: 16 Jan, 2024
+---
+
+<div>
+  <figure style="float: right; width: 100%; margin: 0 0 10px 25px">
+    <img src="/assets/images/sauce-dots.jpg" width="100%" alt="Adding dots of sauce to a plate of food.">
+    <figcaption style="text-align: center;">Adding dots of sauce to a plate.  Photo attribution <a href="/blog/what-are-dotfiles/#photo-attribution" target="_blank">here</a>.</figcaption>
+  </figure>
+</div>
+
+<p>If the goal is to find out what happens when we type <code>bundle install</code> into our terminal, then a good place to start is by reading the file which gets executed when running the <code>bundle</code> command.</p>
+
+<p>To find that file, let's use <a href="https://web.archive.org/web/20230308043620/https://linux.die.net/man/1/which" target="_blank">the <code>which</code> UNIX command</a>. In my terminal, I type the following:</p>
+<!--more-->
+<pre><code>$ which bundle
+/Users/richiethomas/.rbenv/shims/bundle
+$</code></pre>
+
+<p>Here we see that file containing the <code>bundle</code> command's logic lives in a directory called <code>/Users/richiethomas/.rbenv/shims/</code>, also sometimes referred to in this guide as <code>~/.rbenv/shims</code>.</p>
+
+<h2>Dotfiles and dot folders</h2>
+
+<p>The <code>~/.rbenv/</code> directory's name begins with a <code>.</code>.  In UNIX, there's a convention whereby the names of files and folders which are meant to be hidden from view by default are prefixed with a dot.  Unsurprisingly, these are called <a href='https://web.archive.org/web/20230623095245/https://www.freecodecamp.org/news/dotfiles-what-is-a-dot-file-and-how-to-create-it-in-mac-and-linux/' target="_blank">"dotfiles" or "dot folders"</a>.</p>
+
+<p>When I say "hidden", I mean hidden from the <code>ls</code> command.  For example, the following is the contents of my laptop's home directory, according to the regular <code>ls</code> command (passing the <code>-l</code> flag to list one item per line):</p>
+
+<pre><code>$ ls -l
+total 0
+drwxr-xr-x   3 richiethomas  staff    96 Dec  4 14:18 Applications
+drwx------+ 35 richiethomas  staff  1120 Jan 10 12:08 Desktop
+drwx------+  4 richiethomas  staff   128 Dec 27 22:02 Documents
+drwx------+ 50 richiethomas  staff  1600 Jan  8 19:23 Downloads
+drwx------@ 92 richiethomas  staff  2944 Jan  7 11:56 Library
+drwx------   4 richiethomas  staff   128 Dec  4 15:42 Movies
+drwx------+  4 richiethomas  staff   128 Dec 30 21:11 Music
+drwx------+  4 richiethomas  staff   128 Dec  4 14:02 Pictures
+drwxr-xr-x+  4 richiethomas  staff   128 Dec  4 14:02 Public
+$</code></pre>
+
+<p>But there are actually many more files in this folder.  To view them all, we have to add the <code>-a</code> flag to our previously-run command:</p>
+  
+<pre><code>$ ls -la
+total 240
+drwxr-x---+ 36 richiethomas  staff   1152 Jan 10 12:23 .
+drwxr-xr-x   5 root          admin    160 Dec  4 14:02 ..
+-r--------   1 richiethomas  staff      7 Dec  4 14:02 .CFUserTextEncoding
+-rw-r--r--@  1 richiethomas  staff  10244 Jan  5 22:24 .DS_Store
+drwx------+ 33 richiethomas  staff   1056 Jan  9 13:52 .Trash
+-rw-r--r--   1 richiethomas  staff    348 Dec  4 15:04 .aliases.sh
+drwxr-xr-x   3 richiethomas  staff     96 Dec 23 11:48 .bundle
+drwx------   3 richiethomas  staff     96 Dec 19 18:15 .cups
+-rw-r--r--   1 richiethomas  staff     36 Dec  4 15:07 .editor.sh
+-rw-r--r--   1 richiethomas  staff    373 Dec  4 15:07 .format_terminal_prompt.sh
+drwxr-xr-x@  4 richiethomas  staff    128 Dec  6 08:47 .gem
+-rw-r--r--   1 richiethomas  staff    203 Jan  9 14:16 .gitconfig
+-rw-------   1 richiethomas  staff   5082 Jan  8 17:36 .irb_history
+-rw-------   1 richiethomas  staff     32 Jan  9 14:38 .lesshst
+drwxr-xr-x   4 richiethomas  staff    128 Dec 13 14:24 .local
+drwxr-xr-x   5 richiethomas  staff    160 Dec 29 16:59 .npm
+-rw-------   1 richiethomas  staff   1082 Jan  7 21:17 .python_history
+drwxr-xr-x  18 root          staff    576 Jan  9 14:11 .rbenv
+drwx------   7 richiethomas  staff    224 Jan  1 17:40 .ssh
+drwxr-xr-x   3 richiethomas  staff     96 Jan  8 19:21 .texlive2023
+-rw-------   1 richiethomas  staff  23757 Jan 10 12:23 .viminfo
+-rw-r--r--   1 richiethomas  staff    440 Dec  4 15:09 .vimrc
+drwxr-xr-x@  5 richiethomas  staff    160 Dec  4 14:54 .vscode
+-rw-r--r--   1 richiethomas  staff     43 Dec  4 15:11 .zprofile
+-rw-------   1 richiethomas  staff  36003 Jan  9 14:20 .zsh_history
+drwx------  48 richiethomas  staff   1536 Jan  9 14:20 .zsh_sessions
+-rw-r--r--   1 richiethomas  staff   1018 Jan  7 12:18 .zshrc
+drwxr-xr-x   3 richiethomas  staff     96 Dec  4 14:18 Applications
+drwx------+ 35 richiethomas  staff   1120 Jan 10 12:08 Desktop
+drwx------+  4 richiethomas  staff    128 Dec 27 22:02 Documents
+drwx------+ 50 richiethomas  staff   1600 Jan  8 19:23 Downloads
+drwx------@ 92 richiethomas  staff   2944 Jan  7 11:56 Library
+drwx------   4 richiethomas  staff    128 Dec  4 15:42 Movies
+drwx------+  4 richiethomas  staff    128 Dec 30 21:11 Music
+drwx------+  4 richiethomas  staff    128 Dec  4 14:02 Pictures
+drwxr-xr-x+  4 richiethomas  staff    128 Dec  4 14:02 Public
+$</code></pre>
+  
+<p>Ignoring the fact that my dotfiles are a lot less organized than they could be lol, we now see all the dotfiles and dot folders in my home directory.</p>
+
+<h2>What is an <code>rc</code> dotfile?</h2>
+
+<p>When you open a new terminal tab or window in Zsh, one of the first things that happens is that Zsh runs a few setup scripts. One of these scripts is located at <code>.zshrc</code>. This file is where you'd put configuration options that you'd want to run on every new terminal tab or window.</p>
+
+<p>There are other setup scripts which get loaded as well, such as <code>~/.zshenv</code>.  But <code>~/.zshrc</code> is the one I interact with most.  Zsh will run these scripts in a specific order, and there are <a href="https://web.archive.org/web/20230724164024/https://unix.stackexchange.com/questions/71253/what-should-shouldnt-go-in-zshenv-zshrc-zlogin-zprofile-zlogout" target="_blank">conventions around what you should put in each file</a>.</p>
+
+<p>Other shells have similar <code>rc</code> files (ex.- Bash has <code>~/.bashrc</code>). The <code>rc</code> in <code>.zshrc</code> stands for "run commands" or "run control", depending on <a href="https://web.archive.org/web/20230320050723/https://unix.stackexchange.com/questions/3467/what-does-rc-in-bashrc-stand-for" target="_blank">who you ask</a>.</p>
+
+<h2>Experiment- preventing files from being deleted</h2>
+
+<p>Hidden files are helpful in preventing accidental deletion of important data.  Let's test that out now.</p>
+
+<p>I create a temporary directory named <code>foo/</code>, and create two files inside of it:</p>
+
+<ul>
+  <li>a hidden file named <code>.bar</code></li>
+  <li>a regular file named <code>baz</code></li>
+</ul>
+
+<pre><code>$ mkdir foo
+$ touch foo/.bar foo/baz
+$ ls foo
+baz
+$ ls -a foo
+.	..	.bar	baz
+$</code></pre>
+
+<p>Then I run <code>rm ./foo/*</code> and hit the <code>y</code> key when prompted for confirmation.  Lastly, I re-run <code>ls -a foo</code>:<p>
+
+<pre><code>$ rm ./foo/*
+zsh: sure you want to delete the only file in /Users/richiethomas/Desktop/Workspace/temp/./foo [yn]? y
+$ ls -a foo
+.	..	.bar
+$</code></pre>
+
+<p>We see that the file <code>baz</code> is now gone, but the hidden dotfile <code>.bar</code> is still there.  So yes, it appears that adding a <code>.</code> prefix to a file can prevent it from being accidentally deleted.</p>
+
+<p>But what if we really do want to delete our dotfiles?  We simply add a dot before the <code>*</code> symbol.  To demonstrate this, I'll create a 2nd dotfile named <code>.baz</code>, and then delete all the dotfiles in my <code>foo/</code> folder at once:</p>
+
+<pre><code>$ rm foo/.*
+$ ls -a foo 
+.	..
+$</code></pre>
+
+<p>As you can see, the <code>foo/</code> folder is now truly empty- no more dotfiles.</p>
+
+<h2>Side note- experiments</h2>
+
+<p>We just did our first of many experiments. Sometimes these experiments will help us form a hypothesis of how we think code might work, and then test whether that hypothesis is correct. Other times, we'll just use them to prove to ourselves that something we've read on StackOverflow, ChatGPT, or some random person's blog is actually correct.</p>
+
+<h2>Making a small update to your shell</h2>
+
+<p>One last thing we'll want to do is add a line of code to your shell's config file, a.k.a. the file which configures your shell every time you open a new tab or window.  We want to add a line which updates your <code>$PATH</code> variable to include a specific directory that RBENV contains.</p>
+
+<p>If you're running the Bash shell, then your config file lives at <code>~/.bashrc</code>.</p>
+
+<p>And if you're running the Zsh shell (the default on most newer Macs by now), then your config file lives at <code>~/.zshrc</code>.</p>
+
+<p>Here's the line of code you should add, and it should be fine to add it to the end of the file:</p>
+
+<pre><code>PATH="${HOME}/.rbenv/libexec:$PATH"</code></pre>
+
+<p>We're adding this line of code so that we can modify RBENV's code in its home directory, and see the changes we make reflected in how RBENV works.  For our change to take effect, you'll need to open a new Shell tab or window.</p>
+
+<h2>Wrapping Up</h2>
+
+<p>Let's move on, and talk a bit about the purpose of version managers such as RBENV.</p>
+
+<div id="photo-attribution">
+  <h4>Photo Attribution</h4>
+  <p>Title of Photo: Unknown</p>
+  <p>Description: n/a</p>
+  <p>Author: Unknown</p>
+  <p>Source: <a href="https://www.pickpik.com/food-sauce-leaf-salad-plate-drios-113527" target="_blank">PickPik</a></p>
+  <p>License: <a href="https://creativecommons.org/publicdomain/" target="_blank">CC0 1.0 Public Domain</a></p>
+</div>

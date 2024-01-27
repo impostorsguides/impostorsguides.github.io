@@ -358,3 +358,17 @@
     width: calc(50% - (#{$spacing-unit} / 2));
   }
 }
+
+#photo-attribution {
+  border: 1px solid black;
+  padding: 2em;
+  margin-top: 10em;
+
+  h4 {
+    margin-top: 0;
+  }
+  p {
+    font-size: 12px;
+    margin: 0;
+  }
+}
