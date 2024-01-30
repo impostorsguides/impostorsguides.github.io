@@ -4,6 +4,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
   <script defer data-domain="impostorsguides.com" src="https://plausible.io/js/script.js"></script>
+  {%- if page.title -%}
+    <title>{{ page.title }} | Impostor's Guides</title>
+    {%- else -%}
+    <title>Impostor's Guides</title>
+  {%- endif -%}
 
   {%- seo -%}
   <link rel="stylesheet" href="{{ "/assets/css/style.css" | relative_url }}">
