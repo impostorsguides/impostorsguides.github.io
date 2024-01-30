@@ -1,0 +1,233 @@
+---
+layout: post
+permalink: /blog/path-variable/
+title: The "$PATH" Variable
+excerpt_separator: <!--more-->
+createdAt: 23 Jan, 2024
+---
+
+<div>
+  <figure style="width: 100%; margin: 0 0 10px 25px">
+    <img src="/assets/images/path-train.jpg" style="margin: auto" width="100%" alt="The PATH train between New York City and New Jersey.">
+    <figcaption style="text-align: center;">The PATH train between NYC and New Jersey.  Photo attribution <a href="/blog/path-variable/#photo-attribution" target="_blank">here</a>.</figcaption>
+  </figure>
+</div>
+
+<p>One of the most important environment variables that we use in shell scripting is the <code>"PATH"</code> variable.  Whenever we type a command into the terminal, the shell will use the list of directories contained in <code>$PATH</code> to locate the file associated with that command.  So it's worth spending some time understanding how <code>$PATH</code> works.</p>
+
+<!--more-->
+
+<h2>Background- <code>env</code> and <code>$PATH</code></h2>
+
+<p><a href="/shell/shebangs" target="_blank">When we talked about shebangs</a> in the walk-through of RBENV, we saw that one commonly-used shebang is <code>#!/usr/bin/env bash</code>.  We learned that this means the shell runs the <code>/usr/bin/env</code> command, passing <code>bash</code> as an argument.  If we look up the manual entry for the <code>env</code> command, we see the following:</p>
+
+<pre><code>ENV(1)                                                            General Commands Manual                                                           ENV(1)
+
+  NAME
+       env – set environment and execute command, or print environment
+  
+  SYNOPSIS
+       env [-0iv] [-u name] [name=value ...]
+       env [-iv] [-P altpath] [-S string] [-u name] [name=value ...] utility [argument ...]
+  
+  DESCRIPTION
+       The env utility executes another utility after modifying the environment as specified on the command line.  Each name=value option specifies the
+       setting of an environment variable, name, with a value of value.  All such environment variables are set before the utility is executed.
+  
+       The options are as follows:
+
+...</code></pre>
+
+<p>So when we type <code>/usr/bin/env bash</code>, we're running a command which sets certain environment variables and then running the <code>bash</code> command.  If I run <code>env</code> or <code>/usr/bin/env</code> in our terminal, I see the following output:</p>
+
+<pre><code>$ /usr/bin/env
+TERM_PROGRAM=Apple_Terminal
+SHELL=/bin/zsh
+TERM=xterm-256color
+TMPDIR=/var/folders/n9/35wcp_ps2l919c07czwh504c0000gn/T/
+TERM_PROGRAM_VERSION=452
+TERM_SESSION_ID=5E26DC6A-6460-4F51-9F67-BA46EFF35574
+USER=richiethomas
+SSH_AUTH_SOCK=/private/tmp/com.apple.launchd.mrN3AnwD1B/Listeners
+PATH=/Users/richiethomas/.rbenv/bin:/Users/richiethomas/.rbenv/shims:/Users/richiethomas/.rbenv/bin:/usr/local/lib/ruby/gems/2.6.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/Apple/usr/bin:/Library/TeX/texbin:/Users/richiethomas/Library/Python/3.7/bin/
+__CFBundleIdentifier=com.apple.Terminal
+PWD=/Users/richiethomas/Desktop/Workspace/impostorsguides.github.io
+XPC_FLAGS=0x0
+XPC_SERVICE_NAME=0
+SHLVL=1
+HOME=/Users/richiethomas
+LOGNAME=richiethomas
+OLDPWD=/Users/richiethomas/Desktop/Workspace/impostorsguides.github.io
+HOMEBREW_PREFIX=/opt/homebrew
+HOMEBREW_CELLAR=/opt/homebrew/Cellar
+HOMEBREW_REPOSITORY=/opt/homebrew
+MANPATH=/opt/homebrew/share/man::
+INFOPATH=/opt/homebrew/share/info:
+EDITOR=/usr/local/bin/code
+NVM_DIR=/Users/richiethomas/.nvm
+RBENV_SHELL=zsh
+LANG=en_US.UTF-8
+_=/usr/bin/env
+$ </code></pre>
+
+<p>One of the environment variables that my <code>env</code> command prints out is <code>PATH</code>, which contains a list of directories that UNIX will search through, when it looks for the command we include in our shebang (whether that command is <code>bash</code>, <code>ruby</code>, or something else).</p>
+  
+<p>Because UNIX will search <code>$PATH</code> in the order in which directories appear, <code>$PATH</code> also determines which version of a given executable takes precedence over others, if multiple versions are found.</p>
+
+<p>Because the above <code>PATH</code> value is long and hard-to-parse, in this post I'm going to use a simpler, shorter version of the above:</p>
+
+<pre><code>/Users/richiethomas/.rbenv/shims
+/usr/local/bin
+/usr/bin
+/bin</code></pre>
+
+<p>I split the above into one path per line for readability reasons, but note that <code>$PATH</code> will normally print out as a single, long string with directories separated by the <code>:</code> character.  Later in this chapter, we will write a script to do this splitting for us.</p>
+
+<p>If my shebang is <code>#!/usr/bin/env ruby</code>, and my <code>PATH</code> variable is the above value, then UNIX will check for the ruby command in those directories, in the same order listed above.  For example, if <code>/Users/richiethomas/.rbenv/shims</code> contains no Ruby versions, <code>/usr/local/bin</code> contains Ruby version 2.7.5, and <code>/usr/bin</code> contains Ruby version 1.9.3, then a Ruby script which contains the shebang <code>#!/usr/bin/env ruby</code> will tell UNIX to run that script using Ruby version 2.7.5.</p>
+
+<p>Let's do an experiment to verify this is true.</p>
+
+<h2>Experiment- setting our own <code>$PATH</code></h2>
+
+<p>In my <code>scratch/</code> directory, I create two sub-directories: <code>foo/</code> and <code>bar/</code>.  Next, I create a file in each directory.  These two files print different strings, but they share the same name: <code>baz</code>.</p>
+
+<p>The <code>foo/baz</code> file looks like this:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+echo 'Inside foo/baz'</code></pre>
+
+<p>And <code>bar/baz</code> looks like this:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+echo 'Inside bar/baz'</code></pre>
+
+<p>I run <code>chmod +x</code> on each file, to make sure they're executable.</p>
+
+<p>When I run <code>ls -Rla</code>, I see the following:</p>
+
+<pre><code>$ ls -lRa                 
+total 0
+drwxr-xr-x  4 richiethomas  staff  128 Jan 30 10:14 .
+drwxr-xr-x  6 richiethomas  staff  192 Jan 11 10:35 ..
+drwxr-xr-x  3 richiethomas  staff   96 Jan 30 10:14 bar
+drwxr-xr-x  3 richiethomas  staff   96 Jan 30 10:14 foo
+
+./bar:
+total 8
+drwxr-xr-x  3 richiethomas  staff   96 Jan 30 10:14 .
+drwxr-xr-x  4 richiethomas  staff  128 Jan 30 10:14 ..
+-rwxr-xr-x  1 richiethomas  staff   38 Jan 30 10:14 baz
+
+./foo:
+total 8
+drwxr-xr-x  3 richiethomas  staff   96 Jan 30 10:14 .
+drwxr-xr-x  4 richiethomas  staff  128 Jan 30 10:14 ..
+-rwxr-xr-x  1 richiethomas  staff   38 Jan 30 10:14 baz
+$ </code></pre>
+
+<p>The <code>-R</code> flag after <code>ls</code> just tells the shell to recursively list the contents of the current directory and any sub-directories.</p>
+
+<p>Next, I update my <code>PATH</code> variable to the simplified version I mentioned above,  with just 4 directories in it:</p>
+
+<pre><code>$ export PATH="/Users/richiethomas/.rbenv/shims:/usr/local/bin:/usr/bin:/bin"
+$ echo $PATH
+/Users/richiethomas/.rbenv/shims:/usr/local/bin:/usr/bin:/bin
+$ </code></pre>
+
+<p>Next, I update my <code>$PATH</code> variable a 2nd time, so that it begins with the <code>bar/</code> and <code>foo/</code> directories, for my current terminal tab only.  In my case, I run:</p>
+
+<pre><code>$ echo $PATH
+/Users/richiethomas/Desktop/Workspace/scratch/bar/:/Users/richiethomas/Desktop/Workspace/scratch/foo/:/Users/richiethomas/.rbenv/shims:/usr/local/bin:/usr/bin:/bin
+$ </code></pre>
+
+<p>Notice that the above string contains two absolute paths (one for <code>/Users/richiethomas/Desktop/Workspace/scratch/bar/</code> and one for <code>/Users/richiethomas/Desktop/Workspace/scratch/foo/</code>), followed by the original value of <code>$PATH</code>.  This means we're prepending <code>$PATH</code> with our two new absolute paths, with <code>bar</code> coming before <code>foo</code>.</p>
+
+<p>By the way, when adding these paths to <code>PATH</code>, it's important to use the absolute path (i.e. <code>/Users/(username)/...</code>) rather than using the <code>~/</code> shorthand prefix.  Otherwise, it won't work.</p>
+
+<p>Lastly, I run the newly-created <code>baz</code> command in my current terminal:</p>
+
+<pre><code>$ baz
+Inside bar/baz
+$ </code></pre>
+
+<p>We see "Inside bar", not "Inside foo".  That's because, even though we have two different "baz" files, and they're each executable, the file inside the <code>bar/</code> directory comes first in our <code>$PATH</code> environment variable.</p>
+
+<h2><code>$IFS</code> and delimiters</h2>
+
+<p>As previously mentioned, the directories in <code>PATH</code> are concatenated together into a single string, with the <code>:</code> character used as a delimiter. This delimiter is also called an <a href="https://web.archive.org/web/20220715010436/https://www.baeldung.com/linux/ifs-shell-variable" target="_blank">"internal field separator"</a>, and UNIX refers to it by the environment variable <code>$IFS</code>.</p>
+
+<p>The link above contains an experiment, which I've modified slightly below so we can see an example of how <code>$IFS</code> is used.</p>
+
+<h2>Experiment- printing <code>$PATH</code> in a readable way, using <code>$IFS</code></h2>
+
+<p>The <code>$PATH</code> variable can be pretty hard-to-read, with all those directories concatenated together. Let's write a script to make it more legible:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+string="$PATH"
+
+for path in $string
+do
+  echo "$path"
+done</code></pre>
+
+<p>When I <code>chmod +x</code> and then run the script, I see:</p>
+
+<pre><code>$ ./foo
+/Users/richiethomas/Desktop/Workspace/scratch/bar/:/Users/richiethomas/Desktop/Workspace/scratch/foo/:/Users/richiethomas/.rbenv/shims:/usr/local/bin:/usr/bin:/bin
+$ </code></pre>
+
+<p>No improvement in readability so far.</p>
+
+<p>Then, I add the following to the top of the script:</p>
+
+<pre><code>#!/usr/bin/env bash
+#!/usr/bin/env bash
+
+IFS=":"   # <= I added this
+
+string="$PATH"
+
+for path in $string
+do
+  echo "$path"
+done</code></pre>
+
+<p>When I re-run the script, I get:</p>
+
+<pre><code>$ ./foo
+/Users/richiethomas/Desktop/Workspace/scratch/bar/
+/Users/richiethomas/Desktop/Workspace/scratch/foo/
+/Users/richiethomas/.rbenv/shims
+/usr/local/bin
+/usr/bin
+/bin
+$ </code></pre>
+
+<p>This experiment also shows that you can iterate over a string in the same way you can iterate over an array, so long as:</p>
+
+<ul>
+  <li>you include a delimiter in-between each part of the string that you want to treat as a discrete array item, and</li>
+  <li>you update <code>$IFS</code> to tell the shell what delimiter you used for this purpose.</li>
+</ul>
+
+<p>Note that the default value for <code>$IFS</code> is a combination of 3 characters:
+  <ul>
+    <li>the "space" character</li>
+    <li>the "tab" character</li>
+    <li>the "newline" character</li>
+  </ul>
+  
+<p>So a string like "foo bar baz" (with 3 words and two spaces) will be separated into 3 separate strings ("foo", "bar", and "baz") if you iterate over the string and print each item.</p>
+
+<div id="photo-attribution">
+  <h4>Photo Attribution</h4>
+  <p>Title: PATH Train, New York</p>
+  <p>Description: The Port Authority Trans-Hudson Corporation (PATH) was established in 1962 as a subsidiary of The Port Authority of New York and New Jersey. The heavy rail rapid transit system serves as the primary transit link between Manhattan and neighboring New Jersey urban communities and suburban commuter railroads. PATH presently carries 244,000 passenger trips each weekday. This volume is expected to continue to increase with the anticipated growth in regional residential, commercial, and business development.</p>
+  <p>Author: <a href="https://www.flickr.com/photos/13070711@N03/" target="_blank">P. L. Tandon</a></p>
+  <p>Source: <a href="https://www.flickr.com/photos/13070711@N03/10700397664" target="_blank">Flickr</a></p>
+  <p>License: <a href="https://creativecommons.org/licenses/by-nc-sa/2.0/" target="_blank">CC BY-NC-SA 2.0 DEED
+    Attribution-NonCommercial-ShareAlike 2.0 Generic</a></p>
+</div>

@@ -1,0 +1,147 @@
+---
+layout: post
+permalink: /blog/how-to-use-the-man-command/
+title: How To Use The `man` Command
+excerpt_separator: <!--more-->
+createdAt: 19 Jan, 2024
+---
+
+<div>
+  <figure style="width: 100%; margin: 0 0 10px 25px">
+    <img src="/assets/images/cookbook.jpg" style="margin: auto" width="100%" alt="Image of a cookbook.">
+    <figcaption style="text-align: center;">Photo attribution <a href="/blog/how-to-use-the-man-command/#photo-attribution" target="_blank">here</a>.</figcaption>
+  </figure>
+</div>
+
+<p>In our <a href="/shell/set-command/" target="_blank">examination of the RBENV shim</a>, we encountered the <code>set</code> command.  At that point, we hadn't yet encountered that command, and so we had to look it up in the docs.</p>
+
+<p>In many cases, we can find the manual for various terminal commands using the <code>man</code> command (short for "manual"). If we fail to find what we're looking for using <code>man</code>, we can try checking StackOverflow or another source. But the quality of those sources can vary widely, so a useful habit is to stick to official docs when we can.</p>
+
+<p>Also note that <code>set</code> is a builtin command and therefore <a href="https://web.archive.org/web/20220516205120/https://unix.stackexchange.com/questions/167004/why-dont-shell-builtins-have-proper-man-pages" target="_blank">we have to access its docs via the <code>help</code> command</a>.  Typically, we'd start our docs search with the <code>man</code> command and switch to <code>help</code> if we discover that the command in question is a builtin.  A bit later in this post, we'll look at how to tell whether a command is a builtin command or not.</p>
+
+<p><code>man</code> entries can be hard-to-parse if you've never encountered one before.  Let's learn how to read them.</p>
+
+<!--more-->
+
+<h2>Looking up a <code>man</code> page</h2>
+
+<p>One terminal command that most of us are familiar with by now is <code>ls</code>, which prints out the contents of a directory.  <code>ls</code> is an internal command (i.e. not a builtin), so let's use it as a springboard to help us learn about <code>man</code> pages.</p>
+
+<p>If we type <code>man ls</code> in the terminal, the result that we get starts out like this:</p>
+
+<pre><code>LS(1)                                                             General Commands Manual                                                            LS(1)
+
+  NAME
+       ls – list directory contents
+  
+  SYNOPSIS
+       ls [-@ABCFGHILOPRSTUWabcdefghiklmnopqrstuvwxy1%,] [--color=when] [-D format] [file ...]
+  
+  DESCRIPTION
+       For each operand that names a file of a type other than directory, ls displays its name as well as any requested, associated information.  For each
+       operand that names a file of type directory, ls displays the names of files contained within that directory, as well as any requested, associated
+       information.
+  
+       If no operands are given, the contents of the current directory are displayed.  If more than one operand is given, non-directory operands are
+       displayed first; directory and non-directory operands are sorted separately and in lexicographical order.
+  
+       The following options are available:
+  
+       -@      Display extended attribute keys and sizes in long (-l) output.
+
+...</code></pre>
+
+<p>Here we can see:</p>
+
+<ul>
+  <li>the command's name and a brief description</li>
+  <li>a synopsis of the command's usage (the order in which you'd type the command, its flags and args, etc.)</li>
+  <li>a longer description of the command itself (here, "operand" means the argument you pass to <code>ls</code>)</li>
+  <li>a list of the command's possible arguments and flags, and what each one does</li>
+</ul>
+
+<p>If we keep scrolling down, we'll also see:</p>
+
+<ul>
+  <li>a list of environment variables which affect how <code>ls</code> works</li>
+  <li>a description of the <a href="https://web.archive.org/web/20230604005103/https://www.techopedia.com/definition/33430/exit-code" target="_blank">exit code(s)</a> that <code>ls</code> might return, and under what conditions they might be returned</li>
+  <li>examples of how to use the command</li>
+  <li>various other bits of information which aren't immediately relevant to us</li>
+</ul>
+
+<p>I recommend running "man ls" in your terminal, and skimming the results in order to get familiar with the typical format of a <code>man</code> page.</p>
+
+<h2>Looking up the <code>man</code> page for <code>set</code></h2>
+
+<p>Let's try looking up the <code>set</code> command in its <code>man</code> page. I type <code>man set</code> into my terminal and I see the following:</p>
+
+<pre><code>BUILTIN(1)                                                        General Commands Manual                                                       BUILTIN(1)
+
+  NAME
+       builtin, !, %, ., :, @, [, {, }, alias, alloc, bg, bind, bindkey, break, breaksw, builtins, case, cd, chdir, command, complete, continue, default,
+       dirs, do, done, echo, echotc, elif, else, end, endif, endsw, esac, eval, exec, exit, export, false, fc, fg, filetest, fi, for, foreach, getopts,
+       glob, goto, hash, hashstat, history, hup, if, jobid, jobs, kill, limit, local, log, login, logout, ls-F, nice, nohup, notify, onintr, popd, printenv,
+       printf, pushd, pwd, read, readonly, rehash, repeat, return, sched, set, setenv, settc, setty, setvar, shift, source, stop, suspend, switch, telltc,
+       test, then, time, times, trap, true, type, ulimit, umask, unalias, uncomplete, unhash, unlimit, unset, unsetenv, until, wait, where, which, while –
+       shell built-in commands
+  
+  SYNOPSIS
+       See the built-in command description in the appropriate shell manual page.
+  
+  DESCRIPTION
+       Shell builtin commands are commands that can be executed within the running shell's process.  Note that, in the case of csh(1) builtin commands, the
+       command is executed in a subshell if it occurs as any component of a pipeline except the last.
+  
+       If a command specified to the shell contains a slash ‘/’, the shell will not execute a builtin command, even if the last component of the specified
+       command matches the name of a builtin command.  Thus, while specifying “echo” causes a builtin command to be executed under shells that support the
+       echo builtin command, specifying “/bin/echo” or “./echo” does not.
+  
+  ...</code></pre>
+
+<p>This <code>man</code> page looks a bit different. It doesn't mention the command name (<code>set</code>) in the top-left corner, the way the <code>man ls</code> results did. Instead we just see the word <code>BUILTIN</code>.</p>
+
+<h2>Builtin vs. External Commands</h2>
+
+<p>As it turns out, depending on the command you give it, sometimes <code>man</code> will give you documentation on that command (like it did with <code>ls</code>).  Other times, it returns the above: an explanation of what a <a href="https://web.archive.org/web/20230226091101/https://www.gnu.org/software/bash/manual/html_node/Shell-Builtin-Commands.html" target="_blank">builtin command</a> is in UNIX.</p>
+
+<p>So when does it give you one result, vs. the other?</p>
+
+<p>The gist of it is that <a href="https://unix.stackexchange.com/questions/167004/why-dont-shell-builtins-have-proper-man-pages" target="_blank"><code>man</code> pages are provided only for "external commands"</a>, i.e. commands which come from UNIX.  But the shell is not UNIX. UNIX is the operating system, and the shell is the application we're using to interact with the operating system.  In fact, <a href="https://web.archive.org/web/20220601094544/https://www.pcmag.com/encyclopedia/term/shell" target="_blank">the reason why it's called the "shell"</a> is that it surrounds the operating system, like an eggshell.</p>
+
+<p>The <code>set</code> command is a builtin program provided by the shell, not an external command provided by UNIX. It's for this reason that shell authors keep the docs for their commands separate from the docs for external commands.  The filesystem can be a messy place, and it's important to maintain strict compartmentalization for the sake of keeping things organized.  As the British say, <a href="https://www.youtube.com/watch?v=onRk0sjSgFU" target="_blank">"everything in its right place"</a>.</p>
+
+<h2>How to tell if a command is a builtin</h2>
+
+<p>A quick an easy way to tell whether a command is a builtin command, external command, or something else is by using the <code>type</code> command.  If we run <code>type set</code> in Zsh, we see:</p>
+
+<pre><code>$ type set
+  set is a shell builtin
+$ </code></pre>
+
+<p>And if we type <code>type ls</code>, we see:</p>
+
+<pre><code>$ type ls
+ls is /bin/ls
+$ </code></pre>
+
+<p>Lastly, let's define a shell function named <code>foo</code>, and run <code>type foo</code>:</p>
+
+<pre><code>$ foo() {
+  function> echo 'Hello world'
+  function> }
+$ type foo
+  foo is a shell function
+ $ 
+</code></pre>
+
+<p>Based on the response from <code>type (command)</code>, we can tell ahead of time whether we should look up the command's docs using <code>man</code> or <code>help</code>.</p>
+
+
+<div id="photo-attribution">
+  <h4>Photo Attribution</h4>
+  <p>Title: Unknown</p>
+  <p>Description: n/a</p>
+  <p>Author: No author specified.</p>
+  <p>Source: <a href="https://pxhere.com/en/photo/452472" target="_blank">PxHere</a></p>
+  <p>License: <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank">Public Domain (CC0 1.0 DEED CC0 1.0 Universal)</a></p>
+</div>
