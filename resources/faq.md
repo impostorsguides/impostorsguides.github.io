@@ -8,7 +8,7 @@ title: FAQ
 
 Any developer who aspires to level up, but who feels like working on mission-critical open-source apps is "out of their league".  If you've ever said to yourself "Maybe an engineering manager or a staff engineer could grok that, but I'd never be able to", this site is for you.
 
-## Warning
+## Warning: Here Be Errors
 
 These posts represent my best understanding of the domain at the time I wrote them.  That said, I'm a journeyman engineer myself, and I guarantee you there are errors within these posts.  This project started out as an attempt to level myself up by "teaching what I've learned", and that will continue to be the case going forward.
 
