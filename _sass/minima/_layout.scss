@@ -372,3 +372,21 @@
     margin: 0;
   }
 }
+
+.photo-attributions {
+  margin-top: 10em;
+}
+
+.photo-attribution {
+  border: 1px solid black;
+  padding: 2em;
+  margin-top: 1em;
+
+  h4 {
+    margin-top: 0;
+  }
+  p {
+    font-size: 12px;
+    margin: 0;
+  }
+}
