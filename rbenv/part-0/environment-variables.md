@@ -1,7 +1,7 @@
 ---
 layout: page
 category: rbenv-introduction
-id: 17
+id: 18
 previous-title: "Case 2: When the argument is a filepath"
 previous-permalink: /shell/case-2/
 title: Environment Variables

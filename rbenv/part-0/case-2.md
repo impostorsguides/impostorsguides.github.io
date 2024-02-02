@@ -1,7 +1,7 @@
 ---
 layout: page
 category: rbenv-introduction
-id: 16
+id: 17
 previous-title: "Case 1: When we don't care about the args"
 previous-permalink: /shell/case-1/
 title: "Case 2: When the argument is a filepath"
