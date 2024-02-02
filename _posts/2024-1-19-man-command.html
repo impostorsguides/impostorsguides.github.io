@@ -123,13 +123,10 @@ createdAt: 19 Jan, 2024
 
 <p>This <code>man</code> page looks a bit different. It doesn't mention the command name (<code>set</code>) in the top-left corner, the way the <code>man ls</code> results did. Instead we just see the word <code>BUILTIN</code>.</p>
 
-<h2>Builtin vs. External Commands</h2>
-
-<p>As it turns out, depending on the command you give it, sometimes <code>man</code> will give you documentation on that command (like it did with <code>ls</code>).  Other times, it returns the above: an explanation of what a <a href="https://web.archive.org/web/20230226091101/https://www.gnu.org/software/bash/manual/html_node/Shell-Builtin-Commands.html" target="_blank">builtin command</a> is in UNIX.</p>
 
 <p>So when does it give you one result, vs. the other?</p>
 
-<p>The gist of it is that <a href="https://unix.stackexchange.com/questions/167004/why-dont-shell-builtins-have-proper-man-pages" target="_blank"><code>man</code> pages are provided only for "external commands"</a>, i.e. commands which come from UNIX.  But the shell is not UNIX. UNIX is the operating system, and the shell is the application we're using to interact with the operating system.  In fact, <a href="https://web.archive.org/web/20220601094544/https://www.pcmag.com/encyclopedia/term/shell" target="_blank">the reason why it's called the "shell"</a> is that it surrounds the operating system, like an eggshell.</p>
+<p>As it turns out, <a href="https://unix.stackexchange.com/questions/167004/why-dont-shell-builtins-have-proper-man-pages" target="_blank"><code>man</code> pages are provided only for "external commands"</a>, i.e. commands which come from UNIX.  But the shell is not UNIX. UNIX is the operating system, and the shell is the application we're using to interact with the operating system.  In fact, <a href="https://web.archive.org/web/20220601094544/https://www.pcmag.com/encyclopedia/term/shell" target="_blank">the reason why it's called the "shell"</a> is that it surrounds the operating system, like an eggshell.</p>
 
 <p>The <code>set</code> command is a builtin program provided by the shell, not an external command provided by UNIX. It's for this reason that shell authors keep the docs for their commands separate from the docs for external commands.  The filesystem can be a messy place, and it's important to maintain strict compartmentalization for the sake of keeping things organized.  As the British say, <a href="https://www.youtube.com/watch?v=onRk0sjSgFU" target="_blank">"everything in its right place"</a>.</p>
 
