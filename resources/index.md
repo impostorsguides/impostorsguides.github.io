@@ -8,14 +8,13 @@ path: shell
 
 <ul class="resources-titles">
   <h2>The Impostor's Guide To The Shell</h2>
-  <h3><a href="/rbenv/introduction">Introduction</a></h3>
   <ol type="I">
     <h3><li>Part 1: The RBENV Shim</li></h3>
     <ol>
     {% assign sorted_pages = site.pages | sort:"id" %}
 
     {% for page in sorted_pages %}
-      {% if page.category == 'rbenv-pt-1' %}
+      {% if page.category == 'rbenv-introduction' %}
         <li><a href="{{ page.url }}">{{ page.title }}</a></li>
       {% endif %}
     {% endfor %}
