@@ -2,7 +2,7 @@
 layout: page
 category: rbenv-introduction
 id: 10
-title: The test Command
+title: The `test`` Command
 permalink: /shell/test-command/
 next-title: Verbose Mode
 next-permalink: /shell/verbose-mode/

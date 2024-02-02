@@ -33,8 +33,6 @@ exec "/opt/homebrew/bin/rbenv" exec "$program" "$@"
 
 <p>I run a Google search for the string <code>#!/usr/bin/env bash</code>, and I learn that this line of code is called a <a href="https://web.archive.org/web/20230323182633/https://en.wikipedia.org/wiki/Shebang_(Unix)" target="_blank">"shebang"</a>.</p>
 
-<h2>The shebang line</h2>
-
 <p>In UNIX, a shebang is a special line of code at the top of a script file which tells UNIX which program to use when executing the rest of the file's code. In this case, since the shebang ends in Bash, we're telling UNIX to use the bash shell to evaluate the code.</p>
 
 <p>If you're going to include a shebang, it must be on the first line of the file in order for it to work correctly.</p>
@@ -67,15 +65,17 @@ USER=richiethomas
 
 <p>On the one hand, using this shebang means that your script doesn't depend on Bash residing in a specific folder on the user's machine.  This is because <code>#!/usr/bin/env bash</code> tells macOS "Hey, check the directories listed in your <code>$PATH</code> environment variable for the 'bash' executable, and use the first one you find to run code which follows."</p>
 
-<p>Note- we'll talk more about environment variables, and specifically the <code>$PATH</code> env var, later on.</p>
+<p>We'll talk about environment variables in a future chapter.  But if you're unfamiliar with the <code>$PATH</code> environment variable, I've got a write-up about it <a href="/blog/path-variable/" target="_blank">here</a>.</p>
 
-<p>If we use the <code>/usr/bin/bash</code> shebang, then whoever runs our script must have Bash installed in their <code>/usr/bin/</code> directory. But that's not a safe bet. For example, my <code>bash</code> executable is installed at <code>/bin/bash</code>, with no <code>/usr/</code> prefix. If we load <code>$PATH</code> into our environment via the <code>/usr/bin/env bash</code> shebang, then UNIX will search through all the directories in <code>$PATH</code> until it finds Bash. More directories in our <code>$PATH</code> means more chances to find a working <code>bash</code> executable.</p>
+<p>If we use the <code>/usr/bin/bash</code> shebang, then whoever runs our script must have Bash installed in their <code>/usr/bin/</code> directory.  Since people run RBENV on all kinds of machines with all sorts of software installed, this is not a safe assumption. For example, my <code>bash</code> executable is installed at <code>/bin/bash</code>, with no <code>/usr/</code> prefix.  You may face a similar situation on your machine.</p>
+
+<p>If we load <code>$PATH</code> into our environment via the <code>/usr/bin/env bash</code> shebang, then UNIX will search through all the directories in <code>$PATH</code> until it finds Bash. More directories in our <code>$PATH</code> means more chances to find a working <code>bash</code> executable.</p>
 
 <h3>Cons of using <code>#!/usr/bin/env bash</code></h3>
 
 <p>Since using <code>#!/usr/bin/env bash</code> means that macOS will find the first version of Bash that it finds, this means that your users could potentially be using different versions of Bash.  This could cause your program to behave in unexpected ways, depending on how different those versions are.</p>
 
-<p>The links <a href="https://web.archive.org/web/20230326212656/https://www.baeldung.com/linux/bash-shebang-lines" target="_blank">here</a> and <a href="https://web.archive.org/web/20230316084258/https://stackoverflow.com/questions/16365130/what-is-the-difference-between-usr-bin-env-bash-and-usr-bin-bash" target="_blank">here</a> contain additional info on the differences between the two types of shebangs, including some cases where you might not want to use <code>/usr/bin/env bash"</code>.</p>
+<p>The links <a href="https://web.archive.org/web/20230326212656/https://www.baeldung.com/linux/bash-shebang-lines" target="_blank">here</a> and <a href="https://web.archive.org/web/20230316084258/https://stackoverflow.com/questions/16365130/what-is-the-difference-between-usr-bin-env-bash-and-usr-bin-bash" target="_blank">here</a> contain additional info on the differences between the two types of shebangs, including some cases where you might not want to use <code>/usr/bin/env bash</code>.</p>
 
 <h2>Why do we need any shebang at all?</h2>
 
@@ -91,7 +91,7 @@ USER=richiethomas
 
 <h2>Non-<code>bash</code> shebangs</h2>
 
-<p>As I mentioned before, the string Bash at the end of the shebang tells UNIX to use Bash when interpreting the code which follows.  But Bash is not the only interpreter we can tell UNIX to use for a script that we write.</p>
+<p>As I mentioned before, the string "bash" at the end of the shebang tells UNIX to use the Bash shell when interpreting the code which follows.  But Bash is not the only interpreter we can tell UNIX to use for a script that we write.</p>
 
 <p>The only reason the code uses the <code>bash</code> shebang here is because the subsequent code is written in Bash. If they had written it in Ruby, they could have used a Ruby shebang (i.e. <code>#!/usr/bin/env ruby</code>) instead. In fact, let's try doing exactly that, as an experiment.</p>
 
@@ -156,4 +156,8 @@ On OS X (and U*x generally), the name of the file doesn't matter at all. What ma
 
 <h2>Moving On</h2>
 
-<p>Earlier we used the <code>chmod +x</code> command, but didn't dive into it at all.  Let's do that now.</p>
+<p>The next line of code is:</p>
+
+<pre><code>set -e</code></pre>
+
+<p>This is a tiny line of code which packs a lot of punch.  In the next section, we'll look at how the <code>set</code> command works.</p>

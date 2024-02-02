@@ -2,13 +2,17 @@
   <h1 class="post-title">The <code>set</code> Command</h1>
 </header>
 
+<p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L2" target="_blank">The next line of code in our shim file</a> is:</p>
+
+<pre><code>set -e</code></pre>
+
 <p>If you're using Bash as your shell, you should be able to run <code>help set</code> without any problems.  If you're using the Zsh shell (i.e. the standard shell on a Mac), the <code>help</code> command is not enabled by default.  I recommend you simply open a new Bash shell from within Zsh (by typing <code>bash</code> at your prompt) if you need to use the <code>help</code> command.</p>
 
-<p>There are other ways to solve this problem, including solutions which save you from opening Bash first every time.  But implementing these would be a digression from our main goal of understanding <code>set</code>, and I want to keep our forward momentum going, so I've moved my discussion of these options to <a href="/blog/configuring-the-help-command-in-zsh/" target="_blank">a blog post here</a>.</p>
+<p>There are other ways to solve this problem, including solutions which save you from opening Bash first every time.  But implementing these would be a digression from our main goal of understanding <code>set</code>, and I want to keep our forward momentum going.  So I've moved my discussion of these options to <a href="/blog/configuring-the-help-command-in-zsh/" target="_blank">a blog post here</a>.</p>
 
 <h2>Parsing the output of <code>help set</code></h2>
 
-<p>Assuming you were successfully able to run <code>help set</code> from a Bash terminal window, let's see what it tells us:</p>
+<p>Assuming you were successfully able to run <code>help set</code> from a Bash terminal window, it should output something like this:</p>
 
 <pre><code>set [ {+|-}options | {+|-}o [ option_name ] ] ... [ {+|-}A [ name ] ]
 [ arg ... ]
@@ -65,13 +69,25 @@ set -v
     <th>Effect</th>
   </tr>
   <tr>
+    <td>...</td>
+    <td>...</td>
+    <td>...</td>
+  </tr>
+  <tr>
     <td>-e</td>
     <td>errexit</td>
     <td>Abort script at first error, when a command exits with non-zero status...</td>
   </tr>
+  <tr>
+    <td>...</td>
+    <td>...</td>
+    <td>...</td>
+  </tr>
 </table></blockquote>
 
-<p>So running <code>set -e</code> tells the script to exit as soon as "a command exits with a non-zero status".  What does that mean?</p>
+<p>So a "shell option" is simply a setting which controls some aspect of how the shell operates.  There are many such options, controlling many such behaviors, and the <code>errexit</code> option is one of them.</p>
+  
+<p>By running <code>set -e</code>, we tell the shell to turn the <code>errexit</code> option on.  From that point until we turn <code>errexit</code> off (by running <code>set +e</code>), the shell will exit as soon as "a command exits with a non-zero status".  What does that mean?</p>
 
 <h2>Exit Statuses</h2>
 
@@ -93,7 +109,7 @@ set -v
 
 <p>Back to <code>set -e</code>.  What the docs are saying is that, if you add <code>set -e</code> to your bash script and an error occurs, the program exits immediately, as opposed to continuing on with the execution.</p>
 
-<p>OK, but... why do we need <code>set -e</code> for that?  When I write a script in another language and an error occurs, the interpreter exits immediately. Is the helpfile implying that a Bash program would just continue executing if you leave out <code>set -e</code> and an error occurs?</p>
+<p>OK, but... why do we need <code>set -e</code> for that?  When I write a script in another language, the interpreter exits as soon as an error occurs. Is the helpfile implying that a Bash program would just continue executing if you leave out <code>set -e</code> and an error occurs?</p>
 
 <p>Let's try an experiment to figure it out.</p>
 
@@ -135,7 +151,7 @@ exit 1</code></pre>
   <li>triggers a non-zero exit code (i.e. an error)</li>
 </ul>
 
-<p>I run "chmod +x" on both of these scripts, as we've done before, to make sure they're executable. Then I run "./foo" in my terminal:</p>
+<p>I run <code>chmod +x</code> on both of these scripts, as we've done before, to make sure they're executable. Then I run <code>./foo</code> in my terminal:</p>
 
 <pre><code>$ ./foo
 Inside bar; about to crash...
@@ -149,7 +165,7 @@ $ </code></pre>
 1
 $ </code></pre>
 
-<p>We get 1, which is what we'd expect.</p>
+<p>We get <code>1</code>, which is what we'd expect.</p>
 
 <p>Now let's comment out <code>set -e</code> from <code>foo</code>:</p>
 

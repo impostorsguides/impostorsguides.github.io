@@ -20,32 +20,32 @@
 
 <p>Professionally, I work on a large Rails codebase with many contributors, and <code>bundle install</code> is one of the most common commands we find ourselves typing.  I was frustrated that I didn't know how this command worked under-the-hood.  Since I'm a big believer that <a href="https://ideas.time.com/2011/11/30/the-protege-effect/" target="_blank">"The best way to learn something is to explain it to someone else"</a>, I decided to blog about what I was learning, as I learned it.</p>
 
-<p>As it happens, my deep-dive took me on a detour into the code for my Ruby version manager.  That version manager, named RBENV, creates shim files for every Ruby command you enter, including <code>bundle</code>.  Therefore, the first file I encountered in my deep-dive was this shim.</p>
+<p>As it turns out, my deep-dive took me on a detour into the code for my Ruby version manager.  That version manager, named RBENV, creates shim files for every Ruby command you enter, including <code>bundle</code>.  Therefore, the first file I encountered in my deep-dive was this shim.</p>
 
-<p>In the process of exploring this shim file (and RBENV’s code in general), I ended up learning a lot about the UNIX shell and Bash, the language RBENV is written in.  This might actually be more broadly-applicable than learning about Bundle, since Bash is much more broadly-used than Bundle.</p>
+<p>In the process of exploring this shim file (and RBENV's code in general), I ended up learning a lot about the UNIX shell and Bash, the language RBENV is written in.  This might actually be more broadly-applicable than learning about Bundle, since Bash is much more broadly-used than Bundle.</p>
 
 <p>Along the way, I kept a journal of all my wins, my frustrations, my questions, my a-ha moments, etc.  The document you're reading is an edited version of that journal.</p>
 
-<h2>Starting Our Journey</h2>
+<h2>First Steps</h2>
 
-<p>If we want to figure out what happens when we type <code>bundle install</code>, a good place to start is looking for where the <code>bundle</code> command lives.  I did this by running <code>which bundle</code> in my terminal.  I found the following:</p>
+<p>Since I wanted to figure out what happens when I type <code>bundle install</code>, I figured a good place to start is the file where the <code>bundle</code> command lives.  I did this by running <code>which bundle</code> in my terminal.  I found the following:</p>
 
 <pre><code>$ which bundle
 /Users/richiethomas/.rbenv/shims/bundle
 $ </code></pre>
 
-<p>By default, the <code>which</code> command gives us just the first executable filepath it finds which matches the parameter we pass it (in this case, that parameter is <code>bundle</code>).  If we pass the <code>-a</code> flag, it will give us every executable filepath:</p>
+<p>By default, the <code>which</code> command returns just the first executable filepath it finds which matches the parameter we pass it (in this case, that parameter is <code>bundle</code>).  If we pass the <code>-a</code> flag, it will return every executable filepath:</p>
 
 <pre><code>$ which -a bundle
 /Users/richiethomas/.rbenv/shims/bundle
 /usr/bin/bundle
 $ </code></pre>
 
-<p>Here we see that there are two executable filepaths in total, and that the one located at <code>/Users/richiethomas/.rbenv/shims/</code> is found before the one located at <code>/usr/bin/bundle</code>.  The filepath that is found first is the one that our computer will use to run our command, so this is the filepath we should inspect if we want to know what our machine is doing.</p>
+<p>Here we see that there are two executable filepaths in total, and that the one located at <code>/Users/richiethomas/.rbenv/shims/</code> is found before the one located at <code>/usr/bin/bundle</code>.  The filepath that is found first is the one that my computer will use to run this command, so this is the filepath I need to inspect if I want to know what my machine is doing.</p>
 
 <p>Note- if you're wondering why <code>~/.rbenv/</code> begins with a dot, I go into more detail about that <a href="/blog/what-are-dotfiles/" target="_blank">here</a>.</p>
 
-<h2>Inspecting the filepath we found</h2>
+<h2>Inspecting the filepath I found</h2>
 
 <p>For my code editor, I sometimes use VS Code and sometimes use vim as my editor, and I have a terminal command named <code>code</code> which will open up a filepath I pass in VS Code.  So I run the following in my terminal:</p>
 
@@ -77,12 +77,12 @@ exec "/Users/richiethomas/.rbenv/bin/rbenv" exec "$program" "$@"</code></pre>
 
 <p>Yikes, that's a spicy meatball!</p>
 
-<p>It'll take us quite a few posts to explain this code in its entirety.  For now, the important take-away is that this code comes from RBENV, <i>not</i> from the <code>bundle</code> command.  There are a few clues which let us know this is true:</p>
+<p>It'll take me quite a few posts to explain this code in its entirety.  For now, the important take-away is that this code comes from <a href="https://github.com/rbenv/rbenv" target="_blank">RBENV</a>, the version manager I use for Ruby.  It does <i>not</i> come from the <code>bundle</code> command.  There are a few clues which let me know this is true:</p>
 
 <ul>
-  <li>the file's path is <code>/Users/richiethomas/.rbenv/shims/bundle</code>, which includes <code>.rbenv</code>.</li>
-  <li>there are a few RBENV-specific references in the code, including environment variables named <code>RBENV_DIR</code> and <code>RBENV_ROOT</code>.</li>
-  <li>if we were to inspect other files in the <code>~/.rbenv/shims/</code> folder, we'd see they all look <i>exactly</i> the same! The following files all contain exactly the same code as the above:
+  <li>The file's path is <code>/Users/richiethomas/.rbenv/shims/bundle</code>, which includes <code>.rbenv</code>.</li>
+  <li>There are a few RBENV-specific references in the code, including environment variables named <code>RBENV_DIR</code> and <code>RBENV_ROOT</code>.</li>
+  <li>If we were to inspect other files in the <code>~/.rbenv/shims/</code> folder, we'd see they all look <i>exactly</i> the same! The following files all contain exactly the same code as the above:
       <ul>
         <li><code>~/.rbenv/shims/rails</code></li>
         <li><code>~/.rbenv/shims/ruby</code></li>
@@ -91,10 +91,13 @@ exec "/Users/richiethomas/.rbenv/bin/rbenv" exec "$program" "$@"</code></pre>
     </li>
 </ul>
 
-
-<p>In the following chapters, we'll break down the code line-by-line.  By the end, we'll see why all these files can have the same exact code, yet execute different programs.  We'll also see that RBENV (and some other Ruby version managers) work by intercepting your call to the <code>ruby</code> command (or any other Ruby-specific command), doing some work to figure out which Ruby version you want to use, and then making sure that this Ruby version is used by the command you've typed.</p>
+<p>If you're unfamiliar with the concept of version managers, I wrote a blog post about it <a href="/blog/version-managers/" target="_blank">here</a>.  If you know what version managers are but are unfamiliar with why someone might choose RBENV over other options, I wrote a blog post about that <a href="/blog/comparing-rbenv-with-similar-tools/" target="_blank">here</a>.</p>
 
 <h2>Moving On</h2>
+
+<p>In the following chapters, I'll break down the code line-by-line.  By the end, we'll see why all these files can have the same exact code, yet execute different programs.  We'll also see that RBENV (and some other Ruby version managers) work by intercepting your call to the <code>ruby</code> command (or any other Ruby-specific command), doing some work to figure out which Ruby version you want to use, and then making sure that this Ruby version is used by the command you've typed.</p>
+
+<p>In order to keep the focus of this guide on the RBENV codebase, I didn't want to dive too deeply into the concept of a "shim".  If you're unfamiliar with the concept of a shim, I wrote a blog post about it, which you can read <a href="/blog/what-is-a-shim/" target="_blank">here</a>.</p>
 
 <p>The first line of code in the above shim is:</p>
 
