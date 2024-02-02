@@ -32,7 +32,7 @@
 
 <p>The description for <code>-x</code> says "Similar to -v, but expands commands".  In turn, the description for <code>-v</code> says "Print each command to stdout before executing it".  Based on this, it sounds like we're setting our shell to "debug mode". Which would make sense, given the 2nd half of the condition only executes if we've set a variable named <code>RBENV_DEBUG</code>.</p>
 
-<p>Let's see if that's what happens.</p>
+<p>Let's see what that looks like.</p>
 
 <h2>Experiment- the <code>set -x</code> command</h2>
 
@@ -57,16 +57,18 @@ foo
 bar
 $</code></pre>
 
-<p>The lines with <code>+</code> in front of them appear to be the lines which are printed out as a result of <code>set -x</code>. The lines without <code>+</code> are lines that would have printed out anyway (i.e. as a result of the <code>echo</code> commands I included in the script).</p>
+<p>The lines with <code>+</code> in front of them appear to be the lines which are printed out as a result of <code>set -x</code>.  They show the code that gets executed, before that code is actually run.</p>
 
-<p>Now, when I comment out <code>set -x</code> and re-run the script, I see:</p>
+<p>In contrast, the lines without <code>+</code> are lines that would have printed out anyway (i.e. as a result of the <code>echo</code> commands I included in the script).</p>
+
+<p>When I comment out <code>set -x</code> and re-run the script, I see:</p>
 
 <pre><code>$ ./foo
 foo
 bar
 $ </code></pre>
 
-<p>Now we don't see the lines beginning with <code>+</code> anymore.</p>
+<p>Now we don't see the lines beginning with <code>+</code> anymore.  We just see the printed output from the executed code.</p>
 
 <p>From this, we can conclude that <code>set -x</code> prints each line of code that is run, just as our docs described.</p>
 
@@ -74,6 +76,6 @@ $ </code></pre>
 
 <h2>Wrapping Up</h2>
 
-<p>As we can see, verbose mode is useful if you want to see which lines of code get executed just before an error occurs.  To make full use of this, <code>set -x</code> should be used in conjunction with <code>set -e</code>, so that an exception is raised and the program immediately exits.  This makes it easier to zero in on where the error occurred- just scroll to the end of the output for <code>set -x</code>.</p>
+<p>Verbose mode is useful if you want to see which lines of code get executed just before an error occurs.  To make full use of this, <code>set -x</code> can be used in conjunction with <code>set -e</code>, so that an exception is raised and the program immediately exits.  This makes it easier to zero in on where the error occurred- just scroll to the end of the output, and look for the output of <code>set -x</code> which occurs just before the output of the exception.</p>
 
 <p>Let's move on to the next line of code.</p>

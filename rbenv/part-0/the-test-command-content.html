@@ -8,7 +8,7 @@
 
 <h2>Tests and Conditions</h2>
 
-<p>The bracket syntax (i.e. <code>[ -n "$RBENV_DEBUG" ]</code>, or more generally, <code>[ ... ]</code>) is one way to write conditional logic in bash.  The syntax is actually a synonym for the <code>test</code> command.  If we run <code>man [</code> or <code>man test</code> in the terminal, we see the following:</p>
+<p>The bracket syntax <code>[ ... ]</code>, when combined with <code>&&</code> or <code>||</code>, is one way to write conditional logic in bash.  The syntax is actually a synonym for the <code>test</code> command.  If we run <code>man [</code> or <code>man test</code> in the terminal, we see the following:</p>
 
 <pre><code>TEST(1)              General Commands Manual             TEST(1)
 
@@ -36,7 +36,7 @@
 
 [ 5 == 5 ] && echo "[ 5 == 5 ]";</code></pre>
 
-<p>The <code>&&</code> in between the test condition and the echo string means that, if our test is true, we will continue executing the <code>echo</code> command.  If our bracket syntax condition returns false, the execution will stop before the <code>echo</code> command, and nothing will be printed to the screen.</p>
+<p>The <code>&&</code> in between the test condition and the echo string means that, if our test is true, we will continue executing the <code>echo</code> command.  If our bracket syntax condition returns false, the execution will stop before the <code>echo</code> command, and nothing will be printed to the screen.  The equivalent in Ruby would be <code>5 == 5 and puts '5 equals 5'</code>.</p>
 
 <p>I run <code>chmod +x foo</code> so I can execute the script, then <code>./foo</code>:</p>
 
@@ -58,9 +58,9 @@ $ </code></pre>
 [ 5 == 5 ]
 $ </code></pre>
 
-<p>The string <code>[5 == 6 ]</code> does not appear, indicating that this condition is falsy, as we'd expect.</p>
+<p>The string <code>[5 == 6 ]</code> does not appear, indicating that this line's condition is falsy, and the code after <code>&&</code> is ignored.  This is what we'd expect.</p>
 
-<p>I then update the script to use the test command instead of the square brackets, and repeat the experiment:</p>
+<p>I then update the script to use the <code>test</code> command instead of <code>[ ... ]</code>, and repeat the experiment:</p>
 
 <pre><code>#!/usr/bin/env bash
 
@@ -85,7 +85,9 @@ $ </code></pre>
 
 <h2>Passing flags to <code>[</code></h2>
 
-<p>When looking for docs on a certain flag for a command, we can usually just read the docs for the command itself. In this case, I search for <code>-n</code> in the <code>man</code> page for <code>test</code>:</p>
+<p>When looking for docs on a certain flag for a command, we can usually just read the <code>man</code> entry for the command itself, and search for the flag.  For a refresher on how to search a <code>man</code> entry for a flag, check out <a href="/blog/how-to-use-the-man-command/">my blog post on the <code>man</code> command.</a></p>
+      
+<p>When I run <code>man test</code> and search for <code>-n</code> in the <code>man</code> page for <code>test</code>, I find the following:</p>
 
 <pre><code>-n string     True if the length of string is nonzero.</code></pre>
 
@@ -104,7 +106,7 @@ $ [ -n "$BAR" ] && echo "Hi"
 $ [ -n "" ] && echo "Hi" 
 $ </code></pre>
 
-<p>So using the <code>-n</code> flag to test the length of <code>$FOO</code> resulted in printing "Hi" to the screen because <code>$FOO</code> has a greater-than-zero string length. But <code>$BAR</code> and <code>""</code> both do not, so nothing was printed in those two cases.</p>
+<p>So using the <code>-n</code> flag to test the length of <code>$FOO</code> resulted in printing "Hi" to the screen because <code>$FOO</code> has a greater-than-zero string length.  But <code>$BAR</code> has a length of zero because it has not yet been set, and <code>""</code> has a length of zero because it's the empty string.  So nothing is printed in these two cases.</p>
 
 <p>This all works as expected. Then, out of curiosity, I removed the double-quotes from <code>$BAR</code>:</p>
 
