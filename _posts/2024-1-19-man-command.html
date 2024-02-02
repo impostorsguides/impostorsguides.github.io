@@ -69,11 +69,34 @@ createdAt: 19 Jan, 2024
   <li>various other bits of information which aren't immediately relevant to us</li>
 </ul>
 
-<p>I recommend running "man ls" in your terminal, and skimming the results in order to get familiar with the typical format of a <code>man</code> page.</p>
+<p>I recommend running <code>man ls</code> in your terminal, and skimming the results in order to get familiar with the typical format of a <code>man</code> page.</p>
 
-<h2>Looking up the <code>man</code> page for <code>set</code></h2>
+<h2>Searching a <code>man</code> page for a string</h2>
 
-<p>Let's try looking up the <code>set</code> command in its <code>man</code> page. I type <code>man set</code> into my terminal and I see the following:</p>
+<p>You may have seen the command <code>ls -la</code> in use by other devs, in a tutorial, etc.  Let's assume you aren't yet familiar with the <code>-la</code> flags (note that this syntax indicates we're passing two separate flags, and is equivalent to <code>-l -a</code>).  How can we get more information on these flags?</p>
+
+<p>If we pull up the <code>man</code> entry for <code>ls</code>, we see it's quite long and includes documentation on many different flags.  But that doesn't mean we have to read through these docs manually.  We can search for a specific string, by using the <code>/</code> character.  If we type <code>/-l</code>, we're taken to the first occurrence of the <code>-l</code> string:</p>
+
+<pre><code>-@      Display extended attribute keys and sizes in long (<mark>-l</mark>) output.</code></pre>
+
+<p>If this occurrence doesn't look like what we want, we can type the <code>n</code> key (i.e. lower-case "n") and move to the next occurrence:</p>
+
+<pre><code>-D format
+  When printing in the long (<mark>-l</mark>) format, use format to format the date and time output...</code></pre>
+
+<p>If we do this enough times, eventually we arrive at this entry:</p>
+
+<pre><code><mark>-l</mark>      (The lowercase letter “ell”.) List files in the long format, as described in the The Long Format subsection below.</code></pre>
+
+<p>If you accidentally skip past the occurrence you want, you can type <code>N</code> (capital "n") to go back one entry.</p>
+
+<p>There are many more commands that you can use when searching a <code>man</code> page for a string, as well as many more commands to use in general.  To see an exhaustive list, type <code>h</code> while inside a <code>man</code> page.</p>
+
+<h2>Builtin vs. External Commands</h2>
+
+<p>Depending on the command you give it, sometimes <code>man</code> will give you documentation on that command (like it did with <code>ls</code>).  Other times, it returns an explanation of what a <a href="https://web.archive.org/web/20230226091101/https://www.gnu.org/software/bash/manual/html_node/Shell-Builtin-Commands.html" target="_blank">builtin command</a> is in UNIX.</p>
+
+<p>For example, let's try looking up the <code>set</code> command in its <code>man</code> page. I type <code>man set</code> into my terminal and I see the following:</p>
 
 <pre><code>BUILTIN(1)                                                        General Commands Manual                                                       BUILTIN(1)
 
