@@ -1643,7 +1643,7 @@ And that's the end of the file!
 
 You may have noticed that the files we generate are regular files, generated via the `cp` command.  They are explicitly **not** symlinks, generated via the `ln -s` command.
 
-Why **not** use symlinks?  In other words, we could generate a symlink to point to a single canonical regular shim file, rather than do a full copy of the prototype file into a new shim file.  We learned when we [read the `rbenv` command's code](http://localhost:4000/rbenv/rbenv/resolving-paths){:target="_blank" rel="noopener"} that regular files take up much more space than symlinks.  And because of its smaller file size, generating a symlink would likely be faster than generating a regular file, making our `rehash` command more performant.
+Why **not** use symlinks?  In other words, we could generate a symlink to point to a single canonical regular shim file, rather than do a full copy of the prototype file into a new shim file.  We learned when we [read the `rbenv` command's code](/rbenv/rbenv/resolving-paths){:target="_blank" rel="noopener"} that regular files take up much more space than symlinks.  And because of its smaller file size, generating a symlink would likely be faster than generating a regular file, making our `rehash` command more performant.
 
 This was actually the first approach that RBENV took.  I searched for "symlink" in RBENV's Github repo, and I found [this PR](https://github.com/rbenv/rbenv/commit/06228d3583e24b5057516f357f7d0ae802153007){:target="_blank" rel="noopener"} which shows that the (much shorter) `rbenv-rehash` file used to contain this:
 
