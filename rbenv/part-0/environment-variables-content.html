@@ -173,6 +173,12 @@ $</code></pre>
 
 <p>We now know enough to piece together what this line of code is doing.  We create a new environment variable named <code>RBENV_DIR</code> which will be available in any child shells.  Then, we take the directory of the file that was passed to the <code>ruby</code> command, and set <code>RBENV_DIR</code> equal to <i>the directory containing that Ruby file</i>.</p>
 
+<h2>A quick note- single- and double-quotes</h2>
+
+<p>When working with environment variables, it's a good idea to wrap them in double (<strong>not</strong> single) quotation marks.  That's because sometimes the value stored in an environment variable can contain spaces.</p>
+
+<p>If double-quotes are not used, the shell may treat the multiple words inside the variable's value as multiple arguments, instead of a single argument.  And if single-quotes are used, the shell will treat <code>$FOO</code> as the string "$FOO" instead of as a variable containing a value.</p>
+
 <h2>Summarizing the <code>if</code>-block</h2>
 
 <p>While we're at it, let's summarize what we've learned about the <code>if</code> block inside the shim:</p>

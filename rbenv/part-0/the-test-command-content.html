@@ -137,24 +137,6 @@ $ </code></pre>
 
 <p>So when double-quotes are absent, the script thinks the test is equal to <code>[ -n ]</code>, which the interpreter reads as an operand of length 2, which is why it returns true. This is true whether I'm running <code>[ -n ]</code> or <code>[ -n $BAR ]</code>.</p>
 
-<h2>Experiment- difference between single- and double-quotes</h2>
-
-<p>Another question about the bracket syntax: what would happen if I used single-quotes instead of double-quotes? Does that matter? Time for another experiment.</p>
-
-<p>Since I've already defined my <code>$FOO</code> variable in my terminal tab, I <code>echo</code> it in the same terminal tab, and I see the following result:</p>
-
-<pre><code>$ echo "$FOO"
-foo
-$ </code></pre>
-
-<p>Next I try the same thing, but I replace the double-quotes with single-quotes</p>
-
-<pre><code>$ echo '$FOO'
-$FOO
-$ </code></pre>
-
-<p>So when using single-quotes instead of double-quotes, the shell doesn't expand the variable into its underlying value. It just treats the variable name as a string literal, and in this case we echo that string to the terminal.</p>
-
 <h2>Wrapping Up</h2>
 
 <p>So that's the first half of line 3 of the shim file (the part before the <code>&&</code>).  If the <code>$RBENV_DEBUG</code> environment variable contains a value (i.e. if it's non-empty), then our condition is true.</p>
