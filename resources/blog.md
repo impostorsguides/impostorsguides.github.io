@@ -8,10 +8,10 @@ title: Blog
 {% for post in site.posts %}
 
   <li class='blog-post-item'>
-    <h2>
+    <p class='blog-post-created-at'>{{ post.createdAt }}</p>
+    <p class='blog-post-title'>
       <a href="{{ post.permalink}}">{{ post.title }}</a>
-    </h2>
-    <h4>{{ post.createdAt }}</h4>
+    </p>
     <p>{{ post.excerpt }}</p>
   </li>
 {% endfor %}
