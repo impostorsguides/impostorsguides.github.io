@@ -26,6 +26,8 @@ done</code></pre>
 
 <blockquote><p>Omitting:</p>
   <code>in word ...</code>
+  <br />
+  <br />
   <p>shall be equivalent to:</p>
   <code>in "$@"</code>
 </blockquote>
@@ -84,11 +86,20 @@ $ </code></pre>
 
 <p>Awesome! Nothing changed, meaning that the in <code>$@</code> bit is optional in this case.</p>
 
-<p>So we learned:</p>
+<h2>Wrapping Up</h2>
+
+<p>So from this line of code, we learned:</p>
 
 <ul>
   <li><code>$@</code> stands for the arguments that you pass to the script</li>
   <li>If you write a <code>for</code> loop but leave off the <code>in ___</code> part, bash defaults to using <code>$@</code></li>
+</ul>
+
+<p>And summing up what we know up to this point:</p>
+
+<ul>
+  <li>we're iterating over each argument provided to our command...</li>
+  <li>... but we only do that if that command is <code>ruby</code>.</li>
 </ul>
 
 <p>Let's move on to the next line of code.</p>

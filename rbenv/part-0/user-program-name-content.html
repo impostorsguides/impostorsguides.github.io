@@ -6,11 +6,13 @@
 
 <pre><code>program="${0##*/}"</code></pre>
 
-<p>We declare a variable named <code>program</code>, so it looks like we're trying to store the name of the program whose command we're running. Let's see whether we're right with an experiment.</p>
+<p>We declare a variable named <code>program</code>, so it looks like we're storing the name of the program we're running. Let's see if that's correct.</p>
 
 <h2>Experiment- what string are we storing?</h2>
 
-<p>I edit the shim file (<code>~/.rbenv/shims/bundle</code>) to add the <code>echo</code> statement just beneath the declaration of the <code>program</code> variable.  This prints the value of the <code>program</code> variable to the screen:</p>
+<p>I open up the shim file (<code>~/.rbenv/shims/bundle</code>), and edit it to add the <code>echo</code> statement just beneath the declaration of the <code>program</code> variable.  If your shim doesn't live here, run <code>which bundle</code> in your terminal to get its filepath.</p>
+  
+<p>After editing the shim file, it now looks like this:</p>
 
 <pre><code>#!/usr/bin/env bash
 set -e
@@ -37,7 +39,7 @@ fi
 export RBENV_ROOT="/Users/richiethomas/.rbenv"
 exec "/opt/homebrew/bin/rbenv" exec "$program" "$@"</code></pre>
 
-<p>The <code>$</code> in <code>program name: $program</code> tells Bash that we want to print the value of the <code>program</code> variable, as opposed to the string "program".</p>
+<p>This new <code>echo</code> statement prints the value of the <code>program</code> variable to the screen.  The <code>$</code> in <code>program name: $program</code> tells Bash that we want to print the value of the <code>program</code> variable, as opposed to the string "program".</p>
 
 <p>Then I run <code>bundle version</code> in my terminal, and I see the following:</p>
 
@@ -57,11 +59,12 @@ $ </code></pre>
 
 <p>Before moving on, I delete my <code>echo</code> commands from both the <code>bundle</code> and <code>ruby</code> shims.</p>
 
-<h2>Syntax In Parameter Expansion</h2>
+<h2>Parameter Expansion</h2>
 
-<p>But what is this weird syntax which evaluates to the name of the program? After Googling the exact string <code>${0##*/}</code>, I find <a href="https://web.archive.org/web/20150926110359/https://unix.stackexchange.com/questions/214465/what-does-prog-0-mean-in-a-bash-script/214469" target="_blank">this StackOverflow link</a>, which says:</p>
+<p>What is this weird syntax which evaluates to the name of the program? After Googling the exact string <code>${0##*/}</code>, I find <a href="https://web.archive.org/web/20150926110359/https://unix.stackexchange.com/questions/214465/what-does-prog-0-mean-in-a-bash-script/214469" target="_blank">this StackOverflow link</a>, which says:</p>
 
 <blockquote>
+  <p>...this has to deal with parameter expansion.</p>
   <p><code>$0</code> is the name and path that this script was executed with. For example, if you call <code>/usr/bin/example.sh</code>, then <code>$0</code> will be <code>/usr/bin/example.sh</code>. If your current working directory is <code>/usr</code>, and you call the same script with <code>./bin/example.sh</code>, then <code>$0</code> will be <code>./bin/example.sh</code>.</p>
 
   <p>As for the <code>#</code>, this means to expand <code>$0</code> after removing the previously specified prefix. In this case the previously specified prefix is the <code>*/</code> glob. A single <code>#</code> is non-greedy, so after it matches the first <code>*/</code> glob, it will stop. So it will remove the first <code>/</code> and everything before it. Two <code>#</code>'s mean to greedily remove all <code>*/</code>. So it will find remove all <code>/</code> and everything that comes before them.</p>
@@ -71,7 +74,7 @@ $ </code></pre>
 
 <ul>
   <li><code>$0</code> will evaluate to the path of the file that we're executing.</li>
-  <li>We can modify it by the use of <code>#</code> and <code>*/</code> inside the curly braces.</li>
+  <li>We can modify it by using <code>#</code> and <code>*/</code> inside the curly braces.</li>
 </ul>
 
 <p>Let's test how <code>$0</code> is affected by this parameter expansion syntax.</p>
@@ -141,8 +144,8 @@ $ </code></pre>
 
 <p>Now we see <code>foo/bar/baz</code>. The <code>foo/bar/</code> prefix is no longer missing, but the leading <code>./</code> before <code>foo/</code> has been removed.</p>
 
-<p>This is expected. The StackOverflow answer mentions that including only one <code>#</code> will cause the parameter expansion to stop after matching the first case of its search pattern. In our case, this means the first <code>/</code> character plus anything before it.</p>
+<p>This is expected. The StackOverflow answer mentions that including only one <code>#</code> will cause the shell to remove the <strong>first</strong> case of its search pattern, plus everything before it.  On the other hand, two <code>#</code> symbols tells the shell to stop after matching the <strong>last</strong> case of its search pattern (again, plus everything before it).</p>
 
-<p>So one <code>#</code> will cause <code>./</code> to be removed, while two <code>##</code> will cause <code>./foo/bar/</code> to be removed.</p>
+<p>In our case, one <code>#</code> will cause <code>./</code> to be removed, while two <code>##</code> will cause <code>./foo/bar/</code> to be removed.</p>
 
-<p>For more info on parameter expansion, <a href="https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html" target="_blank">this link</a> contains the GNU docs for parameter expansion, including a much more complete list of the syntax and its capabilities.</p>
+<p>There is much, <strong>much</strong> more to learn about parameter expansion.  We will encounter it again in future parts of the codebase, using new and different patterns besides <code>##/*</code>.  <a href="https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html" target="_blank">This link</a> contains the GNU docs for parameter expansion, including a much more complete list of the syntax and its capabilities.</p>

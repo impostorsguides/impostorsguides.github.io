@@ -6,7 +6,7 @@ title: Verbose Mode
 permalink: /shell/verbose-mode/
 next-title: Setting the Name of the User's Program
 next-permalink: /shell/user-program-name/
-previous-title: The test Command
+previous-title: The 'test' Command
 previous-permalink: /shell/test-command/
 ---
 
