@@ -8,7 +8,7 @@
 
 <p>This is clause #2 of our case statement, with <code>*/*</code> as the pattern that the case statement will match against.</p>
 
-<p>One difference I notice is that this is not the same as a "catch-all" default case; the <code>*/* )</code> pattern here doesn't exactly match the <code>* )</code> pattern in the example code we read earlier.</p>
+<p>One difference I notice is that this is not the same as a "catch-all" default case, because the <code>*/* )</code> pattern here doesn't exactly match the <code>* )</code> pattern in the example code we read earlier.</p>
 
 <p>Instead, it looks like this pattern searches for a forward-slash, surrounded on either side with zero or more characters. The one thing I can think of which would match that pattern is a file path. Let's check that with an experiment.</p>
 
@@ -45,7 +45,7 @@ $ </code></pre>
 
 <p>I sent my <code>./foo</code> script the following arguments:</p>
 <ul>
-  <li>3 arguments with no forward slashes (just 3 random numbers, "1", 2", and "3").</li>
+  <li>3 arguments with no forward slashes at all, just 3 random numbers ("1", 2", and "3").</li>
   <li>4 arguments containing a forward slash in various positions</li>
   <li>an empty string, ''</li>
 </ul>
@@ -78,7 +78,7 @@ fi</code></pre>
   -f file       True if file exists and is a regular file.
 $ </code></pre>
 
-<p>It says that <code>[ -f "$file" ]</code> returns true "if <code>file</code> exists and is a regular file".  In other words, our case statement matches if the arg <i>could be</i> a filepath, and we then verify that it actually <i>is</i> a file by using <code>[ -f "$arg" ]</code>.</p>
+<p>It says that <code>[ -f "$file" ]</code> returns true "if <code>file</code> exists and is a regular file".  In other words, our case statement matches if the arg <i>could be</i> a filepath, and we then verify that it actually <i>is</i> a filepath by using <code>[ -f "$arg" ]</code>.</p>
 
 <p>To test whether the <code>-f</code> flag behaves the way I think it does, we can update our <code>foo</code> script from earlier to look like the following:</p>
 
@@ -146,16 +146,20 @@ $ </code></pre>
 
 <p>The case statement doesn't recognize it as a match, because it doesn't have a "/" in its argument.  But it is a file. Since this case statement closely matches the one in RBENV's shim, does that imply the RBENV shim is also skipping some filepaths?  And if so, is that on purpose, or should it in fact be treating them as matches?</p>
 
-<p>The short answer is that yes, we are skipping files which don't have a <code>/</code> in them.  That's because we can assume that files which don't have a <code>/</code> in them are in our current directory.</p>
+<p>The short answer is that yes, we are skipping files which don't have a <code>/</code> in them.  And that is intentional, because we can assume that files which don't have a <code>/</code> in them are in our current directory.</p>
   
 <p>I'm skipping ahead a bit, but the purpose of this part of the <code>case</code> statement is to set an environment variable called <code>RBENV_DIR</code>.  This environment variable controls where RBENV searches for a file called <code>.ruby-version</code>, which tells it which version of Ruby to use.  We only want to set that environment variable <i>from within the shim</i> if the Ruby script we're running lives somewhere <i>other than</i> in our current directory.</p>
 
-<p>So for example, if we're currently in <code>~/foo/</code>, but we're running <code>ruby ~/bar/baz.rb</code>, then we want RBENV to use the <code>.ruby-version</code> file inside <code>~/bar/</code>, <i>not</i> the <code>.ruby-version</code> file inside <code>~/foo/</code>.</p>
+<p>So for example, let's assume we're running a script which is located <i>inside</i> our current directory, i.e. we're inside <code>~/foo/</code> and we want to run <code>ruby ~/foo/buzz.rb</code>.  In that case, we assume that the <code>.ruby-version</code> file also lives in the current directory.  So we don't need to look for <code>.ruby-version</code> from inside the shim, because the <code>rbenv</code> command (which we'll look at later) will handle that.</p>
 
-<p>The other scenario is that we're running a script which is located <i>inside</i> our current directory, i.e. we're inside <code>~/foo/</code> and we want to run <code>ruby ~/foo/buzz.rb</code>.  In that case, we assume that the <code>.ruby-version</code> file also lives in the current directory, in which case we'll rely on the code for the <code>rbenv</code> command itself.  That code is located in another file, and we'll cover it in a future chapter.</p>
+<p>On the other hand, if we're currently in <code>~/foo/</code>, but we're running <code>ruby ~/bar/baz.rb</code>, then we want RBENV to use the <code>.ruby-version</code> file inside <code>~/bar/</code>, <i>not</i> the <code>.ruby-version</code> file inside <code>~/foo/</code>.</p>
+
+
 
 <h2>Wrapping Up</h2>
 
-<p>Don't worry if you weren't able to put this together yourself, just based on the code we've read up to this point.  I wasn't able to either, and it wasn't until I read the code for the <code>rbenv</code> file that this all came together for me.  One important skill that I've had to develop over the course of reading open-source code is the ability to capture my open questions in a document, and set them aside until I've read more code and have more knowledge of all the moving parts.</p>
+<p>Don't worry if you weren't able to put this together yourself, just based on the code we've read up to this point.  I wasn't able to either, and it wasn't until I <a href="https://github.com/rbenv/rbenv/issues/1173" target="_blank">asked this question in the RBENV Github repo</a> that this all came together for me.</p>
 
-<p>Let's move on.</p>
+<p>Additionally, in some cases I've thought of questions which I haven't been able to answer in the moment.  One important habit that I've had to develop while working on this project is capturing my open questions in a document, and setting them aside until I've read more code and have more knowledge of all the moving parts.  Oftentimes, when I come back to those questions after some time, I'm able to answer them myself with the knowledge I've acquired since then.</p>
+
+<p>Let's now move on to a topic that we touched on briefly above- initializing the <code>RBENV_DIR</code> variable.</p>

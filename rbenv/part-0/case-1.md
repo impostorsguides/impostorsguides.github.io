@@ -2,7 +2,7 @@
 layout: page
 category: rbenv-introduction
 id: 16
-previous-title: Case Statements
+previous-title: "'case'-statements"
 previous-permalink: /shell/case-statements/
 title: "Case 1: When we don't care about the args"
 permalink: /shell/case-1/

@@ -2,12 +2,12 @@
 layout: page
 category: rbenv-introduction
 id: 19
-previous-title: Environment Variables
-previous-permalink: /shell/environment-variables/
+previous-title: Setting the Correct Ruby Version
+previous-permalink: /shell/setting-ruby-version/
 title: Executing The User's Command
 permalink: /shell/exec-command/
-next-title:
-next-permalink:
+next-title: Conclusion
+next-permalink: /shell/conclusion/
 ---
 
 {% include_relative exec-command-content.html %}

@@ -8,7 +8,9 @@
 
 <h2>Confirming The Correct RBENV Version</h2>
 
-<p>For what it's worth, this line will look a bit different on your machine than it does on mine, since the username that appears in the filepath in this line ("richiethomas") will be different.  But the majority of it should look similar, assuming you're using the same version of RBENV that I am (<code>1.2.0-16-gc4395e5</code>).  To make sure this is true, run the following in your Bash terminal:</p>
+<p>For what it's worth, this line will look a bit different on your machine than it does on mine, since the username that appears in the filepath in this line ("richiethomas") will of course be different.</p>
+
+<p>But the majority of it should look similar, assuming you're using the same version of RBENV that I am (<code>1.2.0-16-gc4395e5</code>).  To make sure this is true, run the following in your Bash terminal:</p>
 
 <pre><code>bash-3.2$ rbenv --version
 rbenv 1.2.0-16-gc4395e5
@@ -18,9 +20,9 @@ bash-3.2$ </code></pre>
 
 <h2>What command are we running?</h2>
 
-<p>On the last line of code in the shim, we're running a command called <code>exec</code>.  We'll get to what it does in a minute, but first let's print out the arguments that we're passing, so we can make more sense of the command.</p>
+<p>This line of code starts by running a shell command called <code>exec</code>.  We'll get to what it does in a minute, but first let's print out the last 2 arguments that we're passing (<code>"$program"</code> and <code>"$@"</code>), to get the big picture of what we're running.</p>
 
-<p>Above the last line of code, I add the following:</p>
+<p>In-between the <code>export</code> line and the <code>exec</code> line at the bottom of the shim, I add the following two <code>echo</code> statements:</p>
 
 <pre><code>export RBENV_ROOT="/Users/richiethomas/.rbenv"
 echo "program: $program"
@@ -69,7 +71,7 @@ bash-3.2$ </code></pre>
   <p>exec is a critical function of any Unix-like operating system. Traditionally, the only way to create a new process in Unix is to fork it. The fork system call makes a copy of the forking program. The copy then uses exec to execute the child process in its memory space.</p>
 </blockquote>
 
-<p>To be honest, that explanation creates more questions for me than it answers:</p>
+<p>This raises a few new questions:</p>
 
 <ul>
   <li>What's a "process"?</li>
@@ -81,7 +83,7 @@ bash-3.2$ </code></pre>
 
 <p>Rather than copy/paste the whole page, I'll direct you to open and read it yourself.  Feel free to skip the section called "Password Verification" unless you're curious, since it isn't immediately relevant to our discussion here.  However the section after that, called "Introduction to the Shell", is worth reading.</p>
 
-<p>FYI, I also wrote <a href="/blog/what-are-processes/" target="_blank">a separate blog post called "What Are Processes?"</a>, containing some additional information and experiments based on the things I learned in the above article.</p>
+<p>To keep the focus of this page on the current line of code, I broke off further discussion of processes into <a href="/blog/what-are-processes/" target="_blank">a separate blog post called "What Are Processes?"</a>.  It contains some additional information and experiments based on the things I learned in the above article.  I recommend reading it before moving on if you are still confused about processes, since understanding this line of code is dependent on having that added context.</p>
 
 <p>Armed with this new information, let's try using <code>exec</code> ourselves.</p>
 
@@ -96,7 +98,7 @@ bash-3.2$ </code></pre>
 
 <p>The final output I see in my terminal tab is "[Process completed]", and I can no longer run any commands in this tab. I have to close this tab and open a new one to resume entering commands in the terminal.</p>
 
-<p>Now we know what it looks like when "the shell exits when the command is complete".</p>
+<p>So when we read above that the command we execute "completely replaces the current process" and that "(t)he current shell process is destroyed", this is what we mean.  Once the command we execute is completed, there is no more shell process to return to, since it was replaced by our command.</p>
 
 <h2>Using <code>exec</code> in the RBENV shim</h2>
 
@@ -106,7 +108,7 @@ bash-3.2$ </code></pre>
 
 <p>This means we're running the builtin exec command, and passing it the <code>/Users/richiethomas/.rbenv/libexec/rbenv</code> filepath.  Remember what we read in the <code>help exec</code> output above: <code>exec</code> technically takes a filepath as an argument.  It's just that, if we were to run <code>exec rbenv</code> instead of <code>exec /Users/richiethomas/.rbenv/libexec/rbenv</code>, the terminal would look up the filepath for <code>rbenv</code> by iterating through <code>$PATH</code>.</p>
 
-<p>Since we don't know what the user's <code>$PATH</code> contains, we don't know whether the version it would find first is the version of <code>rbenv</code> that lives at <code>/Users/richiethomas/.rbenv/libexec/rbenv</code>.  We specifically want to run that version, so we specify its filepath in order to bypass this <code>$PATH</code> lookup.</p>
+<p>Since we don't know what the user's <code>$PATH</code> contains, we don't know whether the version it would find first is the version of <code>rbenv</code> that lives at <code>/Users/richiethomas/.rbenv/libexec/rbenv</code>.  We specifically want to run that version, <a href="https://github.com/rbenv/rbenv/pull/1350" target="_blank">for reasons explained here</a>, so we declare our desired filepath manually.</p>
 
 <h2>The <code>rbenv exec</code> command</h2>
 
@@ -126,7 +128,7 @@ is equivalent to:
 
 $ </code></pre>
 
-<p>Translating the above, <code>rbenv exec</code> ensures that, the first directory UNIX finds when it checks <code>$PATH</code> for a directory containing the command we entered is the one containing the version of Ruby you have set as your current version.</p>
+<p>Translating the above, <code>rbenv exec</code> ensures that the first directory UNIX finds when it checks <code>$PATH</code> for a directory containing the command we entered is the one containing the version of Ruby you have set as your current version.</p>
 
 <h2>Wrapping Up</h2>
 

@@ -8,7 +8,7 @@
 
 <p>This is the first block of our case statement.</p>
 
-<h2>Breaking early, depending on the args to Ruby</h2>
+<h2>Breaking out of the <code>for</code>-loop early</h2>
 
 <p>In the earlier list of bullet points, I mentioned that "A pattern can have <a href="https://web.archive.org/web/20220820011901/https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html" target="_blank">special characters</a>."  This clause is an example of the use of such special characters.</p>
 
@@ -41,7 +41,7 @@ echo "outside the for loop"</code></pre>
 
 <ul>
   <li>If an arg matches <code>-e*</code>, we <code>echo</code> a test string and <code>break</code> out of the loop.</li>
-  <li>Otherwise, we just <code>echo</code> the arg itself and keep iterating until we've handled all the arguments.</li>
+  <li>Otherwise, we just <code>echo</code> that the arg does not match, and keep iterating until we've handled all the arguments.</li>
   <li>When we're done with the <code>for</code>-loop, we echo "Outside the for loop" to indicate that the script is finished.</li>
 </ul>
 
@@ -53,9 +53,9 @@ Pattern matched on arg -ebaz; exiting...
 outside the for loop
 $ </code></pre>
 
-<p>The script prints our first arg, and then "Pattern matched on arg -ebaz; exiting...", then skips the third arg "buzz". This is because <code>-ebaz</code> starts with <code>-e</code>, which matched the <code>break</code> condition of <code>-e*</code>.</p>
+<p>The script tells us that our first arg did not match, and then prints "Pattern matched on arg -ebaz; exiting...".  The last thing it does within the loop is skip the third arg "buzz". This is because <code>-ebaz</code> starts with <code>-e</code>, which matched the <code>break</code> condition of <code>-e*</code>.</p>
   
-<p>Lastly, we printed "Outside the for loop" to prove that <code>break</code>'ing only terminates the iterations of the <code>for</code>-loop, as opposed to the entire script.</p>
+<p>After it exits the loop, it prints "Outside the for loop" to prove that <code>break</code>'ing only terminates the iterations of the <code>for</code>-loop, as opposed to the entire script.</p>
 
 <p>Next, I run the same command, but I pass <code>-e</code> instead of <code>-ebaz</code>:</p>
 
@@ -112,6 +112,10 @@ $ </code></pre>
 
 <p>This clause, as well as the conditions it matches (<code>-e*</code> or <code>--</code>), imply that everything else which comes afterward is an argument that tells the <code>ruby</code> command what to process, not a flag which tells the script how to process it.</p>
 
-<h2>Moving On</h2>
+<h2>Wrapping Up</h2>
+
+<p>In the discussion above, I restricted my sources of information to those which are publicly-available via Google.  However, in full disclosure, back in 2019 I actually <a href="https://github.com/rbenv/rbenv/issues/1173" target="_blank">posted a question on the RBENV Github page</a> asking why this <code>if</code>-block was necessary, and why it was only activated if the program being run was Ruby.  A frequent contributor named to the codebase Jason Karns was kind enough to reply in detail, and taught me a lot about the shim file with his response.</p>
+
+<p>I hesitated to include the above link in this chapter because I want to encourage my fellow aspiring 10x'ers to answer their own questions first if possible, and only post questions to a repo in this manner if all other options have been exhausted.  However, I decided to err on the side of transparency and share this issue, in the event that Jason's answer will fill in any blanks that the above explanation left.</p>
 
 <p>Let's move on to the next block of code.</p>

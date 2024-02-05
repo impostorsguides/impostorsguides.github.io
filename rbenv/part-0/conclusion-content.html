@@ -1,0 +1,60 @@
+<header class="post-header">
+  <h1 class="post-title">Conclusion</h1>
+</header>
+
+<p>We covered a lot in this series, including:</p>
+
+<ul>
+  <li>What dotfiles and dot directories are</li>
+  <li>What version management is, and why it matters</li>
+  <li>What shims are</li>
+  <li>What a shebang is</li>
+  <li>What the <code>$PATH</code> variable is, and how it's used</li>
+  <li>How to read and modify UNIX's file permissions</li>
+  <li>What the internal field separator (aka <code>$IFS</code>) is, and what it's useful for</li>
+  <li>How to look up documentation on our machine, using both the <code>man</code> and <code>help</code> commands</li>
+  <li>What a shell is</li>
+  <li>What POSIX is</li>
+  <li>What a "builtin" command is</li>
+  <li>How to find out which shell is your machine's default</li>
+  <li>What a <code>.rc</code> file is</li>
+  <li>What shell options are, and how to set them with the <code>set</code> command</li>
+  <li>Some common shell options (<code>set -e</code> and <code>set -x</code>), and what they do</li>
+  <li>How to write boolean conditions in a shell script using the <code>[</code> or <code>test</code> command</li>
+  <li>Some useful flags for <code>[ ... ]</code> (such as <code>-n</code> and <code>-f</code>).</li>
+  <li>Double- vs. single-<code>=</code> in a shell script</li>
+  <li>Single-<code>[ ... ]</code> vs. double-<code>[[ ... ]]</code> in a shell script</li>
+  <li>Using the <code>$@</code> symbol to fetch the list of arguments provided to a script</li>
+  <li>How to iterate over arguments in a shell script, using a for-loop</li>
+  <li>How to write a case statement in Bash</li>
+  <li>What <code>export</code> statements are, and why they're useful</li>
+  <li>The difference between shell variables and environment variables</li>
+  <li>The <code>exec</code> command, how it differs from forking, and when to use each one</li>
+  <li>What a "process" is</li>
+  <li>How to use Github and the repository's git history to figure out *why* the code is the way that it is.</li>
+</ul>
+
+<p>And possibly more, as well.  I lost count lol.</p>
+
+<h2>I still have more questions!</h2>
+
+<p>Such as:</p>
+
+<ul>
+  <li>What happens inside the child process that gets created by the call to <code>exec</code> at the end of the shim file?</li>
+  <li>We still haven't seen the actual logic which picks the right version number, so it must be happening somewhere else.  Where does that live, and how does it work?</li>
+  <li>We only scratched the surface of what can be done in Bash.  What are some other Bash-isms that we can learn from the RBENV codebase?</li>
+</ul>
+
+<p>These and more questions will be answered in the upcoming soup-to-nuts walk-through of the RBENV codebase.  By the end of the walk-through, we will have learned:</p>
+
+<ul>
+  <li>how RBENV keeps your Ruby versions separate, organized, and compartmentalized.</li>
+  <li>how RBENV implements the "order of precedence" (`shell > script local > cwd local > global`) mentioned <a href="https://github.com/rbenv/rbenv/pull/298#issuecomment-11710825" target="_blank">here</a>.</li>
+  <li>how to patch RBENV's behavior using hooks and plugins.</li>
+  <li>how to use common Bash tools like <code>sed</code>, <code>awk</code>, and command substitution</li>
+</ul>
+
+<h2>If you like what you've read</h2>
+
+<p>Please share it with your friends, on Hacker News, Reddit, etc.</p>

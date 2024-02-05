@@ -1,5 +1,5 @@
 <header class="post-header">
-  <h1 class="post-title">Environment Variables</h1>
+  <h1 class="post-title">Setting the Correct Ruby Version</h1>
 </header>
 
 <p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L12-L13" target="_blank">Next 2 lines of code</a> are:</p>
@@ -11,7 +11,7 @@ break</code></pre>
 
 <h2>Searching for usages of <code>RBENV_DIR</code></h2>
 
-<p>To answer this question, I search for it in the RBENV codebase, which (on my machine) is located at <code>~/.rbenv/</code>.</p>
+<p>To answer this question, I search for it in the RBENV codebase, which (on my machine) is located at <code>~/.rbenv/</code>, because <a href="http://localhost:4000/blog/installing-rbenv-from-source/" target="_blank">I installed RBENV from source, not via Homebrew</a>.</p>
 
 <p>Note that I performed the search below using the <code>ag</code> command, which you can learn how to install <a href="https://github.com/ggreer/the_silver_searcher" target="_blank">here</a>. Your computer will likely ship with the <code>grep</code> command, but <a href="https://stackoverflow.com/questions/39689604/why-is-ag-slower-than-grep#:~:text=Ag%20is%20designed%20for%20searching,tools%20meant%20for%20different%20purposes." target="_blank"><code>ag</code> is <i>much</i> faster for searching codebases</a>.</p>
 
@@ -84,7 +84,7 @@ $ </code></pre>
 
 <blockquote><p>"...rbenv scans the current project directory for a file named .ruby-version. If found, that file determines the version of Ruby that should be used within that directory."</p></blockquote>
 
-<p>So here we're setting the <code>RBENV_DIR</code> variable, in order to tell RBENV where it can find the <code>.ruby-version</code> file.</p>
+<p>So here we're setting the <code>RBENV_DIR</code> variable, in order to tell RBENV which version of Ruby to use.</p>
 
 <p>But what is the <code>export</code> keyword at the start of <code>export RBENV_DIR="${arg%/*}"</code>?</p>
 
@@ -141,11 +141,11 @@ bash-3.2$ </code></pre>
 
 <p>So our current line of code creates an environment variable called <code>RBENV_DIR</code>, which will be available in child shells. This implies that we'll be creating a child shell soon. What will that child shell do?</p>
 
-<p>We'll need quite a few more chapters to fully explain the answer, but the short answer is that this shim will launch the <code>rbenv</code> command inside a child shell, wherein the environment variable will be used by RBENV to detect which Ruby version is the right one.  Then we execute the original command corresponding to the shim that's being executed (i.e. <code>bundle</code> or whatever).</p>
+<p>We'll need quite a few more chapters to fully explain the answer, but the short answer is that this shim will launch the <code>rbenv</code> command inside a child shell, wherein the environment variable <code>RBENV_DIR</code> (which we just set above) will be used to detect which Ruby version is the right one.  Then we execute the original command corresponding to the shim that's being executed (i.e. <code>bundle</code> or whatever).</p>
 
 <h2>Setting the <code>RBENV_DIR</code> variable</h2>
 
-<p>In the meantime, what do the contents of the <code>RBENV_DIR</code> variable look like? To answer that, we have to know what <code>"${arg%/*}"</code> resolves to, in <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L12" target="_blank">this line of code</a>.  It looks like more parameter expansion, but the <code>%/*</code> syntax looks new.  Let's run an experiment to find out what it does.</p>
+<p>In the meantime, what do the contents of the <code>RBENV_DIR</code> variable look like? To answer that, we have to know what <code>"${arg%/*}"</code> resolves to, in <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L12" target="_blank">this line of code</a>.  It looks like more parameter expansion, similar to the kind we used <a href="https://gist.github.com/richiethomas/272b7719f3c75abf6818a8211552004e#file-bundle-L5" target="_blank">here</a> to store the program name in the <code>program</code> shell variable.  But the <code>%/*</code> syntax looks new, so let's run an experiment to find out what it does.</p>
 
 <h3>Experiment- a simpler version of RBENV's parameter expansion</h3>
 
@@ -171,17 +171,19 @@ $</code></pre>
 
 <p>The word is expanded to produce a pattern and matched according to the rules described below (see <a href="https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html" target="_blank">Pattern Matching</a>). <u>If the pattern matches the beginning of the expanded value of parameter, then the result of the expansion is the expanded value of parameter with the shortest matching pattern (the <code>#</code> case) or the longest matching pattern (the <code>##</code> case) deleted.</u></p></blockquote>
 
-<p>We now know enough to piece together what this line of code is doing.  We create a new environment variable named <code>RBENV_DIR</code> which will be available in any child shells.  Then, we take the directory of the file that was passed to the <code>ruby</code> command, and set <code>RBENV_DIR</code> equal to <i>the directory containing that Ruby file</i>.</p>
+<p>We now know enough to piece together what this line of code is doing.  We create a new environment variable named <code>RBENV_DIR</code> which will be available in any child shells.  Then, we take the parent directory of the filepath which was passed to the <code>ruby</code> command, and set <code>RBENV_DIR</code> equal to that parent directory.</p>
 
 <h2>A quick note- single- and double-quotes</h2>
 
-<p>When working with environment variables, it's a good idea to wrap them in double (<strong>not</strong> single) quotation marks.  That's because sometimes the value stored in an environment variable can contain spaces.</p>
+<p>When working with both shell and environment variables, it's a good idea to wrap them in double (<strong>not</strong> single) quotation marks.  That's because sometimes the value stored in a variable can contain spaces.</p>
 
-<p>If double-quotes are not used, the shell may treat the multiple words inside the variable's value as multiple arguments, instead of a single argument.  And if single-quotes are used, the shell will treat <code>$FOO</code> as the string "$FOO" instead of as a variable containing a value.</p>
+<p>If no quotation marks are used, the shell may treat the multiple words inside the variable's value as multiple arguments, instead of a single argument.  And if single-quotes are used, the shell will treat <code>$FOO</code> as the string "$FOO" instead of as a variable containing a value.</p>
+
+<p>More info at <a href="https://web.archive.org/web/20231128200800/https://unix.stackexchange.com/questions/16303/what-is-the-significance-of-single-and-double-quotes-in-environment-variables" target="_blank">this StackOverflow post</a>.</p>
 
 <h2>Summarizing the <code>if</code>-block</h2>
 
-<p>While we're at it, let's summarize what we've learned about the <code>if</code> block inside the shim:</p>
+<p>Let's summarize what we've learned about the <code>if</code> block inside the shim:</p>
 
 <pre><code>if [ "$program" = "ruby" ]; then
   for arg; do
@@ -201,7 +203,7 @@ fi</code></pre>
 
 <p>RBENV first checks whether the command you're running is the <code>ruby</code> command.  If it's not, we skip the <code>for</code> loop entirely.</p>
 
-<p>If it is, RBENV will iterate over each of the arguments you passed to <code>ruby</code>, checking its value.  If the arg is <code>--</code> or if it starts with <code>-e</code>, it will immediately stop checking the remaining args, and proceed to running the code outside the case statement (what that code does is TBD).</p>
+<p>If it is the <code>ruby</code> command, RBENV will iterate over each of the arguments you passed to <code>ruby</code>, checking its value.  If the arg is <code>--</code> or if it starts with <code>-e</code>, it will immediately stop checking the remaining args, and proceed to running the code outside the case statement (which we'll review next).</p>
 
 <p>If the argument contains a "/" character, RBENV will check to see if that argument corresponds to a valid filepath.  If it does, the shim will store the file's parent directory in an environment variable called <code>RBENV_DIR</code>.</p>
 
@@ -215,9 +217,9 @@ fi</code></pre>
 
 <p>This line of code just sets a 2nd environment variable named <code>RBENV_ROOT</code>.</p>
 
-<p>Referring back to the README.md file we just read, we see that this env var "Defines the directory under which Ruby versions and shims reside." Given we're <code>export</code>ing thie variable (i.e. given that this is an environment variable and not a shell variable), we can assume that this variable will be used by a child process, just like <code>RBENV_DIR</code> is.</p>
+<p>Referring back to the README.md file we just read, we see that this variable "Defines the directory under which Ruby versions and shims reside." Given we're <code>export</code>ing the variable (i.e. given that this is an environment variable and not a shell variable), we can assume that this variable will be used by a child process, just like <code>RBENV_DIR</code> is.</p>
 
-<p>In my case, the value to which this env var gets set is the <code>.rbenv</code> hidden directory inside my home directory, i.e. <code>/Users/richiethomas/.rbenv</code>.</p>
+<p>In my case, the value to which this variable gets set is the <code>.rbenv</code> hidden directory inside my home directory, i.e. <code>/Users/richiethomas/.rbenv</code>.</p>
 
 <h2>Wrapping Up</h2>
 
