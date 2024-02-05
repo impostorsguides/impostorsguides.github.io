@@ -10,7 +10,7 @@ Moving onto the next line of code.
 
 ## for-loops in bash
 
-We saw a regular `bash` for-loop earlier, in our experiment with delimiters and `IFS`.  This loop is a bit weird, though, because we haven't yet seen an `arg` variable explicitly defined by the code.  Yet here it is, all the same.
+We saw a regular Bash for-loop earlier, in our experiment with delimiters and `IFS`.  This loop is a bit weird, though, because we haven't yet seen an `arg` variable explicitly defined by the code.  Yet here it is, all the same.
 
 If we haven't seen this variable defined yet, does that mean it's defined or built-in by the language?  As usual, Googling turns up [a StackOverflow post](https://web.archive.org/web/20230406161948/https://stackoverflow.com/questions/73134672/linux-shell-for-arg-do){:target="_blank" rel="noopener"}:
 
@@ -106,9 +106,9 @@ case "$arg" in
 esac
 ```
 
-If you've done any programming before, you've likely seen case statements before (Ruby has them, as well).  But it might still pay to familiarize ourselves with the way `bash` in particular handles them.
+If you've done any programming before, you've likely seen case statements before (Ruby has them, as well).  But it might still pay to familiarize ourselves with the way Bash in particular handles them.
 
-I try `help case` in my `bash` terminal, and get the following:
+I try `help case` in my Bash terminal, and get the following:
 
 ```
 bash-3.2$ help case
@@ -120,7 +120,7 @@ case: case WORD in [PATTERN [| PATTERN]...) COMMANDS ;;]... esac
 
 OK, pretty short and doesn't tell me much more than I already know.
 
-I find [this link](https://web.archive.org/web/20220820011836/https://linuxize.com/post/bash-case-statement/){:target="_blank" rel="noopener"}, which explains bash's case statement syntax.  It's much too long to copy/paste in its entirety, but there's a lot of good stuff in it.  Here is the general pattern that `case` statements take in `bash`:
+I find [this link](https://web.archive.org/web/20220820011836/https://linuxize.com/post/bash-case-statement/){:target="_blank" rel="noopener"}, which explains bash's case statement syntax.  It's much too long to copy/paste in its entirety, but there's a lot of good stuff in it.  Here is the general pattern that `case` statements take in Bash:
 
 ```
 case EXPRESSION in
@@ -199,7 +199,7 @@ The only thing new here, at least for me, is the syntax.  In general, these rule
 
 ### Experiment- building a simple `case` statement
 
-To solidify our understanding of how `bash` handles case statements, let's build a simple one here.  I start by updating my `foo` script to look like the following:
+To solidify our understanding of how Bash handles case statements, let's build a simple one here.  I start by updating my `foo` script to look like the following:
 
 ```
 #!/usr/bin/env bash
@@ -331,7 +331,7 @@ This explains the syntax of the first clause of the shim's case statement.
 
 We see two patterns (`-e*` and `--`), separated by the `|` character, then terminated by the `)` character, as mentioned in bullet points 2 and 3 above.  If the current arg in the iteration matches either pattern, we exit the `for` loop (i.e. we `break`).  Otherwise, we fall through and check the next clause in the case statement.
 
-In the above link, the `*` symbol is listed as one of the "special characters" available in `bash` pattern matching:
+In the above link, the `*` symbol is listed as one of the "special characters" available in Bash pattern matching:
 
 > *
 >
@@ -441,7 +441,7 @@ Instead, it looks like this pattern searches for a forward-slash, surrounded on 
 
 #### Experiment: matching the `*/*` pattern
 
-I make a `bash` script which looks like so
+I make a Bash script which looks like so
 
 ```
 #!/usr/bin/env bash

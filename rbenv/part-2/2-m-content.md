@@ -522,7 +522,7 @@ if [ -z "$awk" ]; then
 fi
 ```
 
-If neither `gawk` nor `awk` is installed on the user's system, we echo an error message to STDERR and return a non-zero exit code.  This might happen if (for example) a user is running RBENV on a version of Windows with which `bash` does not natively ship.  Note that `bash` is now available for Windows, but [that hasn't always been the case](https://web.archive.org/web/20230329195218/https://venturebeat.com/business/microsoft-is-bringing-the-bash-shell-to-windows/){:target="_blank" rel="noopener"}.
+If neither `gawk` nor `awk` is installed on the user's system, we echo an error message to STDERR and return a non-zero exit code.  This might happen if (for example) a user is running RBENV on a version of Windows with which Bash does not natively ship.  Note that Bash is now available for Windows, but [that hasn't always been the case](https://web.archive.org/web/20230329195218/https://venturebeat.com/business/microsoft-is-bringing-the-bash-shell-to-windows/){:target="_blank" rel="noopener"}.
 
 #### Disabling a `shellcheck` rule
 
@@ -674,7 +674,7 @@ So this function:
  - stores them in variables named `summary`, `usage`, or `help` depending on which section of the comments they appeared in, and
  - prints a script to `stdout` which creates shell variables with the same names and contents as the `awk` variables.
 
-We'll see later on that the `bash` code which is output by `collect_documentation` is later `eval`'ed by multiple other functions, defined further down in the file.
+We'll see later on that the Bash code which is output by `collect_documentation` is later `eval`'ed by multiple other functions, defined further down in the file.
 
 So that's a high level of what this function does.
 
@@ -708,7 +708,7 @@ echo one two | awk '{print $0}'
 # All the fields!
 ```
 
-I successfully reproduce the behavior of the exact same commands in my `bash` terminal:
+I successfully reproduce the behavior of the exact same commands in my Bash terminal:
 
 ```
 bash-3.2$ echo one two | awk '{print $1}'
@@ -812,7 +812,7 @@ The answer I get is pretty clear:
 >
 > In this example, the variable sum is initialized to 0 implicitly. For each line in the input file, the value of the first field is added to the sum variable. Finally, in the END block, the script prints the accumulated sum.
 
-I try this in my `bash` terminal, and get the same output:
+I try this in my Bash terminal, and get the same output:
 
 ```
 bash-3.2$ awk -f sum.awk numbers.txt

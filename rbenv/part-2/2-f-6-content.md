@@ -1,4 +1,4 @@
-TODO: write a post on the pros and cons of `fish` vs `zsh` vs `bash`.
+TODO: write a post on the pros and cons of `fish` vs `zsh` vs Bash.
 
 Next line of code:
 
@@ -82,7 +82,7 @@ Next few lines:
 
 ### The Escape Character
 
-The `\` before the dollar sign is called the [escape character](https://web.archive.org/web/20230317171428/https://www.gnu.org/software/bash/manual/html_node/Escape-Character.html){:target="_blank" rel="noopener"}.  It's necessary because, without it, the interpreter will try to resolve `$argv[1]` into a `bash` variable (since `rbenv-init` is being evaluated as a `bash` script).
+The `\` before the dollar sign is called the [escape character](https://web.archive.org/web/20230317171428/https://www.gnu.org/software/bash/manual/html_node/Escape-Character.html){:target="_blank" rel="noopener"}.  It's necessary because, without it, the interpreter will try to resolve `$argv[1]` into a Bash variable (since `rbenv-init` is being evaluated as a Bash script).
 
 We don't want that, at least not here.  Instead, we want `set command $argv[1]` to be part of what gets `echo`'ed to `eval`, so that it gets included in the definition of the `rbenv` shell function.  So whenever you see `\` in this part of `rbenv-init`, it's because we want the character which comes after it to be treated as a string, not as code to be evaluated.
 
@@ -95,7 +95,7 @@ You'll need to leave it out when trying to evaluate `fish` code inside a `fish` 
 
 This is the code as our `fish` shell function will see it.
 
-NOTE- occasionally, we **will** want `bash` to treat code with a dollar sign as code.  If we see a `$` **without** the escape character, we'll know that we're looking at a variable which will be resolved to a specific value by the time it reaches `fish`.  This might not make sense in the abstract, but I'll call it out again when we reach a specific example.
+NOTE- occasionally, we **will** want Bash to treat code with a dollar sign as code.  If we see a `$` **without** the escape character, we'll know that we're looking at a variable which will be resolved to a specific value by the time it reaches `fish`.  This might not make sense in the abstract, but I'll call it out again when we reach a specific example.
 
 ### Setting the `command` variable
 
@@ -182,13 +182,13 @@ argv[3]: buzz
 
 A few things to call out here:
 
- - We got an error, but the code continued executing.  Presumably that's because we didn't include the `fish` equivalent of [the `bash` `set -e` command](https://web.archive.org/web/20230209180114/https://linuxhint.com/bash-set-e/){:target="_blank" rel="noopener"}, so the code just continues executing when it hits an error.
+ - We got an error, but the code continued executing.  Presumably that's because we didn't include the `fish` equivalent of [the Bash `set -e` command](https://web.archive.org/web/20230209180114/https://linuxhint.com/bash-set-e/){:target="_blank" rel="noopener"}, so the code just continues executing when it hits an error.
  - As the error states, `fish` array indices start at 1, not 0.
  - We were correct in our hypothesis that we can access the individual args in `argv` using array indexing syntax.
 
 ### Removing an argument from the list
 
-So we store the first argument inside the new variable named `command`.  Then we call `set -e argv[1]`.  But remember, we're in `fish`-land now, so `set -e` here does **not** mean the same thing it does in `bash`.
+So we store the first argument inside the new variable named `command`.  Then we call `set -e argv[1]`.  But remember, we're in `fish`-land now, so `set -e` here does **not** mean the same thing it does in Bash.
 
 According to the `SYNOPSIS` section of the above `man` entry for `set`, the `-e` flag is short for `--erase`.  The longer name of the flag `--erase` suggests to me that we're deleting the value inside `argv[1]`.
 
@@ -259,7 +259,7 @@ switch "$command"
 end
 ```
 
-This is **almost** correct, but it's not what we would see in `fish`.  Notice that the code `${commands[*]}` has a dollar sign, but it did **not** have an escape character.  That means `bash` will treat this as code, and will resolve it to a value before it gets `echo`'ed.
+This is **almost** correct, but it's not what we would see in `fish`.  Notice that the code `${commands[*]}` has a dollar sign, but it did **not** have an escape character.  That means Bash will treat this as code, and will resolve it to a value before it gets `echo`'ed.
 
 So what would it resolve to?  The easiest way to determine this is to simply print out the function definition.  But we haven't yet installed the `rbenv` shell integrations in our `fish` shell yet.  Let's do that first.
 
@@ -278,7 +278,7 @@ status --is-interactive; and rbenv init - fish | source
 
 It tells me to copy the code `status --is-interactive; and rbenv init - fish | source` into the file `~/.config/fish/config.fish`.  So that's what I do.  I then open a new terminal tab and enter the `fish` shell again.
 
-If I were in `bash`, I could print out the shell function by typing `which rbenv`.  I don't know what the equivalent of that is in `fish`, so I Google "print a shell function definition fish".  The first link I find is [this one](https://web.archive.org/web/20230320234416/https://fishshell.com/docs/current/cmds/functions.html){:target="_blank" rel="noopener"}:
+If I were in Bash, I could print out the shell function by typing `which rbenv`.  I don't know what the equivalent of that is in `fish`, so I Google "print a shell function definition fish".  The first link I find is [this one](https://web.archive.org/web/20230320234416/https://fishshell.com/docs/current/cmds/functions.html){:target="_blank" rel="noopener"}:
 
 <center>
   <a target="_blank" href="/assets/images/screenshot-10may2023-938am.png">

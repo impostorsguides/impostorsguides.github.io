@@ -43,6 +43,6 @@ I think *I'm* ready to move on, but I reserve the right to come back later, and 
   <p>Talks a lot about many of the same tools we've encountered here.  And surprisingly beginner-friendly, considering it's from MIT.</p>
   </li>
   <li><h3><a href="https://devhints.io/bash" target="_blank">Bash Scripting Cheatsheet</a></h3>
-  <p>From DevHints.io.  A concise list of examples, tips, and tricks in `bash`.</p>
+  <p>From DevHints.io.  A concise list of examples, tips, and tricks in Bash.</p>
   </li>
 </ol>

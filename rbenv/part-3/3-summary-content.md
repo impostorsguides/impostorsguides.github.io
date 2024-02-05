@@ -15,7 +15,7 @@ In this section, we learned about:
 - Testing whether a shell option is turned on via the `[[ -o <optionanme> ]]` syntax
 - How to test the type of a variable using parameter expansion, coupled with the `(t)` parameter
 - How to generate completions for a command in `zsh`, using `compctl -K`
-- How to generate completions for a command in `bash`, using `complete -F`
+- How to generate completions for a command in Bash, using `complete -F`
 - What a `bindir` or `bin_dir` is
 - How RBENV automatically re-generates its shims when a gem is installed or uninstalled, using the RubyGems hooks ecosystem.
 - Why you might use a delimiter other than `/` when using `sed` to search-and-replace.

@@ -16,7 +16,7 @@ set -e
 
 We see the following:
 
- - Our shebang, which tells UNIX to interpret the code using `bash`.
+ - Our shebang, which tells UNIX to interpret the code using Bash.
  - "Summary" and "Usage" comments.  These comments are actually used to print the output of the `rbenv-help` command, as we'll see when we read through that command's code.
  - The `set -e` command, which as we know, tells the shell to stop execution and exit immediately if an error is raised.
  - The last line checks if the `$RBENV_DEBUG` env var is set, and if it is, we turn on `xtrace` mode so that the filename and line of code are printed for each line of code that is executed.
@@ -57,7 +57,7 @@ ksh
 zsh
 ```
 
-These arguments correspond to the 4 shells that RBENV supports (`bash`, `fish`, `ksh`, and `zsh`), plus the `-` argument and the `--no-rehash` argument, both of which we'll examine later in this file.
+These arguments correspond to the 4 shells that RBENV supports (Bash, `fish`, `ksh`, and `zsh`), plus the `-` argument and the `--no-rehash` argument, both of which we'll examine later in this file.
 
 ## The 'print' and 'no_rehash' variables
 

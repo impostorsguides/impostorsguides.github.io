@@ -92,7 +92,7 @@ set -e
 
 As usual, we have:
 
- - `bash` shebang
+ - Bash shebang
  - "Usage" comments
  - `set -e` to set "exit-on-error" mode.
  - `set -x` to set "verbose" mode.

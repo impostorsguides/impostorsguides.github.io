@@ -210,7 +210,7 @@ That said, we've succeeded in our goal of understanding what the `if`-block does
 
 ### Looking for `ruby-local-exec`
 
-I suspect that `ruby-local-exec` is a file.  After all, the interpreters that shebangs use (such as the `bash` in `#!/usr/bin/env bash` or the `ruby` in `#!/usr/bin/env ruby`) are just executable files, so `ruby-local-exec` might be a file too.
+I suspect that `ruby-local-exec` is a file.  After all, the interpreters that shebangs use (such as the Bash in `#!/usr/bin/env bash` or the `ruby` in `#!/usr/bin/env ruby`) are just executable files, so `ruby-local-exec` might be a file too.
 
 If it **is** a file, there must have been a git commit somewhere which introduced the file.  Maybe we can use the same strategy here that we used with the `if`-block above.
 
@@ -320,7 +320,7 @@ The first line is:
 set -e
 ```
 
-We've seen this command before, so we know what that does- it tells `bash` to exit immediately when it encounters an error.
+We've seen this command before, so we know what that does- it tells Bash to exit immediately when it encounters an error.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 

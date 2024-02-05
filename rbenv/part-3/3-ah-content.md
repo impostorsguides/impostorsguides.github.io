@@ -20,7 +20,7 @@ Let's now move on to the code.
 
 ## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/configure){:target="_blank" rel="noopener"}
 
-We've seen the `bash` shebang and the setting of "exit-on-first-error" mode before, so we won't dwell on those two lines of code.
+We've seen the Bash shebang and the setting of "exit-on-first-error" mode before, so we won't dwell on those two lines of code.
 
 ### Storing the current directory
 

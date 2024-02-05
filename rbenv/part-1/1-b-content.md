@@ -8,7 +8,7 @@ Our first line of code in the shim file is:
 
 From a Google search for the string `"#!/usr/bin/env bash"`, I learned that this line of code is called a ["shebang"](https://web.archive.org/web/20230323182633/https://en.wikipedia.org/wiki/Shebang_(Unix)){:target="_blank" rel="noopener"}.
 
-In UNIX, a shebang is a special line of code at the top of a script file which tells UNIX which program to use in order to execute the code which comes after it.  In this case, since the shebang ends in "bash", we're telling UNIX to use `bash` to evaluate the code.
+In UNIX, a shebang is a special line of code at the top of a script file which tells UNIX which program to use in order to execute the code which comes after it.  In this case, since the shebang ends in "bash", we're telling UNIX to use Bash to evaluate the code.
 
 ### Different types of shebangs
 
@@ -29,7 +29,7 @@ PWD=/Users/myusername/Workspace/OpenSource
 
 The benefit of using the `/usr/bin/env bash` shebang instead of `/usr/bin/bash` is that the former will likely work on more peoples' machines than the latter.  This is because one of the environment variables that `/usr/bin/env` loads is the `$PATH` env var (as we can see above in the output of the `env` command).
 
-If we use the `/usr/bin/bash` shebang, then whoever runs our script **must** have `bash` installed in their `/usr/bin/` directory.  But that's not a safe bet.  For example, my `bash` executable is installed at `/bin/bash`, with no `/usr/` prefix.  If we load `PATH` into our environment via the `/usr/bin/env bash` shebang, then UNIX will search through all the directories in `PATH` until it finds `bash`.  More directories in our `$PATH` means more chances to find a working `bash` executable.
+If we use the `/usr/bin/bash` shebang, then whoever runs our script **must** have Bash installed in their `/usr/bin/` directory.  But that's not a safe bet.  For example, my Bash executable is installed at `/bin/bash`, with no `/usr/` prefix.  If we load `PATH` into our environment via the `/usr/bin/env bash` shebang, then UNIX will search through all the directories in `PATH` until it finds Bash.  More directories in our `$PATH` means more chances to find a working Bash executable.
 
 The links [here](https://web.archive.org/web/20230326212656/https://www.baeldung.com/linux/bash-shebang-lines){:target="_blank" rel="noopener"} and [here](https://web.archive.org/web/20230316084258/https://stackoverflow.com/questions/16365130/what-is-the-difference-between-usr-bin-env-bash-and-usr-bin-bash){:target="_blank" rel="noopener"} contain additional info on the differences between the two types of shebangs, including some cases where you might **not** want to use `/usr/bin/env bash`.
 
@@ -49,9 +49,9 @@ or:
 
 Using a shebang not only saves us a few keystrokes, but it's also one less thing that we humans can mess up when manually typing our command into the terminal.
 
-### Other shells besides `bash`
+### Other shells besides Bash
 
-As I mentioned before, the string "bash" at the end of the shebang tells UNIX to use `bash` when interpreting the code which follows.  But `bash` is not the only interpreter we can tell UNIX to use for a script that we write.  The only reason the code author used it here is because they wrote the subsequent code in bash.  If they had written it in Ruby, they could have written `#!/usr/bin/env ruby` instead (i.e. replace `bash` with `ruby` in the shebang).  In fact, let's try doing exactly that, as an experiment.
+As I mentioned before, the string "bash" at the end of the shebang tells UNIX to use Bash when interpreting the code which follows.  But Bash is not the only interpreter we can tell UNIX to use for a script that we write.  The only reason the code author used it here is because they wrote the subsequent code in bash.  If they had written it in Ruby, they could have written `#!/usr/bin/env ruby` instead (i.e. replace Bash with `ruby` in the shebang).  In fact, let's try doing exactly that, as an experiment.
 
 #### Experiment- writing a script with a Ruby shebang
 

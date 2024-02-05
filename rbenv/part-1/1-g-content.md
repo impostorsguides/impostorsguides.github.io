@@ -224,7 +224,7 @@ But what is the `export` keyword at the start of `export RBENV_DIR="${arg%/*}"`?
 
 ## `export` statements
 
-We've already seen an example of how variables are assigned in `bash`, i.e. `program="${0##*/}"`.  An assignment statement like `export FOO='bar'` is similar, in that creates a variable named `FOO` and sets its value to `bar`, **but** the use of `export` means it's doing something else as well.
+We've already seen an example of how variables are assigned in Bash, i.e. `program="${0##*/}"`.  An assignment statement like `export FOO='bar'` is similar, in that creates a variable named `FOO` and sets its value to `bar`, **but** the use of `export` means it's doing something else as well.
 
 What does `export FOO='bar'` do that `FOO='bar'` doesn't do?
 

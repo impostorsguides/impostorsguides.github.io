@@ -6,7 +6,7 @@ shopt -s nullglob
 
 ## Pattern-matching on filepaths
 
-In my `bash` shell, I type `help shopt`, and get the following:
+In my Bash shell, I type `help shopt`, and get the following:
 
 ```
 $ help shopt

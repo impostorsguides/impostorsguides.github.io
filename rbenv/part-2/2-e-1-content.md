@@ -8,7 +8,7 @@ The first line of code is:
 #!/usr/bin/env bats
 ```
 
-This is a shebang, which we've seen before.  But importantly, it's not a `bash` shebang.  Instead, it's a `bats` shebang.  [BATS is a test-runner program](https://github.com/sstephenson/bats){:target="_blank" rel="noopener"} that Sam Stephenson (the original author of RBENV) wrote, and it's used here as RBENV's test framework.  But it's not RBENV-specific.  In theory, you could use it to test any shell script.
+This is a shebang, which we've seen before.  But importantly, it's not a Bash shebang.  Instead, it's a `bats` shebang.  [BATS is a test-runner program](https://github.com/sstephenson/bats){:target="_blank" rel="noopener"} that Sam Stephenson (the original author of RBENV) wrote, and it's used here as RBENV's test framework.  But it's not RBENV-specific.  In theory, you could use it to test any shell script.
 
 The `bats` repo is archived, meaning there won't be further updates to it, but I still want to see if the code works and can be used to run tests in the `rbenv` repo.  I'd be surprised if it didn't, since RBENV is still maintained and therefore still needs a way to run its own tests.
 
@@ -105,7 +105,7 @@ The first thing I notice is the `@test` snippet.  I'm not sure what other develo
 
 In BATS, annotations are used as metadata, and they help identify which code represents tests that should be run.  If we search the BATS codebase for the string `@test` and look through the results, eventually we find [this line of code](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-preprocess#L34){:target="_blank" rel="noopener"}.  This is a regular expression (or a regex for short).  If you aren't familiar with regexes, they're a very powerful tool for finding and parsing strings.  See [here](https://web.archive.org/web/20221024181745/https://linuxtechlab.com/bash-scripting-learn-use-regex-basics/){:target="_blank" rel="noopener"} for more information.
 
-This isn't a walk-through of the BATS codebase so I want to keep this part short, but essentially what's happening here is we're providing a pattern for `bash` to use when searching for lines of code.  `bash` will read each line of code in a test file (for example, `test/rbenv.bats`) and see if it matches the pattern `@test`.  If it does, we know we've found a test, and we'll run the code we find.
+This isn't a walk-through of the BATS codebase so I want to keep this part short, but essentially what's happening here is we're providing a pattern for Bash to use when searching for lines of code.  Bash will read each line of code in a test file (for example, `test/rbenv.bats`) and see if it matches the pattern `@test`.  If it does, we know we've found a test, and we'll run the code we find.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 

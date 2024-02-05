@@ -57,9 +57,9 @@ As it turns out, depending on the command you give it, sometimes `man` will give
 
 So when does it give you one result, vs. the other?
 
-I found an answer [here](https://unix.stackexchange.com/questions/167004/why-dont-shell-builtins-have-proper-man-pages){:target="_blank" rel="noopener"}.  The gist of it is that `man` pages are provided only for commands which come from UNIX.  But `bash` is not UNIX.  UNIX is the operating system, and `bash` is the application we're using to interact with the operating system (aka [the "shell"](https://web.archive.org/web/20220601094544/https://www.pcmag.com/encyclopedia/term/shell){:target="_blank" rel="noopener"} which surrounds the operating system).
+I found an answer [here](https://unix.stackexchange.com/questions/167004/why-dont-shell-builtins-have-proper-man-pages){:target="_blank" rel="noopener"}.  The gist of it is that `man` pages are provided only for commands which come from UNIX.  But Bash is not UNIX.  UNIX is the operating system, and Bash is the application we're using to interact with the operating system (aka [the "shell"](https://web.archive.org/web/20220601094544/https://www.pcmag.com/encyclopedia/term/shell){:target="_blank" rel="noopener"} which surrounds the operating system).
 
-The `set` command is a builtin program provided by `bash`, not [an external command](https://web.archive.org/web/20220709025237/https://www.geeksforgeeks.org/internal-and-external-commands-in-linux/){:target="_blank" rel="noopener"} provided by UNIX.  Shell authors keep the docs for their commands separate from the docs for OS commands because comingling them together in the same folder would lead to user confusion about whether a given program was a builtin or an external command.
+The `set` command is a builtin program provided by Bash, not [an external command](https://web.archive.org/web/20220709025237/https://www.geeksforgeeks.org/internal-and-external-commands-in-linux/){:target="_blank" rel="noopener"} provided by UNIX.  Shell authors keep the docs for their commands separate from the docs for OS commands because comingling them together in the same folder would lead to user confusion about whether a given program was a builtin or an external command.
 
 To look up docs on builtin commands, we can use the `help` command.  More on that in a minute.
 
@@ -85,7 +85,7 @@ I interpret this to mean that POSIX defines the standards that determine how use
 
 ### Experiment- which shell are you using?
 
-I'm typing this on a 2019 Macbook Pro, [which ships with `zsh` as its default shell](https://web.archive.org/web/20221205115311/https://scriptingosx.com/2019/06/moving-to-zsh-part-3-shell-options/){:target="_blank" rel="noopener"}.  Your default shell might be the same as mine, or it might `bash` or another shell.
+I'm typing this on a 2019 Macbook Pro, [which ships with `zsh` as its default shell](https://web.archive.org/web/20221205115311/https://scriptingosx.com/2019/06/moving-to-zsh-part-3-shell-options/){:target="_blank" rel="noopener"}.  Your default shell might be the same as mine, or it might Bash or another shell.
 
 To find out what shell we're using, we can open the terminal and type the `echo` command, passing [`"$0"`](https://web.archive.org/web/20230124040420/https://linuxhint.com/0-bash-script/){:target="_blank" rel="noopener"} as a parameter:
 
@@ -103,7 +103,7 @@ $ echo "$0"
 
 We see `-zsh` as the output, telling us that our current shell is `zsh`.
 
-Now, when I open up a `bash` terminal *from* my `zsh` terminal and repeat this, I see the following:
+Now, when I open up a Bash terminal *from* my `zsh` terminal and repeat this, I see the following:
 
 ```
 $ bash
@@ -117,9 +117,9 @@ bash-3.2$ echo "$0"
 bash
 ```
 
-Now we see `bash`!
+Now we see Bash!
 
-By the way, ignore the line that reads `The default interactive shell is now zsh.`  We know we're now in a `bash` terminal because:
+By the way, ignore the line that reads `The default interactive shell is now zsh.`  We know we're now in a Bash terminal because:
 
  - the command prompt starts with `bash-3.2$`, and
  - more importantly, we saw "bash" when we `echo`'ed `"$0"`.
@@ -130,7 +130,7 @@ You may have also heard about the `$SHELL` environment variable:
 echo "$SHELL"
 ```
 
-When I exit out of my `bash` shell and type this on my machine from my original `zsh` shell, I see:
+When I exit out of my Bash shell and type this on my machine from my original `zsh` shell, I see:
 
 ```
 $ echo "$SHELL"
@@ -138,7 +138,7 @@ $ echo "$SHELL"
 /bin/zsh
 ```
 
-That's easier to remember, and should work fine in most cases.  The only reason I went with the `echo "$0"` command above is that I wanted the ability to open up `bash` **from `zsh`** and see `bash` as the output, for the purposes of the demonstration.  If I were to do this with `echo "$SHELL"`, I would continue to see `zsh`, even though we're now in a `bash` shell:
+That's easier to remember, and should work fine in most cases.  The only reason I went with the `echo "$0"` command above is that I wanted the ability to open up Bash **from `zsh`** and see Bash as the output, for the purposes of the demonstration.  If I were to do this with `echo "$SHELL"`, I would continue to see `zsh`, even though we're now in a Bash shell:
 
 ```
 bash-3.2$ echo "$SHELL"
@@ -150,7 +150,7 @@ That's because [`$SHELL` returns the current user's login shell](https://unix.st
 
 ### Making `help` easier to work with in `zsh`
 
-In a regular `bash` (i.e. not `zsh`) terminal, typing `help set` offers an explanation of the `set` command:
+In a regular Bash (i.e. not `zsh`) terminal, typing `help set` offers an explanation of the `set` command:
 
 <p style="text-align: center">
   <a href="/assets/images/bash-help-set.png" target="_blank">
@@ -160,7 +160,7 @@ In a regular `bash` (i.e. not `zsh`) terminal, typing `help set` offers an expla
 
 However, when I try to type `help set` into `zsh`, I see that `General Commands Manual` for builtin commands, which I don't find particularly helpful.  I'd rather see information on the specific command I type in.
 
-I could configure my laptop to make `bash` the default shell for my machine.  Then I'd be able to type `help set` and see what I'm looking for.  However, I'm a creature of habit, and over time I've gotten used to `zsh`.  I don't feel like changing the default shell would be worth the effort.
+I could configure my laptop to make Bash the default shell for my machine.  Then I'd be able to type `help set` and see what I'm looking for.  However, I'm a creature of habit, and over time I've gotten used to `zsh`.  I don't feel like changing the default shell would be worth the effort.
 
 After some Googling around, I found [this StackOverflow question](https://superuser.com/questions/1563825/is-there-a-zsh-equivalent-to-the-bash-help-builtin){:target="_blank" rel="noopener"}, with [this answer](https://superuser.com/a/1563859/300277){:target="_blank" rel="noopener"} describing how to make the `help` output more helpful:
 
@@ -196,7 +196,7 @@ I then run `source ~/.zshrc` to reload the file into memory.
 
 When you open a new terminal tab or window in `zsh`, one of the first things that happens is that `zsh` runs [a few setup scripts](https://web.archive.org/web/20230317222607/https://zsh.sourceforge.io/Intro/intro_3.html){:target="_blank" rel="noopener"}.  One of these setup scripts is called `.zshrc`.  This file is where you'd put configuration options that you'd want to run on every new terminal tab or window.  This includes our `help` configuration, so that's why we add that code in `.zshrc`.
 
-There are other setup scripts   which get loaded as well, such as `.zshenv`, but `.zshrc` is the one I interact with most.  Other shells have similar `rc` files (ex.- `bash` has `.bashrc`).  The `rc` in `.zshrc` stands for "run commands" or "run control", depending on [who you ask](https://web.archive.org/web/20230320050723/https://unix.stackexchange.com/questions/3467/what-does-rc-in-bashrc-stand-for){:target="_blank" rel="noopener"}.
+There are other setup scripts   which get loaded as well, such as `.zshenv`, but `.zshrc` is the one I interact with most.  Other shells have similar `rc` files (ex.- Bash has `.bashrc`).  The `rc` in `.zshrc` stands for "run commands" or "run control", depending on [who you ask](https://web.archive.org/web/20230320050723/https://unix.stackexchange.com/questions/3467/what-does-rc-in-bashrc-stand-for){:target="_blank" rel="noopener"}.
 
 ## Finally getting some answers on `set`
 
@@ -210,7 +210,7 @@ Now I'm able to re-run `help set` from my regular `zsh` terminal window, and get
   </a>
 </p>
 
-For me, the format of the `help` output makes it less-readable than a `man` page, BUT at least now I can see the original source of truth for builtin commands, despite using `zsh` instead of `bash`.
+For me, the format of the `help` output makes it less-readable than a `man` page, BUT at least now I can see the original source of truth for builtin commands, despite using `zsh` instead of Bash.
 
 From the first paragraph, I see the following:
 
@@ -276,7 +276,7 @@ Back to `set -e`.  It sounds like, if you add `set -e` to your bash script and a
 
 OK, but... why do I need `set -e` for that?
 
-When I write a Ruby script and an error occurs, the interpreter exits immediately.  Is the helpfile implying that a `bash` program would just continue executing if you *leave out* `set -e` and an error occurs?
+When I write a Ruby script and an error occurs, the interpreter exits immediately.  Is the helpfile implying that a Bash program would just continue executing if you *leave out* `set -e` and an error occurs?
 
 Let's try an experiment to figure out whether that's the case.
 
@@ -298,7 +298,7 @@ echo "foo ran successfully"
 
 It does the following:
 
- - declares the script as a `bash` script
+ - declares the script as a Bash script
  - calls `set -e` in the theory that this will cause any error to prevent the script from continuing
  - runs the `./bar` script, and
  - prints a summary line
@@ -317,7 +317,7 @@ exit 1
 
 It does the following:
 
- - declares the script as a `bash` script (just like in foo)
+ - declares the script as a Bash script (just like in foo)
  - prints a logline to STDOUT, and
  - triggers a non-zero exit code (i.e. an error)
 

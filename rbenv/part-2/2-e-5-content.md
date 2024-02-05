@@ -50,13 +50,13 @@ To use the `test` binary found via $PATH instead of the shell builtin version:
 enable -n test
 ```
 
-The word "binary" is important here.  We can't just use any old `bash` script here- we have to pass a path to [an **executable binary** file](https://web.archive.org/web/20080112180414/https://www.f-secure.com/v-descs/binary.shtml){:target="_blank" rel="noopener"}, or a file that has been compiled from a human-readable language like C into a different language that is tailored to your machine's specific CPU type.
+The word "binary" is important here.  We can't just use any old Bash script here- we have to pass a path to [an **executable binary** file](https://web.archive.org/web/20080112180414/https://www.f-secure.com/v-descs/binary.shtml){:target="_blank" rel="noopener"}, or a file that has been compiled from a human-readable language like C into a different language that is tailored to your machine's specific CPU type.
 
 I learned this the hard way when I tried to simply write a script and use it to overwrite a known-valid builtin.
 
 ### Experiment- trying to over-write a builtin with `enable -f`
 
-I write a simple `bash` script called `./foo`, which just prints out "Hello world":
+I write a simple Bash script called `./foo`, which just prints out "Hello world":
 
 ```
 #!/usr/bin/env bash
@@ -64,7 +64,7 @@ I write a simple `bash` script called `./foo`, which just prints out "Hello worl
 echo "Hello world"
 ```
 
-In my `bash` shell, I generate a list of possible builtin commands, using the `enable -a` command:
+In my Bash shell, I generate a list of possible builtin commands, using the `enable -a` command:
 
 ```
 bash-3.2$  enable -a
@@ -161,7 +161,7 @@ tried:
 '/Users/myusername/Workspace/OpenSource/impostorsguides.github.io/foo' (not a mach-o file)
 ```
 
-The error `not a mach-o file` tells me that I've tried to pass `enable` a file format that it doesn't expect.  I just passed a simple `bash` script, but it looks like it expects something called [a "mach-o file"](https://web.archive.org/web/20230314194621/https://en.wikipedia.org/wiki/Mach-O){:target="_blank" rel="noopener"}:
+The error `not a mach-o file` tells me that I've tried to pass `enable` a file format that it doesn't expect.  I just passed a simple Bash script, but it looks like it expects something called [a "mach-o file"](https://web.archive.org/web/20230314194621/https://en.wikipedia.org/wiki/Mach-O){:target="_blank" rel="noopener"}:
 
 > Mach-O, short for Mach object file format, is a file format for executables, object code, shared libraries, dynamically-loaded code, and core dumps.
 

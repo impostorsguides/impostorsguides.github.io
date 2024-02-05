@@ -32,7 +32,7 @@ I'm not sure what the question-mark syntax does, so I pull up [the bash docs on 
   </a>
 </center>
 
-So with the question mark, we get a specific error message saying that the value of `parameter` (or in our case, `"$1"`) is unset.  I try this in my local `bash` terminal, and I see the following:
+So with the question mark, we get a specific error message saying that the value of `parameter` (or in our case, `"$1"`) is unset.  I try this in my local Bash terminal, and I see the following:
 
 ```
 bash-3.2$ unset foo
@@ -76,7 +76,7 @@ Let's break this into two pieces.  The first piece is:
   }
 ```
 
-This half is wrapped in curly braces, meaning we perform it as a single operation and send its contents to the next half.  This is called ["command grouping"](https://web.archive.org/web/20230326002400/https://www.gnu.org/software/bash/manual/html_node/Command-Grouping.html){:target="_blank" rel="noopener"} in `bash`, and we've seen it before (for example, when we defined the `abort` helper function [in `libexec/rbenv`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L16-L19){:target="_blank" rel="noopener"}).
+This half is wrapped in curly braces, meaning we perform it as a single operation and send its contents to the next half.  This is called ["command grouping"](https://web.archive.org/web/20230326002400/https://www.gnu.org/software/bash/manual/html_node/Command-Grouping.html){:target="_blank" rel="noopener"} in Bash, and we've seen it before (for example, when we defined the `abort` helper function [in `libexec/rbenv`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L16-L19){:target="_blank" rel="noopener"}).
 
 What is the output of the command grouping?  We start by invoking `$#` and checking if it's equal to 0.  Referring back to [this line of `libexec/rbenv`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L16){:target="_blank" rel="noopener"}, we recall that `$#` expands to the number of arguments that were passed to the `create_executable` function.
 
@@ -313,7 +313,7 @@ We've seen a test like this before.  The goal is to cover [this block of code](h
 
  - We create a hook file whose output depends on certain values being set for the [internal field separator](https://web.archive.org/web/20220715010436/https://www.baeldung.com/linux/ifs-shell-variable){:target="_blank" rel="noopener"}.
  - We then set the Ruby version to the machine's default version.
- - We then run `rbenv exec` with a command that we know will be on the user's machine (the `env` command, which ships with all `bash` terminals).
+ - We then run `rbenv exec` with a command that we know will be on the user's machine (the `env` command, which ships with all Bash terminals).
  - When we run `rbenv exec`, we set the value of the internal field separator to the characters which our hook depends on in order to produce the expected output.
  - Lastly, we assert that the command was successful and that the output was printed to STDOUT as expected.
 
@@ -350,7 +350,7 @@ OUT
 
 This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L47){:target="_blank" rel="noopener"}.  It creates an executable named `ruby`, whose logic consists of:
 
- - A simplified version of our `bash` shebang (using the `$BASH` env var, which evalates to `/bin/bash` on my machine).
+ - A simplified version of our Bash shebang (using the `$BASH` env var, which evalates to `/bin/bash` on my machine).
  - A call to print the "$0" argument, which [expands to the name of the script that's being run](https://web.archive.org/web/20220923182330/https://www.gnu.org/software/bash/manual/html_node/Special-Parameters.html#:~:text=If%20Bash%20is%20invoked%20with,executed%2C%20if%20one%20is%20present.){:target="_blank" rel="noopener"}
  - A loop over all the arguments it receives, printing each one followed by a newline.
 
@@ -430,7 +430,7 @@ To answer this, [I post a StackOverflow question](https://web.archive.org/web/20
     - The rest of the file will be treated as regular Ruby code, as intended.
 - On a machine which does **not** support shebangs:
     - Only lines 1 and 2 will be treated as comments.
-    - Line 3 will be interpreted as executable `bash` code, and we call `exec /usr/local/bin/ruby -S $0 $*`.
+    - Line 3 will be interpreted as executable Bash code, and we call `exec /usr/local/bin/ruby -S $0 $*`.
     - This command uses `exec` to execute a Ruby interpreter at a specific path.
     - Because `exec` is called, this process will be immediately replaced by the new process which calls the Ruby interpreter.
     - Now that the Ruby interpreter has replaced the original process, lines 1-3 will be interpreted as comments, and the rest of the Ruby code will be evaluated as usual.
@@ -494,7 +494,7 @@ In particular, the command which triggered the error was:
 /Users/sam/.rbenv/versions/1.9.3-preview1/bin/ruby -S rake ...
 ```
 
-I gather this was happening because (on a machine using RBENV) the `rake` executable that was found by `ruby -S` was the `rake` shim that RBENV generated.  This shim would have had a `bash` shebang, not a `ruby` shebang.  This caused Ruby to return the error `no Ruby script found in input (LoadError)`.
+I gather this was happening because (on a machine using RBENV) the `rake` executable that was found by `ruby -S` was the `rake` shim that RBENV generated.  This shim would have had a Bash shebang, not a `ruby` shebang.  This caused Ruby to return the error `no Ruby script found in input (LoadError)`.
 
 We can replicate this error by making a script named `foo`, containing the following:
 
@@ -547,7 +547,7 @@ The heredoc string representing our pared-down `ruby` command contains:
 #!$BASH
 ```
 
-The `$` here is not escaped, so `$BASH` will evaluate to a specific value which represents the path to the `bash` executable.  On my machine, the above code will look something like:
+The `$` here is not escaped, so `$BASH` will evaluate to a specific value which represents the path to the Bash executable.  On my machine, the above code will look something like:
 
 ```
 #!/bin/bash
@@ -695,7 +695,7 @@ On my machine, this evaluates to:
 /bin/bash /var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/rbenv.Eae/root/versions/2.0/bin/rake
 ```
 
-So if the condition is shebang is a `ruby` shebang, we use `bash` to call the version of the `rake` command that we found.
+So if the condition is shebang is a `ruby` shebang, we use Bash to call the version of the `rake` command that we found.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
@@ -846,7 +846,7 @@ set -e
 
 Same deal as before:
 
- - The `bash` shebang.
+ - The Bash shebang.
  - Comments summarizing what the command is and how to use it.
  - Telling bash to exit on the first error.
  - Setting "verbose" mode (at least, that's what I call it) if the user has set the `RBENV_DEBUG` environment variable.
@@ -1177,7 +1177,7 @@ It seems that some programs change their behavior depending on what the value of
 $ ./foo
 ```
 
-What you're really doing is calling the program mentioned in the shebang, i.e. `/usr/bin/env bash`, and passing the shell script name as the argument.  In my case, `bash` doesn't care what the 0th argument is, so the behavior is the same in all cases.
+What you're really doing is calling the program mentioned in the shebang, i.e. `/usr/bin/env bash`, and passing the shell script name as the argument.  In my case, Bash doesn't care what the 0th argument is, so the behavior is the same in all cases.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 

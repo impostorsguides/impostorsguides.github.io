@@ -178,7 +178,7 @@ set -e
 
 Same deal as always:
 
- - The `bash` shebang
+ - The Bash shebang
  - The usage + summary comments
  - The call to `set -e`, which tells the shell to exit immediately upon the first error it encounters
  - When the `RBENV_DEBUG` env var is present, call `set -x` to tell the shell to run in verbose mode.

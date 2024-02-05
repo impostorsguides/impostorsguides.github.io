@@ -7,7 +7,7 @@ The first line in [this file](https://github.com/rbenv/rbenv/blob/master/libexec
 #!/usr/bin/env bash
 ```
 
-This is the shebang, which we're already familiar with from Part 1.  This tells us that UNIX will use `bash` to process the script.
+This is the shebang, which we're already familiar with from Part 1.  This tells us that UNIX will use Bash to process the script.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
@@ -293,7 +293,7 @@ I'm curious what `:+` means, so I look for these two characters in [the paramete
 > var is set and not null
 > ```
 
-So you can pass in a variable, and if that variable is set, `bash` will print whatever string you give it.  That seems to be what's happening here, except instead of checking for `var`, we're checking for `FUNCNAME[0]`.  If it's set, we print its value, followed by `():`.
+So you can pass in a variable, and if that variable is set, Bash will print whatever string you give it.  That seems to be what's happening here, except instead of checking for `var`, we're checking for `FUNCNAME[0]`.  If it's set, we print its value, followed by `():`.
 
 And that actually fits with what we were told by the article that was linked in the code comment.  It said the terminal would appear...
 

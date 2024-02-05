@@ -121,9 +121,9 @@ set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 ```
 
- - The `bash` shebang.
+ - The Bash shebang.
  - Usage comments
- - An instruction to exit `bash` if an error is raised
+ - An instruction to exit Bash if an error is raised
  - Setting verbose / `xtrace` mode if `R`BENV_DEBUG is set
 
 ### Completions

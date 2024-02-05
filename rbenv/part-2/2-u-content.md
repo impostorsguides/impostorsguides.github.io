@@ -97,7 +97,7 @@ Let's break down the components of "${1:2}":
  - The result is the portion of the string from the third character onwards.
 ```
 
-We can verify this with an experiment.  I paste the following function in my `bash` terminal:
+We can verify this with an experiment.  I paste the following function in my Bash terminal:
 
 ```
 foo() {
@@ -219,7 +219,7 @@ The string that we use to replace `sep` is:
 $'\n'
 ```
 
-This syntax is called [ANSI-C quoting](https://web.archive.org/web/20230613061217/https://www.gnu.org/software/bash/manual/html_node/ANSI_002dC-Quoting.html){:target="_blank" rel="noopener"}.  It ensures that `bash` treats the special newline character (`\n`) as a newline, rather than as a literal string.
+This syntax is called [ANSI-C quoting](https://web.archive.org/web/20230613061217/https://www.gnu.org/software/bash/manual/html_node/ANSI_002dC-Quoting.html){:target="_blank" rel="noopener"}.  It ensures that Bash treats the special newline character (`\n`) as a newline, rather than as a literal string.
 
 To summarize: the code...
 

@@ -280,7 +280,7 @@ First we test if the value stored in `VERSION_FILE` actually represents an exist
 IFS="${IFS}"$'\r'
 ```
 
-We modify the value of the internal field separator to be its original value, plus the carriage return.  The `"${IFS}"$'\r'` syntax can be thought of as `"${IFS}"` plus `$'\r'`.  The 2nd half of this syntax is the `bash` way of expanding escape sequences, as illustrated by [this StackOverflow answer](https://web.archive.org/web/20220929180039/https://stackoverflow.com/questions/11966312/how-does-the-leading-dollar-sign-affect-single-quotes-in-bash){:target="_blank" rel="noopener"}.  [For example](https://stackoverflow.com/a/11966402){:target="_blank" rel="noopener"}:
+We modify the value of the internal field separator to be its original value, plus the carriage return.  The `"${IFS}"$'\r'` syntax can be thought of as `"${IFS}"` plus `$'\r'`.  The 2nd half of this syntax is the Bash way of expanding escape sequences, as illustrated by [this StackOverflow answer](https://web.archive.org/web/20220929180039/https://stackoverflow.com/questions/11966312/how-does-the-leading-dollar-sign-affect-single-quotes-in-bash){:target="_blank" rel="noopener"}.  [For example](https://stackoverflow.com/a/11966402){:target="_blank" rel="noopener"}:
 
 ```
 $ echo $'Name\tAge\nBob\t24\nMary\t36'

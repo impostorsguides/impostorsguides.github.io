@@ -25,7 +25,7 @@ DESCRIPTION
      expression, test also returns 1 (false).
 ```
 
-OK, so `[ ... ]` is how `bash` denotes conditional logic.  Also, it looks like `[ ... ]` and `test` are synonyms as far as `bash` is concerned.
+OK, so `[ ... ]` is how Bash denotes conditional logic.  Also, it looks like `[ ... ]` and `test` are synonyms as far as Bash is concerned.
 
 Let's run an experiment to see how this syntax works.
 
@@ -245,7 +245,7 @@ bar="$(( 5+5 ))"
 echo "$bar"
 ```
 
-Side note- I found out from [this link](https://stackoverflow.com/questions/6348902/how-can-i-add-numbers-in-a-bash-script){:target="_blank" rel="noopener"} that, if you want to add two integers in `bash`, you use the `$((...))` syntax.
+Side note- I found out from [this link](https://stackoverflow.com/questions/6348902/how-can-i-add-numbers-in-a-bash-script){:target="_blank" rel="noopener"} that, if you want to add two integers in Bash, you use the `$((...))` syntax.
 
 As you can see, this script includes `set -x` at the top.  When I run this script, I see the following:
 

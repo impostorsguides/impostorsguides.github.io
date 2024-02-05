@@ -116,7 +116,7 @@ We can see that we initialized `result_of_foo` to equal the result of the comman
 
 Note that I'm careful not to say "The return value of the foo function is 'Hello world'."  That would be inaccurate.
 
-Functions in `bash` don't work the same way that they do in Ruby, where the return value is the last expression executed in the function's body.  The closest thing a `bash` function has to a return value is the exit code.
+Functions in Bash don't work the same way that they do in Ruby, where the return value is the last expression executed in the function's body.  The closest thing a Bash function has to a return value is the exit code.
 
 However, you can `echo` anything you want from inside the function, and store that result via command substitution, as we've done above.
 
@@ -236,7 +236,7 @@ Before we move on, don't forget to rename your `dylib` file back to its original
 
 ### Native Extensions
 
-The `NATIVE_EXT` in the name `RBENV_NATIVE_EXT` refers to the concept of ["native extensions"](https://web.archive.org/web/20180912035230/https://stackoverflow.com/questions/31202707/what-exactly-is-a-gem-native-extension){:target="_blank" rel="noopener"}.  A native extension is a library written in one language, which can be used by a program written in another language.  In this case, RBENV is written in `bash`, but we're relying on an implementation of `realpath` which is [written in C](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/realpath.c){:target="_blank" rel="noopener"}.
+The `NATIVE_EXT` in the name `RBENV_NATIVE_EXT` refers to the concept of ["native extensions"](https://web.archive.org/web/20180912035230/https://stackoverflow.com/questions/31202707/what-exactly-is-a-gem-native-extension){:target="_blank" rel="noopener"}.  A native extension is a library written in one language, which can be used by a program written in another language.  In this case, RBENV is written in Bash, but we're relying on an implementation of `realpath` which is [written in C](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/realpath.c){:target="_blank" rel="noopener"}.
 
 Ruby does a lot of things well, but it's not the right tool for every job.  If a Ruby developer needs to use certain APIs which are very close to the operating system, or are unavoidably slow in Ruby, a native extension might be the right tool to use.  [For example](https://web.archive.org/web/20230409112559/https://guides.rubygems.org/gems-with-extensions/){:target="_blank" rel="noopener"}:
 
@@ -265,7 +265,7 @@ I get confirmation that `greadlink` comes from GNU coreutils [here](https://gith
 
 Back to the main question: what value are we assigning to the `READLINK` variable?
 
-It looks like we're taking the results of `type -p greadlink readlink 2>/dev/null`, and piping them to the `head -n1` command.  I start with that `type -p` command.  In a `bash` terminal, I try `help type` in the terminal, and I get the following:
+It looks like we're taking the results of `type -p greadlink readlink 2>/dev/null`, and piping them to the `head -n1` command.  I start with that `type -p` command.  In a Bash terminal, I try `help type` in the terminal, and I get the following:
 
 ```
 $ bash
@@ -719,7 +719,7 @@ local name="${path##*/}"
 path="$(resolve_link "$name" || true)"
 ```
 
-From [DevHints.io's guide to `bash`](https://web.archive.org/web/20230423012642/https://devhints.io/bash){:target="_blank" rel="noopener"}, we see that `%/*` in parameter expansion is often used to get the directory in which a file lives.  Example:
+From [DevHints.io's guide to Bash](https://web.archive.org/web/20230423012642/https://devhints.io/bash){:target="_blank" rel="noopener"}, we see that `%/*` in parameter expansion is often used to get the directory in which a file lives.  Example:
 
 ```
 str="/path/to/foo.cpp"
@@ -790,9 +790,9 @@ cd "$cwd"
 
 The purpose here is to `echo` the current directory, so that this can be captured by command substitution, without moving the user to a new directory as a side effect of calling the function.
 
-## "Return values" from `bash` functions
+## "Return values" from Bash functions
 
-Remember, the return value of a `bash` function is **not** the result of the last line of code in the function.  Technically, it's the exit code of the function.  The *output* of a function (i.e. what you can capture via command substitution) is whatever is `echo`'ed while inside the function.
+Remember, the return value of a Bash function is **not** the result of the last line of code in the function.  Technically, it's the exit code of the function.  The *output* of a function (i.e. what you can capture via command substitution) is whatever is `echo`'ed while inside the function.
 
 When I Google "bash return value of a function", the first result I see is [a blog post in LinuxJournal.com](https://web.archive.org/web/20220718223538/https://www.linuxjournal.com/content/return-values-bash-functions){:target="_blank" rel="noopener"}.  Among other things, it tells me:
 

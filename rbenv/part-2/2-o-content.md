@@ -262,7 +262,7 @@ This means the `-a` flag tells `type` to return any and all such files, whereas 
 
 #### Experiment: passing `-a` to `type`
 
-In `bash`, I run `type ls` as a sanity check for the output I should expect:
+In Bash, I run `type ls` as a sanity check for the output I should expect:
 
 ```
 bash-3.2$ type ls
@@ -290,7 +290,7 @@ ls ()
 }
 ```
 
-As expected, `bash` now interprets `ls` as a shell function, because it looks for shell functions before executables.
+As expected, Bash now interprets `ls` as a shell function, because it looks for shell functions before executables.
 
 Now I run `type -a ls`:
 
@@ -311,7 +311,7 @@ This time I see two results in the output.  First, I see the `ls is a function` 
 
 So in our `for` loop, we're iterating over each of the results that are found for the executable command whose name we passed to `path_without`.
 
-For example, in our test we say `path_without ruby`, so we're iterating over each `ruby` executable that we have installed on our machine.  On my machine, when I open a `bash` shell and enter `type -aP ruby`, I get:
+For example, in our test we say `path_without ruby`, so we're iterating over each `ruby` executable that we have installed on our machine.  On my machine, when I open a Bash shell and enter `type -aP ruby`, I get:
 
 ```
 bash-3.2$ type -aP ruby
@@ -445,7 +445,7 @@ Having read through the spec file for the `prefix` command, let's turn to the co
 
 First up is the 4 things that we always see at the beginning:
 
- - `bash` shebang
+ - Bash shebang
  - "Usage" and "Summary" comments
  - the call to `set -e`, and
  - the check for the `$RBENV_DEBUG` env var.
@@ -480,7 +480,7 @@ If the user specified a first argument, then we assume it is the version number 
 
 If the user did *not* specify a first argument, *and* if `RBENV_VERSION` is currently blank, we set `RBENV_VERSION` equal to the return value of the `rbenv version-name` command.
 
-Based on a cursory run of `rbenv version-name` in my `bash` terminal, this appears to be quite similar to running `rbenv version`, but only including the number itself (not including the path to the `.ruby-version` file that sets the version number, as does the `rbenv version` command).  Note that we don't export the environment variable in this case.
+Based on a cursory run of `rbenv version-name` in my Bash terminal, this appears to be quite similar to running `rbenv version`, but only including the number itself (not including the path to the `.ruby-version` file that sets the version number, as does the `rbenv version` command).  Note that we don't export the environment variable in this case.
 
 If neither the above `if` or `elif` conditions are met, that means that:
 

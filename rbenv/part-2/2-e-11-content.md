@@ -300,7 +300,7 @@ command: command [-pVv] command [arg ...]
 
 So according to the above, calling `command ls` is **not** the same as calling `ls`.
 
-Let's say you have a shell function named `ls`, in addition to the regular `ls` command, and you call `ls` in your shell.  In this case, `bash` will try to execute the shell function first, before executing the `ls` command.  The way to bypass this behavior, and go straight to the shell command, is with the `command` command.  [This applies to aliases as well as shell functions.](https://web.archive.org/web/20230502134246/https://askubuntu.com/questions/512770/what-is-the-bash-command-command){:target="_blank" rel="noopener"}
+Let's say you have a shell function named `ls`, in addition to the regular `ls` command, and you call `ls` in your shell.  In this case, Bash will try to execute the shell function first, before executing the `ls` command.  The way to bypass this behavior, and go straight to the shell command, is with the `command` command.  [This applies to aliases as well as shell functions.](https://web.archive.org/web/20230502134246/https://askubuntu.com/questions/512770/what-is-the-bash-command-command){:target="_blank" rel="noopener"}
 
 As the `help` output mentions, adding the `-v` flag results in a printed description of the command you're running.  When I pass `-v` to `command ls`, my terminal displays the path to the executable (`/bin/ls`) *instead of* actually executing the command.
 
@@ -356,13 +356,13 @@ So if the user's input was the string "shell", then we abort with one error mess
 
 We would reach this branch if we tried to run `rbenv shell` either:
 
- - before adding `eval "$(rbenv init - bash)"` to our `~/.bashrc` config file (if we're using `bash` as a shell),
+ - before adding `eval "$(rbenv init - bash)"` to our `~/.bashrc` config file (if we're using Bash as a shell),
  - before adding `eval "$(rbenv init - zsh)"` to our `~/.zshrc` file (if we're using `zsh` as a shell),
  - etc.
 
 In this case, `$command_path` would be empty.
 
-On my machine, I have the above `rbenv init` command added to my `~/.zshrc` file, so I can't reproduce this error in `zsh`.  However, I **don't** have the equivalent line added to my `~/.bashrc` file.  So if I open up a `bash` shell and type `rbenv shell`, I get the following:
+On my machine, I have the above `rbenv init` command added to my `~/.zshrc` file, so I can't reproduce this error in `zsh`.  However, I **don't** have the equivalent line added to my `~/.bashrc` file.  So if I open up a Bash shell and type `rbenv shell`, I get the following:
 
 ```
 bash-3.2$ rbenv shell
@@ -370,7 +370,7 @@ bash-3.2$ rbenv shell
 rbenv: shell integration not enabled. Run `rbenv init' for instructions.
 ```
 
-We'll get to why `$command_path` has a value in my `zsh` and no value in my `bash` later, when we examine the `rbenv-init` file in detail.
+We'll get to why `$command_path` has a value in my `zsh` and no value in my Bash later, when we examine the `rbenv-init` file in detail.
 
 In our `else` clause (i.e. if `$command` does *not* equal `"shell"`), we abort with a `no such command` error.  I'm able to reproduce the `else` case by simply running `rbenv foobar` in my terminal.
 

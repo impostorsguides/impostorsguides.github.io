@@ -86,7 +86,7 @@ RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${RBENV_ROOT}/rbenv.d"
 
  - We want RBENV to automatically re-run the `rbenv rehash` command every time we install a new Ruby gem.
  - The way we achieve this is by updating `RBENV_HOOK_PATH` to include `${RBENV_ROOT}/rbenv.d`, which itself includes a subdirectory named `exec` with a bash script named `gem-rehash.bash`.
- - This presence of this script inside this directory causes this `bash` script to be `source`'ed every time `rbenv exec` is run.
+ - This presence of this script inside this directory causes this Bash script to be `source`'ed every time `rbenv exec` is run.
  - The act of `source`'ing this script causes the `RUBYLIB` environment variable to be updated to include `/.rbenv/rbenv.d/exec/gem-rehash`, i.e. the value which `${BASH_SOURCE%.bash}` resolves to.
  - This directory includes the Ruby file `rubygems_plugin.rb`, which then is run by `gem` whenever you install a new RubyGem.
 

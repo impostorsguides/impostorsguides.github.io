@@ -123,7 +123,7 @@ Next test:
 }
 ```
 
-Here we do the same test as the one before, except this time we set that `RBENV_SHELL` is set to `fish` instead of `bash`.
+Here we do the same test as the one before, except this time we set that `RBENV_SHELL` is set to `fish` instead of Bash.
 
 #### `run rbenv shell` vs. `run rbenv-sh-shell`
 
@@ -143,7 +143,7 @@ Next test:
 }
 ```
 
-We set `RBENV_SHELL` to `bash` and run `rbenv sh-shell -`.  We assert that the command was successful, and that the first line of output was a snippet of `bash` code, i.e.:
+We set `RBENV_SHELL` to Bash and run `rbenv sh-shell -`.  We assert that the command was successful, and that the first line of output was a snippet of Bash code, i.e.:
 
 ```
 if [ -n "${RBENV_VERSION_OLD+x}" ]; then
@@ -151,7 +151,7 @@ if [ -n "${RBENV_VERSION_OLD+x}" ]; then
 
 Again, we're testing `rbenv-sh-shell`, not `rbenv shell`, so our expected output will be code that the `rbenv` shell function will `eval`.
 
-The code that is printed to the terminal depends on what shell you're using, i.e. `bash`, `fish`, or another shell.  We want to make sure the right code is `eval`'ed for the right shell program.  This test covers that case, for the `bash` shell.
+The code that is printed to the terminal depends on what shell you're using, i.e. Bash, `fish`, or another shell.  We want to make sure the right code is `eval`'ed for the right shell program.  This test covers that case, for the Bash shell.
 
 Same with the next test:
 
@@ -180,7 +180,7 @@ OUT
 }
 ```
 
-Here we pass the `RBENV_SHELL=bash` env var and the `--unset` flag to `rbenv sh-shell` and assert that, in the case of `bash`, the output is bash-specific code for setting `RBENV_VERSION_OLD` and unsetting `RBENV_VERSION`.
+Here we pass the `RBENV_SHELL=bash` env var and the `--unset` flag to `rbenv sh-shell` and assert that, in the case of Bash, the output is bash-specific code for setting `RBENV_VERSION_OLD` and unsetting `RBENV_VERSION`.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
@@ -232,7 +232,7 @@ OUT
 }
 ```
 
-This is a happy-path, `bash`-specific test which asserts that, when a given Ruby version has been installed and the user tries to set their shell's Ruby version to that version, the command succeeds and does in fact set the shell version to that number.
+This is a happy-path, Bash-specific test which asserts that, when a given Ruby version has been installed and the user tries to set their shell's Ruby version to that version, the command succeeds and does in fact set the shell version to that number.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
@@ -250,7 +250,7 @@ OUT
 }
 ```
 
-This is the same spec as the previous one, but for the `fish` shell.  Instead of testing that certain `bash` code is printed to the screen, we test that certain `fish` code is printed.
+This is the same spec as the previous one, but for the `fish` shell.  Instead of testing that certain Bash code is printed to the screen, we test that certain `fish` code is printed.
 
 ### Testing **what** code does vs. testing **how** it does it
 
@@ -468,7 +468,7 @@ We're `cat`'ing a here-doc string containing a bunch of commands which will be e
 
 Just because `RBENV_VERSION_OLD` has been set, doesn't mean it has a value.  It could be set to `null`.
 
-Here we check whether it has a non-zero value.  The `[ -n ... ]` syntax does the same thing in `fish` as it does in `bash`.
+Here we check whether it has a non-zero value.  The `[ -n ... ]` syntax does the same thing in `fish` as it does in Bash.
 
 If it does have a value:
 
@@ -517,7 +517,7 @@ EOS
     ;;
 ```
 
-We can go faster this time around, since we can assume that this block of code does the same thing in `bash` that the previous block of code does in `fish`.
+We can go faster this time around, since we can assume that this block of code does the same thing in Bash that the previous block of code does in `fish`.
 
 ##### If `RBENV_VERSION_OLD` is set
 

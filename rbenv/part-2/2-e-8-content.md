@@ -21,7 +21,7 @@ What does `$RBENV_ROOT` do?  According to [the "Environment Variables" section](
 
 > Defines the directory under which Ruby versions and shims reside.
 
-And what does `$HOME` do?  This resolves to the root directory of a particular user (specifically, you) in your `bash` terminal.  When you see me type `~/Workspace/OpenSource` in some of the example code, the `~` (aka tilde) character expands to `"$HOME"`, or `/Users/myusername`.
+And what does `$HOME` do?  This resolves to the root directory of a particular user (specifically, you) in your Bash terminal.  When you see me type `~/Workspace/OpenSource` in some of the example code, the `~` (aka tilde) character expands to `"$HOME"`, or `/Users/myusername`.
 
 ## Setting `RBENV_DIR`
 
@@ -65,7 +65,7 @@ RBENV_DIR="$PWD"
 cd "$OLDPWD"
 ```
 
-Here we're attempting to `cd` into our latest version of `$RBENV_DIR`, sending any error message to `/dev/null`, and aborting with a helpful error message if that `cd` attempt fails.  We then set the value of `RBENV_DIR` to the value of `$PWD` (the directory we're currently in), before `cd`ing into `OLDPWD`, an environment variable [that `bash` maintains ](https://web.archive.org/web/20220127091111/https://riptutorial.com/bash/example/16875/-oldpwd){:target="_blank" rel="noopener"} and which stores the directory we were in prior to our current one.
+Here we're attempting to `cd` into our latest version of `$RBENV_DIR`, sending any error message to `/dev/null`, and aborting with a helpful error message if that `cd` attempt fails.  We then set the value of `RBENV_DIR` to the value of `$PWD` (the directory we're currently in), before `cd`ing into `OLDPWD`, an environment variable [that Bash maintains ](https://web.archive.org/web/20220127091111/https://riptutorial.com/bash/example/16875/-oldpwd){:target="_blank" rel="noopener"} and which stores the directory we were in prior to our current one.
 
 This sequence of code is doing two things:
 

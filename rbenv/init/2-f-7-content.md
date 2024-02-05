@@ -10,7 +10,7 @@ function rbenv {
 
 This is the 2nd branch of our outer case statement (the one which checks which shell the user is using).  If the user is using the `ksh` shell (aka the Korn shell), we employ a similar strategy of starting to `cat` a function definition, but this time we don't close that definition (that comes later).
 
-Note that the `function` keyword prior to the function name is optional in `bash` and `zsh`, but mandatory in `fish` and `ksh`.  One reason you might **not** want to use the `function` keyword in `bash` or `zsh` is portability.  According to [StackOverflow](https://unix.stackexchange.com/a/73752/142469){:target="_blank" rel="noopener"}, leaving the keyword off means your script will be more portable with older shells.
+Note that the `function` keyword prior to the function name is optional in Bash and `zsh`, but mandatory in `fish` and `ksh`.  One reason you might **not** want to use the `function` keyword in Bash or `zsh` is portability.  According to [StackOverflow](https://unix.stackexchange.com/a/73752/142469){:target="_blank" rel="noopener"}, leaving the keyword off means your script will be more portable with older shells.
 
 ### Declaring a local variable in `ksh`
 
@@ -26,7 +26,7 @@ For now, we just declare a variable named `command`, which is scoped locally to 
 
 > typeset without options has an important meaning: if a typeset statement is used inside a function definition, the variables involved all become local to that function (in addition to any properties they may take on as a result of typeset options).
 
-In other words, here the `typeset` keyword is doing what the `local` keyword would do in `bash`.
+In other words, here the `typeset` keyword is doing what the `local` keyword would do in Bash.
 
 ## Declaring the `rbenv` function in other shells
 
@@ -221,7 +221,7 @@ Therefore, if the user's command is present in the return value of `rbenv-comman
 
 If the user's command was something *other than* `shell` or `rehash`, we use the `command` shell program to skip the `rbenv` function and go directly to the `rbenv` script inside `libexec`.  We pass as arguments the name of the command and any other arguments the user included.
 
-Here we see why we needed to override `IFS`.  The output of `rbenv-commands --sh` is `rehash | shell`.  With `IFS` set to its default value, `bash` would only execute this branch of the case statement if the user entered the string `"rehash | shell"` as their "command".  With `IFS` set to `|`, this logic works as expected- we execute the `case` branch if the user's command was either `rehash` *or* `shell`.
+Here we see why we needed to override `IFS`.  The output of `rbenv-commands --sh` is `rehash | shell`.  With `IFS` set to its default value, Bash would only execute this branch of the case statement if the user entered the string `"rehash | shell"` as their "command".  With `IFS` set to `|`, this logic works as expected- we execute the `case` branch if the user's command was either `rehash` *or* `shell`.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 

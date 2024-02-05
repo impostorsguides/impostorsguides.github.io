@@ -753,7 +753,7 @@ I make a simple text file named `bar` and paste the following Ruby versions insi
 
 These Ruby versions were taken from [the official Ruby release list](https://web.archive.org/web/20221006111802/https://www.ruby-lang.org/en/downloads/releases/){:target="_blank" rel="noopener"}.  I figured this looked like a fairly exhaustive list of all the various formats that Ruby uses for its version numbers.
 
-I then ran the following command in my `bash` terminal:
+I then ran the following command in my Bash terminal:
 
 ```
 $ sed 'h; s/[+-]/./g;' bar

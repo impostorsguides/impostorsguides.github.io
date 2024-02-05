@@ -41,7 +41,7 @@ The value we set for `profile` is a path to the user's shell configuration file,
 
 3 of the 4 shells (`zsh`, `ksh`, and `fish`) are straightforward- we directly set `profile` to a hard-coded filepath.
 
-The case statement for `bash`, however, is marginally more complex:
+The case statement for Bash, however, is marginally more complex:
 
 ```
 bash )
@@ -109,7 +109,7 @@ status --is-interactive; and rbenv init - fish | source
 
 We see that `profile` evaluates to `~/.config/fish/config.fish`, as we expected from the hard-coded value in our earlier `case` statement.
 
-If we specify `bash`, we see:
+If we specify Bash, we see:
 
 ```
 $ rbenv init bash

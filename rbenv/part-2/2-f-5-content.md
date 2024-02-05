@@ -1,4 +1,4 @@
-TODO: add a section on why someone would choose `fish` over `zsh` or `bash`.
+TODO: add a section on why someone would choose `fish` over `zsh` or Bash.
 
 Next line of code is:
 
@@ -154,7 +154,7 @@ Next block of code:
 
 This code will be executed if our `"$shell"` variable contains any value other than `fish`.
 
-Just as it was with the `fish` script, our goal here is to set the `PATH` and `RBENV_SHELL` env vars.  But since our shell is not `fish`, we use regular `bash` syntax instead of `fish` syntax.  For example, instead of `set -gx`, we use `export` statements.
+Just as it was with the `fish` script, our goal here is to set the `PATH` and `RBENV_SHELL` env vars.  But since our shell is not `fish`, we use regular Bash syntax instead of `fish` syntax.  For example, instead of `set -gx`, we use `export` statements.
 
 ## Importing completion files
 
@@ -172,11 +172,11 @@ Next block of code:
 
 After the two `export` statements, the next block of code in the default `case` branch creates a file path where the user's completion file should live.  After the filepath is created, the `[ -r "$completion" ]` test checks whether that file actually exists and is readable.  If it does exist, we run `source` on that file in order to run its contents.  If not, nothing will happen.
 
-The `${root}/completions` folder only includes two such files for now- `rbenv.bash` and `rbenv.zsh`.  So the `if` logic will only be executed if the user's shell is either `bash` or `zsh`.  If the shell is something like `ksh`, we would reach the `[ -r "$completion" ]` check, but that check would be falsy.
+The `${root}/completions` folder only includes two such files for now- `rbenv.bash` and `rbenv.zsh`.  So the `if` logic will only be executed if the user's shell is either Bash or `zsh`.  If the shell is something like `ksh`, we would reach the `[ -r "$completion" ]` check, but that check would be falsy.
 
-### Why do we add completions for `bash` and `zsh`, but not `fish`?
+### Why do we add completions for Bash and `zsh`, but not `fish`?
 
-I was wondering why we include completion scripts for `bash` and `zsh`, but not `fish`, so I did some digging in the Github history.  I found [this issue](https://github.com/rbenv/rbenv/issues/1212){:target="_blank" rel="noopener"} which indicates that [`fish` supports RBENV completions natively](https://github.com/fish-shell/fish-shell/blob/1aa0dfe91bc5382220ba2f170bff525501d13908/share/completions/rbenv.fish){:target="_blank" rel="noopener"}.
+I was wondering why we include completion scripts for Bash and `zsh`, but not `fish`, so I did some digging in the Github history.  I found [this issue](https://github.com/rbenv/rbenv/issues/1212){:target="_blank" rel="noopener"} which indicates that [`fish` supports RBENV completions natively](https://github.com/fish-shell/fish-shell/blob/1aa0dfe91bc5382220ba2f170bff525501d13908/share/completions/rbenv.fish){:target="_blank" rel="noopener"}.
 
 Because of that, the `rbenv.fish` shell was redundant and was removed as part of [this PR](https://github.com/rbenv/rbenv/commit/143b2c9c02dbacbbb40592ef4fee5bb5f7f106a5){:target="_blank" rel="noopener"}.  The code to `source` the completion file was then moved into the default branch of the `case` statement [here](https://github.com/gioele/rbenv/commit/9fbbfd268dcbedf0d99f8d14946023e3242feff3){:target="_blank" rel="noopener"}.
 
@@ -192,7 +192,7 @@ The code that we `echo` is `source '$completion'`.  This code will then be execu
 
 The `source` command is one of the more commonly-used commands I have in my shell scripting toolbox.  The command takes the name of a file, and runs that file.  I find this useful when I edit my shell configuration file (i.e. `~/.zshrc`) and I don't want to have to open a new terminal tab in order to activate the changes I've made.
 
-Typing `help source` in my `bash` shell returns the following:
+Typing `help source` in my Bash shell returns the following:
 
 ```
 bash-3.2$ help source

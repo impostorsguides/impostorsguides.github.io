@@ -382,7 +382,7 @@ Next test:
 }
 ```
 
-This test creates a file under `/versions/2.0` named `ruby`.  It then runs `rbenv sh-rehash`, making sure to specify `bash` as the shell program for RBENV to use.  We then assert that the command ran successfully, and that the printed output contained the string:
+This test creates a file under `/versions/2.0` named `ruby`.  It then runs `rbenv sh-rehash`, making sure to specify Bash as the shell program for RBENV to use.  We then assert that the command ran successfully, and that the printed output contained the string:
 
 ```
 "hash -r 2>/dev/null || true"
@@ -403,7 +403,7 @@ Last spec:
 }
 ```
 
-This spec performs the same set of assertions as our previous test, but with the RBENV shell set to `fish` instead of `bash`.
+This spec performs the same set of assertions as our previous test, but with the RBENV shell set to `fish` instead of Bash.
 
 ## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-rehash){:target="_blank" rel="noopener"}
 
@@ -422,7 +422,7 @@ if [ "$1" = "--complete" ]; then
 fi
 ```
 
- - The `bash` shebang.
+ - The Bash shebang.
  - This time, there are no "Usage" or "Summary" instructions.  This command is meant to be called by RBENV itself, not by users.
  - Setting verbose mode if `RBENV_DEBUG` is set.
  - Tab completion instructions.
@@ -474,7 +474,7 @@ esac
 
 Here we inspect the value that we stored in `shell` earlier.  If it's `fish`, we execute a no-op.  According to the comment, we can't rehash if the user's shell is fish.
 
-If their shell is anything else, we `echo` a snippet of `bash` code that the caller of `rbenv-sh-rehash` will execute via `exec`.  This command includes the `hash` builtin.
+If their shell is anything else, we `echo` a snippet of Bash code that the caller of `rbenv-sh-rehash` will execute via `exec`.  This command includes the `hash` builtin.
 
 I'm not familiar with the `hash` command, so I look up its `help` page:
 
@@ -662,10 +662,10 @@ set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 ```
 
-- `bash` shebang
+- Bash shebang
 - "Summary" remarks
-- `set -e` tells `bash` to exit immediately on first error
-- `set -x` tells `bash` to print more verbose output, in this case only if the `RBENV_DEBUG` environment variable was set.
+- `set -e` tells Bash to exit immediately on first error
+- `set -x` tells Bash to print more verbose output, in this case only if the `RBENV_DEBUG` environment variable was set.
 
 ### Making the `shims/` directory
 
@@ -771,7 +771,7 @@ $ echo "foo" > /dev/null
 $
 ```
 
-I researched why this line of code was added to RBENV, and [the PR which added it](https://github.com/rbenv/rbenv/pull/982){:target="_blank" rel="noopener"} says that some versions of `bash` don't permit this behavior.  Your mileage may vary depending on which version of `bash` you have on your machine.
+I researched why this line of code was added to RBENV, and [the PR which added it](https://github.com/rbenv/rbenv/pull/982){:target="_blank" rel="noopener"} says that some versions of Bash don't permit this behavior.  Your mileage may vary depending on which version of Bash you have on your machine.
 
 FWIW, [I posted a StackExchange question](https://unix.stackexchange.com/questions/720024/is-dev-null-treated-differently-from-other-files-when-the-noclobber-option){:target="_blank" rel="noopener"} asking why this might be happening, and eventually the answer comes back that `/dev/null` is treated differently by `noclobber`, since it's considered a "non-standard file".
 
@@ -817,7 +817,7 @@ Here we just turn off the `noclobber` option that we turned on before we attempt
 
 That's it for the lock file logic!
 
-### Telling `bash` to clean things up when we're done
+### Telling Bash to clean things up when we're done
 
 Next block of code:
 
@@ -900,7 +900,7 @@ bash-3.2$ trap -l
 29) SIGINFO	30) SIGUSR1	31) SIGUSR2
 ```
 
-Note that the above works in `bash`, but not `zsh`.
+Note that the above works in Bash, but not `zsh`.
 
 You'll notice that the "signal" we used in our first `trap` example, i.e. `EXIT`, is not listed in the above signals.  That's because `EXIT` is actually a special "catch-all" that can be used to catch any signal.
 
@@ -1298,7 +1298,7 @@ A simplfied way of using this command is shown in the experiment below.
 
 #### Experiment- the `read` command
 
-I make the following `bash` script, called `foo`:
+I make the following Bash script, called `foo`:
 
 ```
 #!/usr/bin/env bash
@@ -1429,7 +1429,7 @@ One thing you might notice is that, even though this function is called `make_sh
 
 I asked about this in a PR, and [the response](https://github.com/rbenv/rbenv/pull/1452#discussion_r990776073){:target="_blank" rel="noopener"} was that, since the `rbenv rehash` command supports plugins, these two functions are kept in-place for backwards compatibility with any plugins that might still use them.
 
-#### Experiment- Arrays in `bash`
+#### Experiment- Arrays in Bash
 
 The `registered_shims+=("$shim")` might look strange.  `registered_shims` is an array of strings, and here we're adding a new item to that array.  This is something we've never needed to do until now.
 

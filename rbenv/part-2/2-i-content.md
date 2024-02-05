@@ -346,7 +346,7 @@ fi
 
 We have:
 
-- the `bash` shebang
+- the Bash shebang
 - Summary and usage comments (to be read by the previous command we analyzed, `rbenv help`)
 - Setting the shell option to exit immediately once it encounters an error.
 - Setting the shell option to output verbose logs if the `RBENV_DEBUG` env var was set
@@ -508,7 +508,7 @@ We've seen `shopt -s nullglob` before, but as a reminder, [this StackExchange li
 
 So if `${hook_paths[@]}` doesn't match any actual directories, or `$path/$RBENV_COMMAND"/*.bash` doesn't match any filenames, we don't perform the code inside the `for` block.
 
-What are the two blocks doing?  For each path in our `hook_paths` variable, and for each `bash` script in that path, we call our `realpath` function.  As an argument to `realpath`, we pass the name of that `bash` script.  This has the effect of resolving any symlinks and deriving the canonical filepath for that hook script.
+What are the two blocks doing?  For each path in our `hook_paths` variable, and for each Bash script in that path, we call our `realpath` function.  As an argument to `realpath`, we pass the name of that Bash script.  This has the effect of resolving any symlinks and deriving the canonical filepath for that hook script.
 
 Note that we're iterating over each *bash* script.  We don't include any `.sh` script (or any other file extension, for that matter).  This is why the `invalid.sh` script in the earlier test really was invalid, and was therefore not included in the output of the BATS test we examined earlier.  It's also why `bright.sh` was included in a different test- it was being pointed to by a symlink file which *did* contain a `.bash` file extension.
 
@@ -518,7 +518,7 @@ And that's it for the `rbenv hooks` command!
 
 Hooks are 3rd-party libraries that you can install within RBENV, to add functionality to its existing commands.
 
-If we look back to our read-through of the `rbenv` file, we saw that part of that file's job was to [populate the `RBENV_HOOK_PATH` environment variable](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81-L91){:target="_blank" rel="noopener"} with various directories.  One of those directories is `~/.rbenv/rbenv.d/`.  This directory contains zero or more subdirectories whose names correspond to RBENV's commands (for example, `exec/`).  If we create a `.bash` script inside one of these directories, RBENV will treat it as a hook, and will execute that `bash` script when running the command corresponding to that directory.
+If we look back to our read-through of the `rbenv` file, we saw that part of that file's job was to [populate the `RBENV_HOOK_PATH` environment variable](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81-L91){:target="_blank" rel="noopener"} with various directories.  One of those directories is `~/.rbenv/rbenv.d/`.  This directory contains zero or more subdirectories whose names correspond to RBENV's commands (for example, `exec/`).  If we create a `.bash` script inside one of these directories, RBENV will treat it as a hook, and will execute that Bash script when running the command corresponding to that directory.
 
 To learn more, let's make our own as an experiment.
 
@@ -550,7 +550,7 @@ Next, inside `~/.rbenv/rbenv.d/exec/`, I create a script called `foo.bash`.  Ins
 echo "Hello world"
 ```
 
-I `chmod +x` the `bash` script so that it's executable.  I then use `rbenv exec` to re-run the `--version` commands I previously ran:
+I `chmod +x` the Bash script so that it's executable.  I then use `rbenv exec` to re-run the `--version` commands I previously ran:
 
 ```
 $ rbenv exec ruby --version

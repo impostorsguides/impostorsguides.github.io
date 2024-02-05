@@ -24,7 +24,7 @@ We covered a lot in this series, including:
  - Single-`[ ... ]` vs. double-`[[ ... ]]` in a shell script
  - Using the `$@` symbol to fetch the list of arguments provided to a script
  - How to iterate over arguments in a shell script, using a for-loop
- - How to write a case statement in `bash`
+ - How to write a case statement in Bash
  - What `export` statements are, and why they're useful
  - The difference between shell variables and environment variables
  - The `exec` and `fork` commands, and when to use each one
@@ -39,14 +39,14 @@ Such as:
 
  - What happens inside the child process that gets created by the call to `exec` at the end of the shim file?
  - We still haven't seen the actual logic which picks the right version number, so it must be happening somewhere else.  Where does that live, and how does it work?
- - We only scratched the surface of what can be done in `bash`.  What are some other `bash`-related things that we can learn from the RBENV codebase?
+ - We only scratched the surface of what can be done in Bash.  What are some other Bash-related things that we can learn from the RBENV codebase?
 
 These and more questions will be answered in the upcoming soup-to-nuts walk-through of the RBENV codebase.  By the end of the walk-through, we will have learned:
 
  - how RBENV keeps your Ruby versions separate, organized, and compartmentalized.
  - how RBENV implements the "order of precedence" (`shell > script local > cwd local > global`) mentioned [here](https://github.com/rbenv/rbenv/pull/298#issuecomment-11710825){:target="_blank" rel="noopener"}.
  - how to patch RBENV's behavior using hooks and plugins.
- - how to use common `bash`-isms, such as:
+ - how to use common Bash-isms, such as:
     - `sed`
     - `awk`
     - command substitution
