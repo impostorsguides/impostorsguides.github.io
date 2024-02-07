@@ -1,0 +1,209 @@
+---
+layout: post
+permalink: /blog/using-chatgpt-to-get-unstuck/
+title: How I Use ChatGPT To Get Unstuck
+excerpt_separator: <!--more-->
+createdAt: 5 Feb, 2024
+---
+
+<div>
+  <figure style="width: 100%; margin: 0 0 10px 25px">
+    <img src="/assets/images/robot-conductor.jpeg" style="margin: auto" width="100%" alt="A robot conducting an orchestra.">
+    <figcaption style="text-align: center;">Photo attribution <a href="/blog/using-chatgpt-to-get-unstuck/#photo-attribution">here</a>.</figcaption>
+  </figure>
+</div>
+
+<p>Ideally, when we have questions about a piece of code, we'd always have a <code>man</code> or <code>help</code> entry (or some other official, canonical resource) to guide us.  Failing that, we could plug our question into Google and get an answer from StackOverflow or (worst-case scenario) someone's blog.</p>
+
+<p>But some questions aren't conducive to that.  Some questions are specific to our unique situation, and it's unlikely we'll find a resource already written which addresses our issue.</p>
+
+<p>In these cases, we can unblock ourselves by asking ChatGPT our preliminary question, and using its response to refine, rephrase, or completely change our question into something which will help us figure out our next steps.</p>
+
+<!--more-->
+
+<h2>Caveat- <i>always</i> double-check ChatGPT's answer</h2>
+
+<p>We've all heard of hallucinations, i.e. ChatGPT's habit of returning confident-but-incorrect answers to the questions it receives.  And it's frequently possible to make ChatGPT second-guess itself back and forth, simply by repeatedly typing "Are you sure?" in response to what it tells you.  If your experience is the same as mine, it will reply to this question with some form of "I'm sorry for the confusion, you're right and I'm wrong."  Needless to say, this doesn't inspire confidence in the answers it gives us.</p>
+
+<p>For these reasons, it's important that we always double-check with a secondary, trustworthy source.  This is actually a good habit to instill when encountering human-generated answers as well, but it's doubly-important with ChatGPT.</p>
+
+<h2>Story Time- A Personal Example</h2>
+
+<p>Sometimes, when we have a programming question, we aren't even sure what to Google, or we have a vague idea but don't know how to phrase our question.  Nor can we post our question on a site like StackOverflow, since sites like those specifically state that your question must be well-formed and broadly-applicable in order to be kept open.</p>
+
+<p>Some great examples of this are:</p>
+
+<ul>
+  <li>regular expressions</li>
+  <li>parameter expansion in shell scripting</li>
+  <li>instructions for the <code>sed</code> command</li>
+</ul>
+
+<p>More often than not, a particular expression is tailored to fit its concise use case, and is not particularly portable from one application to another.  This makes it unlikely that a Google search for your specific regex will return any relevant results.  It also makes it likely that someone on StackOverflow will close your question as being overly specific, and therefore not useful to the community at-large.</p>
+
+<p>I experienced this while <a href="/shell" target="_blank">reading through (and blogging about) the RBENV codebase</a>, in order to combat my impostor's syndrome.  One of RBENV's commands is <code>rbenv versions</code>, which lists all the Ruby versions that RBENV currently manages for you on your machine.  Among other things, this command sorts these versions.</p>
+
+<p>But sorting version numbers isn't as straightforward as it might appear.  We can see what versions RBENV will let us install by running <code>rbenv install --list-all</code>.  A sample of the output at the time of this writing is:</p>
+
+<pre><code>3.2.2
+3.3.0-dev
+3.3.0-preview1
+3.3.0-rc1
+jruby-9.4.5.0
+truffleruby-23.1.2
+truffleruby+graalvm-22.0.0.2
+truffleruby+graalvm-23.0.0-preview1
+</code></pre>
+
+<p>These are already sorted, but it's RBENV's job to perform that sorting.  To do this, we need to first sort by major version, then by minor version, then by patch version.  Complicating this task is the fact that some Ruby versions begin with a string (like "jruby" or "truffleruby"), <i>and only then</i> followed by their major/minor/patch versions.</p>
+
+<p>Additionally, we need to treat the version numbers as numbers (not as strings), while continuing to sort the non-numeric characters (i.e. "truffleruby", "jruby") as the strings that they are.  In other words, we need to sort numerically when appropriate, and lexicographically all other times.</p>
+
+<p>To do this, RBENV's <code>versions</code> command implements the following helper function:</p>
+
+<pre><code>sort_versions() {
+  sed 'h; s/[+-]/./g; s/.p\([[:digit:]]\)/.z.\1/; s/$/.z/; G; s/\n/ /' | \
+    LC_ALL=C sort -t. -k 1,1 -k 2,2n -k 3,3n -k 4,4n -k 5,5n | awk '{print $2}'
+}</code></pre>
+
+<p>If you've never used <code>sed</code> before (as was the case for me when I first read this), you might have no idea about where to start looking for answers to what the above does or means.</p>
+
+<p>As you can imagine, Googling the entire string following <code>sed</code> is unlikely to produce any helpful results.  We could post a question on StackOverflow, but as I previously mentioned, there's a good chance that question will be closed, since it's not widely applicable to many users.  And even if it's not closed, we may have to wait awhile for an answer, if we get one at all.</p>
+
+<p>Instead, we can ask ChatGPT to help us decipher this cryptic code into its components (of which there are clearly many).  Once we get an answer, we'll have a series of discrete moving parts, which will be much easier to Google and/or ask StackOverflow about.  Let's do that now.</p>
+
+<h2>Experiment- Asking ChatGPT for help</h2>
+
+<p>I paste the following question into ChatGPT:</p>
+
+<blockquote>
+  <p>I am reading through the codebase of RBENV, a version manager for Ruby.  One of this program's commands is `rbenv versions`, which lists all the Ruby versions that RBENV currently manages for me on my machine.  Inside the file for this command, I see the following helper method:
+
+  <pre><code>sort_versions() {
+  sed 'h; s/[+-]/./g; s/.p\([[:digit:]]\)/.z.\1/; s/$/.z/; G; s/\n/ /' | \
+    LC_ALL=C sort -t. -k 1,1 -k 2,2n -k 3,3n -k 4,4n -k 5,5n | awk '{print $2}'
+}</code></pre>
+    
+    I don't understand the string following the `sed` command.  Please explain what it does.</p>
+</blockquote>
+
+<p>In response, ChatGPT gives me the following answer:</p>
+
+<blockquote>
+  <p>Sure, let's break down the <code>sed</code> command:</p>
+
+  <pre><code>sort_versions() {
+  sed 'h; s/[+-]/./g; s/.p\([[:digit:]]\)/.z.\1/; s/$/.z/; G; s/\n/ /' | \
+    LC_ALL=C sort -t. -k 1,1 -k 2,2n -k 3,3n -k 4,4n -k 5,5n | awk '{print $2}'
+}</code></pre>
+
+  <p>Here's what each part does:</p>
+
+  <ol>
+    <li><code>h</code>: This command copies the pattern space (the current line) to the hold space (a temporary buffer).</li>  
+    <li><code>s/[+-]/./g</code>: This command replaces all occurrences of <code>+</code> or <code>-</code> characters with a <code>.</code>. This is typically done to transform version strings like <code>2.7.3-p1</code> into <code>2.7.3.p1</code>.</li>
+    <li><code>s/.p\([[:digit:]]\)/.z.\1/</code>: This command replaces the pattern <code>.p</code> followed by a digit with <code>.z</code>. and the same digit. This typically handles patch versions, converting something like <code>.p123</code> into <code>.z.123</code>.</li>
+    <li><code>s/$/.z/</code>: This command appends <code>.z</code> to the end of each line.</li>
+    <li><code>G</code>: This command appends a newline followed by the contents of the hold space (the original line) to the pattern space (the modified line).</li>
+    <li><code>s/\n/ /</code>: This command replaces the newline character added by the <code>G</code> command with a space. This effectively joins the original version string with its modified form.</li>
+  </ol>
+
+  <p>The purpose of this <code>sed</code> command seems to be to normalize version strings, replacing certain characters and adding suffixes to make them easier to sort. This is necessary because versions like 2.7.3-p1 need to be sorted alongside versions like 2.7.3.p1, and this script ensures they are sorted correctly.</p>
+</blockquote>
+
+<p>With this response, we've taken the first steps toward breaking our intractable problem into multiple problems of a manageable size.  <strong>Again, this answer may not be accurate</strong>- that's one of the drawbacks of relying on ChatGPT.  But I'd argue that this still represents forward progress, since we now have things we can effectively Google.</p>
+
+<p>For example, prior to asking this question, I didn't even know how to delimit the multiple commands in this string.  I had no way of even knowing whether it <i>was</i> multiple commands, or one large command.  When you're a shell noob who <a href="https://english.stackexchange.com/questions/59145/usage-of-the-phrase-you-dont-know-what-you-dont-know" target="_blank">doesn't know what he doesn't know</a>, questions which might seem obvious to old shell hands can represent real stumbling blocks.</p>
+
+<p>It wasn't until I saw how ChatGPT itemized the commands that I noticed the semi-colons in the <code>sed</code> string, and put 2 and 2 together.</p>
+
+<p>With this step forward, I now have multiple questions I can Google.  For example:</p>
+
+<ul>
+  <li>What do "pattern space" and "hold space" mean, in the context of <code>sed</code>?</li>
+  <li>I notice that <code>s/.p\([[:digit:]]\)/.z.\1/</code> in step 2 looks a lot like a regular expression.  Is that the case?  And are there any differences between regexes in <code>sed</code> and regexes in (for example) Ruby, my default language?</li>
+  <li>Line 3 says that the code <code>s/.p\([[:digit:]]\)/.z.\1/</code> "...replaces the pattern <code>.p</code> followed by a digit with <code>.z</code>. and the same digit."  What is the process by which it captures "the same digit", and re-use it later?</li>
+</ul>
+
+<p>These questions can be further broken down into sub-questions.  For example, we can repeat the above process with the regex <code>s/.p\([[:digit:]]\)/.z.\1/</code>, asking ChatGPT to break this down for us:</p>
+
+<blockquote>
+  <p>Can you further break down the following code from line 3:</p>
+
+  <pre><code>s/.p\([[:digit:]]\)/.z.\1/</code></pre>
+</blockquote>
+
+<p>It answers with the following:</p>
+
+<blockquote>
+  <p>Certainly! Let's break down the <code>s/.p\([[:digit:]]\)/.z.\1/</code> command:</p>
+
+  <ul>
+    <li><code>s/</code>: This is the substitute command in sed, used for replacing text patterns.</li>
+    <li><code>.</code>: This matches any character.</li>
+    <li><code>p</code>: This matches the character 'p' literally.</li>
+    <li><code>\([[:digit:]]\)</code>: This is a capture group (<code>\(</code> and <code>\)</code>), capturing a single digit (<code>[[:digit:]]</code>). The <code>[[:digit:]]</code> is a character class matching any digit (0-9).</li>
+    <li><code>/</code>: This separates the pattern to match and the replacement text.</li>
+    <li><code>.z.</code>: This is the replacement text. It's a literal string that replaces the matched pattern. It adds <code>.z.</code> before the captured digit.</li>
+    <li><code>\1</code>: This refers to the first capture group, which in this case is the single digit matched by <code>[[:digit:]]</code>. It's used in the replacement text to insert the matched digit after <code>.z.</code>.</li>
+  </ul>
+
+  <p>So, in summary, this command looks for any occurrence of .p followed by a single digit in the version string and replaces it with .z. followed by the same digit. For example, 2.7.3-p1 would be transformed into 2.7.3.z1.</p>
+</blockquote>
+
+<p>From this, I can add the questions "What is a capture group?" and "What are <a href="https://www.gnu.org/software/sed/manual/html_node/Character-Classes-and-Bracket-Expressions.html" target="_blank">character classes</a>?" to my running list of questions.  Once I've Googled those questions to get a second opinion, I can then run simple experiments with each of these commands.  For example:</p>
+
+<ul>
+  <li>Adding data from the pattern space to the hold space (and vice versa), using <code>h</code> and <code>G</code>.</li>
+  <li>Making arbitrary modifications to the pattern space using the <code>s/</code> instruction.</li>
+  <li>Using character classes and capture groups within my search-and-replace instructions.</li>
+</ul>
+
+<p>In retrospect, we can now see that my original question of "What does this huge <code>sed</code> command do?" is really the sum of quite a few smaller questions.  In general, the more we can break up a large question into these smaller questions, the more receptive people will be to help us answer them on Q&A sites, and the easier it will be to Google for answers.</p>
+
+<h2>What the code actually does</h2>
+
+<p>As it turns out, ChatGPT is not far off.  The purpose of this method is indeed to normalize version strings.  It takes input such as this...</p>
+
+<pre><code>2.7.5
+3.0.0
+truffleruby-23.1.2
+3.1.0
+3.2.2
+mruby-3.2.0</code></pre>
+
+<p>...and turns it into this:</p>
+
+<pre><code>2.7.5.z 2.7.5 3.0.0.z 3.0.0 truffleruby.23.1.2.z truffleruby-23.1.2 3.1.0.z 3.1.0 3.2.2.z 3.2.2 mruby.3.2.0.z mruby-3.2.0</code></pre>
+
+<p>This represents a single long string containing each version number, in unsorted order.  Each version is prefixed with a modified version of itself which is much easier to sort than the original.  <a href="https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-versions#L60" target="_blank">From there</a>, this string is piped to the <code>sort</code> command, which takes multiple instances of the <code>-k</code> flag.  This sorts our version numbers by this prefix value, resulting in this:</p>  
+
+<pre><code>2.7.5.z 2.7.5 3.0.0.z 3.0.0 3.1.0.z 3.1.0 3.2.2.z 3.2.2 mruby.3.2.0.z mruby-3.2.0 truffleruby.23.1.2.z truffleruby-23.1.2</code></pre>
+
+<p>Finally, we pipe <i>this</i> result to the <code>awk</code> command, which prints the 2nd field from each entry (i.e. the version number we care about), without the prefix.  This leaves us with the human-readable, sorted version numbers we want:</p>
+
+<pre><code>2.7.5 3.0.0 3.1.0 3.2.2 mruby-3.2.0 truffleruby-23.1.2</code></pre>
+
+<p>A subsequent step (which we won't examine here) iterates over each of these entries, printing them on separate lines.</p>
+
+<p>Note that the first <code>-k</code> flag in our <code>sort</code> command does <i>not</i> have an <code>n</code> at the end, indicating that we treat the first sort field as a string.  This allows us to compare a version number like <code>3.2.2</code> with a version like <code>mruby-3.2.0</code>, by treating major version numbers as strings.</p>
+
+<p>This will eventually become a problem when we reach Ruby version 10, because a version number like <code>2.0.0</code> will come after a number like <code>10.0.0</code>.  But we are a long way from Ruby version 10, so this is a problem for another day.</p>
+
+<h2>Alternate use case- confirming your understanding</h2>
+
+<p>Even if you <i>think</i> you understand what a line of code does, it can be helpful to plug that code into ChatGPT anyway, and ask it what the code does.  Who knows, ChatGPT might return an answer which differs from what you expected.  You can then go about Googling who is right, you or the machine.  You might discover that your preconception was incorrect, and thus save yourself from going down a wrong path.</p>
+
+
+<div id="photo-attribution">
+  <h4>Photo Attribution</h4>
+  <p>Title: Robot_conductor_'EveR 6'_03</p>
+  <p>Description: Press release of robot conductor
+    June 26, 2023
+    National Theater of Korea, Jongno-gu, Seoul
+    KOCIS(Korean Culture and Informatioon Service)
+    Official Photographer : KIM SUNJOO</p>
+  <p>Author: <a href="https://www.flickr.com/photos/koreanet/" target="_blank">Republic of Korea</a></p>
+  <p>Source: <a href="https://www.flickr.com/photos/koreanet/53007281180/" target="_blank">Flickr</a></p>
+  <p>License: <a href="https://creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC BY-SA 2.0 DEED Attribution-ShareAlike 2.0 Generic</a></p>
+</div>
