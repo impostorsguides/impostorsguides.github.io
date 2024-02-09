@@ -19,7 +19,7 @@ path: shell
       {% endif %}
     {% endfor %}
     </ol>
-    <h3><li>Part 2: The `rbenv` command</li></h3>
+    <h3><li>Part 2: The `rbenv` command (work-in-progress)</li></h3>
     <ol>
       {% for page in sorted_pages %}
         {% if page.category == 'rbenv-pt-2a' %}
@@ -27,7 +27,7 @@ path: shell
         {% endif %}
       {% endfor %}
     </ol>
-    <h3><li>Part 3: The `rbenv init` command</li></h3>
+    <h3><li>Part 3: The `rbenv init` command (work-in-progress)</li></h3>
     <ol>
       {% for page in sorted_pages %}
         {% if page.category == 'rbenv-pt-2b' %}
@@ -35,7 +35,7 @@ path: shell
         {% endif %}
       {% endfor %}
     </ol>
-    <h3><li>Part 4: Other RBENV Commands</li></h3>
+    <h3><li>Part 4: Other RBENV Commands (work-in-progress)</li></h3>
     <ol>
       {% for page in sorted_pages %}
         {% if page.category == 'rbenv-pt-2' %}
@@ -43,7 +43,7 @@ path: shell
         {% endif %}
       {% endfor %}
     </ol>
-    <h3><li>Part 5: Infrastructure Files</li></h3>
+    <h3><li>Part 5: Infrastructure Files (work-in-progress)</li></h3>
     <ol>
       {% for page in sorted_pages %}
         {% if page.category == 'rbenv-pt-3' %}

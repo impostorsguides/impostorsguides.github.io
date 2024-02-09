@@ -5,8 +5,6 @@ main:
     url: /shell/
   - title: Blog
     url: /blog/
-  - title: About
-    url: /about/
   - title: FAQ
     url: /faq/
   - title: Contact
