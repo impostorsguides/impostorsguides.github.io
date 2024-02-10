@@ -19,6 +19,14 @@ path: shell
       {% endif %}
     {% endfor %}
     </ol>
+    <h3><li>Part Foo: The `rbenv` command (work-in-progress)</li></h3>
+    <ol>
+      {% for page in sorted_pages %}
+        {% if page.category == 'rbenv-command' %}
+          <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+        {% endif %}
+      {% endfor %}
+    </ol>
     <h3><li>Part 2: The `rbenv` command (work-in-progress)</li></h3>
     <ol>
       {% for page in sorted_pages %}

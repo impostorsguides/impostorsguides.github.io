@@ -1,0 +1,43 @@
+<header class="post-header">
+  <h1 class="post-title">Introduction: The <code>rbenv</code> Command</h1>
+</header>
+
+<p>You made it to part 2!  If you haven't read <a href="/shell/introduction">Part 1</a> yet, I highly recommend you start there.  It contains both context on RBENV and bash syntax, which this next section depends on.</p>
+
+<p>Having finished reading the code for RBENV's shims, we need to decide what's next.</p>
+
+<p>At the time of this writing, <a href="https://github.com/rbenv/rbenv/tree/c4395e58201966d9f90c12bd6b7342e389e7a4cb" target="_blank">the following files and directories</a> exist in the Github repo:</p>
+
+<pre><code>~/.rbenv (impostorsguides)  $ ls -la
+  total 80
+  drwxr-xr-x  18 richiethomas  staff    576 Feb  9 12:02 .
+  drwxr-x---+ 45 richiethomas  staff   1440 Feb 10 01:33 ..
+  drwxr-xr-x  12 richiethomas  staff    384 Feb  9 12:02 .git
+  drwxr-xr-x   3 richiethomas  staff     96 Feb  9 12:02 .github
+  -rw-r--r--   1 richiethomas  staff     97 Jan 21 13:03 .gitignore
+  -rw-r--r--   1 richiethomas  staff     35 Jan 21 13:03 .vimrc
+  -rw-r--r--   1 richiethomas  staff   3390 Jan 21 13:03 CODE_OF_CONDUCT.md
+  -rw-r--r--   1 richiethomas  staff   1058 Jan 21 13:03 LICENSE
+  -rw-r--r--   1 richiethomas  staff  18411 Feb  9 12:02 README.md
+  drwxr-xr-x   3 richiethomas  staff     96 Jan 21 13:03 bin
+  drwxr-xr-x   4 richiethomas  staff    128 Feb  9 12:02 completions
+  drwxr-xr-x  27 richiethomas  staff    864 Feb  9 12:02 libexec
+  drwxr-xr-x   3 richiethomas  staff     96 Jan 21 13:03 rbenv.d
+  drwxr-xr-x  46 richiethomas  staff   1472 Feb  9 12:33 shims
+  drwxr-xr-x   7 richiethomas  staff    224 Feb  9 12:02 src
+  drwxr-xr-x  28 richiethomas  staff    896 Feb  9 12:02 test
+  -rw-r--r--   1 richiethomas  staff      6 Jan 20 12:08 version
+  drwxr-xr-x   8 richiethomas  staff    256 Feb  6 18:54 versions
+$ </code></pre>
+
+<p>When I look inside each of these directories, I see that <code>libexec/</code> has the most files in it. While this doesn't necessarily mean that it's the most important directory, it does indicate that a lot of development has taken place in that directory.</p>
+
+<p>It also means that, if we were to finish reading through all the files in that directory, we will have taken a big step toward understanding the codebase as a whole.</p>
+
+<p>Additionally, <a href="https://gist.github.com/richiethomas/272b7719f3c75abf6818a8211552004e#file-bundle-L21" target="_blank">the last line in the shim file</a> we just examined was the <code>libexec/rbenv</code> file, located inside the <code>/Users/richiethomas/.rbenv/</code> directory:</p>
+
+<pre><code>exec "/Users/richiethomas/.rbenv/libexec/rbenv" exec "$program" "$@"</code></pre>
+
+<p>Since the <code>libexec/rbenv</code> command is the file that our shim file executes, that would be a logical next step in our analysis. Coincidentally, this is also the first file in the <code>libexec/</code> directory, so it's already the file we'd start with if we were to work our way through the files in that directory.</p>
+
+<p>For all of these reasons, let's start there.</p>
