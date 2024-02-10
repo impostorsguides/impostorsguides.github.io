@@ -12,7 +12,7 @@ Any developer who aspires to level up, but who feels like working on mission-cri
 
 These posts represent my best understanding of the domain at the time I wrote them.  That said, I'm a journeyman engineer myself, and I guarantee you there are errors within these posts.  This project started out as an attempt to level myself up by "teaching what I've learned", and that will continue to be the case going forward.
 
-"The Impostor's Guides" is a one-person operation, but its quality will go up by orders of magnitude if other people contribute.  If you spot an error and want to help fix it, feel free to reach out by email at `impostorsguides [at] gmail`.
+If you spot an error and want to help fix it, feel free to reach out by email at `impostorsguides [at] gmail`.
 
 ## Why the focus on Ruby and Rubyists?
 
