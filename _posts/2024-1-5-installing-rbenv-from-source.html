@@ -1,7 +1,7 @@
 ---
 layout: post
 permalink: /blog/installing-rbenv-from-source/
-title: Installing (or re-installing) RBENV
+title: Installing Libraries (Like RBENV) From Source
 excerpt_separator: <!--more-->
 createdAt: 5 Jan, 2024
 ---
@@ -12,11 +12,14 @@ createdAt: 5 Jan, 2024
   </figure>
 </div>
 
-<p>If you want to follow along with some of the RBENV-specific experiments I describe on this site, the first step is to install RBENV on your machine.</p>
-
-<p><strong>Even if you've already installed RBENV</strong>, you'll want to read this post, since there's a good chance you'll need to re-install RBENV from source (as opposed to via Homebrew or similar).</p>
+<p>In my walk-through of the RBENV codebase, we do a lot of experiments which involve modifying the code and then running it.  The goal is sometimes to break the code intentionally for educational purposes, and other times just to log what's happening as it happens.</p>
+  
+<p>If you'd like to follow along with those, the first step is to install RBENV on your machine.</p>
 
 <!--more-->
+
+<p><strong>Even if you've already installed RBENV</strong>, you'll want to read this post, since there's a good chance you previously installed it using Homebrew or another package manager, and that won't work for our purposes.  When installed via Homebrew, we don't have access to RBENV's git repository, and we'll need that in order to roll back to a common version.</p>
+
 <p>If you'd rather not do this, you can still follow along with the RBENV code via <a href="https://github.com/rbenv/rbenv/tree/c4395e58201966d9f90c12bd6b7342e389e7a4cb" target="_blank">its Github repo</a>, or by cloning said repo to your machine.  You'll still be able to perform any experiment we do in this guide which isn't RBENV-specific.</p>
 
 <p>I'm writing this tutorial on a Macbook running macOS, and I'll be using macOS-specific installation instructions and commands throughout.</p>
