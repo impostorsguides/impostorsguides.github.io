@@ -1,0 +1,99 @@
+<header class="post-header">
+  <h1 class="post-title">The <code>rbenv</code> Test Harness</h1>
+</header>
+
+<p>Before reading the code for each command, we'll start by looking at the command's test file. In the spirit of <a href="https://web.archive.org/web/20230321145910/https://subscription.packtpub.com/book/application-development/9781788836111/1/ch01lvl1sec13/executable-documentation" target="_blank">"tests as executable documentation"</a>, reading the tests first should give us a sense of what the expected behavior is. The test file for the <code>rbenv</code> command is located <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats" target="_blank">here</a>.</p>
+
+<h2>The Bats Test Framework</h2>
+
+<p>The first line of code is:</p>
+
+<pre><code>#!/usr/bin/env bats</code></pre>
+
+<p>This is a shebang, which we've seen before. But importantly, it's not a Bash shebang. Instead, it's a Bats shebang.  <a href="https://github.com/sstephenson/bats" target="_blank">Bats is a test-runner program</a> written by <a href="https://github.com/sstephenson" target="_blank">Sam Stephenson, the original author of RBENV</a>.  It's used here as RBENV's test framework. But it's not RBENV-specific. In theory, you could use it to test any shell script.</p>
+
+<p>The Bats repo is archived, meaning there won't be further updates to it, but I still want to see if the code works and can be used to run tests in the RBENV repo. I'd be surprised if it didn't, since RBENV is still maintained and therefore still needs a way to run its own tests.</p>
+
+<h2>Installing Bats</h2>
+
+<p>To run these tests, we'll need to install Bats first. There are installation instructions on <a href="https://github.com/sstephenson/bats#installing-bats-from-source" target="_blank">the Github repo's README file</a>, but I also discovered that there is <a href="https://formulae.brew.sh/formula/bats" target="_blank">a Homebrew package for Bats</a>, so I used that:</p>
+
+<pre><code>$ brew install bats
+Running `brew update --auto-update`...
+...
+==> Installing bats-core
+==> Pouring bats-core--1.10.0.all.bottle.tar.gz
+🍺  /opt/homebrew/Cellar/bats-core/1.10.0: 26 files, 154.0KB
+==> Running `brew cleanup bats-core`...
+...</code></pre>
+
+<p>You'll know the installation was successful if you can run <code>which bats</code> and a file path appears, like this:</p>
+
+<pre><code>$ which bats
+/usr/local/bin/bats</code></pre>
+
+<p>If you followed the "Installing Bats from source" instructions on the Github repo page, your file path may look different from mine.</p>
+
+<h2>Experiment: running the Bats tests</h2>
+
+<p>Once that's done, we can navigate to the home directory of our cloned RBENV codebase, and run the following:</p>
+
+<pre><code>$ cd ~/.rbenv
+$ bats test/rbenv.bats
+rbenv.bats
+  ✓ blank invocation
+  ✓ invalid command
+  ✓ default RBENV_ROOT
+  ✓ inherited RBENV_ROOT
+  ✓ default RBENV_DIR
+  ✓ inherited RBENV_DIR
+  ✓ invalid RBENV_DIR
+  ✓ adds its own libexec to PATH
+  ✓ adds plugin bin dirs to PATH
+  ✓ RBENV_HOOK_PATH preserves value from environment
+  ✓ RBENV_HOOK_PATH includes rbenv built-in plugins
+
+11 tests, 0 failures
+  
+$ </code></pre>
+
+<p>They all pass, as we'd expect since we haven't (yet) done anything which breaks the code.</p>
+
+<p>So now that these specs are running, what do they actually do? Reading the tests for a piece of code you're studying is often a great source of documentation. And the Bats repo has <a href="https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/README.md#writing-tests" target="_blank">helpful documentation</a> on the commands it offers and the API it exposes.</p>
+
+<h2>Loading the tests' helper code</h2>
+
+<p>Returning to reading the test file, let's look at the next line of code:</p>
+
+<pre><code>load test_helper</code></pre>
+
+<p>This "load" function is defined in <a href="https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test#L32" target="_blank">this block of code</a> in the Bats repo.</p>
+
+<p>Examining this function's internals is beyond the scope of this guide (although it would make a great exercise for the reader). For now, let's just say that the <code>load</code> function does what it says on the tin- it loads a given file into memory, so that its contents are available to the test suite we're running.</p>
+
+<p>In this line of code, we're loading a helper file called <code>test_helper</code>, which lives <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash" target="_blank">here</a>. Loading <code>test_helper</code> does lots of things for us that help our tests run, such as:</p>
+
+<ul>
+  <li><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L22" target="_blank">Updating the value of <code>$PATH</code></a> to include the RBENV commands that we want to test.</li>
+  <li>"export"ing the <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L18" target="_blank">environment variables</a> that we'll need for those commands to run, such as <code>$RBENV_ROOT</code>, <code>$RBENV_HOOK_PATH</code>, <code>$HOME</code>, and <code>$RBENV_TEST_DIR</code>.</li>
+  <li>Giving us access to helper functions that let us run those commands and assert that the results succeeded or failed. For example:</li>
+  <ul>
+    <li><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L33" target="_blank"><code>teardown()</code></a>- cleans up the effects of our tests.</li>
+    <li><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L37" target="_blank"><code>flunk()</code></a>- causes the test to exit with a non-zero exit code (i.e. the test fails), along with printing an error message.</li>
+    <li><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L45" target="_blank"><code>assert_success()</code></a>- checks that the last command completed successfully, and (optionally) that the expected output of the command matched the actual output.</li>
+    <li><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L53" target="_blank"><code>assert_failure()</code></a>- the opposite of <code>assert_success()</code>. Checks that the last command did not complete successfully. This is useful in testing what happens when a command is used improperly.</li>
+    <li><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L61" target="_blank"><code>assert_equal()</code></a>- checks that two values match.</li>
+    <li><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L69" target="_blank"><code>assert_output()</code></a>- checks that the output of the most-recently-run command matches our expectations.</li>
+    <li><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L77" target="_blank"><code>assert_line()</code></a>- checks that a given line of expected output was contained somewhere in the actual output. You can optionally pass a specific line number at which you expect the output to contain your string.</li>
+    <li><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L89" target="_blank"><code>refute_line()</code></a>- There are two ways to use this function:</li>
+    <ul>
+      <li>You pass it a string, to check that string is not present in the most recent output. Ex.- <code>refute_line 'I hope this line is not present in the output'</code></li>
+      <li>You pass an integer, to check that the number of lines in the output was less than that number. Ex.- <code>refute_line 5</code>.</li>
+    </ul>
+    <li><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L105" target="_blank"><code>assert()</code></a>- Checks that the condition you pass is truthy. For example, <code>assert [ 5 -lt 6 ]</code>.</li>
+    <li><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L113" target="_blank"><code>path_without()</code></a>- Removes a given command from <code>$PATH</code>.</li>
+    <li><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L134" target="_blank"><code>create_hook()</code></a>- creates a fake hook that RBENV will subsequently register.  We'll talk about what hooks are later.</li>
+  </ul>
+</ul>
+
+<p>Now that we know which functions are available to us when writing tests, in the next section we'll start reading the tests themselves.</p>
