@@ -13,21 +13,21 @@ createdAt: 4 Feb, 2024
   </figure>
 </div>
 
-<p>The times when my impostor syndrome is most diminished are the times when I know my set of tools inside and out.  By "tools", I mean languages, frameworks, databases, and any other component of the tech stack in front of me.  If I can predict how they'll behave in a given situation, teach how they work to others, and use them in new and novel ways, then my inner critic usually keeps quiet.</p>
-
-<p>So it stands to reason that the more of my team's tools I understand, the more confident a developer I'll be.</p>
+<p>The times when my impostor syndrome is most diminished are the times when I know my set of tools inside and out.</p>
+  
+<p>By "tools", I mean languages, frameworks, databases, and any other component of the tech stack in front of me.  If I can predict how they'll behave in a given situation, teach how they work to others, and use them in new and novel ways, then my inner critic usually keeps quiet.  So it stands to reason that the more of my team's tools I understand, the more confident a developer I'll be.</p>
 
 <!--more-->
 
-<p>That's the whole premise of <a href="/shell/" target="_blank">the walk-through I wrote of the RBENV codebase</a>.  I picked RBENV for the simple reason that it's the source of the first file I encountered when I asked myself one day, out of the blue, "What happens when I type <code>bundle install</code> in the terminal and hit Enter?"  At the time I was using RBENV as my version manager for Ruby.  RBENV uses shims of the various commands installed by the user, and in my case, this was one of them.</p>
+<p>That's the whole premise of <a href="/shell/" target="_blank">the walk-through I wrote of the RBENV codebase</a>.  One day, I found myself asking "What happens when I type <code>bundle install</code> in the terminal and hit Enter?"  When I tried to answer that question, the first file I encountered was from RBENV.  That's because, in order to manage your Ruby version, RBENV uses <a href="/blog/what-is-a-shim/" target="_blank">shim files</a> for the various commands installed by the user.  The file I first encountered was the shim file for the <code>bundle</code> command.</p>
 
 <h2>Why I Picked RBENV</h2>
 
-<p>Frankly, because it was short enough to seem like a manageable task, and long enough that I thought I'd get a lot of learning out of it.  Really not much more complicated than that.</p>
+<p>In addition to the fact that RBENV was the source of the first file I encountered, I also picked this codebase because it was short enough to seem like a manageable task, and long enough that I thought I'd get a lot of learning out of it.</p>
 
 <p>I could have just as easily picked the Bundle codebase, or Rails, or even Ruby itself.  Any of those would have been a perfectly fine choice, and I'll probably move on to one of those next.  I even considered punting on RBENV and moving on to Ruby itself, since its internals are more broadly-applicable to my day job than shell scripting is.</p>
   
-<p>In the end, I stuck with RBENV out of a combination of stubbornness and curiosity about how the shell worked.  I don't regret my choice, since now the output of my work (my writings) are more broadly-useful to people than if I had kept my writing Ruby-specific.</p>
+<p>In the end, I stuck with RBENV out of a combination of stubbornness and curiosity about how the shell works.  I don't regret my choice, since now I have a series of posts which are useful beyond just the Ruby community.</p>
 
 <h2>Why I Read The Entire Codebase</h2>
 
@@ -35,7 +35,7 @@ createdAt: 4 Feb, 2024
 
 <p>Then, as I learned more and more about the codebase, it became a matter of finishing what I started.  Yes I'm a bit of a completist, at least with personal projects like this.  It means more to me if I can say I read the entire codebase, vs. if I can say I read "most" of it.</p>
 
-<p>There were some parts that I spent more time on than others, of course.  For example, I actually skipped reading and writing about <code>src/shobj-conf</code> line-by-line.  It's almost 600 lines of code long, and it wasn't written by the RBENV core team's authors, but by another developer named Chet Ramey.  It was included in RBENV as a dependency, and according to comments at the top of the file, its job is to:</p>
+<p>There were some parts that I spent more time on than others, of course.  And some files I skipped entirely.  For example, there's a file in the <code>src/</code> directory named <code>shobj-conf</code> (no file extension).  According to comments at the top of the file, its job is to:</p>
 
 <blockquote>
 ...output a series of variable assignments to be substituted
@@ -44,17 +44,21 @@ information for creating shared objects that may be loaded
 into bash...
 </blockquote>
 
+<p>It's almost 600 lines of code long, which isn't <i>by itself</i> a problem.  But its purpose is not related to any core part of what RBENV is about.  Instead, its purpose is limited to helping optimize the performance of the <code>realpath</code> command, which helps RBENV identify the canonical location of a command in the filesystem.  RBENV would function just fine, although maybe a bit slower, using the original implementation of <code>realpath</code>.</p>
+
+<p>Furthermore, this particular file wasn't even written by the core RBENV team.  Instead, it's a dependency which was included in the project, and its logic consists of simply declaring certain environment variables, one-by-one, whose values depend on the system architecture of the computer on which it is executed.</p>
+
 <p>For these reasons, covering this file as part of my project seemed like a lot of work for relatively little reward.  Anything I'd learn from it would be unrelated to my main goal of learning about RBENV.  So I skipped it.</p>
 
 <h2>Why I Write About What I Learn</h2>
 
-<p>To make sure I understand it.  If I can't clearly explain what something does to someone else, it's a sign I don't understand it well enough.</p>
+<p>If I can't clearly explain what something does to someone else, it's a sign I don't understand it well enough.  So the purpose of writing about the code is to make sure I understand it.</p>
 
-<p>Also, because it frequently results in me learning more than I would have.  The act of writing forces me to examine my own thought process, which has the effect of prompting questions which I wouldn't have thought of via reading alone.  This takes me down a rabbit hole which usually results in a more in-depth understanding.</p>
+<p>Also, technical blogging frequently results in me learning more than I would have.  I call this "the StackOverflow Effect", because when I'm writing out a question on StackOverflow, I frequently am able to come up with an answer before I hit the "Post" button.</p>
 
-<p>Also, to get better at technical writing, as well as writing in general.  Without publishing this stuff, I won't get feedback from other people, and that kind of criticism is a key part of becoming more anti-fragile.</p>
+<p>The act of writing forces me to examine my own thought process, which has the effect of prompting questions which I wouldn't have thought of via reading alone.  This takes me down a rabbit hole which usually results in a more in-depth understanding.</p>
 
-<p>Last but not least- in case it's helpful to someone else!  I believe that reading and writing about an open-source codebase is a great way to overcome impostor syndrome.  Again, this is doubly true if the codebase you pick is one that you (or your team) use everyday, since it'll make you a more effective team member.  But picking any codebase which is maintained by someone who knows something you don't will make you a better developer.</p>
+<p>Last but not least- in case it's helpful to someone else!  I believe that reading and writing about an open-source codebase is a great way to overcome impostor syndrome.  Again, this is doubly true if the codebase you pick is one that your team uses everyday, since it'll make you a more effective team member.  But picking any codebase which is maintained by someone who knows something we don't makes us better developers.</p>
 
 
 <div id="photo-attribution">
