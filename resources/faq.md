@@ -16,9 +16,9 @@ If you spot an error and want to help fix it, feel free to reach out by email at
 
 ## Why the focus on Ruby and Rubyists?
 
-I mostly work with Ruby in my day job.  I got my start in Ruby, at a bootcamp (RIP Dev Bootcamp <3).  I love the Ruby community and its MINASWAN ethos.
+I mostly work with Ruby in my day job.  I got my start in Ruby, at a bootcamp.  I love the Ruby community and want to give back to it.
 
-## What prior knowledge do you need to follow this?
+## What prior knowledge do you need to follow these posts?
 
  - You need to know how to use `git`.  If you don't yet know this crucial tool, a good free resource is [the "Pro Git" book](https://git-scm.com/book/en/v2){:target="_blank" rel="noopener"}, a free, comprehensive book available entirely online.
  - You need very basic knowledge of how to navigate in a terminal.  You should be familiar with `cd`, `ls`, `pwd`, and similarly elementary commands.
