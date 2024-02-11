@@ -1,0 +1,121 @@
+<header class="post-header">
+  <h1 class="post-title">Our First Bats Test</h1>
+</header>
+
+<p>The next block of code is also <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats#L5-L9" target="_blank">our first test</a>:</p>
+
+<pre><code>@test "blank invocation" {
+  run rbenv
+  assert_failure
+  assert_line 0 "$(rbenv---version)"
+}</code></pre>
+
+<p>Here we're verifying that an attempt to run the <code>rbenv</code> command without any arguments will fail. The steps in this test are:</p>
+
+<ul>
+  <li>We use <a href="https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test#L50" target="_blank">the Bats <code>run</code> command</a> to execute the "rbenv" command without any arguments or flags.</li>
+  <ul>
+    <li><code>run</code> populates certain variables which are needed to make assertions in the test, such as the <code>output</code>, <code>status</code>, and <code>lines</code> variables.</li>
+    <li>The helper functions we mentioned earlier (such as <code>assert_failure()</code>, which is used in this test) use these variables to determine whether to pass or fail a given test.</li>
+  </ul>
+  <li>Here, <code>assert_failure</code> checks to make sure the last command which was run (i.e. coderun rbenv) had a non-zero exit code.</li>
+  <li>If the command failed, the test passes. If command succeeded, the test fails.</li>
+</ul>
+
+<h2>Annotations</h2>
+
+<p>The <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats#L5" target="_blank">very first line in the test</a> is:</p>
+
+<pre><code>@test "blank invocation" {</code></pre>
+
+<p>Observant readers will notice the <code>@test</code> syntax. I'm not sure whether there's an official name for this syntax, but I would call it an "annotation", because <a href="https://web.archive.org/web/20230309020001/https://en.wikipedia.org/wiki/Java_annotation" target="_blank">similar syntax exists</a> in the Java community, and they also refer to these as annotations.</p>
+
+<p>In Bats, annotations are used as metadata, and they help identify which code represents tests that should be run. If we search the Bats codebase for the string <code>@test</code> and look through the results, eventually we find <a href="https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-preprocess#L34" target="_blank">this line of code</a>:</p>
+
+<pre><code>pattern='^ *@test  *([^ ].*)  *\{ *(.*)$'</code></pre>
+
+<p>This is a regular expression (or a regex for short). If you aren't familiar with regexes, they're a very powerful tool for finding and parsing strings. See <a href="https://web.archive.org/web/20221024181745/https://linuxtechlab.com/bash-scripting-learn-use-regex-basics/" target="_blank">here</a> for a basic tutorial on Bash regexes.</p>
+
+<p>This isn't a walk-through of the Bats codebase so I want to keep this part short.  Essentially what's happening here is we're providing a pattern for Bash to use when searching for lines of code.  Bash will read each line of code in a test file (for example, "test/rbenv.bats") and see if it matches the pattern <code>@test</code>. If it does, we know we've found a test, and we'll run the code we find.</p>
+
+<h2>Happy- vs. sad-path tests</h2>
+
+<p>This kind of test is known in some circles as a "sad-path test". When building our testing harness, we not only want to test what happens when things go right (i.e. the "happy-path"), but also what happens when things go wrong. This gives us confidence that our code will work the way we want in all scenarios, not just the expected scenarios.</p>
+
+<p>We can also test edge cases which are neither happy paths nor sad paths. These are called "alternate paths", and they represent uses of a command which aren't exactly the primary use case, but aren't exactly failures either.</p>
+
+<p>This test implies that running the <code>rbenv</code> command by itself, with no arguments, is considered "sad-path". The <code>rbenv</code> command needs you to pass it the name of a sub-command, before it can do anything.</p>
+
+<p>For example, if you give it the <code>versions</code> sub-command by running <code>rbenv versions</code>, RBENV knows that you want to see a list of all the Ruby versions which are installed on your system. But by itself, the <code>rbenv</code> command does nothing, and attempting to run it by itself would be considered a user error.</p>
+
+<p>There is also a 2nd assertion below the first one:</p>
+
+<pre><code>assert_line 0 "$(rbenv---version)"</code></pre>
+
+<p>This assertion states that the first line of the printed output should be equal to the output of the <code>rbenv --version</code> command (the indexing here is 0-based). So when the user runs <code>rbenv</code> without any arguments, the first line of printed output they should see is the version number for their RBENV installation.</p>
+
+<p>If you try this on your machine, it should work as expected:</p>
+
+<pre><code>$ rbenv
+  rbenv 1.2.0-16-gc4395e5
+  Usage: rbenv command [args]
+  
+  Some useful rbenv commands are:
+     commands    List all available rbenv commands
+     local       Set or show the local application-specific Ruby version
+     global      Set or show the global Ruby version
+     shell       Set or show the shell-specific Ruby version
+     install     Install a Ruby version using ruby-build
+     uninstall   Uninstall a specific Ruby version
+     rehash      Rehash rbenv shims (run this after installing executables)
+     version     Show the current Ruby version and its origin
+     versions    List installed Ruby versions
+     which       Display the full path to an executable
+     whence      List all Ruby versions that contain the given executable
+  
+  See `rbenv help <command>' for information on a specific command.
+  For full documentation, see: https://github.com/rbenv/rbenv#readme
+$ </code></pre>
+
+<p>Here we can see that the first line of printed output is <code>rbenv 1.2.0-16-gc4395e5</code>.  The version number might be different on your machine, but it should at least somewhat resemble the above.</p>
+
+<h2>Command Substitution</h2>
+
+<p>The <code>$( ... )</code> syntax in our 2nd assertion above (i.e. a dollar sign and a set of parentheses enclosing some code) is known as command substitution.  It will come up a lot in our walk-through of the RBENV codebase. It's similar to parameter expansion, in that it resolves to whatever is inside the left and right delimiters (here, parentheses instead of curly braces).</p>
+
+<p>However, instead of outputting a variable along with some optional modifiers (as with parameter expansion), it outputs the result of running the command inside the parens. Let's try it for ourselves.</p>
+
+<h2>Experiment: command substitution</h2>
+
+<p>Directly in my terminal, I run the following:</p>
+
+<pre><code>$ current_dir="$(pwd)"
+
+$ echo "$current_dir" 
+/Users/richiethomas
+
+$ current_dir_contents="$( ls "$current_dir" )"
+
+$ echo "$current_dir_contents"
+Applications
+Desktop
+Documents
+Downloads
+Library
+Movies
+Music
+Pictures
+Public
+$ </code></pre>
+
+<p>Here we create two shell variables:</p>
+
+<ul>
+  <li>one named <code>current_dir</code>, containing the output of the <code>pwd</code> command.</li>
+  <li>the other named <code>current_dir_contents</code>, containing the contents of the directory whose name is stored in the <code>current_dir</code> variable (a.k.a. some directories I have in my <code>~/</code> directory).</li>
+</ul>
+
+<p>When we print <code>current_dir_contents</code>, we see the results we'd expect if we simply ran <code>ls $current_dir</code> in our terminal.</p>
+
+<p>Now that we've finished reading our first Bats test, let's write one of our own.</p>
+
