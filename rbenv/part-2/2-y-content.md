@@ -45,7 +45,7 @@ setup() {
 }
 ```
 
-Here we just make and navigate into our test directory.  This `setup` function is called by the BATS test runner, in [this file](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test){:target="_blank" rel="noopener"}.
+Here we just make and navigate into our test directory.  This `setup` function is called by the Bats test runner, in [this file](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test){:target="_blank" rel="noopener"}.
 
 ### When the user hasn't yet picked a Ruby version
 

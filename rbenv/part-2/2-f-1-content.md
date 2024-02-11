@@ -45,7 +45,7 @@ Next test:
 
 ```
 @test "setup shell completions" {
-  root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
+  root="$(cd $Bats_TEST_DIRNAME/.. && pwd)"
   run rbenv-init - bash
   assert_success
   assert_line "source '${root}/test/../libexec/../completions/rbenv.bash'"
@@ -154,7 +154,7 @@ Next test:
 
 ```
 @test "skip shell completions (fish)" {
-  root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
+  root="$(cd $Bats_TEST_DIRNAME/.. && pwd)"
   run rbenv-init - fish
   assert_success
   local line="$(grep '^source' <<<"$output")"
@@ -243,7 +243,7 @@ Next test:
 
 ```
 @test "adds shims to PATH" {
-  export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
+  export PATH="${Bats_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
   run rbenv-init - bash
   assert_success
   assert_line 0 'export PATH="'${RBENV_ROOT}'/shims:${PATH}"'
@@ -263,7 +263,7 @@ Next test:
 
 ```
 @test "adds shims to PATH (fish)" {
-  export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
+  export PATH="${Bats_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
   run rbenv-init - fish
   assert_success
   assert_line 0 "set -gx PATH '${RBENV_ROOT}/shims' \$PATH"

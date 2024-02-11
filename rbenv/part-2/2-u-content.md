@@ -25,7 +25,7 @@ run rbenv echo "RBENV_HOOK_PATH"
 Here, when we run `rbenv echo` **without** the `-F:` flag, we can see that we expect the result to be an unseparated list of paths:
 
 ```
-assert_success "${RBENV_ROOT}/rbenv.d:${BATS_TEST_DIRNAME%/*}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
+assert_success "${RBENV_ROOT}/rbenv.d:${Bats_TEST_DIRNAME%/*}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
 ```
 
 And [here's](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats#L57){:target="_blank" rel="noopener"} and example of using the command with the `-F` flag:
@@ -37,7 +37,7 @@ run rbenv echo -F: "PATH"
 In this test, we **do** pass the `-F:` flag, and we expect the output to be a **separated** list of paths:
 
 ```
-assert_line 0 "${BATS_TEST_DIRNAME%/*}/libexec"
+assert_line 0 "${Bats_TEST_DIRNAME%/*}/libexec"
 assert_line 1 "${RBENV_ROOT}/plugins/ruby-build/bin"
 assert_line 2 "${RBENV_ROOT}/plugins/rbenv-each/bin"
 ```
@@ -302,7 +302,7 @@ run rbenv echo "RBENV_HOOK_PATH"
 ...prints the following result:
 
 ```
-"${RBENV_ROOT}/rbenv.d:${BATS_TEST_DIRNAME%/*}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
+"${RBENV_ROOT}/rbenv.d:${Bats_TEST_DIRNAME%/*}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
 ```
 
 In other words, we print the un-separated value of `RBENV_HOOK_PATH`, i.e. a sequence of directories which are joined together with the `:` character.

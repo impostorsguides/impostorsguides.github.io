@@ -129,20 +129,20 @@ Next test:
 
 ```
 @test "prefix for system in /" {
-  mkdir -p "${BATS_TEST_DIRNAME}/libexec"
-  cat >"${BATS_TEST_DIRNAME}/libexec/rbenv-which" <<OUT
+  mkdir -p "${Bats_TEST_DIRNAME}/libexec"
+  cat >"${Bats_TEST_DIRNAME}/libexec/rbenv-which" <<OUT
 #!/bin/sh
 echo /bin/ruby
 OUT
-  chmod +x "${BATS_TEST_DIRNAME}/libexec/rbenv-which"
+  chmod +x "${Bats_TEST_DIRNAME}/libexec/rbenv-which"
   RBENV_VERSION="system" run rbenv-prefix
   assert_success "/"
-  rm -f "${BATS_TEST_DIRNAME}/libexec/rbenv-which"
+  rm -f "${Bats_TEST_DIRNAME}/libexec/rbenv-which"
 }
 ```
 
 Here, the setup includes:
- - making a sub-directory within the `BATS_TEST_DIRNAME` directory,
+ - making a sub-directory within the `Bats_TEST_DIRNAME` directory,
  - adding a command within that sub-directory named `rbenv-which` (this is a stubbed-out version of a real RBENV command by the same name),
  - setting its contents equal to a shell script with a single command (`echo /bin/ruby`), and
  - updating the new command's permissions so that it's executable.

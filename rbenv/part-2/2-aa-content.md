@@ -174,7 +174,7 @@ Next test:
 }
 ```
 
-- This test removes the `ruby` executable from `$PATH`, via [the `path_without ruby` command](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L113){:target="_blank" rel="noopener"} from BATS.
+- This test removes the `ruby` executable from `$PATH`, via [the `path_without ruby` command](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L113){:target="_blank" rel="noopener"} from Bats.
 - It then runs the `versions` command.
 - It asserts that:
     - the command fails because there's no Ruby version installed (not even "system" Ruby), and that

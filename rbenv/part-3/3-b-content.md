@@ -204,7 +204,7 @@ So in our case, we're running version 2 of [`actions/checkout`](https://github.c
 
 The `actions/checkout` docs mention that the `$GITHUB_WORKSPACE` environment variable is used to tell the action which codebase to check out.  This environment variable doesn't appear in the RBENV codebase itself, so presumably it's set in the repo's settings UI, and fetched by Github when the action begins to execute.
 
-### Installing BATS so we can run our tests
+### Installing Bats so we can run our tests
 
 ```
 - name: Install bats
@@ -223,7 +223,7 @@ The command that we're running is:
 git clone --depth 1 https://github.com/sstephenson/bats.git
 ```
 
-We're pulling down the code for the BATS test runner, which we encountered extensively while looking at the test files for the various RBENV commands.  The `--depth 1` argument creates a shallow clone of the repo, with history truncated to the specified number of commits (in this case, 1 commit).  This is probably for performance reasons, since we don't care about the git history for the purposes of running the tests in CI.
+We're pulling down the code for the Bats test runner, which we encountered extensively while looking at the test files for the various RBENV commands.  The `--depth 1` argument creates a shallow clone of the repo, with history truncated to the specified number of commits (in this case, 1 commit).  This is probably for performance reasons, since we don't care about the git history for the purposes of running the tests in CI.
 
 ### Actually running the tests
 

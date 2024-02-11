@@ -109,7 +109,7 @@ When I run this spec file with `bats test/hooks.bats`, I see `testlog` has been 
 </center>
 
 There's a bunch of junk at the start of the filepath, but we see it ends with `/exec/hello.bash`.
-So not only were we right about what the newly-created directory and file look like, but we now have a dependable way to log stuff from our BATS tests.  Cool!
+So not only were we right about what the newly-created directory and file look like, but we now have a dependable way to log stuff from our Bats tests.  Cool!
 
 Before moving on, I remove the tracer methods I just added.
 
@@ -510,7 +510,7 @@ So if `${hook_paths[@]}` doesn't match any actual directories, or `$path/$RBENV_
 
 What are the two blocks doing?  For each path in our `hook_paths` variable, and for each Bash script in that path, we call our `realpath` function.  As an argument to `realpath`, we pass the name of that Bash script.  This has the effect of resolving any symlinks and deriving the canonical filepath for that hook script.
 
-Note that we're iterating over each *bash* script.  We don't include any `.sh` script (or any other file extension, for that matter).  This is why the `invalid.sh` script in the earlier test really was invalid, and was therefore not included in the output of the BATS test we examined earlier.  It's also why `bright.sh` was included in a different test- it was being pointed to by a symlink file which *did* contain a `.bash` file extension.
+Note that we're iterating over each *bash* script.  We don't include any `.sh` script (or any other file extension, for that matter).  This is why the `invalid.sh` script in the earlier test really was invalid, and was therefore not included in the output of the Bats test we examined earlier.  It's also why `bright.sh` was included in a different test- it was being pointed to by a symlink file which *did* contain a `.bash` file extension.
 
 And that's it for the `rbenv hooks` command!
 

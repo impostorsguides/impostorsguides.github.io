@@ -22,7 +22,7 @@ Alternately, there are other Ruby version managers out there which are also quit
 
 ## The `bats` codebase
 
-Tests are the thing that give us confidence in our code, so we can only be as confident in our code as we are in our tests.  But we hardly looked at the `bats` code at all, and the few lines of code that we *did* look at, we kind of glossed over (because this was meant to be a guide on RBENV, not on BATS).  By understanding our testing framework better, we could have more confidence in our tests, and therefore more confidence in our code.
+Tests are the thing that give us confidence in our code, so we can only be as confident in our code as we are in our tests.  But we hardly looked at the `bats` code at all, and the few lines of code that we *did* look at, we kind of glossed over (because this was meant to be a guide on RBENV, not on Bats).  By understanding our testing framework better, we could have more confidence in our tests, and therefore more confidence in our code.
 
 ## Ruby's codebase
 

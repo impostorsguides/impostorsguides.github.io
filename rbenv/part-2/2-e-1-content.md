@@ -1,6 +1,6 @@
 Before reading the code for each command, we'll start by looking at the command's tests.  In the spirit of ["tests as executable documentation"](https://web.archive.org/web/20230321145910/https://subscription.packtpub.com/book/application-development/9781788836111/1/ch01lvl1sec13/executable-documentation){:target="_blank" rel="noopener"}, reading the tests first should give us a sense of what the expected behavior is.  The test file for the `rbenv` command is located [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats){:target="_blank" rel="noopener"}.
 
-## The `BATS` test framework
+## The `Bats` test framework
 
 The first line of code is:
 
@@ -8,13 +8,13 @@ The first line of code is:
 #!/usr/bin/env bats
 ```
 
-This is a shebang, which we've seen before.  But importantly, it's not a Bash shebang.  Instead, it's a `bats` shebang.  [BATS is a test-runner program](https://github.com/sstephenson/bats){:target="_blank" rel="noopener"} that Sam Stephenson (the original author of RBENV) wrote, and it's used here as RBENV's test framework.  But it's not RBENV-specific.  In theory, you could use it to test any shell script.
+This is a shebang, which we've seen before.  But importantly, it's not a Bash shebang.  Instead, it's a `bats` shebang.  [Bats is a test-runner program](https://github.com/sstephenson/bats){:target="_blank" rel="noopener"} that Sam Stephenson (the original author of RBENV) wrote, and it's used here as RBENV's test framework.  But it's not RBENV-specific.  In theory, you could use it to test any shell script.
 
 The `bats` repo is archived, meaning there won't be further updates to it, but I still want to see if the code works and can be used to run tests in the `rbenv` repo.  I'd be surprised if it didn't, since RBENV is still maintained and therefore still needs a way to run its own tests.
 
 ### Installing `bats`
 
-To run these tests, we'll need to install `bats` first.  There are installation instructions [on the Github repo's README file](https://github.com/sstephenson/bats#installing-bats-from-source){:target="_blank" rel="noopener"}, but I also discovered that there is [a Homebrew package for BATS](https://formulae.brew.sh/formula/bats){:target="_blank" rel="noopener"}, so I used that:
+To run these tests, we'll need to install `bats` first.  There are installation instructions [on the Github repo's README file](https://github.com/sstephenson/bats#installing-bats-from-source){:target="_blank" rel="noopener"}, but I also discovered that there is [a Homebrew package for Bats](https://formulae.brew.sh/formula/bats){:target="_blank" rel="noopener"}, so I used that:
 
 ```
 $ brew install bats
@@ -30,7 +30,7 @@ $ which bats
 
 If you followed the "Installing Bats from source" instructions on the Github repo page, your filepath may look different from mine.
 
-### Experiment: running the BATS tests
+### Experiment: running the Bats tests
 
 Once that's done, we can navigate to the home directory of our cloned RBENV codebase, and run the following:
 
@@ -56,7 +56,7 @@ $ bats ./test/rbenv.bats
 
 They all pass, as we'd expect since we haven't (yet) done anything which breaks the code.
 
-So now that these specs are running, what do they actually do?  Reading the tests for a piece of code you're studying is often a great source of documentation.  And the BATS repo has [helpful documentation](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/README.md#writing-tests){:target="_blank" rel="noopener"} on the commands it offers and the API it exposes.
+So now that these specs are running, what do they actually do?  Reading the tests for a piece of code you're studying is often a great source of documentation.  And the Bats repo has [helpful documentation](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/README.md#writing-tests){:target="_blank" rel="noopener"} on the commands it offers and the API it exposes.
 
 ## Loading helper code
 
@@ -103,9 +103,9 @@ The next block of code is also our first test.  It starts with:
 
 The first thing I notice is the `@test` snippet.  I'm not sure what other developers would call this, but I would call it an "annotation", because [similar syntax exists](https://web.archive.org/web/20230309020001/https://en.wikipedia.org/wiki/Java_annotation){:target="_blank" rel="noopener"} in the Java community, and they also refer to these as annotations.
 
-In BATS, annotations are used as metadata, and they help identify which code represents tests that should be run.  If we search the BATS codebase for the string `@test` and look through the results, eventually we find [this line of code](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-preprocess#L34){:target="_blank" rel="noopener"}.  This is a regular expression (or a regex for short).  If you aren't familiar with regexes, they're a very powerful tool for finding and parsing strings.  See [here](https://web.archive.org/web/20221024181745/https://linuxtechlab.com/bash-scripting-learn-use-regex-basics/){:target="_blank" rel="noopener"} for more information.
+In Bats, annotations are used as metadata, and they help identify which code represents tests that should be run.  If we search the Bats codebase for the string `@test` and look through the results, eventually we find [this line of code](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-preprocess#L34){:target="_blank" rel="noopener"}.  This is a regular expression (or a regex for short).  If you aren't familiar with regexes, they're a very powerful tool for finding and parsing strings.  See [here](https://web.archive.org/web/20221024181745/https://linuxtechlab.com/bash-scripting-learn-use-regex-basics/){:target="_blank" rel="noopener"} for more information.
 
-This isn't a walk-through of the BATS codebase so I want to keep this part short, but essentially what's happening here is we're providing a pattern for Bash to use when searching for lines of code.  Bash will read each line of code in a test file (for example, `test/rbenv.bats`) and see if it matches the pattern `@test`.  If it does, we know we've found a test, and we'll run the code we find.
+This isn't a walk-through of the Bats codebase so I want to keep this part short, but essentially what's happening here is we're providing a pattern for Bash to use when searching for lines of code.  Bash will read each line of code in a test file (for example, `test/rbenv.bats`) and see if it matches the pattern `@test`.  If it does, we know we've found a test, and we'll run the code we find.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
@@ -121,7 +121,7 @@ Back to our test block:
 
 Here we're verifying that an attempt to run `rbenv` without any arguments will fail.  The steps in this test are:
 
- - We use the BATS [`run` command](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test#L50){:target="_blank" rel="noopener"} to execute the `rbenv` command without any arguments or flags.
+ - We use the Bats [`run` command](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test#L50){:target="_blank" rel="noopener"} to execute the `rbenv` command without any arguments or flags.
    - `run` populates certain variables like `output`, `status`, and `lines`.
    - The helper functions we mentioned earlier (such as `assert_failure`, which is used in this test) use these variables to determine whether to pass or fail a given test.
  - Here, `assert_failure` checks to make sure the last command which was run (i.e. `run rbenv`) had a non-zero exit code.
@@ -199,9 +199,9 @@ Here we create two shell variables:
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
-Now that we've finished reading our first BATS test, let's write one of our own.
+Now that we've finished reading our first Bats test, let's write one of our own.
 
-### Experiment: writing our own BATS test
+### Experiment: writing our own Bats test
 
 I create a file named `bar.bash`, inside the same `test/` folder as `rbenv.bats`, which defines a shell function named `my_echo`:
 
@@ -241,7 +241,7 @@ $ bats foo.bats
 
 The thing to zero in on here is `assert_success: command not found`.
 
-We're getting this error because we're missing the `assert_success` command.  That's because `assert_success` is a `test-helper` function, not a BATS function.  To access this command, we need to load `test_helper`, just like the regular test files do.
+We're getting this error because we're missing the `assert_success` command.  That's because `assert_success` is a `test-helper` function, not a Bats function.  To access this command, we need to load `test_helper`, just like the regular test files do.
 
 I update the test file to look like the following:
 
@@ -370,7 +370,7 @@ $ bats foo.bats
 2 tests, 0 failures
 ```
 
-Great, that's a (very preliminary) introduction to writing our own BATS test.  We'll see lots more BATS syntax in the subsequent tests.
+Great, that's a (very preliminary) introduction to writing our own Bats test.  We'll see lots more Bats syntax in the subsequent tests.
 
 ### Aside- Test-Driven Development
 
@@ -473,7 +473,7 @@ Next test:
 
 ```
 @test "inherited RBENV_DIR" {
-  dir="${BATS_TMPDIR}/myproject"
+  dir="${Bats_TMPDIR}/myproject"
   mkdir -p "$dir"
   RBENV_DIR="$dir" run rbenv echo RBENV_DIR
   assert_output "$dir"
@@ -482,9 +482,9 @@ Next test:
 
 This test covers the same block of code as the previous test, except this time we're testing [the `else` branch](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L63){:target="_blank" rel="noopener"} instead of [the `if` branch](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L61){:target="_blank" rel="noopener"}:
 
-- We create a variable named `dir` and set it equal to `BATS_TMPDIR` with "/myproject" appended to the end.
-  - The value of the `BATS_TMPDIR` env var is set [here](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test#L305){:target="_blank" rel="noopener"} if it's not already set.
-  - More info on `BATS_TMPDIR` and other BATS-specific environment variables can be found [here](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/README.md#special-variables){:target="_blank" rel="noopener"}.
+- We create a variable named `dir` and set it equal to `Bats_TMPDIR` with "/myproject" appended to the end.
+  - The value of the `Bats_TMPDIR` env var is set [here](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test#L305){:target="_blank" rel="noopener"} if it's not already set.
+  - More info on `Bats_TMPDIR` and other Bats-specific environment variables can be found [here](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/README.md#special-variables){:target="_blank" rel="noopener"}.
 - We then create a directory whose name is the value of our `dir` variable.
   - The `-p` flag ensures that any intermediate directories in between our current one and `/myproject` are also created, if they don't already exist.
 - We set the `RBENV_DIR` env var equal to this directory.
@@ -498,7 +498,7 @@ Next test:
 
 ```
 @test "invalid RBENV_DIR" {
-  dir="${BATS_TMPDIR}/does-not-exist"
+  dir="${Bats_TMPDIR}/does-not-exist"
   assert [ ! -d "$dir" ]
   RBENV_DIR="$dir" run rbenv echo RBENV_DIR
   assert_failure
@@ -521,7 +521,7 @@ Next test:
 ```
 @test "adds its own libexec to PATH" {
   run rbenv echo "PATH"
-  assert_success "${BATS_TEST_DIRNAME%/*}/libexec:$PATH"
+  assert_success "${Bats_TEST_DIRNAME%/*}/libexec:$PATH"
 }
 ```
 
@@ -541,7 +541,7 @@ Next test is:
   mkdir -p "$RBENV_ROOT"/plugins/rbenv-each/bin
   run rbenv echo -F: "PATH"
   assert_success
-  assert_line 0 "${BATS_TEST_DIRNAME%/*}/libexec"
+  assert_line 0 "${Bats_TEST_DIRNAME%/*}/libexec"
   assert_line 1 "${RBENV_ROOT}/plugins/ruby-build/bin"
   assert_line 2 "${RBENV_ROOT}/plugins/rbenv-each/bin"
 }
@@ -602,7 +602,7 @@ $ bats rbenv.bats
     from function `assert_output' in file test_helper.bash, line 74,
     from function `assert_success' in file test_helper.bash, line 49,
     in test file rbenv.bats, line 75)
-     `assert_success "${RBENV_ROOT}/rbenv.d:${BATS_TEST_DIRNAME%/*}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"' failed
+     `assert_success "${RBENV_ROOT}/rbenv.d:${Bats_TEST_DIRNAME%/*}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"' failed
    expected: TEST_DIR/root/rbenv.d:/Users/myusername/Workspace/OpenSource/rbenv/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks
    actual:   /Users/myusername/Workspace/OpenSource/rbenv/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks
 
@@ -619,7 +619,7 @@ Last test:
 @test "RBENV_HOOK_PATH includes rbenv built-in plugins" {
   unset RBENV_HOOK_PATH
   run rbenv echo "RBENV_HOOK_PATH"
-  assert_success "${RBENV_ROOT}/rbenv.d:${BATS_TEST_DIRNAME%/*}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
+  assert_success "${RBENV_ROOT}/rbenv.d:${Bats_TEST_DIRNAME%/*}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
 }
 ```
 
@@ -630,7 +630,7 @@ Here we do the following:
  - assert that it was successful, and
  - assert that the printed output references the following directories, delimited by the `:` character:
     - `${RBENV_ROOT}/rbenv.d`
-    - `${BATS_TEST_DIRNAME%/*}/rbenv.d`
+    - `${Bats_TEST_DIRNAME%/*}/rbenv.d`
     - `/usr/local/etc/rbenv.d`
     - `/etc/rbenv.d`
     - `/usr/lib/rbenv/hooks`
@@ -638,7 +638,7 @@ Here we do the following:
 This test covers the block of code [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81-L91){:target="_blank" rel="noopener"}.  We can see that the order of the above directories matches the order in which they're added to `RBENV_HOOK_PATH` by the code:
 
  - [This line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81){:target="_blank" rel="noopener"} adds `${RBENV_ROOT}/rbenv.d` to the front of `RBENV_HOOK_PATH`.  It would also add any previously-set value of `RBENV_HOOK_PATH` before `${RBENV_ROOT}/rbenv.d` if we had previously set such a value, but we didn't in this test.
- - [This block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L82-L85){:target="_blank" rel="noopener"} adds `${BATS_TEST_DIRNAME%/*}/rbenv.d` to `RBENV_HOOK_PATH`.
+ - [This block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L82-L85){:target="_blank" rel="noopener"} adds `${Bats_TEST_DIRNAME%/*}/rbenv.d` to `RBENV_HOOK_PATH`.
  - Lastly, [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L86){:target="_blank" rel="noopener"} adds `/usr/local/etc/rbenv.d`, `/etc/rbenv.d`, and `/usr/lib/rbenv/hooks` to `RBENV_HOOK_PATH`.
 
 That's all for the `rbenv` command's tests.  Let's move onto the code.

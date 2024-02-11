@@ -61,7 +61,7 @@ setup() {
 }
 ```
 
-This helper function just makes a test directory and `cd`s into it.  We've seen this before- `setup()` is called by the BATS test runner.
+This helper function just makes a test directory and `cd`s into it.  We've seen this before- `setup()` is called by the Bats test runner.
 
 ### Creating a Ruby version file
 
