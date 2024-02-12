@@ -1,0 +1,222 @@
+---
+layout: post
+permalink: /blog/test-driven-development/
+title: How (And Why) To Practice Test-Driven Development
+excerpt_separator: <!--more-->
+createdAt: 12 Feb, 2024
+---
+
+<div>
+  <figure style="width: 100%; margin: 0 0 10px 25px">
+    <img src="/assets/images/driving-school.jpg" style="margin: auto" width="100%" alt="A driving instructor in front of his student driver car.">
+    <figcaption style="text-align: center;">Photo attribution <a href="/blog/test-driven-development/#photo-attribution">here</a>.</figcaption>
+  </figure>
+</div>
+
+<p>Even <a href="https://web.archive.org/web/20240210081018/https://en.wikipedia.org/wiki/Test-driven_development#History" target="_blank">20+ years after</a> it was first (re-)introduced to the programming community, test-driven development is a spicy topic.  Some developers say it saves them time, while others say it's more trouble than it's worth.</p>
+
+<p>I consider myself a TDD fan, although I'd be lying if I said I practice it as strictly as it's meant to be.  Nevertheless, I feel confident in my ability to defend it as a practice, and this post is my attempt to do that.</p>
+
+<p>This post also ties in to my explanation of the RBENV codebase, since we'll be writing our own test using the Bats framework (the same testing framework used by the RBENV codebase).  This will help us better understand the framework, as well as the extent of RBENV's own test harness.  Let's get started.</p>
+
+<!--more-->
+
+<p>If you haven't already installed the Bats test framework, you can do so via Homebrew.  Instructions are <a href="https://formulae.brew.sh/formula/bats-core" target="_blank">here</a>.  To make sure you can run the RBENV tests mentioned below, make sure you have RBENV installed on your machine, and that the directory containing your RBENV installation includes a <code>test/</code> sub-directory.</p>
+
+<h2>Writing A Happy-Path Test</h2>
+
+<p>I create a file named <code>bar.bash</code>, inside the same <code>test/</code> folder as <code>rbenv.bats</code>, which defines a shell function named <code>my_echo()</code>:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+my_echo() {
+  echo "Hi"
+}</code></pre>
+
+<p>Then I create a 2nd file called <code>foo.bats</code>, also in the same directory, with the following content:</p>
+
+<pre><code>#!/usr/bin/env bats
+
+load bar
+
+@test "prints 'Hey yourself!' when it's supposed to" {
+  run my_echo "Hey"
+  assert_success "Hey yourself!"
+}</code></pre>
+
+<p>When I try to run it with the <code>bats</code> command, I get:</p>
+
+<pre><code>~/.rbenv/test (impostorsguides) $ bats foo.bats
+foo.bats
+  ✗ prints 'Hey yourself!' when it's supposed to
+    (in test file foo.bats, line 7)
+      `assert_success "Hey yourself!"' failed with status 127
+    /Users/richiethomas/Desktop/Workspace/scratch/foo.bats: line 7: assert_success: command not found
+
+1 test, 1 failure
+
+~/.rbenv/test (impostorsguides) $ </code></pre>
+
+<p>The thing to focus on here is <code>assert_success: command not found</code>.</p>
+
+<p>We're getting this error because we're missing the <code>assert_success</code> command. That's because <code>assert_success</code> comes from the <code>test-helper.bash</code> file located <a href="https://github.com/rbenv/rbenv/blob/master/test/test_helper.bash" target="_blank">here</a>, not the Bats framework. To access this command, we need to load <code>test_helper</code>, <a href="https://github.com/rbenv/rbenv/blob/master/test/rbenv.bats#L3" target="_blank">just like the regular test files do</a>.</p>
+
+<p>I update the test file to look like the following:</p>
+
+<pre><code>#!/usr/bin/env bats
+
+load test_helper
+load bar
+
+@test "prints 'Hey yourself!' when it's supposed to" {
+  run my_echo "Hey"
+  assert_success "Hey yourself!"
+}</code></pre>
+
+<p>I then run it again:</p>
+
+<pre><code>~/.rbenv/test (impostorsguides) $ bats foo.bats 
+foo.bats
+  ✗ prints 'Hey yourself!' when it's supposed to
+    (from function `assert_equal' in file test_helper.bash, line 65,
+    from function `assert_output' in file test_helper.bash, line 74,
+    from function `assert_success' in file test_helper.bash, line 49,
+    in test file foo.bats, line 8)
+      `assert_success "Hey yourself!"' failed
+    expected: Hey yourself!
+    actual:   Hi
+
+1 test, 1 failure
+
+~/.rbenv/test (impostorsguides) $ </code></pre>
+
+<p>Now we see the error:</p>
+
+<pre><code>expected: Hey yourself!  
+actual:   Hi</code></pre>
+  
+<p>This is the failure we want.</p>
+
+<p>We've run the test, and verified that it fails for the correct reason. This gives us confidence that our test fails when it's supposed to.  This is the "red" stage of the "Red-Green-Refactor" pattern (see below).</p>
+
+<p>We can then write the functionality that we expect to make the test pass, and re-run the test. In our case, that just means updating the <code>my_echo()</code> function inside <code>bar.bash</code> to actually print what it's supposed to:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+my_echo() {
+  echo "Hey yourself!"
+}</code></pre>
+
+<p>When we re-run the test, we get:</p>
+
+<pre><code>~/.rbenv/test (impostorsguides) $ bats foo.bats
+foo.bats
+  ✓ prints 'Hey yourself!' when it's supposed to
+
+1 test, 0 failures
+
+~/.rbenv/test (impostorsguides) $ </code></pre>
+
+<p>That's an example of testing a "happy-path" scenario.</p>
+
+<h2>Writing A Sad-Path Test</h2>
+
+<p>Next, I want to test a "sad-path" scenario. I write a 2nd test in my <code>.bats</code> file to check that it fails when I pass an invalid argument:</p>
+
+
+<pre><code>#!/usr/bin/env bats
+
+load bar
+
+@test "prints 'Hey yourself!' when it's supposed to" {
+  run my_echo "Hey"
+  assert_success "Hey yourself!"
+}
+
+@test "fails if the input is not 'Hey'" {
+  run my_echo "Ahoy"
+  assert_failure "I don't understand 'Ahoy'"
+}</code></pre>
+  
+<p>When I re-run it:</p>
+
+<pre><code>~/.rbenv/test (impostorsguides) $ bats foo.bats
+foo.bats
+  ✓ prints 'Hey yourself!' when it's supposed to
+  ✗ fails if the input is not 'Hey'
+    (from function `flunk' in file test_helper.bash, line 42,
+    from function `assert_failure' in file test_helper.bash, line 55,
+    in test file foo.bats, line 13)
+      `assert_failure "I don't understand 'Ahoy'"' failed
+    expected failed exit status
+
+2 tests, 1 failure
+
+~/.rbenv/test (impostorsguides)  $ </code></pre>
+
+<p>We see a "✗" character instead of a "✓" character next to the test description. We also see which assertion failed: <code>assert_failure "I don't understand 'Ahoy'"' failed</code>.</p>
+
+<p>Lastly, we see <code>expected failed exit status</code>, which tells us why <code>assert_failure</code> failed.</p>
+
+<p>To make this "sad-path" test pass, we can update our function to the following:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+my_echo() {
+  if [ "$1" != "Hey" ]; then
+    echo "I don't understand '$1'"
+    exit 1;
+  fi
+  echo "Hey yourself!"
+}</code></pre>
+
+<p>Now, when we re-run the test, we see:</p>
+
+<pre><code>~/.rbenv/test (impostorsguides)  $ bats foo.bats
+foo.bats
+  ✓ prints 'Hey yourself!' when it's supposed to
+  ✓ fails if the input is not 'Hey'
+
+2 tests, 0 failures
+
+~/.rbenv/test (impostorsguides)  $ </code></pre>
+
+<p>That's a (very preliminary) introduction to writing our own Bats test.  I cover much more Bats syntax in <a href="/shell" target="_blank">my walk-through of RBENV</a>.</p>
+
+<h2>Test-Driven Development</h2>
+
+<p>In our first test, we expected to see <code>Hey yourself!</code> printed to the screen, but we actually saw <code>Hi</code>. I wrote the test this way intentionally, to demonstrate the concept of <a href="https://web.archive.org/web/20221203024358/https://www.codecademy.com/article/tdd-red-green-refactor" target="_blank">"Red-Green-Refactor"</a>, which comes from the world of <a href="https://web.archive.org/web/20230425032604/https://en.wikipedia.org/wiki/Test-driven_development" target="_blank">test-driven development</a> (or "TDD" for short). We start by writing a test for the functionality that we want to test, before we write the functionality itself.</p>
+
+<p>If we really wanted to be strict about our TDD practice, our sequence of steps would have been even more granular, making one change at a time:</p>
+
+<ul>
+  <li>We run the test without the <code>load bar</code> line, and see a failure related to a missing <code>my_echo()</code> function.</li>
+  <li>We run the test with an empty implementation of <code>my_echo()</code> (i.e. no function body), and see a failure related to empty output of <code>my_echo()</code>.</li>
+  <li>We run the test with an incorrect implementation of <code>my_echo()</code>, and see a failure related to incorrect output of <code>my_echo()</code>.</li>
+  <li>Then and only then, we write the correct implementation of <code>my_echo()</code> and see our test pass.</li>
+</ul>
+
+<p>The benefit of working this way is to help ensure we only write the minimum amount of code necessary to make our tests pass.</p>
+
+<h2>Is TDD Even Worth It?</h2>
+
+<p>At first, it might seem like writing tests in this manner is slower than just writing the code itself and forgetting about tests.</p>
+
+<p>And truth be told, it is, At least at first.</p>
+
+<p>But over time, as an application starts to grow in size, it actually becomes faster to use TDD.  This is because, without sufficient automated tests, you need to spend more and more time checking your app by hand, to make sure that the features you just finished writing didn't break previous features.</p>
+
+<p>This effort multiplies exponentially as your feature set grows.  Eventually, you get to the point where you are resistant to add new features because you don't want to risk breaking the app, but you also don't want to go through another exhausting round of manual testing.</p>
+
+<p>In the worst-case scenario, at a certain point you simply burn out on testing your app by hand, and start to rely on your user base to report errors to you. That's not a great user experience, and I would claim that it's not great engineering practice either.</p>
+
+<p>At the very least, it's a fate which could have been avoided if you simply invested a little more effort up-front, to write those automated tests.</p>
+
+
+<div id="photo-attribution">
+  <h4>Photo Attribution</h4>
+  <p>Title: n/a</p>
+  <p>Author: Unknown</p>
+  <p>Source: <a href="https://pxhere.com/en/photo/1238922" target="_blank">PxHere</a></p>
+  <p>License: <a href="https://pxhere.com/en/photo/1238922" target="_blank">CC0 Public Domain</a></p>
+</div>
