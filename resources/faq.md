@@ -57,5 +57,6 @@ This site would not have been possible without inspiration from:
 - Saron Yitbarek @ [CodeNewbie](https://www.codenewbie.org/)
 - Vaidehi Joshi @ [Base.CS](https://medium.com/basecs)
 - Chase Lambert @ [Makefile Tutorial](https://makefiletutorial.com/)
+- Michael Hartl @ [Rails Tutorisl](https://www.railstutorial.org/)
 
 Thanks for paving the way, y'all!
