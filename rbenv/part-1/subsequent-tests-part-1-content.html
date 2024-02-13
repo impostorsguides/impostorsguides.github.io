@@ -1,0 +1,125 @@
+<header class="post-header">
+  <h1 class="post-title">The Subsequent Tests (Part 1 of 2)</h1>
+</header>
+
+<p>Let's break down the rest of the tests for the <code>rbenv</code> command, one-by-one, to see what behavior they cover.</p>
+
+<h2>Entering an invalid command</h2>
+
+<p><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats#L11-L15" target="_blank">The code for the test</a> is:</p>
+
+<pre><code>@test "invalid command" {
+  run rbenv does-not-exist
+  assert_failure
+  assert_output "rbenv: no such command \`does-not-exist'"
+}</code></pre>
+
+<p>This test covers the sad-path case of when a user tries to run a command that RBENV doesn't recognize. We run a fake RBENV command called <code>rbenv does-not-exist</code>, and assert that:</p>
+
+<ul>
+  <li>the previous command failed, and</li>
+  <li>the output which was printed to <code>stdout</code> contained the line <code>rbenv: no such command 'does-not-exist'</code>.</li>
+</ul>
+
+<p>I try this on my machine as well, with a different fake command:</p>
+
+<pre><code>$ rbenv foo
+rbenv: no such command `foo'
+$ </code></pre>
+
+<p>Pretty much like what I expected!</p>
+
+<h2>When <code>RBENV_ROOT</code> *is* unset</h2>
+
+<p><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats#L17-L21" target="_blank">Next test</a> is:</p>
+
+<pre><code>@test "default RBENV_ROOT" {
+  RBENV_ROOT="" HOME=/home/mislav run rbenv root
+  assert_success
+  assert_output "/home/mislav/.rbenv"
+}</code></pre>
+
+<p>Here we call <code>root</code> (a real RBENV command) because we want to test how RBENV responds to a known-valid command (unlike the previous test, which tested a known-invalid command).</p>
+
+<p>The test author likely chose to run the <code>root</code> command in particular because its job is to print the value of <code>RBENV_ROOT</code>.  This implicitly allows us to test that, when <code>RBENV_ROOT</code> is unset, it will inherit its value of the <code>HOME</code> variable.</p>
+
+<p>The test passes an empty value for <code>RBENV_ROOT</code> and an arbitrary but unsurprising value for <code>HOME</code> as environment variables, and asserts that:</p>
+
+<ul>
+  <li>the command succeeded, and</li>
+  <li>that the printed output included the <code>.rbenv/</code> directory, prepended with the value we set for <code>HOME</code>.</li>
+</ul>
+
+<p>Judging by the environment variables (<code>RBENV_ROOT</code> and <code>HOME</code>) which are passed to the <code>run rbenv root</code> command, this test appears to cover the behavior beginning at this line of code. But rather than skip ahead to analyze what this line of code does, let's punt on that until we look at the code for the command itself.</p>
+
+<h2>When <code>RBENV_ROOT</code> *is not* set</h2>
+
+<p><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats#L23-L27" target="_blank">Next test</a>:</p>
+
+<pre><code>@test "inherited RBENV_ROOT" {
+  RBENV_ROOT=/opt/rbenv run rbenv root
+  assert_success
+  assert_output "/opt/rbenv"
+}</code></pre>
+
+<p>This test is similar to the previous test, except this time we're testing <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L56" target="_blank">the "else" branch</a> instead of <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L54" target="_blank">the if branch</a>.  We set a non-empty value for <code>RBENV_ROOT</code>,  and then we assert that that value is used as the output for the root command. </p>
+
+<p>We leave <code>HOME</code> blank this time, because <code>HOME</code> is only needed to help construct <code>RBENV_ROOT</code> if <code>RBENV_ROOT</code> doesn't already exist.</p>
+
+<h2>Setting the value for <code>RBENV_DIR</code></h2>
+
+<p><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats#L29-L32" target="_blank">Next test</a>:</p>
+
+<pre><code>@test "default RBENV_DIR" {
+  run rbenv echo RBENV_DIR
+  assert_output "$(pwd)"
+}</code></pre>
+
+<p>Here we appear to be testing <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L61" target="_blank">this block of code</a>.  We assert that, if no prior value has been set for <code>RBENV_DIR</code>, we set it equal to the value of the shell's <code>PWD</code> environment variable (which is also the same as the output of the <code>pwd</code> shell command, which is what <code>$(pwd)</code> resolves to here).</p>
+
+<p>Note that we won't be able to run <code>rbenv echo</code> in our shell unless we manually update our <code>PATH</code> environment variable to include RBENV's <code>test/libexec/</code> directory. The <code>test_helper</code> file does this for us when we run our test, but if we're not running a test then we have to do this ourselves.</p>
+
+<h2>When <code>RBENV_DIR</code> is already set</h2>
+
+<p><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats#L34-L39" target="_blank">Next test</a>:</p>
+
+<pre><code>@test "inherited RBENV_DIR" {
+  dir="${BATS_TMPDIR}/myproject"
+  mkdir -p "$dir"
+  RBENV_DIR="$dir" run rbenv echo RBENV_DIR
+  assert_output "$dir"
+}</code></pre>
+
+<p>This test covers the same block of code as the previous test, except this time we're testing <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L63" target="_blank">the else branch</a> instead of <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L61" target="_blank">the "if" branch</a>.</p>
+
+<p>We start by creating a variable named "dir" and set it equal to "BATS_TMPDIR" with "/myproject" appended to the end.  The value of the "BATS_TMPDIR" env var is set here if it's not already set.  More info on "BATS_TMPDIR" and other BATS-specific environment variables can be found <a href="https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/README.md#special-variables" target="_blank">here</a>.</p>
+
+<p>We then create a directory whose name is the value of our "dir" variable.  The -p flag ensures that any intermediate directories in between our current one and "/myproject" are also created, if they don't already exist.  We then set the <code>RBENV_DIR</code> env var equal to this directory.</p>
+
+<p>We then run "rbenv echo RBENV_DIR".  Finally, we assert that the command printed the value that we specified for the <code>RBENV_DIR</code> env var, since that's the env var that we passed to <code>rbenv echo</code>.</p>
+
+<p>In other words, we assert that <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L61" target="_blank">the block of code that we're testing</a> didn't modify the value of <code>RBENV_DIR</code> in any way.</p>
+
+<h2>When <code>RBENV_DIR</code> is set to a non-existent directory</h2>
+
+<p><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats#L41-L47" target="_blank">Next test</a>:</p>
+
+<pre><code>@test "invalid RBENV_DIR" {
+  dir="${BATS_TMPDIR}/does-not-exist"
+  assert [ ! -d "$dir" ]
+  RBENV_DIR="$dir" run rbenv echo RBENV_DIR
+  assert_failure
+  assert_output "rbenv: cannot change working directory to \`$dir'"
+}</code></pre>
+
+<p>Here we're testing <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L61" target="_blank">the same block of logic as the last test</a>, but this time we're testing a different edge case.</p>
+
+<p>Inside that block's "else" branch, we try to cd into the directory specified by <code>RBENV_DIR</code>. As of this point, the value of <code>RBENV_DIR</code> is not known to be a valid directory, so this may or may not work.</p>
+
+<p>If it does work, <a href="https://github.com/rbenv/rbenv/blob/master/libexec/rbenv#L35" target="_blank">we reset <code>RBENV_DIR</code></a> to be equal to our current directory. But if it fails, we abort and print the error message "rbenv: cannot change working directory to <code>$dir</code>. That's the edge case we're testing- when the navigation into the specified directory fails, the command fails and the expected error message is printed to "stderr".</p>
+
+<p>Why do we reset <code>RBENV_DIR</code>? We'll analyze that in depth later, but the short explanation is that we want to remove any existing directory traversal syntax (for example, <code>../</code>).  In other words, we want to "canonicalize" it.</p>
+
+<h2>Wrapping Up</h2>
+
+<p>In case you need a break, let's pause there and continue with the 2nd half of the test harness in the next section.</p>
