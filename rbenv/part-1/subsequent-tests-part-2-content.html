@@ -1,0 +1,147 @@
+<header class="post-header">
+  <h1 class="post-title">The Subsequent Tests (Part 2 of 2)</h1>
+</header>
+
+<p>Let's pick up where we left off, on <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats#L49-L52" target="_blank">this block of the testing harness</a>.</p>
+
+<h2>Adding <code>libexec/</code> to <code>$PATH</code></h2>
+
+<p>The test looks like this:</p>
+
+<pre><code>@test "adds its own libexec to PATH" {
+  run rbenv echo "PATH"
+  assert_success "${BATS_TEST_DIRNAME%/*}/libexec:$PATH"
+}</code></pre>
+
+<p>After some digging, I discovered that this test covers <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L79" target="_blank">this line of code</a>.  We can prove this by running the test with this line of code in-place, and then re-running it with the code commented-out, observing that the test fails when the line is commented out.</p>
+
+<p>We will dive into what this line of code does when we start reading the code for the <code>rbenv</code> command itself. But from the description of this test ("adds its own libexec to PATH"), we can deduce that the <code>libexec/</code> folder contains commands that we'll want to execute from the terminal.</p>
+
+<p>Remember that <code>$PATH</code> is the list of folders which UNIX checks when we give it a command to execute. By adding more folders to <code>$PATH</code> (such as <code>libexec/</code>), we'll have access to more commands.</p>
+
+<h2>Adding our plugins to <code>$PATH</code></h2>
+
+<p><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats#L54-L62" target="_blank">Next test</a> is:</p>
+
+<pre><code>@test "adds plugin bin dirs to PATH" {
+  mkdir -p "$RBENV_ROOT"/plugins/ruby-build/bin
+  mkdir -p "$RBENV_ROOT"/plugins/rbenv-each/bin
+  run rbenv echo -F: "PATH"
+  assert_success
+  assert_line 0 "${BATS_TEST_DIRNAME%/*}/libexec"
+  assert_line 1 "${RBENV_ROOT}/plugins/ruby-build/bin"
+  assert_line 2 "${RBENV_ROOT}/plugins/rbenv-each/bin"
+}</code></pre>
+
+<p>This test covers the 4-line block of code starting <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L76" target="_blank">here</a>.</p>
+
+<p>Inside the test, we create two directories, one named <code>ruby-build</code> and one named <code>rbenv-each</code>. From the name of the directory (<code>plugins/</code>), we can assume that this is where RBENV stores its plugins (i.e. functionality from 3rd-party code that we can add to enhance RBENV's behavior).  So we can deduce that creating these two sub-directories means we're creating two RBENV plugins for the purposes of our test. </p>
+
+<p>Since there's no additional setup (such as creating files inside of those directories), we can assume that's all the setup required, in order to make our test think these plugins actually exist.</p>
+
+<p>We then call <code>run rbenv echo -F: "PATH"</code>, which tells RBENV to print <code>$PATH</code>. We tell <code>rbenv echo</code> to use <code>:</code> as a separator by passing the <code>-F:</code> flag.  This will cause each item in <code>$PATH</code> to print on its own line.</p>
+
+<p>We could have called <code>run rbenv echo "PATH"</code> without the <code>-F:</code> flag, but then our entire <code>$PATH</code> will print on one line, which will make it really hard to call <code>assert_line</code> with a specific line number, such as <code>0</code>, further down in the code.</p>
+
+<p>Lastly, we assert that:</p>
+
+<ul>
+  <li>the command was successful,</li>
+  <li>the first item in <code>$PATH</code> is the value prepended to <code>$PATH</code> here, and</li>
+  <li>the next two items in <code>$PATH</code> are the paths to the two plugins that we "installed" when we ran <code>mkdir</code> twice at the start of our test.</li>
+</ul>
+
+<h2>Preserving our existing <code>$RBENV_HOOK_PATH</code></h2>
+
+<p><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats#L64-L70" target="_blank">Next test</a>:</p>
+
+<pre><code>@test "RBENV_HOOK_PATH preserves value from environment" {
+  RBENV_HOOK_PATH=/my/hook/path:/other/hooks run rbenv echo -F: "RBENV_HOOK_PATH"
+  assert_success
+  assert_line 0 "/my/hook/path"
+  assert_line 1 "/other/hooks"
+  assert_line 2 "${RBENV_ROOT}/rbenv.d"
+}</code></pre>
+
+<p>This test covers <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81" target="_blank">this line of code</a>. It takes any previously-set value of <code>RBENV_HOOK_PATH</code>, and adds <code>${RBENV_ROOT}/rbenv.d</code> to the end of that value.</p>
+
+<p>To test this, we set the value of <code>RBENV_HOOK_PATH</code> so that it includes two hard-coded paths, <code>/my/hook/path</code> and <code>/other/hooks</code>. We then run <code>rbenv echo</code> on this env var, again telling <code>rbenv echo</code> to use <code>:</code> as a separator via the <code>-F:</code> flag. We assert that:</p>
+
+<ul>
+  <li>the command was successful and that</li>
+  <li>our two paths are printed, followed by <code>${RBENV_ROOT}/rbenv.d</code>.</li>
+</ul>
+
+<p>We can increase our confidence that this test covers the above line of code by simply commenting out that line in the <code>rbenv</code> command, and seeing whether the test fails:</p>
+
+<pre><code>export PATH="${bin_path}:${PATH}"
+
+# RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${RBENV_ROOT}/rbenv.d"    <= commented out this line
+if [ "${bin_path%/*}" != "$RBENV_ROOT" ]; then</code></pre>
+
+<p>When I re-run the test, I get:</p>
+
+<pre><code>$ bats rbenv.bats
+rbenv.bats
+  ✓ blank invocation
+  ✓ invalid command
+  ✓ default RBENV_ROOT
+  ✓ inherited RBENV_ROOT
+  ✓ default RBENV_DIR
+  ✓ inherited RBENV_DIR
+  ✓ invalid RBENV_DIR
+  ✓ adds its own libexec to PATH
+  ✓ adds plugin bin dirs to PATH
+  ✗ RBENV_HOOK_PATH preserves value from environment
+    (from function `assert_equal' in file test_helper.bash, line 65,
+    from function `assert_line' in file test_helper.bash, line 79,
+    in test file rbenv.bats, line 69)
+      `assert_line 2 "${RBENV_ROOT}/rbenv.d"' failed
+    expected: TEST_DIR/root/rbenv.d
+    actual:   /Users/richiethomas/.rbenv/rbenv.d
+  ✗ RBENV_HOOK_PATH includes rbenv built-in plugins
+    (from function `assert_equal' in file test_helper.bash, line 65,
+    from function `assert_output' in file test_helper.bash, line 74,
+    from function `assert_success' in file test_helper.bash, line 49,
+    in test file rbenv.bats, line 75)
+      `assert_success "${RBENV_ROOT}/rbenv.d:${BATS_TEST_DIRNAME%/*}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"' failed
+    expected: TEST_DIR/root/rbenv.d:/Users/richiethomas/.rbenv/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks
+    actual:   /Users/richiethomas/.rbenv/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks
+
+11 tests, 2 failures
+  
+$ </code></pre>
+
+<p>The above 2 failures include the test we're currently examining as well as the next one, meaning that test also covers this same line of code.</p>
+
+<h2>Adding specific additional paths to <code>$RBENV_HOOK_PATH</code></h2>
+
+<p><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/rbenv.bats#L72-L76" target="_blank">Last test</a>:</p>
+
+<pre><code>@test "RBENV_HOOK_PATH includes rbenv built-in plugins" {
+  unset RBENV_HOOK_PATH
+  run rbenv echo "RBENV_HOOK_PATH"
+  assert_success "${RBENV_ROOT}/rbenv.d:${BATS_TEST_DIRNAME%/*}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
+}</code></pre>
+
+<p>Here we unset <code>RBENV_HOOK_PATH</code>, to prevent any prior value from influencing the result of our test.</p>
+
+<p>We then run the command, and assert that it was successful, and that the printed output references the following directories, delimited by the <code>:</code> character:</p>
+
+<ul>
+  <li><code>${RBENV_ROOT}/rbenv.d</code></li>
+  <li><code>${BATS_TEST_DIRNAME%/*}/rbenv.d</code></li>
+  <li><code>/usr/local/etc/rbenv.d</code></li>
+  <li><code>/etc/rbenv.d</code></li>
+  <li><code>/usr/lib/rbenv/hooks</code></li>
+</ul>
+
+<p>This test covers the block of code <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81-L91" target="_blank">here</a>. We can see that the order of the above directories matches the order in which they're added to <code>RBENV_HOOK_PATH</code> by the code:</p>
+
+<ul>
+  <li><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81" target="_blank">This line of code</a> adds <code>${RBENV_ROOT}/rbenv.d</code> to the front of <code>RBENV_HOOK_PATH</code>. It would also add any previously-set value of <code>RBENV_HOOK_PATH</code> before <code>${RBENV_ROOT}/rbenv.d</code> if we had previously set such a value, but we didn't in this test.</li>
+  <li>This block of code adds <code>${BATS_TEST_DIRNAME%/*}/rbenv.d</code> to <code>RBENV_HOOK_PATH</code>.</li>
+  <li>Lastly, this block of code adds <code>/usr/local/etc/rbenv.d</code>, <code>/etc/rbenv.d</code>, and <code>/usr/lib/rbenv/hooks</code> to <code>RBENV_HOOK_PATH</code>.</li>
+</ul>
+
+<p>That's all for the <code>rbenv</code> command's tests. Let's move onto the code.</p>
