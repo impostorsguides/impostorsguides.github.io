@@ -1,0 +1,99 @@
+<header class="post-header">
+  <h1 class="post-title">Preparing To Run In "Debug" Mode</h1>
+</header>
+
+<p><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L1-L2" target="_blank">The 1st and 2nd lines in the file</a> for the <code>rbenv</code> command are just the shebang and the call to <code>set -e</code>, which we're already familiar with:</p>
+
+<pre><code>#!/usr/bin/env bash
+set -e</code></pre>
+
+<p>Since we're already familiar with these lines, we'll skip over them now.</p>
+
+<h2>Checking if the user passed the <code>--debug</code> flag</h2>
+
+<p><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L4" target="_blank">Next block of code</a> is:</p>
+
+<pre><code>if [ "$1" = "--debug" ]; then
+  ...
+fi</code></pre>
+
+<p>As you can see, I've temporarily removed the contents of the <code>if</code>-block in this screenshot, so we can concentrate on the <code>if</code> condition itself.</p>
+
+<p>We recognize the <code>if</code> statement and the <code>[</code> bracket syntax from earlier.  Here, we're testing whether <code>$1</code> evaluates to the string <code>--debug</code>.  I suspect that <code>$1</code> represents the first argument that gets passed to the command, but I'm not sure if the indexing is 0-based or 1-based. A quick Google search leads me <a href="https://web.archive.org/web/20211006091051/https://stackoverflow.com/questions/29258603/what-do-0-1-2-mean-in-shell-script#answer-29258643" target="_blank">here</a>:</p>
+
+<blockquote>
+  <p>These are positional arguments of the script.</p>
+
+  <p>Executing:</p>
+
+  <pre><code>./script.sh Hello World</code></pre>
+
+  <p>Will make:</p>
+
+  <pre><code>$0 = ./script.sh
+$1 = Hello
+$2 = World</code></pre>
+</blockquote>
+
+<p>StackOverflow suggests that our guess was correct. Based on this, we can conclude that if the first argument is equal to <code>--debug</code>, then... what?</p>
+
+<h2>Setting the value of <code>$RBENV_DEBUG</code></h2>
+
+<p><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L5" target="_blank">Next line of code</a>:</p>
+
+<pre><code>export RBENV_DEBUG=1</code></pre>
+
+<p>We recognize the <code>export</code> statement from Part 1. We set <code>$RBENV_DEBUG</code> equal to 1, and then export it.  And We know from <a href="https://unix.stackexchange.com/a/28349/142469" target="_blank">here</a> that an <code>export</code>ed variable is available in the same script, in a child script, and in a function which is called inside that same script, but not in the parent process or other sibling scripts called by that parent process. So we can assume that <code>$RBENV_DEBUG</code> will be used in one of those places in the near future.</p>
+
+<h2>Removing the no-longer-needed argument via <code>shift</code></h2>
+
+<p><a href="" target="_blank">Next line of code</a>:</p>
+
+<pre><code>shift</code></pre>
+
+<p>What does <code>shift</code> do? According to <a href="https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_09_07.html" target="_blank">the docs</a>:</p>
+
+<blockquote><p>This command takes one argument, a number. The positional parameters are shifted to the left by this number, N. The positional parameters from N+1 to <code>$#</code> are renamed to variable names from <code>$1</code> to <code>$#</code> - N+1.</p></blockquote>
+
+<p>Let's see for ourselves how <code>shift</code> works.</p>
+
+<h2>Experiment- the <code>shift</code> command</h2>
+
+<p>I wrote a script containing the following code:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+echo "old arg length: $#"
+echo "old args: $@"
+echo "old fifth arg: $5"
+
+echo
+echo "Calling 'shift 4'..."
+echo
+shift 4
+
+echo "new arg length: $#"
+echo "new args: $@"
+echo "new first arg: $1"</code></pre>
+
+<p><code>$#</code> evaluates to the number of positional arguments, and <code>$@</code> evaluates to the list of args.</p>
+
+<p>I run it, passing it 5 different arguments ("bar", "baz", "buzz", "quox", and "bing"), and I get:</p>
+
+<pre><code>$ ./foo bar baz buzz quox bing
+old arg length: 5
+old args: bar baz buzz quox bing
+old fifth arg: bing
+
+Calling 'shift 4'...
+
+new arg length: 1
+new args: bing
+new first arg: bing
+$ </code></pre>
+
+<p>The old argument length was 5, and after calling "shift 4", the new argument length is 1.  So calling <code>shift</code> does what we thought it would- it removes the first 4 arguments from the front of the list.</p>
+
+<h2>Wrapping Up</h2>
+
+<p>So to summarize the entire <code>if</code> block: if the user passes <code>--debug</code> as their first arg to <code>rbenv</code>, we set <code>RBENV_DEBUG</code> and trim the <code>--debug</code> flag off the list of args.</p>
