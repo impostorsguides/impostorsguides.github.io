@@ -1,0 +1,252 @@
+<header class="post-header">
+  <h1 class="post-title">"Debug" mode</h1>
+</header>
+
+<p><a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L9-L13" target="_blank">Next block of code</a>:</p>
+
+<pre><code>if [ -n "$RBENV_DEBUG" ]; then
+  # https://wiki-dev.bash-hackers.org/scripting/debuggingtips#making_xtrace_more_useful
+  export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+  set -x
+fi</code></pre>
+
+<p>We see the <code>[</code> command again, this time with the <code>-n</code> flag.  I run <code>man test</code> and search for <code>-n</code>, and I see:</p>
+
+<pre><code>-n string     True if the length of string is nonzero.</code></pre>
+
+<p>So if the length of <code>$RBENV_DEBUG</code> is non-zero (i.e. if we just set it), then we execute the code inside this if-block.</p>
+
+<h2>The <code>$PS4</code> environment variable</h2>
+
+<p>The first line of code is just a comment, containing <a href="https://web.archive.org/web/20221105082147/https://wiki-dev.bash-hackers.org/scripting/debuggingtips#making_xtrace_more_useful" target="_blank">a link to an article</a> about a program named "xtrace". Inside the article, we see the following:</p>
+
+<blockquote>
+  <h3>Making xtrace more useful</h3>
+  <p>(by AnMaster)</p>
+  
+  <p><code>xtrace</code> output would be more useful if it contained source file and line number. Add this assignment PS4 at the beginning of your script to enable the inclusion of that information:</p>
+
+  <code>export PS4='+(${BASH_SOURCE:-}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'</code>
+</blockquote>
+
+<p>The article mentions that, by setting an environment variable called <code>PS4</code> equal to some complicated string, the output of our command line will look different.  And then the next line of our code is the same <code>export</code> statement we see in the linked URL, which defines <code>PS4</code> and exports it.</p>
+
+<p>So what is <code>PS4</code>, and what does it do?</p>
+
+<p>I try <code>man PS4</code> but get no answer. I Google <code>PS4 bash</code>, and I open up the first result I see. It mentions not only <code>$PS4</code>, but also <code>PS1</code>, <code>$PS2</code>, and <code>PS3</code>. I scroll down to the section on <code>$PS4</code> and I see:</p>
+
+<blockquote>
+  <p><code>PS4</code> – Used by <code>set -x</code> to prefix tracing output</p>
+  <p>The <code>PS4</code> shell variable defines the prompt that gets displayed, when you execute a shell script in debug mode as shown below.</p>
+</blockquote>
+
+<p>So we're updating the prompt which is displayed when <code>set -x</code> is executed. That makes sense, because right after we set <code>$PS4</code> inside our file, the next line is <code>set -x</code>.</p>
+
+<h2>The <code>$PS</code> environment variables</h2>
+
+<p>The initials "PS" stand for "prompt statement".  There are actually multiple "PS" environment variables, and they control the appearance of the prompt in your command line, in various situations.  According to the "SS64" command line reference, those variables are:</p>
+
+<ul>
+  <li><code>PS1</code>: Default interactive prompt (this is the variable most often customized).</li>
+  <li><code>PS2</code>: Continuation interactive prompt (when a long command is broken up with \ at the end of the line).  The default value is  <code>></code>.</li>
+  <li><code>PS3</code>: Prompt used by "select" loop inside a shell script.</li>
+  <li><code>PS4</code>: Prompt used when a shell script is executed in debug mode (<code>set -x</code> will turn this on).  The default is <code>++</code>.</li>
+</ul>
+
+<p>We won't go into each of these in exhaustive detail, but we can quickly illustrate <code>$PS2</code> with an experiment.</p>
+
+<h2>Experiment- The <code>$PS2</code> environment variable</h2>
+
+<p>Let's <code>echo "$PS2"</code> in our terminal:</p>
+
+<pre><code>$ echo "$PS2"
+>
+$ </code></pre>
+
+<p>We see a ">" character, followed by a space (which you can't see here).  If we then type <code>echo \</code> and hit enter, the terminal will expect us to continue our input on the next line, and the terminal prompt will change to that same ">" character:</p>
+
+<pre><code>$ echo \
+> </code></pre>
+
+<p>We see the ">" symbol, followed by that space which we couldn't originally see.</p>
+
+<p>If we were to reset the value of <code>$PS2</code> to another character, our prompt would then change when re-running <code>echo \</code>.  Let's change this variable's value to <code>foo</code>:</p>
+
+<pre><code>$ PS2=<code>foo</code>
+$ echo \
+foo
+</code></pre>
+
+<p>After changing the value of <code>$PS2</code> to <code>foo</code> in our shell, running <code>echo \</code> results in a terminal prompt of <code>foo</code> instead of our old "> " prompt.</p>
+
+<p>Before moving on, let's close this terminal and open a new one, to reset our <code>$PS2</code> variable back to its original value.</p>
+
+<h2><code>BASH_SOURCE</code>, <code>LINENO</code>, and <code>FUNCNAME</code></h2>
+
+<p>In our case, we're updating <code>$PS4</code>, not <code>$PS2</code>.  <code>$PS4</code> is the variable which controls how our prompt will appear when we are in debug mode (i.e. when we've called <code>set -x</code>).  But what are we updating <code>$PS4</code> to?</p>
+
+<p>Judging by the dollar-sign-plus-curly-brace syntax, there appears to be some parameter expansion happening here. On a hunch, I try an experiment.</p>
+
+<h3>Experiment- <code>BASH_SOURCE</code> and <code>LINENO</code></h3>
+
+<p>I make a script named <code>foo</code> with the first half of our <code>PS4</code> value, i.e. everything before the space in the middle:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+echo "+(${BASH_SOURCE}:${LINENO}):"</code></pre>
+
+<p>When I <code>chmod +x</code> the script and run it, I get:</p>
+
+<pre><code>$ ./foo
++(./foo:3):
+$ </code></pre>
+
+<p>So the <code>+(</code>, <code>:</code>, and <code>):</code> don't do anything special- they're literal characters which get printed directly to the screen.</p>
+
+<p>That leaves the following:</p>
+
+<ul>
+  <li><code>${BASH_SOURCE}</code>, which looks like it gets evaluated to <code>./foo</code> (the name of my script file), and</li>
+  <li><code>${LINENO}</code>, which looks like it resolves to <code>3</code> (the line number of <code>./foo</code> that the <code>echo</code> command appears on).</li>
+</ul>
+
+<h2>The <code>FUNCNAME</code> environment variable</h2>
+
+<p>What about the <code>FUNCNAME</code> variable?  How does that work?</p>
+
+<pre><code>${FUNCNAME[0]:+${FUNCNAME[0]}(): }'</code></pre>
+
+<p>After Googling <code>FUNCNAME</code>, I find the online version of <a href="https://web.archive.org/web/20230322221925/https://www.man7.org/linux/man-pages/man1/bash.1.html" target="_blank">its man page entry</a>:</p>
+
+<blockquote>
+  <h4>FUNCNAME</h4>
+  <p>An array variable containing the names of all shell
+    functions currently in the execution call stack.  The
+    element with index 0 is the name of any currently-
+    executing shell function.  The bottom-most element (the
+    one with the highest index) is "main".  This variable
+    exists only when a shell function is executing.
+    Assignments to FUNCNAME have no effect.  If FUNCNAME is
+    unset, it loses its special properties, even if it is
+    subsequently reset.</p>
+</blockquote>
+
+<p>So <code>FUNCNAME</code> is an array variable. That explains why we're invoking <code>FUNCNAME[0]</code>- as stated in the docs, "(t)he element with index 0 is the name of any currently-executing shell function".</p>
+
+
+
+<p>Can we reproduce this behavior? Let's try another experiment.</p>
+
+<h2>Experiment- attempting to print <code>FUNCNAME</code></h2>
+
+<p>I rewrite my <code>foo</code> script to look like this:</p>
+
+<pre><code>#!/usr/bin/env bash
+
+bar() {
+  for method in "${FUNCNAME[@]}"; do
+    echo "$method"
+  done
+  echo "-------"
+}
+
+foo() {
+  for method in "${FUNCNAME[@]}"; do
+    echo "$method"
+  done
+  echo "-------"
+  bar
+}
+
+foo</code></pre>
+
+<p>It implements two functions, one named <code>foo()</code> and one named <code>bar()</code>. Each function iterates over <code>FUNCNAME</code> and prints each item in the call stack.</p>
+
+<p>In addition, <code>foo()</code> calls <code>bar()</code>, so <code>bar()</code> should have one more item in its callstack than <code>foo()</code> does.</p>
+
+<p>When I run <code>foo()</code>, I get:</p>
+
+<pre><code>$ ./foo
+foo
+main
+-------
+bar
+foo
+main
+-------
+$ </code></pre>
+
+<p>Success- the first list of function names (the one generated from inside <code>foo()</code>) lists <code>foo</code> and <code>main</code>.  The 2nd list (the one generated from inside <code>bar()</code>) had one more item printed in its callstack than <code>foo()</code> did.  This is what we should have expected.</p>
+
+<h2>Combining our env vars into a new <code>$PS4</code></h2>
+
+<p>By now, we've figured out what the 3 environment variables in our <code>PS4</code> definition are.  But how are they being combined?</p>
+
+<p>Let's look more closely at the 2nd half of the <code>$PS4</code> value:</p>
+
+<pre><code>${FUNCNAME[0]:+${FUNCNAME[0]}(): }'</code></pre>
+
+<p>We see <code>${ ... }</code>, so we know we're dealing with parameter expansion again. And if we take out the two references to <code>FUNCNAME[0]</code> (which we know will equal the current function if we're currently inside a function), then we're left with <code>${__:+__():}</code>.</p>
+
+<p>I'm curious what <code>:+</code> means, so I look for these two characters in <a href="https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html" target="_blank">the parameter expansion docs</a>. I see:</p>
+
+<blockquote>
+  <p><strong>${parameter:+word}</strong></p>
+  <p>If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.</p>
+
+  <pre><code>$ var=123
+$ echo ${var:+var is set and not null}
+var is set and not null</code></pre>
+</blockquote>
+
+<p>You can pass in a variable, and if that variable is set, Bash will print whatever string you give it.</p>
+
+<p>So the following...</p>
+
+<pre><code>${FUNCNAME[0]:+${FUNCNAME[0]}(): }'</code></pre>
+
+<p>...means that if <code>FUNCNAME[0]</code> has a non-null value (i.e. if we're currently inside a function call), then we print the value of <code>FUNCNAME[0]</code> (i.e. the name of the current function) plus <code>():</code> appended to the end.  If <code>FUNCNAME</code> is not set, we print nothing.</p>
+
+<h2>Expected vs. actual <code>$PS4</code></h2>
+
+<p>Let's see if this is what really happens, by running <code>rbenv --debug version</code>:</p>
+
+<pre><code>$ rbenv --debug version
++(/Users/richiethomas/.rbenv/bin/rbenv:23): enable -f /Users/richiethomas/.rbenv/bin/../libexec/rbenv-realpath.dylib realpath
++(/Users/richiethomas/.rbenv/bin/rbenv:30): '[' -z '' ']'
+++(/Users/richiethomas/.rbenv/bin/rbenv:32): type -p greadlink readlink
+++(/Users/richiethomas/.rbenv/bin/rbenv:32): head -n1
++(/Users/richiethomas/.rbenv/bin/rbenv:32): READLINK=/opt/homebrew/bin/greadlink
++(/Users/richiethomas/.rbenv/bin/rbenv:33): '[' -n /opt/homebrew/bin/greadlink ']'
++(/Users/richiethomas/.rbenv/bin/rbenv:54): '[' -z '' ']'
++(/Users/richiethomas/.rbenv/bin/rbenv:55): RBENV_ROOT=/Users/richiethomas/.rbenv
++(/Users/richiethomas/.rbenv/bin/rbenv:59): export RBENV_ROOT
++(/Users/richiethomas/.rbenv/bin/rbenv:61): '[' -z '' ']'
++(/Users/richiethomas/.rbenv/bin/rbenv:62): RBENV_DIR=/Users/richiethomas/Desktop/Workspace/scratch
++(/Users/richiethomas/.rbenv/bin/rbenv:69): export RBENV_DIR
++(/Users/richiethomas/.rbenv/bin/rbenv:71): '[' -n '' ']'
+...</code></pre>
+
+<p>There's a ton of output, but keep scrolling down.  Eventually, you should see the line below, <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L73" target="_blank">which comes from outside of a function</a>:</p>
+
+<pre><code>+(/Users/richiethomas/.rbenv/bin/rbenv:73): shopt -s nullglob</code></pre>
+
+<p>And here's another <a href="https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L41" target="_blank">which comes from inside a function</a>:</p>
+
+<pre><code>++(/Users/richiethomas/.rbenv/bin/rbenv:40): abs_dirname(): local cwd=/Users/richiethomas/Desktop/Workspace/scratch</code></pre>
+
+<p>So the version of <code>$PS4</code> which is inside a function (i.e. the <code>abs_dirname()</code> function) contains the name of the function followed by a set of parentheses.  The version of <code>$PS4</code> which is outside of a function contains no such function reference.</p>
+
+<p>In summary- although we haven't yet reached the above lines of code and don't yet know what they do, the format of the output does line up with what we've learned about our new <code>$PS4</code> value.</p>
+
+<h2>Wrapping Up</h2>
+
+<p>So to summarize the first 2 blocks of code: if the user passed <code>--debug</code> as the first argument, we:</p>
+
+<ul>
+  <li>Set and export the <code>RBENV_DEBUG</code> environment variable.</li>
+  <li>Change the terminal prompt to output more useful version of <code>$PS4</code>, and</li>
+  <li>Call <code>set -x</code> to put bash into debug mode.</li>
+</ul>
+
+<p>Let's move on to the next block of code.</p>

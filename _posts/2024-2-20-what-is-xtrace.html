@@ -1,0 +1,151 @@
+---
+layout: post
+permalink: /blog/what-is-xtrace/
+title: How to use xtrace to help debug applications
+excerpt_separator: <!--more-->
+createdAt: 20 Feb, 2024
+---
+
+<div>
+  <figure style="width: 100%; margin: 0 0 10px 25px">
+    <img src="/assets/images/robot-conductor.jpeg" style="margin: auto" width="100%" alt="A robot conducting an orchestra.">
+    <figcaption style="text-align: center;">Photo attribution <a href="/blog/using-chatgpt-to-get-unstuck/#photo-attribution">here</a>.</figcaption>
+  </figure>
+</div>
+
+<p>While trying to figure out what PS4 does as part of my deep-dive into RBENV, I kept noticing the phrase <code>xtrace</code> being thrown around on some of the links I encountered. I Googled "what is xtrace bash", and found <a href="https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_02_03.html" target="_blank">this link</a>, which says:</p>
+
+<div>
+  <figure style="width: 100%; margin: 0 0 10px 25px">
+    <img src="/assets/images/xtrace.jpg" style="margin: auto" width="100%" alt="A screenshot of the xtrace docs.">
+  </figure>
+</div>
+
+<p>That's a lot of info to process, but the thing to focus on is the bottom table.  It shows the short notation of <code>set -x</code> corresponds to the long notation of <code>set -o xtrace</code>, or "set the xtrace option". So xtrace is the name of a mode in bash.</p>
+
+<p>RBENV calls <code>set -x</code> at the beginning of the file, because we want to enable debugging over the entire file. But the cool thing about <code>set -x</code> is, you don't have to call it only at the beginning of a script.</p>
+
+<p>According to the above link from TLDP, you can enable it only for a certain section of code that you suspect is buggy, and disable it as soon as the section of buggy code is complete. This reduces the amount of noise you have to wade through before getting to the helpful lines of the xtrace output.</p>
+
+<p>Even further, you can do this anywhere you want in your code, as many times as you want.</p>
+
+<h2>How RBENV uses xtrace</h2>
+
+<p>Speaking of which, where in RBENV's code does this take place?</p>
+
+<p>If we look for <code>RBENV_DEBUG</code> throughout the codebase, we can see it used in multiple locations:</p>
+
+<pre><code>$ ag RBENV_DEBUG
+  libexec/rbenv-version-file-read
+  4:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-completions
+  5:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-commands
+  6:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-whence
+  6:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-exec
+  17:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-which
+  11:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-prefix
+  10:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-sh-shell
+  23:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-local
+  23:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-version-origin
+  4:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv---version
+  13:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-version
+  9:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-shims
+  6:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-help
+  16:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-init
+  6:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-version-file
+  5:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-hooks
+  6:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv
+  5:  export RBENV_DEBUG=1
+  9:if [ -n "$RBENV_DEBUG" ]; then
+  
+  libexec/rbenv-rehash
+  5:[ -n "$RBENV_DEBUG" ] && set -x
+  62:[ -n "\$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-version-name
+  4:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-sh-rehash
+  3:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-version-file-write
+  5:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-versions
+  8:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  libexec/rbenv-global
+  16:[ -n "$RBENV_DEBUG" ] && set -x
+  
+  README.md
+  513:`RBENV_DEBUG` | | Outputs debug information.<br>Also as: `rbenv --debug `</code></pre>
+
+<p>It looks like it's available in most (if not all?) of the command files inside our <code>libexec/</code> folder.  If a given file makes use of debug mode, we'll call it out explicitly when we read through that file's code.  For now, let's just call out one or two points about its usage.</p>
+
+<p>The first thing to notice is the line numbers where <code>RBENV_DEBUG</code> is referenced.  They're pretty low: I see lines 4, 5, 6, 11, 10, 4, etc.  The highest line number I see is in <code>libexec/rbenv-local</code>, and that's just because the first 20 lines of "code" in that file are just comments:</p>
+
+
+<p>So it looks like at the start of all these files, we check if <code>RBENV_DEBUG</code> has been set.  If it has, we invoke <code>xtrace</code> via the <code>set -x</code> command. This is why we had to export the <code>RBENV_DEBUG</code> environment variable- so the command files we invoke (which are run in child processes) can access it.</p>
+
+<p>Lastly, this implies that you can't just turn on <code>xtrace</code> in a parent script and expect it to remain on in the parent's child scripts. Instead, you need to turn it on for each file that you expect to run.</p>
+
+<p>We can prove this with an experiment:</p>
+
+<h2>Experiment- does <code>xtrace</code> trickle down to child scripts?</h2>
+
+<p>I make a script named <code>foo</code> which looks like so:</p>
+
+<p>A simple bash script which turns on <code>xtrace</code>, prints a string, then calls a 2nd script, named <code>bar</code>.</p>
+
+<p>I create that 2nd script, which looks like this:</p>
+
+<p>The <code>bar</code> script calls <code>set -x</code> and <code>echo</code> the same way <code>foo</code> does, but <code>bar</code> doesn't call a child script the way <code>foo</code> does.</p>
+
+<p>When I run <code>foo</code>, I see the following:</p>
+
+<p>We see <code>xtrace</code> statements print out for the <code>echo</code> statements inside both <code>foo</code> and <code>bar</code>.</p>
+
+<p>Then, I remove the call to <code>set -x</code> in <code>bar</code>:</p>
+
+<p>When I re-run <code>foo</code>, I now see the following:</p>
+
+<p>I no longer see the <code>xtrace</code> statement inside <code>bar</code> (i.e. <code>+ echo 'Inside bar'</code>). I only see the result of the echo statement, which I would have seen either way.</p>
+
+<p>So the effects of <code>xtrace</code> do not automatically trickle down from parent scripts to child scripts. We have to manually call <code>set -x</code> for each new script we run.</p>
+
+<h2>Wrapping Up</h2>
+
+<p>That's it for <code>xtrace</code>.  Try it out next time you're attempting to follow the path of code execution in a shell script.</p>
