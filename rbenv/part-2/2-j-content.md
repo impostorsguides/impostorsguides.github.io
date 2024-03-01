@@ -1,6 +1,6 @@
 As per usual, we'll look at the tests first, and the code afterward.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/completions.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/completions.bats){:target="_blank" rel="noopener" }
 
 After the `bats` shebang and the loading of `test_helper`, the first block of code is:
 
@@ -33,7 +33,7 @@ Next block of code is our first test:
 }
 ```
 
-This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-completions#L21){:target="_blank" rel="noopener"}.  We make a simple command file containing only the Bash shebang and an `echo` statement.  Because the file doesn't include any completion comments, when the `completions` command is passed the name of our new file, it should only output the standard completions which are common to all files (i.e. `--help`).  When we run the command, we assert that this is exactly what happens.
+This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-completions#L21){:target="_blank" rel="noopener" }.  We make a simple command file containing only the Bash shebang and an `echo` statement.  Because the file doesn't include any completion comments, when the `completions` command is passed the name of our new file, it should only output the standard completions which are common to all files (i.e. `--help`).  When we run the command, we assert that this is exactly what happens.
 
 ### Running `rbenv completions` on a command with completions
 
@@ -57,7 +57,7 @@ OUT
 }
 ```
 
-This test covers [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-completions#L23-L26){:target="_blank" rel="noopener"}.  We do the following:
+This test covers [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-completions#L23-L26){:target="_blank" rel="noopener" }.  We do the following:
 
  - We again create a fake command named "hello".
  - This time our command contains the comment `# Provide rbenv completions` as well as some logic to conditionally print "hello" when the command is passed the "--complete" flag.
@@ -103,7 +103,7 @@ We have a test which is very similar to the one before:
 
 Now that we've finished the tests, let's move on to the code.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-completions){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-completions){:target="_blank" rel="noopener" }
 
 First few lines of code:
 
@@ -248,7 +248,7 @@ The plain string is easy to reason about, so let's focus on the pattern.
 
  - Here the `^` character means that regex pattern which follows should appear at the start of the string.
 - `(#|-|/)` means `# or - or /`.  More generally, the `|` syntax means "or", and the parentheses with several `|` characters (i.e. `(...|...|...)` ) means that we're looking for one of 3 possible patterns to start the string.
-- The syntax `[...]` means "any one of the characters inside the square brackets.  So `[#%]` means `either # or %`.  Source [here](https://tldp.org/LDP/abs/html/x17129.html){:target="_blank" rel="noopener"}.
+- The syntax `[...]` means "any one of the characters inside the square brackets.  So `[#%]` means `either # or %`.  Source [here](https://tldp.org/LDP/abs/html/x17129.html){:target="_blank" rel="noopener" }.
 
 So to sum up the pattern, we're looking for:
 
@@ -256,11 +256,11 @@ So to sum up the pattern, we're looking for:
  - a space, followed by
  - the string `provide rbenv completions`.
 
-If there was a match, then we shift off the first argument from our list of arguments and run the command itself, passing it the `--complete` option that we've encountered before, for example [here](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-commands#L9){:target="_blank" rel="noopener"}.  This displays the possible completions just for that one command, then exits.
+If there was a match, then we shift off the first argument from our list of arguments and run the command itself, passing it the `--complete` option that we've encountered before, for example [here](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-commands#L9){:target="_blank" rel="noopener" }.  This displays the possible completions just for that one command, then exits.
 
 ### Why do we use *this* regex pattern?
 
-The original regex pattern used in `rbenv-completions` was much simpler- just `^#`.  It was updated to this particular regex pattern (`^\([#%]\|--\|//\)`) as part of [this commit](https://github.com/rbenv/rbenv/commit/497911d6c093341cc1420f1f3f6f1fae5f64d0f5){:target="_blank" rel="noopener"}, in order to support Javascript, Lua, and Erlang comments as well as Bash comments.  Unfortunately we don't have any discussion around this commit, so we don't know why support was added for these languages, and not others.
+The original regex pattern used in `rbenv-completions` was much simpler- just `^#`.  It was updated to this particular regex pattern (`^\([#%]\|--\|//\)`) as part of [this commit](https://github.com/rbenv/rbenv/commit/497911d6c093341cc1420f1f3f6f1fae5f64d0f5){:target="_blank" rel="noopener" }, in order to support Javascript, Lua, and Erlang comments as well as Bash comments.  Unfortunately we don't have any discussion around this commit, so we don't know why support was added for these languages, and not others.
 
 I'll admit I'm a bit confused about why this was necessary.  If I had to speculate, I'd say that some people prefer to write their RBENV plugins in one of these languages, and the core team felt that this was a popular enough choice that it warranted support, in the form of this update to the regex pattern.
 

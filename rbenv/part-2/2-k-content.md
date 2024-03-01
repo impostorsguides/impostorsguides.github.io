@@ -1,6 +1,6 @@
 As usual, we'll do the test first, and the code afterward:
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/exec.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/exec.bats){:target="_blank" rel="noopener" }
 
 After the `bats` shebang and the loading of `test_helper`, the first block of code is:
 
@@ -24,10 +24,10 @@ We start by defining a helper function called `create_executable`.  This functio
 
 #### Storing the name of the executable
 
-I'm not sure what the question-mark syntax does, so I pull up [the bash docs on parameter expansion](https://web.archive.org/web/20230525183815/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"}:
+I'm not sure what the question-mark syntax does, so I pull up [the bash docs on parameter expansion](https://web.archive.org/web/20230525183815/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener" }:
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-28may2023-834pm.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-28may2023-834pm.png">
     <img src="/assets/images/screenshot-28may2023-834pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
@@ -76,11 +76,11 @@ Let's break this into two pieces.  The first piece is:
   }
 ```
 
-This half is wrapped in curly braces, meaning we perform it as a single operation and send its contents to the next half.  This is called ["command grouping"](https://web.archive.org/web/20230326002400/https://www.gnu.org/software/bash/manual/html_node/Command-Grouping.html){:target="_blank" rel="noopener"} in Bash, and we've seen it before (for example, when we defined the `abort` helper function [in `libexec/rbenv`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L16-L19){:target="_blank" rel="noopener"}).
+This half is wrapped in curly braces, meaning we perform it as a single operation and send its contents to the next half.  This is called ["command grouping"](https://web.archive.org/web/20230326002400/https://www.gnu.org/software/bash/manual/html_node/Command-Grouping.html){:target="_blank" rel="noopener" } in Bash, and we've seen it before (for example, when we defined the `abort` helper function [in `libexec/rbenv`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L16-L19){:target="_blank" rel="noopener" }).
 
-What is the output of the command grouping?  We start by invoking `$#` and checking if it's equal to 0.  Referring back to [this line of `libexec/rbenv`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L16){:target="_blank" rel="noopener"}, we recall that `$#` expands to the number of arguments that were passed to the `create_executable` function.
+What is the output of the command grouping?  We start by invoking `$#` and checking if it's equal to 0.  Referring back to [this line of `libexec/rbenv`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L16){:target="_blank" rel="noopener" }, we recall that `$#` expands to the number of arguments that were passed to the `create_executable` function.
 
-So if the # of arguments is equal to 0, then we `cat -`.  Again referring back to [that same line of `libexec/rbenv`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L16){:target="_blank" rel="noopener"}, we recall that `cat -` reads from `stdin` and redirects its input to `stdout`.
+So if the # of arguments is equal to 0, then we `cat -`.  Again referring back to [that same line of `libexec/rbenv`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L16){:target="_blank" rel="noopener" }, we recall that `cat -` reads from `stdin` and redirects its input to `stdout`.
 
 On the other hand, if the # of arguments is **greater than** zero, we `echo $@` (i.e. we print all the arguments to STDOUT).
 
@@ -131,13 +131,13 @@ So the `sed` command is a string editor command.  It takes a block of text and a
 
 ##### The `-E` flag
 
-According to the above `man` entry, the `-E` flag tells UNIX to treat the regular expression as a more modern version called an "extended regular expression", rather than an older version called a "basic regular expression".  [According to `gnu.org`](https://web.archive.org/web/20230524114622/https://www.gnu.org/software/sed/manual/sed.html){:target="_blank" rel="noopener"}:
+According to the above `man` entry, the `-E` flag tells UNIX to treat the regular expression as a more modern version called an "extended regular expression", rather than an older version called a "basic regular expression".  [According to `gnu.org`](https://web.archive.org/web/20230524114622/https://www.gnu.org/software/sed/manual/sed.html){:target="_blank" rel="noopener" }:
 
 > Extended regexps are those that egrep accepts; they can be clearer because they usually have fewer backslashes.
 
 ##### The `-e` flag
 
-According to [StackOverflow](https://unix.stackexchange.com/a/33159/142469){:target="_blank" rel="noopener"}, the `-e` flag means we should be able to pass multiple `sed` commands, chaining them together one after another.  However, it looks like we're only passing one.
+According to [StackOverflow](https://unix.stackexchange.com/a/33159/142469){:target="_blank" rel="noopener" }, the `-e` flag means we should be able to pass multiple `sed` commands, chaining them together one after another.  However, it looks like we're only passing one.
 
 ##### Reading the regexp pattern
 
@@ -150,22 +150,22 @@ The one and only regexp that we pass to `sed` is:
 Most regexps that I encounter are very specific to the concise use case they're being applied toward, making them notoriously hard to Google unless that use case is a very common one among programmers.  So in this case, I decide to ask ChatGPT what this pattern does:
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-29may2023-1209pm.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-29may2023-1209pm.png">
     <img src="/assets/images/screenshot-29may2023-1209pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
 
 From ChatGPT's answer, we learn that:
 
- - `1` refers to the line number to which we want to apply the regexp pattern.  This is confirmed in the documentation for `sed`, [in Section 4.1 titled `Addresses overview`](https://web.archive.org/web/20230524114622/https://www.gnu.org/software/sed/manual/sed.html#Addresses-overview){:target="_blank" rel="noopener"}.
-- `s/` indicates we'll be performing a search-and-replace operation, finding some text which matches one pattern and replacing it with something else.  In the `sed` docs, this is covered in [section 3.3 ("The `s` command")](https://web.archive.org/web/20230524114622/https://www.gnu.org/software/sed/manual/sed.html#The-_0022s_0022-Command){:target="_blank" rel="noopener"}.
-- The `^` caret character after `/` tells `sed` that the subsequent pattern must start at the beginning of the line of input.  The docs confirm this [here](https://web.archive.org/web/20230524114622/https://www.gnu.org/software/sed/manual/sed.html#Regular-Expressions-Overview){:target="_blank" rel="noopener"}, in the section "Overview of basic regular expression syntax".
-  - Although this section deals with basic regular expressions (not extended ones), [the section on extended regular expression syntax](https://web.archive.org/web/20230524114622/https://www.gnu.org/software/sed/manual/sed.html#ERE-syntax){:target="_blank" rel="noopener"} says that `The only difference between basic and extended regular expressions is in the behavior of a few characters: '?', '+', parentheses, braces ('{}'), and '\|'.`
+ - `1` refers to the line number to which we want to apply the regexp pattern.  This is confirmed in the documentation for `sed`, [in Section 4.1 titled `Addresses overview`](https://web.archive.org/web/20230524114622/https://www.gnu.org/software/sed/manual/sed.html#Addresses-overview){:target="_blank" rel="noopener" }.
+- `s/` indicates we'll be performing a search-and-replace operation, finding some text which matches one pattern and replacing it with something else.  In the `sed` docs, this is covered in [section 3.3 ("The `s` command")](https://web.archive.org/web/20230524114622/https://www.gnu.org/software/sed/manual/sed.html#The-_0022s_0022-Command){:target="_blank" rel="noopener" }.
+- The `^` caret character after `/` tells `sed` that the subsequent pattern must start at the beginning of the line of input.  The docs confirm this [here](https://web.archive.org/web/20230524114622/https://www.gnu.org/software/sed/manual/sed.html#Regular-Expressions-Overview){:target="_blank" rel="noopener" }, in the section "Overview of basic regular expression syntax".
+  - Although this section deals with basic regular expressions (not extended ones), [the section on extended regular expression syntax](https://web.archive.org/web/20230524114622/https://www.gnu.org/software/sed/manual/sed.html#ERE-syntax){:target="_blank" rel="noopener" } says that `The only difference between basic and extended regular expressions is in the behavior of a few characters: '?', '+', parentheses, braces ('{}'), and '\|'.`
   - Therefore, we can safely assume that the `^` character functions the same in both BREs and EREs.
 - `" +"` (i.e. a space followed by a plus sign) means that we want to match against one or more empty-space characters.
   - Remember that the `+` character **is** one of the characters whose behavior differs between basic vs. extended regular expressions.
   - In basic regular expressions, we would add a `\` before `+` if we wanted it to be treated as a special character (i.e. to have the "one or more" meaning).
-  - [In extended regular expressions](https://web.archive.org/web/20230524114622/https://www.gnu.org/software/sed/manual/sed.html#ERE-syntax){:target="_blank" rel="noopener"}, it's the opposite- we precede `+` with `\` if we do **not** want it to be treated as a special character.
+  - [In extended regular expressions](https://web.archive.org/web/20230524114622/https://www.gnu.org/software/sed/manual/sed.html#ERE-syntax){:target="_blank" rel="noopener" }, it's the opposite- we precede `+` with `\` if we do **not** want it to be treated as a special character.
 - The `//` syntax indicates the content that we want to use to replace the one or more empty spaces that we found.
   - With no characters in-between the `//`, we indicate that we want to replace those empty spaces with nothing.
   - In other words, we want to delete them.
@@ -284,7 +284,7 @@ OUT
 }
 ```
 
-This test appears to cover [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L20-L22){:target="_blank" rel="noopener"}.
+This test appears to cover [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L20-L22){:target="_blank" rel="noopener" }.
 
  - We specify the Ruby version and make two executables within RBENV's directory for that version.
  - We then run `rbenv rehash` to generate the shims for these two new commands, since the completions for `exec` depend on which shims exist.
@@ -309,15 +309,15 @@ SH
 }
 ```
 
-We've seen a test like this before.  The goal is to cover [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L36-L41){:target="_blank" rel="noopener"}.
+We've seen a test like this before.  The goal is to cover [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L36-L41){:target="_blank" rel="noopener" }.
 
- - We create a hook file whose output depends on certain values being set for the [internal field separator](https://web.archive.org/web/20220715010436/https://www.baeldung.com/linux/ifs-shell-variable){:target="_blank" rel="noopener"}.
+ - We create a hook file whose output depends on certain values being set for the [internal field separator](https://web.archive.org/web/20220715010436/https://www.baeldung.com/linux/ifs-shell-variable){:target="_blank" rel="noopener" }.
  - We then set the Ruby version to the machine's default version.
  - We then run `rbenv exec` with a command that we know will be on the user's machine (the `env` command, which ships with all Bash terminals).
  - When we run `rbenv exec`, we set the value of the internal field separator to the characters which our hook depends on in order to produce the expected output.
  - Lastly, we assert that the command was successful and that the output was printed to STDOUT as expected.
 
-It looks like this test was introduced in response to [this issue](https://github.com/rbenv/rbenv/pull/379){:target="_blank" rel="noopener"}, which reported that [a previous PR](https://github.com/rbenv/rbenv/commit/baf7656){:target="_blank" rel="noopener"} broke the way that plugins behave.
+It looks like this test was introduced in response to [this issue](https://github.com/rbenv/rbenv/pull/379){:target="_blank" rel="noopener" }, which reported that [a previous PR](https://github.com/rbenv/rbenv/commit/baf7656){:target="_blank" rel="noopener" } broke the way that plugins behave.
 
 ### Forwarding arguments
 
@@ -348,10 +348,10 @@ OUT
 }
 ```
 
-This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L47){:target="_blank" rel="noopener"}.  It creates an executable named `ruby`, whose logic consists of:
+This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L47){:target="_blank" rel="noopener" }.  It creates an executable named `ruby`, whose logic consists of:
 
  - A simplified version of our Bash shebang (using the `$BASH` env var, which evalates to `/bin/bash` on my machine).
- - A call to print the "$0" argument, which [expands to the name of the script that's being run](https://web.archive.org/web/20220923182330/https://www.gnu.org/software/bash/manual/html_node/Special-Parameters.html#:~:text=If%20Bash%20is%20invoked%20with,executed%2C%20if%20one%20is%20present.){:target="_blank" rel="noopener"}
+ - A call to print the "$0" argument, which [expands to the name of the script that's being run](https://web.archive.org/web/20220923182330/https://www.gnu.org/software/bash/manual/html_node/Special-Parameters.html#:~:text=If%20Bash%20is%20invoked%20with,executed%2C%20if%20one%20is%20present.){:target="_blank" rel="noopener" }
  - A loop over all the arguments it receives, printing each one followed by a newline.
 
 We then run `rbenv exec` with the name of that script, passing arguments which are formatted in many different ways:
@@ -359,7 +359,7 @@ We then run `rbenv exec` with the name of that script, passing arguments which a
 
  - as a flag (`-w`)
  - as a string with spaces in it (in this case, resembling a path to a file)
- - as a double-dash ([signifying the end of command options](https://web.archive.org/web/20221023095659/https://unix.stackexchange.com/questions/11376/what-does-double-dash-mean){:target="_blank" rel="noopener"})
+ - as a double-dash ([signifying the end of command options](https://web.archive.org/web/20221023095659/https://unix.stackexchange.com/questions/11376/what-does-double-dash-mean){:target="_blank" rel="noopener" })
  - as regular arguments (`extra` and `args`)
 
 Lastly, we assert that the command exited successfully.  We then pass a heredoc string to `assert_output`, ensuring that the arguments printed out the way we expected.
@@ -421,7 +421,7 @@ From here we learn that some machines don't support the use of `#!` shebangs, an
 
 But how does the former (i.e. the use of `-S`) lead to the latter (the ability to achieve shebang-like behavior on machines which don't support shebangs)?
 
-To answer this, [I post a StackOverflow question](https://web.archive.org/web/20230531144658/https://stackoverflow.com/questions/76359523/what-is-the-s-flag-used-for-in-ruby){:target="_blank" rel="noopener"}.  The gist of the answer is:
+To answer this, [I post a StackOverflow question](https://web.archive.org/web/20230531144658/https://stackoverflow.com/questions/76359523/what-is-the-s-flag-used-for-in-ruby){:target="_blank" rel="noopener" }.  The gist of the answer is:
 
  - On a machine which does support shebangs:
     - The file will be executed as normal, and the shebang will tell Unix to use Ruby to execute the rest of the file.
@@ -471,15 +471,15 @@ This time it works, because I passed the `-S` flag to `ruby` **and** I made sure
 
 Now that I get what `-S` is and why it's useful, I'm wondering what prompted this test to be added in the first place.
 
-After a bit of digging, I found [this PR](https://github.com/rbenv/rbenv/issues/14){:target="_blank" rel="noopener"} with the following description:
+After a bit of digging, I found [this PR](https://github.com/rbenv/rbenv/issues/14){:target="_blank" rel="noopener" } with the following description:
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-29may2023-448pm.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-29may2023-448pm.png">
     <img src="/assets/images/screenshot-29may2023-448pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
 
-The above Github issue reported the following error when trying to install [Rubinius](https://github.com/rubinius/rubinius){:target="_blank" rel="noopener"}:
+The above Github issue reported the following error when trying to install [Rubinius](https://github.com/rubinius/rubinius){:target="_blank" rel="noopener" }:
 
 ```
 /Users/sam/.rbenv/versions/1.9.3-preview1/bin/ruby -S rake  -r /private/tmp/ruby-build.10166-13998/rubinius-1.2.4/config.rb -r /private/tmp/ruby-build.10166-13998/rubinius-1.2.4/rakelib/ext_helper.rb -r /private/tmp/ruby-build.10166-13998/rubinius-1.2.4/rakelib/dependency_grapher.rb build:mri
@@ -787,9 +787,9 @@ OK, *that* worked, because `/bin/sh` treats any line starting with `#` as a comm
 
 As far as I can tell, it's only when you try to execute a file directly, without using an interpreter such as `/bin/sh` or `ruby`, that the shebang is used.  Which makes sense, when I think about it.
 
-But then why does the test include the Ruby shebang in an executable that it plans to run with `/bin/sh`?  I know this file is executed by the other file we created [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/exec.bats#L85){:target="_blank" rel="noopener"}, and I know that file looks at the first line of the `rake` file to check for a Ruby shebang.  But if that shebang isn't going to be used, then why check for it at all?
+But then why does the test include the Ruby shebang in an executable that it plans to run with `/bin/sh`?  I know this file is executed by the other file we created [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/exec.bats#L85){:target="_blank" rel="noopener" }, and I know that file looks at the first line of the `rake` file to check for a Ruby shebang.  But if that shebang isn't going to be used, then why check for it at all?
 
-Because according to the answer to [my earlier StackOverflow question](https://web.archive.org/web/20230531144658/https://stackoverflow.com/questions/76359523/what-is-the-s-flag-used-for-in-ruby/){:target="_blank" rel="noopener"}, the real `ruby -S` command is meant to address the case where a user's shell doesn't support shebangs.  In that eventuality, the shell will execute the file as a shell script.  By running the `rake` script (containing a `ruby` shebang) as a shell script via the `/bin/sh` command, it looks like we're mimicing the real world usage of `-S`.  When that file is treated as a shell script, the shebang is treated as a comment and ignored, and only the `echo hello rake` line is executed.
+Because according to the answer to [my earlier StackOverflow question](https://web.archive.org/web/20230531144658/https://stackoverflow.com/questions/76359523/what-is-the-s-flag-used-for-in-ruby/){:target="_blank" rel="noopener" }, the real `ruby -S` command is meant to address the case where a user's shell doesn't support shebangs.  In that eventuality, the shell will execute the file as a shell script.  By running the `rake` script (containing a `ruby` shebang) as a shell script via the `/bin/sh` command, it looks like we're mimicing the real world usage of `-S`.  When that file is treated as a shell script, the shebang is treated as a comment and ignored, and only the `echo hello rake` line is executed.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
@@ -806,13 +806,13 @@ We run `rbenv rehash` (to make sure the shims for `ruby` and `rake` are the firs
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
-We read earlier that some machines apparently don't support shebangs.  Interesting.  I try to look up which ones, starting with Googling "shebang computing".  The first result is [a Wikipedia article](https://web.archive.org/web/20221102170415/https://en.wikipedia.org/wiki/Shebang_(Unix)){:target="_blank" rel="noopener"} whose title is "Shebang (Unix)".  That title, plus the sentence in the 2nd paragraph (below), give a clue:
+We read earlier that some machines apparently don't support shebangs.  Interesting.  I try to look up which ones, starting with Googling "shebang computing".  The first result is [a Wikipedia article](https://web.archive.org/web/20221102170415/https://en.wikipedia.org/wiki/Shebang_(Unix)){:target="_blank" rel="noopener" } whose title is "Shebang (Unix)".  That title, plus the sentence in the 2nd paragraph (below), give a clue:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-409am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
 </p>
 
-Together, these tell me that one type of machine that *wouldn't* support a shebang is a non-Unix system, such as Windows.  I find another StackOverflow answer [here](https://web.archive.org/web/20220725080603/https://stackoverflow.com/questions/7574453/shebang-notation-python-scripts-on-windows-and-linux){:target="_blank" rel="noopener"}, which tells me essentially the same thing, when I Google "do shebangs work in windows":
+Together, these tell me that one type of machine that *wouldn't* support a shebang is a non-Unix system, such as Windows.  I find another StackOverflow answer [here](https://web.archive.org/web/20220725080603/https://stackoverflow.com/questions/7574453/shebang-notation-python-scripts-on-windows-and-linux){:target="_blank" rel="noopener" }, which tells me essentially the same thing, when I Google "do shebangs work in windows":
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-413am.png" width="80%" style="border: 1px solid black; padding: 0.5em">
@@ -820,7 +820,7 @@ Together, these tell me that one type of machine that *wouldn't* support a sheba
 
 I feel like that's a good enough answer for now.  Let's move on to the code.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec){:target="_blank" rel="noopener" }
 
 First few lines of code:
 
@@ -864,7 +864,7 @@ fi
 
 Here we check whether the user passed the `--complete` flag as the first argument to `rbenv exec`.  If they did, we run `rbenv-shims --short`.
 
-This is a different command from what we usually run when the user passes `--complete`.  For instance, [here](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-commands#L9){:target="_blank" rel="noopener"} we just echo basic strings when the user passes this flag.  I'm curious why we do things differently here.
+This is a different command from what we usually run when the user passes `--complete`.  For instance, [here](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-commands#L9){:target="_blank" rel="noopener" } we just echo basic strings when the user passes this flag.  I'm curious why we do things differently here.
 
 First of all, what does `rbenv exec --complete` result in?  Let's run it and find out:
 
@@ -910,9 +910,9 @@ And that's just the output starting with A through G.  It looks like this output
 # Summary: Run an executable with the selected Ruby version
 ```
 
-And judging by the content of [the `rbenv-shims` file](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-shims){:target="_blank" rel="noopener"} (which we'll get to later), it looks like when the user runs `rbenv shims --short`, rbenv will print the name of each shim in its `shims` directory.
+And judging by the content of [the `rbenv-shims` file](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-shims){:target="_blank" rel="noopener" } (which we'll get to later), it looks like when the user runs `rbenv shims --short`, rbenv will print the name of each shim in its `shims` directory.
 
-Since there's one shim in that directory for each Ruby gem I have installed, I conclude that we add a shim to this folder whenever we install a Ruby gem which exposes a terminal command.  (NOTE- we'll find out when we read through [the `rubygems_plugin.rb` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/rbenv.d/exec/gem-rehash/rubygems_plugin.rb){:target="_blank" rel="noopener"} that this is correct.)
+Since there's one shim in that directory for each Ruby gem I have installed, I conclude that we add a shim to this folder whenever we install a Ruby gem which exposes a terminal command.  (NOTE- we'll find out when we read through [the `rubygems_plugin.rb` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/rbenv.d/exec/gem-rehash/rubygems_plugin.rb){:target="_blank" rel="noopener" } that this is correct.)
 
 The reason why we run `exec rbenv-shims --short` here, and nothing else (i.e. no `echo`'ing as with other commands) is that we only expose completions for `rbenv exec` that correspond to commands you can run using `rbenv exec`.
 
@@ -1077,7 +1077,7 @@ We then prepend the `PATH` variable with the value of `RBENV_BIN_PATH`, but **on
 
 We do this so that, in the subsequent `exec` command, the first suitable folder in which the shell finds the user's requested executable is the subfolder of the Ruby version that your configuration has asked RBENV to use.  For example, if my current RBENV Ruby version is 2.7.5, RBENV will prepend `/Users/myusername/.rbenv/versions/2.7.5/bin/` to my path, meaning my shell will search this folder first for any executable with the name of the command I'm trying to run.
 
-I was curious *why* we have this `if` check, and after a bit of digging I found [this commit](https://github.com/rbenv/rbenv/commit/8ee2f2657a088851d0aa75736c7b0305a10522f1){:target="_blank" rel="noopener"}.  It appears that, if the user is running the system version of Ruby, then their Ruby load path is already part of the overall PATH.  And adding it a 2nd time [could break things](https://github.com/rbenv/rbenv/commit/8ee2f2657a088851d0aa75736c7b0305a10522f1){:target="_blank" rel="noopener"}.
+I was curious *why* we have this `if` check, and after a bit of digging I found [this commit](https://github.com/rbenv/rbenv/commit/8ee2f2657a088851d0aa75736c7b0305a10522f1){:target="_blank" rel="noopener" }.  It appears that, if the user is running the system version of Ruby, then their Ruby load path is already part of the overall PATH.  And adding it a 2nd time [could break things](https://github.com/rbenv/rbenv/commit/8ee2f2657a088851d0aa75736c7b0305a10522f1){:target="_blank" rel="noopener" }.
 
 ### Executing the user's command
 
@@ -1112,7 +1112,7 @@ I try looking up the `-a` flag in the `man` entry, but it's confusingly-worded:
 The `-a' option means to make set argv[0] of the executed process to NAME.
 ```
 
-I look it up [here](https://web.archive.org/web/20220628155926/https://ss64.com/bash/exec.html){:target="_blank" rel="noopener"}, which says that `-a` means:
+I look it up [here](https://web.archive.org/web/20220628155926/https://ss64.com/bash/exec.html){:target="_blank" rel="noopener" }, which says that `-a` means:
 
 ```
 The shell passes name as the zeroth argument to command.
@@ -1169,7 +1169,7 @@ Hello world
 2: 2
 ```
 
-Why is the 0th argument different from what I expected?  And why would we want "ruby" as the 0th argument?  It seems like `exec` can handle the full `/Users/myusername/.rbenv/versions/2.7.5/bin/ruby` command just fine, right?  I post a [question on StackExchange](https://unix.stackexchange.com/questions/717671/why-isnt-exec-a-working-the-way-i-expect){:target="_blank" rel="noopener"}, and soon I get [a response](https://unix.stackexchange.com/a/717673/142469){:target="_blank" rel="noopener"}.
+Why is the 0th argument different from what I expected?  And why would we want "ruby" as the 0th argument?  It seems like `exec` can handle the full `/Users/myusername/.rbenv/versions/2.7.5/bin/ruby` command just fine, right?  I post a [question on StackExchange](https://unix.stackexchange.com/questions/717671/why-isnt-exec-a-working-the-way-i-expect){:target="_blank" rel="noopener" }, and soon I get [a response](https://unix.stackexchange.com/a/717673/142469){:target="_blank" rel="noopener" }.
 
 It seems that some programs change their behavior depending on what the value of `$0` is.  Also, the `-a` flag doesn't work the way I'm calling it, because I'm calling a shell script, not a binary executable.  When calling a shell script like so:
 

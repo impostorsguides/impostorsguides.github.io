@@ -48,7 +48,7 @@ No big surprises here.  If we delete the `.ruby-version` file in a directory, no
 
 Moving on to the test file.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-file.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-file.bats){:target="_blank" rel="noopener" }
 
 ### Setup steps
 
@@ -247,7 +247,7 @@ You may be wondering how the test above is different from the test with the desc
 
 Now on to the code itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-file){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-file){:target="_blank" rel="noopener" }
 
 Let's get the repetitive stuff over with:
 
@@ -377,6 +377,6 @@ If we pass an argument to `rbenv version-file`, that means the user wants to che
 
 So it makes sense that the above `if/else` block wouldn't have the same number of `||` or-checks in the `if` block (when the user **did** specify a directory) that we have if the `else` block (when the user did **not** specify a directory).
 
-It might seem misleading to tell the user that their Ruby version is set by `~/.rbenv/version`, when that file potentially doesn't exist.  The reason we do so is because, [according to the core team](https://github.com/rbenv/rbenv/discussions/1510){:target="_blank" rel="noopener"}, the intent of the `rbenv version-file` command is to describe where the version number **is expected to be** set, not (necessarily) where it **is being** set.
+It might seem misleading to tell the user that their Ruby version is set by `~/.rbenv/version`, when that file potentially doesn't exist.  The reason we do so is because, [according to the core team](https://github.com/rbenv/rbenv/discussions/1510){:target="_blank" rel="noopener" }, the intent of the `rbenv version-file` command is to describe where the version number **is expected to be** set, not (necessarily) where it **is being** set.
 
 That's it for the `version-file` file.  On to the next file.

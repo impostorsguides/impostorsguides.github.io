@@ -1,6 +1,6 @@
 We're bypassing `rbenv-init` because we already covered that earlier, and skipping ahead to `rbenv-local`.  As per usual, let's look at the test file first.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/local.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/local.bats){:target="_blank" rel="noopener" }
 
 After the `bats` shebang and call to `test_loader`, the first block of code is:
 
@@ -146,7 +146,7 @@ Here we create an empty `.ruby-version` file.  The file doesn't need any content
 
 A pretty straightforward series of specs.  Now on to the command itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-local){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-local){:target="_blank" rel="noopener" }
 
 The first block of code is:
 

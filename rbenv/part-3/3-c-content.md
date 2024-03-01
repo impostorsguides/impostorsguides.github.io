@@ -1,14 +1,14 @@
 The `bin/` directory contains only one file, a symlink called `rbenv` which points to the `libexec/rbenv` file we've already looked at.
 
-If we look at the `git` history for this symlink file, we can see that it was added in [this PR](https://github.com/rbenv/rbenv/pull/3/files){:target="_blank" rel="noopener"}, quite early in RBENV's history.  Prior to that, all the sub-commands (which now live in `libexec/`) lived directly in `bin/`.
+If we look at the `git` history for this symlink file, we can see that it was added in [this PR](https://github.com/rbenv/rbenv/pull/3/files){:target="_blank" rel="noopener" }, quite early in RBENV's history.  Prior to that, all the sub-commands (which now live in `libexec/`) lived directly in `bin/`.
 
 So, why the change of directories?
 
-When we previously read through the `rbenv` command, specifically the part about [making hooks available](/rbenv/rbenv/making-hooks-available){:target="_blank" rel="noopener"}, we learned about the [Filesystem Hierarchy Standard](https://es.wikipedia.org/wiki/Filesystem_Hierarchy_Standard){:target="_blank" rel="noopener"}.  Part of that standard addresses the `bin/` and `libexec/` directories, and why you might use one vs. the other.
+When we previously read through the `rbenv` command, specifically the part about [making hooks available](/rbenv/rbenv/making-hooks-available){:target="_blank" rel="noopener" }, we learned about the [Filesystem Hierarchy Standard](https://es.wikipedia.org/wiki/Filesystem_Hierarchy_Standard){:target="_blank" rel="noopener" }.  Part of that standard addresses the `bin/` and `libexec/` directories, and why you might use one vs. the other.
 
 ## Uses of the `bin/` directory
 
-Referring to section 3.4 of [the main FHS document](https://web.archive.org/web/20230502051228/https://refspecs.linuxfoundation.org/FHS_3.0/fhs-3.0.pdf){:target="_blank" rel="noopener"}, we see that it addresses the `bin/` directory and its uses:
+Referring to section 3.4 of [the main FHS document](https://web.archive.org/web/20230502051228/https://refspecs.linuxfoundation.org/FHS_3.0/fhs-3.0.pdf){:target="_blank" rel="noopener" }, we see that it addresses the `bin/` directory and its uses:
 
 > `/bin` contains commands that may be used by both the system administrator and by users... It may also contain commands which are used indirectly by scripts.
 
@@ -16,7 +16,7 @@ In other words, `bin/` is meant to store commands which are intentionally expose
 
 ## Uses of the `libexec/` directory
 
-Skipping ahead to section 4.7 of the FHS [says](https://web.archive.org/web/20230502051228/https://refspecs.linuxfoundation.org/FHS_3.0/fhs-3.0.pdf){:target="_blank" rel="noopener"}, we see that the `/usr/libexec` folder:
+Skipping ahead to section 4.7 of the FHS [says](https://web.archive.org/web/20230502051228/https://refspecs.linuxfoundation.org/FHS_3.0/fhs-3.0.pdf){:target="_blank" rel="noopener" }, we see that the `/usr/libexec` folder:
 
 > ...includes internal binaries that are not intended to be executed directly by users or shell
 scripts.
@@ -29,7 +29,7 @@ It's the equivalent of marking a method `private` in Ruby.  You can still call i
 
 ## Why use two separate directories?
 
-Maybe all this seems like overkill.  What's the harm in letting users call internal code themselves?  [This StackOverflow answer](https://unix.stackexchange.com/a/386015/142469){:target="_blank" rel="noopener"} addresses that question:
+Maybe all this seems like overkill.  What's the harm in letting users call internal code themselves?  [This StackOverflow answer](https://unix.stackexchange.com/a/386015/142469){:target="_blank" rel="noopener" } addresses that question:
 
 > It's a question of supportability - platform providers have learned from years of experience that if you put binaries in `PATH` by default, people will come to depend on them being there, and will come to depend on the specific arguments and options they support.
 >

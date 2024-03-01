@@ -2,7 +2,7 @@
   <h1 class="post-title">Executing The User's Command</h1>
 </header>
 
-<p>We've arrived at <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L21" target="_blank">the final line of code in the shim</a>:</p>
+<p>We've arrived at <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L21" target="_blank" rel="noopener">the final line of code in the shim</a>:</p>
 
 <pre><code>exec "/Users/richiethomas/.rbenv/libexec/rbenv" exec "$program" "$@"</code></pre>
 
@@ -16,7 +16,7 @@
 rbenv 1.2.0-16-gc4395e5
 bash-3.2$ </code></pre>
 
-<p>You should see <code>rbenv 1.2.0-16-gc4395e5</code> as the output.  If not, you may need to re-install RBENV <strong>from source</strong> (i.e. not from Homebrew or similar), as per the instructions <a href="/shell/install-rbenv" target="_blank">here</a>.</p>
+<p>You should see <code>rbenv 1.2.0-16-gc4395e5</code> as the output.  If not, you may need to re-install RBENV <strong>from source</strong> (i.e. not from Homebrew or similar), as per the instructions <a href="/shell/install-rbenv" target="_blank" rel="noopener">here</a>.</p>
 
 <h2>What command are we running?</h2>
 
@@ -61,7 +61,7 @@ bash-3.2$ </code></pre>
 
 <p>We're executing a file (i.e. a command), "replacing this shell with the specified program.". What does that mean?</p>
 
-<p>I Google "what is exec in bash", and one of the first links I find is this one, from <a href="https://web.archive.org/web/20230323171516/https://www.computerhope.com/unix/bash/exec.htm" target="_blank">a site called ComputerHope</a>:</p>
+<p>I Google "what is exec in bash", and one of the first links I find is this one, from <a href="https://web.archive.org/web/20230323171516/https://www.computerhope.com/unix/bash/exec.htm" target="_blank" rel="noopener">a site called ComputerHope</a>:</p>
 
 <blockquote>
   <h3>Bash exec builtin command</h3>
@@ -83,7 +83,7 @@ bash-3.2$ </code></pre>
 
 <p>Rather than copy/paste the whole page, I'll direct you to open and read it yourself.  Feel free to skip the section called "Password Verification" unless you're curious, since it isn't immediately relevant to our discussion here.  However the section after that, called "Introduction to the Shell", is worth reading.</p>
 
-<p>To keep the focus of this page on the current line of code, I broke off further discussion of processes into <a href="/blog/what-are-processes/" target="_blank">a separate blog post called "What Are Processes?"</a>.  It contains some additional information and experiments based on the things I learned in the above article.  I recommend reading it before moving on if you are still confused about processes, since understanding this line of code is dependent on having that added context.</p>
+<p>To keep the focus of this page on the current line of code, I broke off further discussion of processes into <a href="/blog/what-are-processes/" target="_blank" rel="noopener">a separate blog post called "What Are Processes?"</a>.  It contains some additional information and experiments based on the things I learned in the above article.  I recommend reading it before moving on if you are still confused about processes, since understanding this line of code is dependent on having that added context.</p>
 
 <p>Armed with this new information, let's try using <code>exec</code> ourselves.</p>
 
@@ -108,7 +108,7 @@ bash-3.2$ </code></pre>
 
 <p>This means we're running the builtin exec command, and passing it the <code>/Users/richiethomas/.rbenv/libexec/rbenv</code> filepath.  Remember what we read in the <code>help exec</code> output above: <code>exec</code> technically takes a filepath as an argument.  It's just that, if we were to run <code>exec rbenv</code> instead of <code>exec /Users/richiethomas/.rbenv/libexec/rbenv</code>, the terminal would look up the filepath for <code>rbenv</code> by iterating through <code>$PATH</code>.</p>
 
-<p>Since we don't know what the user's <code>$PATH</code> contains, we don't know whether the version it would find first is the version of <code>rbenv</code> that lives at <code>/Users/richiethomas/.rbenv/libexec/rbenv</code>.  We specifically want to run that version, <a href="https://github.com/rbenv/rbenv/pull/1350" target="_blank">for reasons explained here</a>, so we declare our desired filepath manually.</p>
+<p>Since we don't know what the user's <code>$PATH</code> contains, we don't know whether the version it would find first is the version of <code>rbenv</code> that lives at <code>/Users/richiethomas/.rbenv/libexec/rbenv</code>.  We specifically want to run that version, <a href="https://github.com/rbenv/rbenv/pull/1350" target="_blank" rel="noopener">for reasons explained here</a>, so we declare our desired filepath manually.</p>
 
 <h2>The <code>rbenv exec</code> command</h2>
 
@@ -132,6 +132,6 @@ $ </code></pre>
 
 <h2>Wrapping Up</h2>
 
-<p>If you're still confused about processes, <code>exec</code>, and <code>fork</code>, you're probably not alone.  Check out <a href="https://web.archive.org/web/20230522095527/https://homepages.uc.edu/~thomam/Intro_Unix_Text/Process.html" target="_blank">the link I mentioned above from University of Cincinatti</a>, as well as <a href="/blog/what-are-processes" target="_blank">my follow-up blog post on processes</a>.</p>
+<p>If you're still confused about processes, <code>exec</code>, and <code>fork</code>, you're probably not alone.  Check out <a href="https://web.archive.org/web/20230522095527/https://homepages.uc.edu/~thomam/Intro_Unix_Text/Process.html" target="_blank" rel="noopener">the link I mentioned above from University of Cincinatti</a>, as well as <a href="/blog/what-are-processes" target="_blank" rel="noopener">my follow-up blog post on processes</a>.</p>
 
 <p>In the meantime, let's move on.</p>

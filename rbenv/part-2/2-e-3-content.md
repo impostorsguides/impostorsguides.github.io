@@ -46,12 +46,12 @@ Let's start on the outside and work our way in.  What is the function of the cur
 
 ## Output Grouping
 
-I Google "curly braces bash", and the first result I get is [this one from Linux.com](https://web.archive.org/web/20230306114329/https://www.linux.com/topic/desktop/all-about-curly-braces-bash/){:target="_blank" rel="noopener"}, which sounds promising.  I scan through the article looking for syntax which is similar to what we're doing, and along the way I learn some interesting but unrelated stuff (for instance, `echo {10..0..2}` will print every 2nd number from 10 down to 0 in your terminal).
+I Google "curly braces bash", and the first result I get is [this one from Linux.com](https://web.archive.org/web/20230306114329/https://www.linux.com/topic/desktop/all-about-curly-braces-bash/){:target="_blank" rel="noopener" }, which sounds promising.  I scan through the article looking for syntax which is similar to what we're doing, and along the way I learn some interesting but unrelated stuff (for instance, `echo {10..0..2}` will print every 2nd number from 10 down to 0 in your terminal).
 
 Finally I get to the last section of the article, called "Output Grouping".  It's here that I learn that "...you can also use `{ ... }` to group the output from several commands into one big blob."
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-25mar2023-937am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-25mar2023-937am.png">
     <img src="/assets/images/screenshot-25mar2023-937am.png" width="100%" style="border: 1px solid black; padding: 0.5em" alt="...you can also use `{ ... }` to group the output from several commands into one big blob.">
   </a>
 </center>
@@ -62,7 +62,7 @@ Cool, mystery solved- we're capturing the output of everything inside the curly 
 
 Next question- what is `>&2` at the end there?
 
-I Google ">&2 bash".  The first result is from [StackExchange](https://askubuntu.com/questions/1182450/what-does-2-mean-in-a-shell-script){:target="_blank" rel="noopener"}:
+I Google ">&2 bash".  The first result is from [StackExchange](https://askubuntu.com/questions/1182450/what-does-2-mean-in-a-shell-script){:target="_blank" rel="noopener" }:
 
 > Using > to redirect output is the same as using 1>. This says to redirect stdout (file descriptor 1).
 >
@@ -72,7 +72,7 @@ I Google ">&2 bash".  The first result is from [StackExchange](https://askubuntu
 
 So we're capturing the output of whatever the curly braces send to `stdout`, and redirecting it to `stderr`.  I happen to know from prior experience that `stdout` is short-hand for "standard out", and `stderr` means "standard error".  I have a vague notion of what these terms mean, but I'm not sure I could verbalize what they actually refer to.
 
-I Google "stdout stdin stderr" and get [this link](https://web.archive.org/web/20230309084428/https://www.tutorialspoint.com/understanding-stdin-stderr-and-stdout-in-linux){:target="_blank" rel="noopener"} as the first result.  From reading it, I learn that:
+I Google "stdout stdin stderr" and get [this link](https://web.archive.org/web/20230309084428/https://www.tutorialspoint.com/understanding-stdin-stderr-and-stdout-in-linux){:target="_blank" rel="noopener" } as the first result.  From reading it, I learn that:
 
  - these three things are called "data streams".
  - "...a data stream is something that gives us the ability to transfer data from a source to an outflow and vice versa. The source and the outflow are the two end points of the data stream."
@@ -84,7 +84,7 @@ I Google "stdout stdin stderr" and get [this link](https://web.archive.org/web/2
 
 The cool thing here is that, if we redirect the output of our `abort` function to `stderr`, then someone else can pick up where we left off, and send the output of their `stderr` anywhere they want.
 
-A website called Guru99 seems to have [some good content on redirection](https://web.archive.org/web/20230309072616/https://www.guru99.com/linux-redirection.html){:target="_blank" rel="noopener"}.  For example:
+A website called Guru99 seems to have [some good content on redirection](https://web.archive.org/web/20230309072616/https://www.guru99.com/linux-redirection.html){:target="_blank" rel="noopener" }.  For example:
 
 <center>
   <img src="/assets/images/screenshot-25mar2023-1039am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
@@ -104,7 +104,7 @@ I Google "difference between < > \| unix", but the special characters confuse Go
 
 ChatGPT tells me that `>` and `<` are used for "redirection", i.e. sending output to or pulling input from **a file**.  On the other hand, `|` is used for "piping" output to a **command**.
 
-Based on this, I Google "difference between redirection and piping unix", and one of the first results I get is [this StackExchange post](https://web.archive.org/web/20220630113310/https://askubuntu.com/questions/172982/what-is-the-difference-between-redirection-and-pipe){:target="_blank" rel="noopener"} which says something quite similar to ChatGPT:
+Based on this, I Google "difference between redirection and piping unix", and one of the first results I get is [this StackExchange post](https://web.archive.org/web/20220630113310/https://askubuntu.com/questions/172982/what-is-the-difference-between-redirection-and-pipe){:target="_blank" rel="noopener" } which says something quite similar to ChatGPT:
 
 <center>
   <img src="/assets/images/screenshot-25mar2023-1101am.png" width="80%" style="border: 1px solid black; padding: 0.5em">
@@ -126,7 +126,7 @@ fi
 
 ## Counting Parameters
 
-First question- what does `$#` evaluate to?  According to [StackOverflow](https://web.archive.org/web/20211120050118/https://askubuntu.com/questions/939620/what-does-mean-in-bash){:target="_blank" rel="noopener"}:
+First question- what does `$#` evaluate to?  According to [StackOverflow](https://web.archive.org/web/20211120050118/https://askubuntu.com/questions/939620/what-does-mean-in-bash){:target="_blank" rel="noopener" }:
 
 > `echo $#` outputs the number of positional parameters of your script.
 
@@ -223,7 +223,7 @@ I type `help cat` in my terminal, and get the following:
 
 OK, so if there are no args passed to `abort`, then we read from standard input.  Interesting.  Based on what we learned earlier about redirection and piping, I wonder if the caller of the `abort` function is piping its `stdout` to the `stdin` here, so that `abort` can read it via `cat -`.
 
-I search for `| abort` in this file, and I find [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L99-L101){:target="_blank" rel="noopener"}:
+I search for `| abort` in this file, and I find [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L99-L101){:target="_blank" rel="noopener" }:
 
 ```
   { rbenv---version
@@ -267,11 +267,11 @@ Last bit of code inside `abort()`:
 else echo "rbenv: $*"
 ```
 
-What does `$*` do?  This time, it's [O'Reilly to the rescue](https://web.archive.org/web/20230323072228/https://www.oreilly.com/library/view/learning-the-bash/1565923472/ch04s02.html){:target="_blank" rel="noopener"}:
+What does `$*` do?  This time, it's [O'Reilly to the rescue](https://web.archive.org/web/20230323072228/https://www.oreilly.com/library/view/learning-the-bash/1565923472/ch04s02.html){:target="_blank" rel="noopener" }:
 
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-25mar2023-1137am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-25mar2023-1137am.png">
     <img src="/assets/images/screenshot-25mar2023-1137am.png" width="90%" style="border: 1px solid black; padding: 0.5em" alt="StackOverflow - what does `$*` do?">
   </a>
 </center>

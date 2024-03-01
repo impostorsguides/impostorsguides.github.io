@@ -41,7 +41,7 @@ createdAt: 5 Feb, 2024
 
 <p>More often than not, a particular expression is tailored to fit its concise use case, and is not particularly portable from one application to another.  This makes it unlikely that a Google search for your specific regex will return any relevant results.  It also makes it likely that someone on StackOverflow will close your question as being overly specific, and therefore not useful to the community at-large.</p>
 
-<p>I experienced this while <a href="/shell" target="_blank">reading through (and blogging about) the RBENV codebase</a>, in order to combat my impostor's syndrome.  One of RBENV's commands is <code>rbenv versions</code>, which lists all the Ruby versions that RBENV currently manages for you on your machine.  Among other things, this command sorts these versions.</p>
+<p>I experienced this while <a href="/shell" target="_blank" rel="noopener">reading through (and blogging about) the RBENV codebase</a>, in order to combat my impostor's syndrome.  One of RBENV's commands is <code>rbenv versions</code>, which lists all the Ruby versions that RBENV currently manages for you on your machine.  Among other things, this command sorts these versions.</p>
 
 <p>But sorting version numbers isn't as straightforward as it might appear.  We can see what versions RBENV will let us install by running <code>rbenv install --list-all</code>.  A sample of the output at the time of this writing is:</p>
 
@@ -113,7 +113,7 @@ truffleruby+graalvm-23.0.0-preview1
 
 <p>With this response, we've taken the first steps toward breaking our intractable problem into multiple problems of a manageable size.  <strong>Again, this answer may not be accurate</strong>- that's one of the drawbacks of relying on ChatGPT.  But I'd argue that this still represents forward progress, since we now have things we can effectively Google.</p>
 
-<p>For example, prior to asking this question, I didn't even know how to delimit the multiple commands in this string.  I had no way of even knowing whether it <i>was</i> multiple commands, or one large command.  When you're a shell noob who <a href="https://english.stackexchange.com/questions/59145/usage-of-the-phrase-you-dont-know-what-you-dont-know" target="_blank">doesn't know what he doesn't know</a>, questions which might seem obvious to old shell hands can represent real stumbling blocks.</p>
+<p>For example, prior to asking this question, I didn't even know how to delimit the multiple commands in this string.  I had no way of even knowing whether it <i>was</i> multiple commands, or one large command.  When you're a shell noob who <a href="https://english.stackexchange.com/questions/59145/usage-of-the-phrase-you-dont-know-what-you-dont-know" target="_blank" rel="noopener">doesn't know what he doesn't know</a>, questions which might seem obvious to old shell hands can represent real stumbling blocks.</p>
 
 <p>It wasn't until I saw how ChatGPT itemized the commands that I noticed the semi-colons in the <code>sed</code> string, and put 2 and 2 together.</p>
 
@@ -151,7 +151,7 @@ truffleruby+graalvm-23.0.0-preview1
   <p>So, in summary, this command looks for any occurrence of .p followed by a single digit in the version string and replaces it with .z. followed by the same digit. For example, 2.7.3-p1 would be transformed into 2.7.3.z1.</p>
 </blockquote>
 
-<p>From this, I can add the questions "What is a capture group?" and "What are <a href="https://www.gnu.org/software/sed/manual/html_node/Character-Classes-and-Bracket-Expressions.html" target="_blank">character classes</a>?" to my running list of questions.  Once I've Googled those questions to get a second opinion, I can then run simple experiments with each of these commands.  For example:</p>
+<p>From this, I can add the questions "What is a capture group?" and "What are <a href="https://www.gnu.org/software/sed/manual/html_node/Character-Classes-and-Bracket-Expressions.html" target="_blank" rel="noopener">character classes</a>?" to my running list of questions.  Once I've Googled those questions to get a second opinion, I can then run simple experiments with each of these commands.  For example:</p>
 
 <ul>
   <li>Adding data from the pattern space to the hold space (and vice versa), using <code>h</code> and <code>G</code>.</li>
@@ -176,7 +176,7 @@ mruby-3.2.0</code></pre>
 
 <pre><code>2.7.5.z 2.7.5 3.0.0.z 3.0.0 truffleruby.23.1.2.z truffleruby-23.1.2 3.1.0.z 3.1.0 3.2.2.z 3.2.2 mruby.3.2.0.z mruby-3.2.0</code></pre>
 
-<p>This represents a single long string containing each version number, in unsorted order.  Each version is prefixed with a modified version of itself which is much easier to sort than the original.  <a href="https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-versions#L60" target="_blank">From there</a>, this string is piped to the <code>sort</code> command, which takes multiple instances of the <code>-k</code> flag.  This sorts our version numbers by this prefix value, resulting in this:</p>  
+<p>This represents a single long string containing each version number, in unsorted order.  Each version is prefixed with a modified version of itself which is much easier to sort than the original.  <a href="https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-versions#L60" target="_blank" rel="noopener">From there</a>, this string is piped to the <code>sort</code> command, which takes multiple instances of the <code>-k</code> flag.  This sorts our version numbers by this prefix value, resulting in this:</p>  
 
 <pre><code>2.7.5.z 2.7.5 3.0.0.z 3.0.0 3.1.0.z 3.1.0 3.2.2.z 3.2.2 mruby.3.2.0.z mruby-3.2.0 truffleruby.23.1.2.z truffleruby-23.1.2</code></pre>
 
@@ -203,7 +203,7 @@ mruby-3.2.0</code></pre>
     National Theater of Korea, Jongno-gu, Seoul
     KOCIS(Korean Culture and Informatioon Service)
     Official Photographer : KIM SUNJOO</p>
-  <p>Author: <a href="https://www.flickr.com/photos/koreanet/" target="_blank">Republic of Korea</a></p>
-  <p>Source: <a href="https://www.flickr.com/photos/koreanet/53007281180/" target="_blank">Flickr</a></p>
-  <p>License: <a href="https://creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC BY-SA 2.0 DEED Attribution-ShareAlike 2.0 Generic</a></p>
+  <p>Author: <a href="https://www.flickr.com/photos/koreanet/" target="_blank" rel="noopener">Republic of Korea</a></p>
+  <p>Source: <a href="https://www.flickr.com/photos/koreanet/53007281180/" target="_blank" rel="noopener">Flickr</a></p>
+  <p>License: <a href="https://creativecommons.org/licenses/by-sa/2.0/" target="_blank" rel="noopener">CC BY-SA 2.0 DEED Attribution-ShareAlike 2.0 Generic</a></p>
 </div>

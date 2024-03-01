@@ -1,6 +1,6 @@
 Let's start by looking at the "Usage" and "Summary" comments.
 
-## [Comments](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-sh-shell#L3){:target="_blank" rel="noopener"}
+## [Comments](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-sh-shell#L3){:target="_blank" rel="noopener" }
 
 ```
 # Summary: Set or show the shell-specific Ruby version
@@ -36,7 +36,7 @@ We also learn that there are 3 ways to use `rbenv shell`:
 
 Next, we'll look at the tests.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/shell.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/shell.bats){:target="_blank" rel="noopener" }
 
 ### Sad path- shell integration disabled
 
@@ -260,7 +260,7 @@ One final note- when we assert that certain code is printed to the screen (as we
 >
 > Tests that are independent of implementation details are easier to maintain since they don't need to be changed each time you make a change to the implementation. They're also easier to understand since they basically act as code samples that show all the different ways your class's methods can be used, so even someone who's not familiar with the implementation should usually be able to read through the tests to understand how to use the class.
 >
-> [Google Testing Blog](https://web.archive.org/web/20230327072205/https://testing.googleblog.com/2013/08/testing-on-toilet-test-behavior-not.html){:target="_blank" rel="noopener"}
+> [Google Testing Blog](https://web.archive.org/web/20230327072205/https://testing.googleblog.com/2013/08/testing-on-toilet-test-behavior-not.html){:target="_blank" rel="noopener" }
 >
 > <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 >
@@ -272,7 +272,7 @@ One final note- when we assert that certain code is printed to the screen (as we
 >
 > "I don't care what the answer is, just make sure you do this thing while figuring it out."
 >
-> \- [LaunchScout.com](https://web.archive.org/web/20230323231337/https://launchscout.com/blog/testing-behavior-vs-testing-implementation){:target="_blank" rel="noopener"}
+> \- [LaunchScout.com](https://web.archive.org/web/20230323231337/https://launchscout.com/blog/testing-behavior-vs-testing-implementation){:target="_blank" rel="noopener" }
 >
 > <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 >
@@ -288,7 +288,7 @@ One final note- when we assert that certain code is printed to the screen (as we
 >
 > Lastly, behavior tests are better than implementation tests because behavior tests are more loosely coupled to the implementation. I ask "Can it start up?" instead of "Does it have an engine?" then I'm free to, for example, change my car factory from a gasoline-powered car factory to an electric car factory without having to change the set of tests that I perform. In other words, behavior tests enable refactoring.
 >
-> [Code With Jason](https://web.archive.org/web/20230209001509/https://www.codewithjason.com/testing-implementation-vs-behavior-rails/){:target="_blank" rel="noopener"}
+> [Code With Jason](https://web.archive.org/web/20230209001509/https://www.codewithjason.com/testing-implementation-vs-behavior-rails/){:target="_blank" rel="noopener" }
 >
 > <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 >
@@ -317,11 +317,11 @@ We could write:
 
 When I add the above test into the spec file and run the full file, everything passes.  So in theory, at least, this approach could be applied to RBENV.  And it seems like the user needs shell integration enabled in order to use `rbenv shell` anyway, so there's no harm in refactoring the tests to all resemble the above.
 
-I submitted [a PR](https://github.com/rbenv/rbenv/pull/1479){:target="_blank" rel="noopener"} to check whether the core team would find this useful, and as of June 17, 2023 I'm waiting for a response.
+I submitted [a PR](https://github.com/rbenv/rbenv/pull/1479){:target="_blank" rel="noopener" } to check whether the core team would find this useful, and as of June 17, 2023 I'm waiting for a response.
 
 Let's now move on to the file itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-sh-shell){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-sh-shell){:target="_blank" rel="noopener" }
 
 Skipping the shebang and "Usage" comments that we've already looked at, the first block of code is:
 
@@ -448,11 +448,11 @@ EOS
 
 We're `cat`'ing a here-doc string containing a bunch of commands which will be evaluated by the `rbenv` shell function:
 
-[The fish docs](https://web.archive.org/web/20221009140752/https://fishshell.com/docs/current/cmds/set.html){:target="_blank" rel="noopener"} tell us that `set -q` is how we test whether a variable has been defined.  There's no output, but the exit code is the number of variables passed to `set -q` which were undefined.  So since we only passed one variable to `set -q`, i.e. `RBENV_VERSION_OLD`, our exit code is 0 if `RBENV_VERSION_OLD` is defined and 1 if it is undefined.
+[The fish docs](https://web.archive.org/web/20221009140752/https://fishshell.com/docs/current/cmds/set.html){:target="_blank" rel="noopener" } tell us that `set -q` is how we test whether a variable has been defined.  There's no output, but the exit code is the number of variables passed to `set -q` which were undefined.  So since we only passed one variable to `set -q`, i.e. `RBENV_VERSION_OLD`, our exit code is 0 if `RBENV_VERSION_OLD` is defined and 1 if it is undefined.
 
 ##### If `RBENV_VERSION_OLD` is set
 
- If the exit code of the `set -q` command is 0, that means 0 variables in the list of variables were undefined.  Since our "list of variables" consisted of just `RBENV_VERSION_OLD`, that means `RBENV_VERSION_OLD` was defined.  According to [fish's `if` docs](https://web.archive.org/web/20221009122727/https://fishshell.com/docs/current/cmds/if.html){:target="_blank" rel="noopener"}, that means our `if` check would be true, and we execute the following code:
+ If the exit code of the `set -q` command is 0, that means 0 variables in the list of variables were undefined.  Since our "list of variables" consisted of just `RBENV_VERSION_OLD`, that means `RBENV_VERSION_OLD` was defined.  According to [fish's `if` docs](https://web.archive.org/web/20221009122727/https://fishshell.com/docs/current/cmds/if.html){:target="_blank" rel="noopener" }, that means our `if` check would be true, and we execute the following code:
 
 ```
   if [ -n "\$RBENV_VERSION_OLD" ]
@@ -490,7 +490,7 @@ If `RBENV_VERSION_OLD` **was** undefined, we'll execute the `else` branch, which
   false
 ```
 
-This just prints an error message to STDERR.  The `false` command at the end is how the `fish` shell sets a non-zero exit status (see the docs [here](https://web.archive.org/web/20230523203818/https://fishshell.com/docs/current/cmds/false.html){:target="_blank" rel="noopener"}).
+This just prints an error message to STDERR.  The `false` command at the end is how the `fish` shell sets a non-zero exit status (see the docs [here](https://web.archive.org/web/20230523203818/https://fishshell.com/docs/current/cmds/false.html){:target="_blank" rel="noopener" }).
 
 #### If the current shell is NOT `fish`
 
@@ -527,7 +527,7 @@ Let's look at the first `if` condition:
 if [ -n "\${RBENV_VERSION_OLD+x}" ]; then
 ```
 
-According to [StackOverflow](https://web.archive.org/web/20190823232017/https://stackoverflow.com/questions/46891981/what-does-argumentx-mean-in-bash){:target="_blank" rel="noopener"}, the point of the `+x` in the parameter expansion is to "deterimine(s) if a variable ARGUMENT is set to any value (empty or non-empty) or not."
+According to [StackOverflow](https://web.archive.org/web/20190823232017/https://stackoverflow.com/questions/46891981/what-does-argumentx-mean-in-bash){:target="_blank" rel="noopener" }, the point of the `+x` in the parameter expansion is to "deterimine(s) if a variable ARGUMENT is set to any value (empty or non-empty) or not."
 
 Similar to the fish script, we're just querying if the variable has been set, even if it's just to the empty string.  We could just use the simpler `if [ -n "${RBENV_VERSION_OLD}" ]` (and in fact we do exactly that on the next line), but that test would be falsy in the case where `RBENV_VERSION_OLD` is set to "", whereas `[ -n "\${RBENV_VERSION_OLD+x}" ]` is truthy in that case.
 

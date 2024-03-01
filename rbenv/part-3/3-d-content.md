@@ -1,6 +1,6 @@
 The `completions/` directory stores scripts which are used to enable word completion in Bash and `zsh` shells, respectively.  You can activate RBENV's completion logic by adding the proper shell integration command to your shell's config file.
 
-In Bash, that means adding the code `eval "$(rbenv init - bash)"`  to your `.bashrc` file.  In `zsh`, you'd add `eval "$(rbenv init - zsh)"` to your `.zshrc` file.  From there, `rbenv-init` will `source` the completion files via [this block of code](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-init#L123-L126){:target="_blank" rel="noopener"}:
+In Bash, that means adding the code `eval "$(rbenv init - bash)"`  to your `.bashrc` file.  In `zsh`, you'd add `eval "$(rbenv init - zsh)"` to your `.zshrc` file.  From there, `rbenv-init` will `source` the completion files via [this block of code](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-init#L123-L126){:target="_blank" rel="noopener" }:
 
 ```
 completion="${root}/completions/rbenv.${shell}"
@@ -9,7 +9,7 @@ if [ -r "$completion" ]; then
 fi
 ```
 
-What about the `fish` shell?  Per [the `fish` shell docs](https://web.archive.org/web/20230523204133/https://fishshell.com/docs/current/completions.html){:target="_blank" rel="noopener"}:
+What about the `fish` shell?  Per [the `fish` shell docs](https://web.archive.org/web/20230523204133/https://fishshell.com/docs/current/completions.html){:target="_blank" rel="noopener" }:
 
 > Fish automatically searches through any directories in the list variable `$fish_complete_path`, and any completions defined are automatically loaded when needed.
 
@@ -82,7 +82,7 @@ fi
 
 What does `-o` do?  The `man test` page references an `-o` flag, but it's actually a different flag, i.e. `expression1 -o expression2` is true if *either* `expression1` or `expression2` is true.  We don't have 2 expressions in our case, so we have to search elsewhere for an answer.
 
-[StackOverflow comes to the rescue](https://web.archive.org/web/20230408143552/https://stackoverflow.com/questions/5897760/what-does-flags-o-and-l-means-in-bash){:target="_blank" rel="noopener"}:
+[StackOverflow comes to the rescue](https://web.archive.org/web/20230408143552/https://stackoverflow.com/questions/5897760/what-does-flags-o-and-l-means-in-bash){:target="_blank" rel="noopener" }:
 
 ```
 -o : True if shell option "OPTIONNAME" is enabled.
@@ -115,13 +115,13 @@ When we turn on the `verbose` option and run our test, we see the test itself (b
 
 ### The `interactive` option
 
-So we're testing whether a certain option is on, namely the `interactive` option.  What is the 'interactive' option, you ask?  [The Linux Documentation Project](https://web.archive.org/web/20230529202612/https://tldp.org/LDP/abs/html/intandnonint.html){:target="_blank" rel="noopener"} give us an answer:
+So we're testing whether a certain option is on, namely the `interactive` option.  What is the 'interactive' option, you ask?  [The Linux Documentation Project](https://web.archive.org/web/20230529202612/https://tldp.org/LDP/abs/html/intandnonint.html){:target="_blank" rel="noopener" } give us an answer:
 
 > An **interactive** shell reads commands from user input on a `tty`. Among other things, such a shell reads startup files on activation, displays a prompt, and enables job control by default. The user can **interact** with the shell.
 >
 > A shell running a script is always a non-interactive shell.
 
-And StackOverflow [fills in some of the gaps](https://web.archive.org/web/20220423122639/https://unix.stackexchange.com/questions/50665/what-is-the-difference-between-interactive-shells-login-shells-non-login-shell){:target="_blank" rel="noopener"} in the above answer:
+And StackOverflow [fills in some of the gaps](https://web.archive.org/web/20220423122639/https://unix.stackexchange.com/questions/50665/what-is-the-difference-between-interactive-shells-login-shells-non-login-shell){:target="_blank" rel="noopener" } in the above answer:
 
 > Interactive: As the term implies: Interactive means that the commands are run with user-interaction from keyboard. E.g. the shell can prompt the user to enter input.
 >
@@ -176,7 +176,7 @@ _rbenv() {
 
 We declare the `_rbenv` function.  The implementation starts with the declaration of two local variables- `words` and `completions`.
 
-Next we use the `read` command (which we learned about [when discussing the `rbenv versions` command](/rbenv/commands/versions){:target="_blank" rel="noopener"}) to populate the `words` variable.
+Next we use the `read` command (which we learned about [when discussing the `rbenv versions` command](/rbenv/commands/versions){:target="_blank" rel="noopener" }) to populate the `words` variable.
 
 Checking the `help` page for the `-c` and `-A` flags for `read`, we see:
 
@@ -264,7 +264,7 @@ Let's move on to the next line of code.
   if [ "${#words}" -eq 2 ]; then
 ```
 
-Referring back to [the docs for parameter expansion](https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"} we see that a `#` before a variable name inside the curly braces resolves to the length of the variable, like so:
+Referring back to [the docs for parameter expansion](https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener" } we see that a `#` before a variable name inside the curly braces resolves to the length of the variable, like so:
 
 ```
 $ foo="foo bar"
@@ -304,7 +304,7 @@ Does it store the contents as a string, or as an array?
 
 For what it's worth, we don't *really* need to know the answer to this question.  After all, we're not checking the length of the `completions` variable like we do with the `words` variable.  I'm mostly just curious, and I find it helpful to know what data types I'm working with in my variables.
 
-To answer this, I need to know how to print a variable's type in the terminal.  StackOverflow [has the answer](https://web.archive.org/web/20220714213343/https://unix.stackexchange.com/questions/269825/how-can-i-get-a-variables-datatype-in-zsh){:target="_blank" rel="noopener"}:
+To answer this, I need to know how to print a variable's type in the terminal.  StackOverflow [has the answer](https://web.archive.org/web/20220714213343/https://unix.stackexchange.com/questions/269825/how-can-i-get-a-variables-datatype-in-zsh){:target="_blank" rel="noopener" }:
 
 > You can use `t` parameter expansion flag:
 >
@@ -500,7 +500,7 @@ In other words, the above 5 strings, joined with newlines into a single string.
 
 #### 1-based arrays in `zsh`
 
-Observant readers will notice that the way to access the 2nd element in the `words` array was with the syntax `[2,...]`, **not** `[1,...]`.  [As StackOverflow notes](https://web.archive.org/web/20220714213343/https://unix.stackexchange.com/questions/269825/how-can-i-get-a-variables-datatype-in-zsh){:target="_blank" rel="noopener"}, array positioning in `zsh` is 1-based:
+Observant readers will notice that the way to access the 2nd element in the `words` array was with the syntax `[2,...]`, **not** `[1,...]`.  [As StackOverflow notes](https://web.archive.org/web/20220714213343/https://unix.stackexchange.com/questions/269825/how-can-i-get-a-variables-datatype-in-zsh){:target="_blank" rel="noopener" }, array positioning in `zsh` is 1-based:
 
 ```
 $ echo "$words[0]"
@@ -536,7 +536,7 @@ reply=("${(ps:\n:)completions}")
 
 Clearly we're setting a (non-local) variable named `reply` equal to `("${(ps:\n:)completions}")`.  What does this evaluate to?
 
-The `(ps:\n:)` syntax at the start of the parameter expansion looks similar to the `(t)` syntax that we encountered earlier.  If we search for `ps:\n` on [the docs page](https://web.archive.org/web/20230320043037/https://zsh.sourceforge.io/Doc/Release/Expansion.html){:target="_blank" rel="noopener"}, we see the following:
+The `(ps:\n:)` syntax at the start of the parameter expansion looks similar to the `(t)` syntax that we encountered earlier.  If we search for `ps:\n` on [the docs page](https://web.archive.org/web/20230320043037/https://zsh.sourceforge.io/Doc/Release/Expansion.html){:target="_blank" rel="noopener" }, we see the following:
 
 > f
 >
@@ -639,7 +639,7 @@ Next line:
 COMPREPLY=()
 ```
 
-Here we initialize a variable called `COMPREPLY`, giving it the initial value of an empty array.  [According to the Bash docs](https://www.gnu.org/software/bash/manual/bash.html#Programmable-Completion){:target="_blank" rel="noopener"}, `COMPREPLY` functions similarly to the `reply` variable in `zsh`:
+Here we initialize a variable called `COMPREPLY`, giving it the initial value of an empty array.  [According to the Bash docs](https://www.gnu.org/software/bash/manual/bash.html#Programmable-Completion){:target="_blank" rel="noopener" }, `COMPREPLY` functions similarly to the `reply` variable in `zsh`:
 
 > `COMPREPLY`
 >
@@ -655,7 +655,7 @@ Next line:
 local word="${COMP_WORDS[COMP_CWORD]}"
 ```
 
-Again according to [the docs](https://www.gnu.org/software/bash/manual/bash.html#Programmable-Completion){:target="_blank" rel="noopener"} for `COMP_CWORD`:
+Again according to [the docs](https://www.gnu.org/software/bash/manual/bash.html#Programmable-Completion){:target="_blank" rel="noopener" } for `COMP_CWORD`:
 
 > COMP_CWORD
 >

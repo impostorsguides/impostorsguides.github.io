@@ -21,7 +21,7 @@ A reminder that, if we've reached the inside of this `if`-block, we can be confi
 
 ### The `local` keyword
 
-By default, variables declared inside a function are available outside that function.  To prevent that from happening, we use the `local` keyword to ensure their scope is limited to the body of the function.  Note- this keyword [is **not** POSIX-compliant](https://web.archive.org/web/20221114113625/https://stackoverflow.com/questions/18597697/posix-compliant-way-to-scope-variables-to-a-function-in-a-shell-script){:target="_blank" rel="noopener"}, though many POSIX shells support it.
+By default, variables declared inside a function are available outside that function.  To prevent that from happening, we use the `local` keyword to ensure their scope is limited to the body of the function.  Note- this keyword [is **not** POSIX-compliant](https://web.archive.org/web/20221114113625/https://stackoverflow.com/questions/18597697/posix-compliant-way-to-scope-variables-to-a-function-in-a-shell-script){:target="_blank" rel="noopener" }, though many POSIX shells support it.
 
 Let's do an experiment to see how `local` works.
 
@@ -150,7 +150,7 @@ This is unexpected to me.  I would have thought that:
  - The 4th `"` would close out the 3rd one, meaning `")"` would be wrapped in a separate set of quotes.
  - Therefore, the `$1` in the middle would then be completely unwrapped.
 
-When I Google "nested double-quotes bash", the first result I get is [this StackOverflow post](https://web.archive.org/web/20220526033039/https://unix.stackexchange.com/questions/289574/nested-double-quotes-in-assignment-with-command-substitution){:target="_blank" rel="noopener"}:
+When I Google "nested double-quotes bash", the first result I get is [this StackOverflow post](https://web.archive.org/web/20220526033039/https://unix.stackexchange.com/questions/289574/nested-double-quotes-in-assignment-with-command-substitution){:target="_blank" rel="noopener" }:
 
 > Once one is inside `$(...)`, quoting starts all over from scratch.
 
@@ -203,7 +203,7 @@ But what is that test?  To find out, we run `help test` in our terminal again, a
 
 So if the `$RBENV_NATIVE_EXT` environment variable is empty, then the test is truthy.  If that env var has already been set, then the test is falsy, and we would abort.
 
-What does the `RBENV_NATIVE_EXT` env var do?  I don't see anything mentioned in [the env vars section of the README](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/README.md#environment-variables){:target="_blank" rel="noopener"}, so I search the Github repo and find [this PR](https://github.com/rbenv/rbenv/pull/528){:target="_blank" rel="noopener"}, which includes the following comment:
+What does the `RBENV_NATIVE_EXT` env var do?  I don't see anything mentioned in [the env vars section of the README](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/README.md#environment-variables){:target="_blank" rel="noopener" }, so I search the Github repo and find [this PR](https://github.com/rbenv/rbenv/pull/528){:target="_blank" rel="noopener" }, which includes the following comment:
 
 > If RBENV_NATIVE_EXT environment variable is set, rbenv will abort if it didn't manage to load the builtin. This is primarily useful for testing.
 
@@ -236,14 +236,14 @@ Before we move on, don't forget to rename your `dylib` file back to its original
 
 ### Native Extensions
 
-The `NATIVE_EXT` in the name `RBENV_NATIVE_EXT` refers to the concept of ["native extensions"](https://web.archive.org/web/20180912035230/https://stackoverflow.com/questions/31202707/what-exactly-is-a-gem-native-extension){:target="_blank" rel="noopener"}.  A native extension is a library written in one language, which can be used by a program written in another language.  In this case, RBENV is written in Bash, but we're relying on an implementation of `realpath` which is [written in C](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/realpath.c){:target="_blank" rel="noopener"}.
+The `NATIVE_EXT` in the name `RBENV_NATIVE_EXT` refers to the concept of ["native extensions"](https://web.archive.org/web/20180912035230/https://stackoverflow.com/questions/31202707/what-exactly-is-a-gem-native-extension){:target="_blank" rel="noopener" }.  A native extension is a library written in one language, which can be used by a program written in another language.  In this case, RBENV is written in Bash, but we're relying on an implementation of `realpath` which is [written in C](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/realpath.c){:target="_blank" rel="noopener" }.
 
-Ruby does a lot of things well, but it's not the right tool for every job.  If a Ruby developer needs to use certain APIs which are very close to the operating system, or are unavoidably slow in Ruby, a native extension might be the right tool to use.  [For example](https://web.archive.org/web/20230409112559/https://guides.rubygems.org/gems-with-extensions/){:target="_blank" rel="noopener"}:
+Ruby does a lot of things well, but it's not the right tool for every job.  If a Ruby developer needs to use certain APIs which are very close to the operating system, or are unavoidably slow in Ruby, a native extension might be the right tool to use.  [For example](https://web.archive.org/web/20230409112559/https://guides.rubygems.org/gems-with-extensions/){:target="_blank" rel="noopener" }:
 
  - the `nokogiri` gem uses a native extension to parse XML.
  - the `mysql2` gem uses a native extension to communicate with the MySQL database.
 
-[This article](https://web.archive.org/web/20230223203806/https://patshaughnessy.net/2011/10/31/dont-be-terrified-of-building-native-extensions){:target="_blank" rel="noopener"} goes into some depth about how to use native extensions in Ruby, as well as what to do when the installation of a Ruby native extension goes wrong.
+[This article](https://web.archive.org/web/20230223203806/https://patshaughnessy.net/2011/10/31/dont-be-terrified-of-building-native-extensions){:target="_blank" rel="noopener" } goes into some depth about how to use native extensions in Ruby, as well as what to do when the installation of a Ruby native extension goes wrong.
 
 ## Storing the name of a command to execute later
 
@@ -255,13 +255,13 @@ Next line of code:
 
 Here we again use command substitution to set a variable called `READLINK`.  What value are we storing?  Whatever is returned by `type -p greadlink readlink 2>/dev/null | head -n1`.
 
-To get some context, I decide to look up the commit which introduced this line of code.  I do my `git blame / git checkout` dance until [I find it in Github](https://github.com/rbenv/rbenv/commit/81bb14e181c556e599e20ca6fdc86fdb690b8995){:target="_blank" rel="noopener"}.  The commit message reads:
+To get some context, I decide to look up the commit which introduced this line of code.  I do my `git blame / git checkout` dance until [I find it in Github](https://github.com/rbenv/rbenv/commit/81bb14e181c556e599e20ca6fdc86fdb690b8995){:target="_blank" rel="noopener" }.  The commit message reads:
 
 > `readlink` comes from GNU coreutils.  On systems without it, rbenv used to spin out of control when it didn't have `readlink` or `greadlink` available because it would re-exec the frontend script over and over instead of the worker script in libexec.
 
 That's somewhat helpful.  Although I don't yet know which "worker script" they're referring to, it's not crazy to think that RBENV might want to exit with a warning if that a dependency is missing, rather than silently suffer from performance issues.
 
-I get confirmation that `greadlink` comes from GNU coreutils [here](https://github.com/common-workflow-language/common-workflow-language/issues/316){:target="_blank" rel="noopener"}.
+I get confirmation that `greadlink` comes from GNU coreutils [here](https://github.com/common-workflow-language/common-workflow-language/issues/316){:target="_blank" rel="noopener" }.
 
 Back to the main question: what value are we assigning to the `READLINK` variable?
 
@@ -346,7 +346,7 @@ I see the 3 paths I expected, each one on a separate line.  Great, I think this 
 
 ### The `head` command
 
-Moving on, we already know what `2>/dev/null` is from earlier- here we redirect any error output from `type -p` to `/dev/null`, aka [the black hole of the terminal](https://web.archive.org/web/20230116003037/https://linuxhint.com/what_is_dev_null/){:target="_blank" rel="noopener"}.
+Moving on, we already know what `2>/dev/null` is from earlier- here we redirect any error output from `type -p` to `/dev/null`, aka [the black hole of the terminal](https://web.archive.org/web/20230116003037/https://linuxhint.com/what_is_dev_null/){:target="_blank" rel="noopener" }.
 
 But what do we do with any non-error output?  That's answered by the last bit of code from this line: `| head -n1`.  Running `man head` gives us:
 
@@ -420,11 +420,11 @@ DESCRIPTION
 
 Looks like these two programs are used to resolve a symlink to its canonical link.
 
-I search the Github repo for the commit which introduced the `greadlink readlink` combination, and after some digging, I find [this PR](https://github.com/rbenv/rbenv/pull/43){:target="_blank" rel="noopener"} which mentions that Solaris (a UNIX operating system originally developed by Sun Microsystems) doesn't support `readlink`, so `greadlink` is called first and `readlink` is used as the fallback.
+I search the Github repo for the commit which introduced the `greadlink readlink` combination, and after some digging, I find [this PR](https://github.com/rbenv/rbenv/pull/43){:target="_blank" rel="noopener" } which mentions that Solaris (a UNIX operating system originally developed by Sun Microsystems) doesn't support `readlink`, so `greadlink` is called first and `readlink` is used as the fallback.
 
 ### Symlinks
 
-The docs for `readlink` mentioned the concept of a "symbolic link".  As [this link](https://web.archive.org/web/20221126123116/https://devdojo.com/devdojo/what-is-a-symlink){:target="_blank" rel="noopener"} says, a symbolic link (or symlink) is "...a file that points to another file".  If you type `open` plus the name of the symlink in your terminal, you're actually opening the canonical file, not the symlink file.
+The docs for `readlink` mentioned the concept of a "symbolic link".  As [this link](https://web.archive.org/web/20221126123116/https://devdojo.com/devdojo/what-is-a-symlink){:target="_blank" rel="noopener" } says, a symbolic link (or symlink) is "...a file that points to another file".  If you type `open` plus the name of the symlink in your terminal, you're actually opening the canonical file, not the symlink file.
 
 ### Experiment- creating symlinks
 
@@ -557,7 +557,7 @@ I also notice that, when I get to the regular, non-symlink file, `readlink` has 
 
 ### Hard links vs. soft links
 
-The `-s` in `ln -s` means `symbolic`.  Symbolic links are also called "soft links".  In contrast, [a "hard link"](https://web.archive.org/web/20230319045725/https://www.javatpoint.com/hard-link-vs-soft-links){:target="_blank" rel="noopener"} is created by using the `ln` command **without** the `-s` flag.  A hard link is a copy of the original file, but it's also a pointer to that file.  So if you change the original file, your hard link file will change as well.
+The `-s` in `ln -s` means `symbolic`.  Symbolic links are also called "soft links".  In contrast, [a "hard link"](https://web.archive.org/web/20230319045725/https://www.javatpoint.com/hard-link-vs-soft-links){:target="_blank" rel="noopener" } is created by using the `ln` command **without** the `-s` flag.  A hard link is a copy of the original file, but it's also a pointer to that file.  So if you change the original file, your hard link file will change as well.
 
 ### Experiment- difference between hard and soft links
 
@@ -607,7 +607,7 @@ $ cat hardfoo
 echo "Hello globetrotter"
 ```
 
-[Here](https://web.archive.org/web/20230412072332/https://www.freecodecamp.org/news/symlink-tutorial-in-linux-how-to-create-and-remove-a-symbolic-link/){:target="_blank" rel="noopener"} is another link on more operations you can do with symlinks, including:
+[Here](https://web.archive.org/web/20230412072332/https://www.freecodecamp.org/news/symlink-tutorial-in-linux-how-to-create-and-remove-a-symbolic-link/){:target="_blank" rel="noopener" } is another link on more operations you can do with symlinks, including:
 
  - creating symlinks for folders
  - removing a symlink with the `-l` flag
@@ -719,7 +719,7 @@ local name="${path##*/}"
 path="$(resolve_link "$name" || true)"
 ```
 
-From [DevHints.io's guide to Bash](https://web.archive.org/web/20230423012642/https://devhints.io/bash){:target="_blank" rel="noopener"}, we see that `%/*` in parameter expansion is often used to get the directory in which a file lives.  Example:
+From [DevHints.io's guide to Bash](https://web.archive.org/web/20230423012642/https://devhints.io/bash){:target="_blank" rel="noopener" }, we see that `%/*` in parameter expansion is often used to get the directory in which a file lives.  Example:
 
 ```
 str="/path/to/foo.cpp"
@@ -765,7 +765,7 @@ while [ -n "$path" ]; do
 done
 ```
 
-I Google `bash "|| true"`, and I see a StackOverflow post with [this answer](https://unix.stackexchange.com/a/325727/142469){:target="_blank" rel="noopener"}:
+I Google `bash "|| true"`, and I see a StackOverflow post with [this answer](https://unix.stackexchange.com/a/325727/142469){:target="_blank" rel="noopener" }:
 
 > The reason for this pattern is that maintainer scripts in Debian packages tend to start with `set -e`, which causes the shell to exit as soon as any command (strictly speaking, pipeline, list or compound command) exits with a non-zero status. This ensures that errors don't accumulate: as soon as something goes wrong, the script aborts.
 >
@@ -794,7 +794,7 @@ The purpose here is to `echo` the current directory, so that this can be capture
 
 Remember, the return value of a Bash function is **not** the result of the last line of code in the function.  Technically, it's the exit code of the function.  The *output* of a function (i.e. what you can capture via command substitution) is whatever is `echo`'ed while inside the function.
 
-When I Google "bash return value of a function", the first result I see is [a blog post in LinuxJournal.com](https://web.archive.org/web/20220718223538/https://www.linuxjournal.com/content/return-values-bash-functions){:target="_blank" rel="noopener"}.  Among other things, it tells me:
+When I Google "bash return value of a function", the first result I see is [a blog post in LinuxJournal.com](https://web.archive.org/web/20220718223538/https://www.linuxjournal.com/content/return-values-bash-functions){:target="_blank" rel="noopener" }.  Among other things, it tells me:
 
 - "Bash functions, unlike functions in most programming languages do not allow you to return a value to the caller.  When a bash function ends its return value is its status: zero for success, non-zero for failure."
 - "To return values, you can:
@@ -891,7 +891,7 @@ value before function call:
 value after function call: Hey there
 ```
 
-Credit for these experiments goes to [the LinuxJournal link from earlier](https://web.archive.org/web/20230326152537/https://www.linuxjournal.com/content/return-values-bash-functions){:target="_blank" rel="noopener"}.
+Credit for these experiments goes to [the LinuxJournal link from earlier](https://web.archive.org/web/20230326152537/https://www.linuxjournal.com/content/return-values-bash-functions){:target="_blank" rel="noopener" }.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 

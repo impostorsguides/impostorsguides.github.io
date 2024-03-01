@@ -39,7 +39,7 @@ $ echo $?
 
 Next, the tests.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/which.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/which.bats){:target="_blank" rel="noopener" }
 
 ### Creating an executable for our tests
 
@@ -104,7 +104,7 @@ Next test:
 }
 ```
 
-This test covers the `if`-block of code [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-which#L39-L40){:target="_blank" rel="noopener"}.  It does the following:
+This test covers the `if`-block of code [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-which#L39-L40){:target="_blank" rel="noopener" }.  It does the following:
 
  - It creates two executables, both named `kill-all-humans`.  One lives in the `RBENV_TEST_DIR/bin` path, and the other in `RBENV_ROOT/shims`.
  - We set the selected Ruby version to `system` and run the `which` command for `kill-all-humans`.
@@ -321,7 +321,7 @@ Here we do the following:
 
 That's all for the tests, now let's move on to the code itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-which){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-which){:target="_blank" rel="noopener" }
 
 ### Printing the available completions
 
@@ -361,7 +361,7 @@ The function does the following:
 - It creates 3 local variables:
     - `path_to_remove`, which we set to the first argument to the function.
     - `path_before`, which we leave unset for now.
-    - `result`, which we initialize to the value of `$PATH`, with any values of `~` replaced with the value of `$HOME`.  More info on this can be found in the GNU "parameter expansion" docs [here](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"}; search for the string "//".
+    - `result`, which we initialize to the value of `$PATH`, with any values of `~` replaced with the value of `$HOME`.  More info on this can be found in the GNU "parameter expansion" docs [here](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener" }; search for the string "//".
  - It executes a `while` loop, which repeatedly removes instances of `path_to_remove` from `result`, until the value of `PATH` before removing `path_to_remove` is the same as the value after removing `path_to_remove` (in other words, when there are no more instances of `path_to_remove` left to remove).
  - It removes leading and trailing `:` characters from `result`, and then prints `result` to `stdout`.
 
@@ -387,7 +387,7 @@ Next block of code:
 RBENV_VERSION="${RBENV_VERSION:-$(rbenv-version-name)}"
 ```
 
-We test whether the environment variable `RBENV_VERSION` is undefined or null, using the `:-` parameter expansion syntax mentioned in [the GNU docs](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"}:
+We test whether the environment variable `RBENV_VERSION` is undefined or null, using the `:-` parameter expansion syntax mentioned in [the GNU docs](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener" }:
 
 > ${parameter:-word}
 >
@@ -492,7 +492,7 @@ In either case, we do the following:
 
  - We first let the user know that the command was not found by printing an error message to STDERR.
  - We then use the `rbenv whence` command to check which Ruby versions *do* include the requested command.  If there are any such versions, we print them to the screen.
- - Whether or not we found other Ruby versions containing the requested command, we exit with a return code of 127.  This exit code [tells the user's shell](https://web.archive.org/web/20220930064126/https://linuxconfig.org/how-to-fix-bash-127-error-return-code){:target="_blank" rel="noopener"} that the command was not found.
+ - Whether or not we found other Ruby versions containing the requested command, we exit with a return code of 127.  This exit code [tells the user's shell](https://web.archive.org/web/20220930064126/https://linuxconfig.org/how-to-fix-bash-127-error-return-code){:target="_blank" rel="noopener" } that the command was not found.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 

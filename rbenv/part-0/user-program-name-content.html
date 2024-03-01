@@ -2,7 +2,7 @@
   <h1 class="post-title">Setting the Name of the User's Program</h1>
 </header>
 
-<p>Moving on to <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L5" target="_blank">the next line of code</a>:</p>
+<p>Moving on to <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L5" target="_blank" rel="noopener">the next line of code</a>:</p>
 
 <pre><code>program="${0##*/}"</code></pre>
 
@@ -61,7 +61,7 @@ $ </code></pre>
 
 <h2>Parameter Expansion</h2>
 
-<p>What is this weird syntax which evaluates to the name of the program? After Googling the exact string <code>${0##*/}</code>, I find <a href="https://web.archive.org/web/20150926110359/https://unix.stackexchange.com/questions/214465/what-does-prog-0-mean-in-a-bash-script/214469" target="_blank">this StackOverflow link</a>, which says:</p>
+<p>What is this weird syntax which evaluates to the name of the program? After Googling the exact string <code>${0##*/}</code>, I find <a href="https://web.archive.org/web/20150926110359/https://unix.stackexchange.com/questions/214465/what-does-prog-0-mean-in-a-bash-script/214469" target="_blank" rel="noopener">this StackOverflow link</a>, which says:</p>
 
 <blockquote>
   <p>...this has to deal with parameter expansion.</p>
@@ -148,4 +148,4 @@ $ </code></pre>
 
 <p>In our case, one <code>#</code> will cause <code>./</code> to be removed, while two <code>##</code> will cause <code>./foo/bar/</code> to be removed.</p>
 
-<p>There is much, <strong>much</strong> more to learn about parameter expansion.  We will encounter it again in future parts of the codebase, using new and different patterns besides <code>##/*</code>.  <a href="https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html" target="_blank">This link</a> contains the GNU docs for parameter expansion, including a much more complete list of the syntax and its capabilities.</p>
+<p>There is much, <strong>much</strong> more to learn about parameter expansion.  We will encounter it again in future parts of the codebase, using new and different patterns besides <code>##/*</code>.  <a href="https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html" target="_blank" rel="noopener">This link</a> contains the GNU docs for parameter expansion, including a much more complete list of the syntax and its capabilities.</p>

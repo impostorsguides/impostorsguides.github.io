@@ -22,13 +22,13 @@ createdAt: 25 Jan, 2024
 
 <h2>UNIX was designed to be multi-user</h2>
 
-<p>I started by <a href="https://web.archive.org/web/20230406160905/https://stackoverflow.com/questions/75627561/my-umask-output-is-022-why-cant-i-execute-a-file-i-just-created-without-c/" target="_blank">asking a question on StackOverflow</a>.  The question I asked involves a command called <code>umask</code> which isn't super-important here. The gist of my question, which you can see in the comments below <a href="https://stackoverflow.com/a/75628499" target="_blank">this answer</a>, is "Why can't a file's creator execute a file without jumping through <code>chmod</code> hoops?"  The person who responded wrote:</p>
+<p>I started by <a href="https://web.archive.org/web/20230406160905/https://stackoverflow.com/questions/75627561/my-umask-output-is-022-why-cant-i-execute-a-file-i-just-created-without-c/" target="_blank" rel="noopener">asking a question on StackOverflow</a>.  The question I asked involves a command called <code>umask</code> which isn't super-important here. The gist of my question, which you can see in the comments below <a href="https://stackoverflow.com/a/75628499" target="_blank" rel="noopener">this answer</a>, is "Why can't a file's creator execute a file without jumping through <code>chmod</code> hoops?"  The person who responded wrote:</p>
 
 <blockquote>
   <p>Because most files are data, and this is generally safer in the unknown broader context. The folk designing the system built it to be easy for me to do quick scripting work, especially on a dedicated private machine, but also easy for sysadmins to manage if the machine is a highly networked production system where very few people should be creating new scripts. When in doubt, a more conservative decision is safer, and the risk tolerances of end users vary wildly.</p>
 </blockquote>
 
-<p>The rest of the comment thread is worth reading as well.  TL;DR- <a href="https://web.archive.org/web/20230331054614/https://en.wikipedia.org/wiki/Multi-user_software" target="_blank">UNIX was designed to be handle multiple users on the same system</a>, so it needs to account for the scenario where a user gains access to a system that they shouldn't have access to, and writes a malicious script that they then try to execute.</p>
+<p>The rest of the comment thread is worth reading as well.  TL;DR- <a href="https://web.archive.org/web/20230331054614/https://en.wikipedia.org/wiki/Multi-user_software" target="_blank" rel="noopener">UNIX was designed to be handle multiple users on the same system</a>, so it needs to account for the scenario where a user gains access to a system that they shouldn't have access to, and writes a malicious script that they then try to execute.</p>
 
 <p>The mechanism which prevents this from happening is the UNIX requirement that files are non-executable by default.  Unless the malicious user has somehow granted themselves sysadmin privileges, they won't have permission to execute the script without authorization from the system's administrator. This, in a nutshell, is why we have to <code>chmod</code> our scripts every time.</p>
 
@@ -44,7 +44,7 @@ $ ls -la foo
 -rw-r--r--  1 richiethomas  staff  0 Jan 31 09:54 foo
 $ </code></pre>
 
-<p>The thing we want to focus on in this output is the <code>-rw-r--r--</code> section. According to <a href="https://web.archive.org/web/20221006191132/https://mason.gmu.edu/~montecin/UNIXpermiss.htm" target="_blank">this source</a>, the first <code>-</code> (i.e. the <code>-</code> in <code>-rw</code>) means that what we're looking at are <i>file</i> permissions, not <i>directory</i> permissions.</p>
+<p>The thing we want to focus on in this output is the <code>-rw-r--r--</code> section. According to <a href="https://web.archive.org/web/20221006191132/https://mason.gmu.edu/~montecin/UNIXpermiss.htm" target="_blank" rel="noopener">this source</a>, the first <code>-</code> (i.e. the <code>-</code> in <code>-rw</code>) means that what we're looking at are <i>file</i> permissions, not <i>directory</i> permissions.</p>
 
 <p>If the reverse were true, we would see a leading <code>d</code> (i.e. <code>drw</code>) instead of <code>-rw</code>.  We can see that by creating a directory as well:</p>
 
@@ -59,7 +59,7 @@ $ </code></pre>
 
 <p>Here we see that the <code>bar/</code> directory's permissions line starts with <code>d</code>, unlike that of the <code>foo</code> file.</p>
 
-<p>Characters 2-4 (i.e. <code>rw-</code> for the <code>foo</code> file) represent the permissions for the file's creator. Characters 5-7 (<code>r–</code>) are for users in the same <a href="https://web.archive.org/web/20211206154949/https://docs.oracle.com/cd/E19120-01/open.solaris/819-2379/userconcept-35906/index.html" target="_blank">user group</a> as the file's creator, and characters 8-10 (also <code>r–</code>) are for everyone else. In each of these bunches of 3 characters, <code>r</code> means that group can read the file, <code>w</code> means they can write to it, and <code>x</code> means they can execute it.</p>
+<p>Characters 2-4 (i.e. <code>rw-</code> for the <code>foo</code> file) represent the permissions for the file's creator. Characters 5-7 (<code>r–</code>) are for users in the same <a href="https://web.archive.org/web/20211206154949/https://docs.oracle.com/cd/E19120-01/open.solaris/819-2379/userconcept-35906/index.html" target="_blank" rel="noopener">user group</a> as the file's creator, and characters 8-10 (also <code>r–</code>) are for everyone else. In each of these bunches of 3 characters, <code>r</code> means that group can read the file, <code>w</code> means they can write to it, and <code>x</code> means they can execute it.</p>
 
 <h2>Experiment- updating a file's permissions</h2>
 
@@ -107,9 +107,9 @@ $ </code></pre>
 <div id="photo-attribution">
   <h4>Photo Attribution</h4>
   <p>Title: Civil Disobedience requires no permission slip - #climatestrike Melbourne IMG_3459</p>
-  <p>Author: <a href="https://www.flickr.com/photos/takver/" target="_blank">John Englart</a></p>
-  <p>Source: <a href="https://www.flickr.com/photos/takver/46114359481" target="_blank">Flickr</a></p>
-  <p>License: <a href="https://creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC BY-SA 2.0 DEED Attribution-ShareAlike 2.0 Generic</a></p>
+  <p>Author: <a href="https://www.flickr.com/photos/takver/" target="_blank" rel="noopener">John Englart</a></p>
+  <p>Source: <a href="https://www.flickr.com/photos/takver/46114359481" target="_blank" rel="noopener">Flickr</a></p>
+  <p>License: <a href="https://creativecommons.org/licenses/by-sa/2.0/" target="_blank" rel="noopener">CC BY-SA 2.0 DEED Attribution-ShareAlike 2.0 Generic</a></p>
   <br />
   <p>Description:</p>
   <p>As part of the movement started by 15 year old Swedish student Greta Thundberg for ramping up climate action, thousands of students around Australia and in Melbourne rallied and marched on November 30, 2018. The Melbourne protest had several thousand students and adult supporters attending and was full of energy, music, chanting, and lots of home-made placards and signs. Towards the end of a march through the city streets some students decided to sitdown on the road and tram tracks on Spring Street in front of the Victorian Parliament and maintained their position for 40 minutes before deciding to move to the end point in the Treasury Gardens.</p>

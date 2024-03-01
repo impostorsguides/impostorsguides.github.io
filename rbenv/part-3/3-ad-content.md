@@ -13,17 +13,17 @@ There are two files in total:
 
  Let's start with `gem-rehash.bash`.
 
-## [gem-rehash.bash](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/rbenv.d/exec/gem-rehash.bash){:target="_blank" rel="noopener"}
+## [gem-rehash.bash](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/rbenv.d/exec/gem-rehash.bash){:target="_blank" rel="noopener" }
 
 ### When and where does `gem-rehash.bash` get run?
 
-If we remember back to the `libexec/rbenv` file, we recall that the `RBENV_HOOK_PATH` environment variable [gets updated to include the `rbenv.d/` directory](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81){:target="_blank" rel="noopener"}.  And if we recall our read-through of `libexec/rbenv-hooks`, `RBENV_HOOK_PATH` gets used in [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-hooks#L55-L63){:target="_blank" rel="noopener"} to return a list of scripts, which later get run by `rbenv-exec` [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L36-L41){:target="_blank" rel="noopener"}.  From what we learned about how `rbenv-hooks` works, we can assume that the file we're looking at now (`gem-rehash.bash`) will get run anytime `rbenv-exec` is run.
+If we remember back to the `libexec/rbenv` file, we recall that the `RBENV_HOOK_PATH` environment variable [gets updated to include the `rbenv.d/` directory](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81){:target="_blank" rel="noopener" }.  And if we recall our read-through of `libexec/rbenv-hooks`, `RBENV_HOOK_PATH` gets used in [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-hooks#L55-L63){:target="_blank" rel="noopener" } to return a list of scripts, which later get run by `rbenv-exec` [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-exec#L36-L41){:target="_blank" rel="noopener" }.  From what we learned about how `rbenv-hooks` works, we can assume that the file we're looking at now (`gem-rehash.bash`) will get run anytime `rbenv-exec` is run.
 
 ### What is this file used for?
 
-This file only has one line of code (which we'll get to in a minute), and it hasn't changed much since it was first added [in this PR](https://github.com/rbenv/rbenv/pull/638){:target="_blank" rel="noopener"}.  The title of the PR (`"Bring rbenv-gem-rehash functionality to core"`) implies that this file's functionality used to be part of some external library, but that functionality was later moved into RBENV itself.
+This file only has one line of code (which we'll get to in a minute), and it hasn't changed much since it was first added [in this PR](https://github.com/rbenv/rbenv/pull/638){:target="_blank" rel="noopener" }.  The title of the PR (`"Bring rbenv-gem-rehash functionality to core"`) implies that this file's functionality used to be part of some external library, but that functionality was later moved into RBENV itself.
 
-If we Google "rbenv-gem-rehash", one of the first results we'll find is [this Github repo](https://github.com/rbenv/rbenv-gem-rehash){:target="_blank" rel="noopener"}, whose job was to save RBENV users from having to run `rbenv rehash` every time they install a gem.  The README file includes the following line:
+If we Google "rbenv-gem-rehash", one of the first results we'll find is [this Github repo](https://github.com/rbenv/rbenv-gem-rehash){:target="_blank" rel="noopener" }, whose job was to save RBENV users from having to run `rbenv rehash` every time they install a gem.  The README file includes the following line:
 
 > This plugin is deprecated since its behavior is now included in rbenv core.
 
@@ -48,7 +48,7 @@ echo "BASH_SOURCE%.bash: ${BASH_SOURCE%.bash}"
 export RUBYLIB="${BASH_SOURCE%.bash}:$RUBYLIB"
 ```
 
-If we run any `rbenv exec` command, we should get our answer.  However, bear in mind that we rarely call `rbenv exec` directly.  Instead, it's called [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-rehash#L80){:target="_blank" rel="noopener"} by shims when we run a gem's executable.
+If we run any `rbenv exec` command, we should get our answer.  However, bear in mind that we rarely call `rbenv exec` directly.  Instead, it's called [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-rehash#L80){:target="_blank" rel="noopener" } by shims when we run a gem's executable.
 
 So instead, let's run a command which invokes a shim:
 
@@ -74,7 +74,7 @@ If we run `man ruby` and search for `RUBYLIB`, we see the following:
 
 So by prepending our directory to `RUBYLIB`, we're indirectly updating Ruby's load path to include that directory as well.
 
-The above docs also mention that Ruby's load path is referred to with the `$:` syntax.  Googling `Ruby "$:"` reveals that `$:` is shorthand for Ruby's `$LOAD_PATH` environment variable.  If we then Google `"RubyGems LOAD_PATH"` to see how `$LOAD_PATH` is used by RubyGems, we find [the "RubyGems Plugins" page](https://web.archive.org/web/20221013080106/https://guides.rubygems.org/plugins/){:target="_blank" rel="noopener"}, which says:
+The above docs also mention that Ruby's load path is referred to with the `$:` syntax.  Googling `Ruby "$:"` reveals that `$:` is shorthand for Ruby's `$LOAD_PATH` environment variable.  If we then Google `"RubyGems LOAD_PATH"` to see how `$LOAD_PATH` is used by RubyGems, we find [the "RubyGems Plugins" page](https://web.archive.org/web/20221013080106/https://guides.rubygems.org/plugins/){:target="_blank" rel="noopener" }, which says:
 
 > RubyGems will load plugins in the latest version of each installed gem or `$LOAD_PATH`. Plugins must be named `'rubygems_plugin'` (`.rb`, `.so`, etc) and placed at the root of your gem's `#require_path`. Plugins are installed at a special location and loaded on boot.
 
@@ -134,7 +134,7 @@ We still see `hello from gem-rehash.bash`, but now we no longer see `Hello from 
 
 But what does the code in `rubygems_plugin.rb` do?  Let's break down the code line-by-line.
 
-## [rubygems_plugin.rb](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/rbenv.d/exec/gem-rehash/rubygems_plugin.rb){:target="_blank" rel="noopener"}
+## [rubygems_plugin.rb](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/rbenv.d/exec/gem-rehash/rubygems_plugin.rb){:target="_blank" rel="noopener" }
 
 First block of code:
 
@@ -148,7 +148,7 @@ end
 
 Here we define a lambda, or a block of code which can be stored in a variable and passed around to anyone who wants to call it.  We expect that whoever calls our lambda will pass a single argument to it- an instance of the `Gem::Installer` class.
 
-If we look at [the docs page](https://web.archive.org/web/20230323054237/https://docs.ruby-lang.org/en/master/Gem/Installer.html){:target="_blank" rel="noopener"} for this class, we see:
+If we look at [the docs page](https://web.archive.org/web/20230323054237/https://docs.ruby-lang.org/en/master/Gem/Installer.html){:target="_blank" rel="noopener" } for this class, we see:
 
 > The installer invokes pre and post install hooks. Hooks can be added... through a rubygems_plugin.rb file in an installed gem...
 
@@ -168,7 +168,7 @@ begin
 
 We wrap our code in a `begin/end` block, because we'll invoke the `rescue` keyword later.  The code inside the `begin` block is our happy path, and the code inside our `rescue` block is our sad path, i.e. what happens if something goes wrong inside the `begin` block.
 
-Per [the docs](https://web.archive.org/web/20230521071726/https://docs.ruby-lang.org/en/2.4.0/syntax/exceptions_rdoc.html){:target="_blank" rel="noopener"}, you can leave out the `begin` keyword, but **only** if your code is inside a method.
+Per [the docs](https://web.archive.org/web/20230521071726/https://docs.ruby-lang.org/en/2.4.0/syntax/exceptions_rdoc.html){:target="_blank" rel="noopener" }, you can leave out the `begin` keyword, but **only** if your code is inside a method.
 
 What goes on inside the happy path?  According to the comment, we check two things.
 
@@ -178,13 +178,13 @@ What goes on inside the happy path?  According to the comment, we check two thin
 if installer.spec.executables.any?...
 ```
 
-First we check whether the gem that we're installing (or un-installing) has any commands that can be run from the terminal.  [The docs for `Gem::Installer`](https://web.archive.org/web/20230323054237/https://docs.ruby-lang.org/en/master/Gem/Installer.html#method-i-spec){:target="_blank" rel="noopener"} tell us that the `installer.spec` method is "a lazy accessor for the installer's spec".  What is "the installer's spec"?  If we step through the code, we see that this method returns an instance of the `Gem::Specification` class.
+First we check whether the gem that we're installing (or un-installing) has any commands that can be run from the terminal.  [The docs for `Gem::Installer`](https://web.archive.org/web/20230323054237/https://docs.ruby-lang.org/en/master/Gem/Installer.html#method-i-spec){:target="_blank" rel="noopener" } tell us that the `installer.spec` method is "a lazy accessor for the installer's spec".  What is "the installer's spec"?  If we step through the code, we see that this method returns an instance of the `Gem::Specification` class.
 
-In turn, the `Gem::Specification` class has an instance method called `#executables`.  If we look up [the docs for *that* method](https://web.archive.org/web/20230616110144/https://guides.rubygems.org/specification-reference/#executables){:target="_blank" rel="noopener"}, we see that this method returns any commands that the gem exposes.  If the gem doesn't expose any commands, there's no point in running `rbenv rehash`, because there's nothing to create a shim for.
+In turn, the `Gem::Specification` class has an instance method called `#executables`.  If we look up [the docs for *that* method](https://web.archive.org/web/20230616110144/https://guides.rubygems.org/specification-reference/#executables){:target="_blank" rel="noopener" }, we see that this method returns any commands that the gem exposes.  If the gem doesn't expose any commands, there's no point in running `rbenv rehash`, because there's nothing to create a shim for.
 
 For example, if we were to put a debugger inside our `rubygems_plugin.rb` file, then run `gem install rails` and step through the code, we'd see that the `railties` gem (which is one of the gems that Rails depends on) exposes the `rails` command, which you'd type in the terminal whenever you want to do Rails-y things.
 
-One big gotcha here- if you try to re-install a gem that you've already installed, even one with executables, you'll get an empty array for `#executables`.  I don't yet know why this is, but I have a question out to the RubyGems folks [here](https://github.com/rubygems/rubygems/discussions/6806){:target="_blank" rel="noopener"} to find out.
+One big gotcha here- if you try to re-install a gem that you've already installed, even one with executables, you'll get an empty array for `#executables`.  I don't yet know why this is, but I have a question out to the RubyGems folks [here](https://github.com/rubygems/rubygems/discussions/6806){:target="_blank" rel="noopener" } to find out.
 
 #### Checking if the Gem's executable directory matches RBENV's expectations
 
@@ -199,18 +199,18 @@ These days, that's not necessarily true, as we in UNIX-land can invoke a filenam
 In the above code snippet, we see the following method calls:
 
  - `Gem.default_bindir`
-    - "The default directory for binaries" (source [here](https://ruby-doc.org/stdlib-2.6/libdoc/rubygems/rdoc/Gem.html#method-c-default_bindir){:target="_blank" rel="noopener"})
+    - "The default directory for binaries" (source [here](https://ruby-doc.org/stdlib-2.6/libdoc/rubygems/rdoc/Gem.html#method-c-default_bindir){:target="_blank" rel="noopener" })
     - On my machine, this evaluates to `/Users/myusername/.rbenv/versions/2.7.5/bin`.
  - `Gem.user_dir`
-    - "Path for gems in the user's home directory" (source [here](https://ruby-doc.org/stdlib-2.6/libdoc/rubygems/rdoc/Gem.html#method-c-user_dir){:target="_blank" rel="noopener"})
+    - "Path for gems in the user's home directory" (source [here](https://ruby-doc.org/stdlib-2.6/libdoc/rubygems/rdoc/Gem.html#method-c-user_dir){:target="_blank" rel="noopener" })
     - On my machine, this evaluates to `/Users/myusername/.gem/ruby/2.7.0`.
     - Note that this path does not actually exist on my machine!
  - `Gem.bindir`
-    - "The path where gem executables are to be installed." (source [here](https://ruby-doc.org/stdlib-2.6/libdoc/rubygems/rdoc/Gem.html#method-c-bindir){:target="_blank" rel="noopener"})
+    - "The path where gem executables are to be installed." (source [here](https://ruby-doc.org/stdlib-2.6/libdoc/rubygems/rdoc/Gem.html#method-c-bindir){:target="_blank" rel="noopener" })
     - On my machine, `Gem.bindir(Gem.user_dir)` evaluates to `/Users/myusername/.gem/ruby/2.7.0/bin`.
     - Note that this path does not actually exist on my machine!
  - `installer.bin_dir`
-    - "The directory a gem's executables will be installed into" (source [here](https://web.archive.org/web/20230708134234/https://ruby-doc.org/stdlib-3.1.0/libdoc/rubygems/rdoc/Gem/Installer.html){:target="_blank" rel="noopener"})
+    - "The directory a gem's executables will be installed into" (source [here](https://web.archive.org/web/20230708134234/https://ruby-doc.org/stdlib-3.1.0/libdoc/rubygems/rdoc/Gem/Installer.html){:target="_blank" rel="noopener" })
     - On my machine, this evaluates to `/Users/myusername/.rbenv/versions/2.7.5/bin`.
 
 So here we check whether the actual directory where a gem's executables will be installed matches either:
@@ -234,10 +234,10 @@ Next block of code:
 `rbenv rehash`
 ```
 
-The backtick syntax tells Ruby to execute the terminal command specified inside the backticks.  In this case, we're telling UNIX to execute `rbenv rehash` in the shell.  From the book ["The Ruby Programming Language"](https://books.google.cl/books?id=jcUbTcr5XWwC&pg=PA53&lpg=PA53&dq=ruby+backticks&source=bl&ots=fLIozb7tjF&sig=ACfU3U1zDhjFnvjOQy1jhjp5mu0USP3zkg&hl=en&sa=X&sqi=2&ved=2ahUKEwjUmsW_pP__AhW1LLkGHf7gAcgQ6AF6BQiXARAD#v=onepage&q=ruby%20backticks&f=false){:target="_blank" rel="noopener"}:
+The backtick syntax tells Ruby to execute the terminal command specified inside the backticks.  In this case, we're telling UNIX to execute `rbenv rehash` in the shell.  From the book ["The Ruby Programming Language"](https://books.google.cl/books?id=jcUbTcr5XWwC&pg=PA53&lpg=PA53&dq=ruby+backticks&source=bl&ots=fLIozb7tjF&sig=ACfU3U1zDhjFnvjOQy1jhjp5mu0USP3zkg&hl=en&sa=X&sqi=2&ved=2ahUKEwjUmsW_pP__AhW1LLkGHf7gAcgQ6AF6BQiXARAD#v=onepage&q=ruby%20backticks&f=false){:target="_blank" rel="noopener" }:
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-8jul2023-1011am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-8jul2023-1011am.png">
     <img src="/assets/images/screenshot-8jul2023-1011am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
@@ -269,7 +269,7 @@ The intent here is to gracefully fail if `rbenv rehash` throws an error.
 
 But are we actually rescuing anything with this rescue block?
 
-Given [this conversation](https://news.ycombinator.com/item?id=28197331){:target="_blank" rel="noopener"}:
+Given [this conversation](https://news.ycombinator.com/item?id=28197331){:target="_blank" rel="noopener" }:
 
 > What I don't like about backticks in Ruby is that they "ignore" errors in commands you run. It's up to the program author to remember to check $? for the last executed command's exit status. And guess how many times the average Ruby script using this feature implements error handling? Usually it's totally forgotten.
 
@@ -297,7 +297,7 @@ Done installing documentation for railties after 0 seconds
 
 I was able to trigger a non-zero exit, yet we don't see our warning beginning with `rbenv: error in gem-rehash...` printed to the screen.  Therefore, we've confirmed that we do *not* reach the `rescue` block here.
 
-I submitted a PR [here](https://github.com/rbenv/rbenv/pull/1513){:target="_blank" rel="noopener"} to address this, and am waiting for a response.
+I submitted a PR [here](https://github.com/rbenv/rbenv/pull/1513){:target="_blank" rel="noopener" } to address this, and am waiting for a response.
 
 ## If gems are installed via `bundle install`
 
@@ -311,11 +311,11 @@ else
 end
 ```
 
-This code was introduced in 2015 as part of [this PR](https://github.com/rbenv/rbenv/pull/806){:target="_blank" rel="noopener"}, and its goal (according to the PR description) was to prevent the `bundle install` command from running `rbenv rehash` multiple times.  Ideally, we'd like that command to run once, after all the gems have been installed.
+This code was introduced in 2015 as part of [this PR](https://github.com/rbenv/rbenv/pull/806){:target="_blank" rel="noopener" }, and its goal (according to the PR description) was to prevent the `bundle install` command from running `rbenv rehash` multiple times.  Ideally, we'd like that command to run once, after all the gems have been installed.
 
 According to the PR description, the `if` block is executed if we're running `bundle install`, and the `else` code is executed if we're not, i.e. if we're just running `gem install` by itself, without `bundler`.  But when I add various `puts` statements both inside and outside the `if` block, I don't see my output when I run `bundle install` in a brand-new Rails app.
 
-After a lot of digging, I discovered that there was [a commit added to Bundler in 2016](https://github.com/rubygems/bundler/pull/4954/files){:target="_blank" rel="noopener"} which changed the way plugins are loaded.  This change resulted in Bundler using a different load path from the one that it used prior to the change, meaning RBENV's `rubygems_plugin.rb` never gets loaded and we don't execute our post-install hook.  This was confirmed by [an answer to a question I posted](https://github.com/rbenv/rbenv/discussions/1516){:target="_blank" rel="noopener"} on the RBENV "Q&A" page.
+After a lot of digging, I discovered that there was [a commit added to Bundler in 2016](https://github.com/rubygems/bundler/pull/4954/files){:target="_blank" rel="noopener" } which changed the way plugins are loaded.  This change resulted in Bundler using a different load path from the one that it used prior to the change, meaning RBENV's `rubygems_plugin.rb` never gets loaded and we don't execute our post-install hook.  This was confirmed by [an answer to a question I posted](https://github.com/rbenv/rbenv/discussions/1516){:target="_blank" rel="noopener" } on the RBENV "Q&A" page.
 
 Furthermore, I re-add the following line of code to my local copy of Bundler's `lib/bundler/cli/install.rb` file, which the above PR removed:
 
@@ -347,7 +347,7 @@ Here we check the following 3 things:
  - `!Bundler::Installer.respond_to?(:install_without_rbenv_rehash)`
     - Does that class **not** implement a method called `install_without_rbenv_rehash`?
 
-It makes sense why we'd do the first check- if `Bundler::Installer` is not defined, then we're not running the `bundle install` command.  I'm not sure why the 2nd check is happening, but the 3rd check seems to be present in order to prevent infinite looping of the code, as per [this comment](https://github.com/rbenv/rbenv/pull/806#discussion_r43037156){:target="_blank" rel="noopener"} in the original PR.
+It makes sense why we'd do the first check- if `Bundler::Installer` is not defined, then we're not running the `bundle install` command.  I'm not sure why the 2nd check is happening, but the 3rd check seems to be present in order to prevent infinite looping of the code, as per [this comment](https://github.com/rbenv/rbenv/pull/806#discussion_r43037156){:target="_blank" rel="noopener" } in the original PR.
 
 ### Opening up the `Bundler::Installer` class
 
@@ -374,7 +374,7 @@ class << self
 end
 ```
 
-The `class << self` block turns any methods defined inside the block into class methods.  We're defining a method called `install` here, but we know that this method already exists because we're inside an `if` block which specifically checked that it exists, via `Bundler::Installer.respond_to?(:install)`.  We can see the previous definition of the method [here](https://github.com/rubygems/bundler/blob/master/lib/bundler/installer.rb#L22){:target="_blank" rel="noopener"}.  It has the exact same signature as our new definition, i.e. the same name and the same arguments.
+The `class << self` block turns any methods defined inside the block into class methods.  We're defining a method called `install` here, but we know that this method already exists because we're inside an `if` block which specifically checked that it exists, via `Bundler::Installer.respond_to?(:install)`.  We can see the previous definition of the method [here](https://github.com/rubygems/bundler/blob/master/lib/bundler/installer.rb#L22){:target="_blank" rel="noopener" }.  It has the exact same signature as our new definition, i.e. the same name and the same arguments.
 
 So we're not *defining* the `install` class method, but *re-defining* it.
 
@@ -389,26 +389,26 @@ begin
   end
 ```
 
-What is `Gem.default_path`?  It sounds like it would return a string representing a path that RubyGems would use to look for gems.  But it actually doesn't return a string, it returns an array of (up to) 3 string paths.  These paths are referred to in [the RubyGems source code](https://github.com/rubygems/rubygems/blob/master/lib/rubygems/defaults.rb#L175){:target="_blank" rel="noopener"} as:
+What is `Gem.default_path`?  It sounds like it would return a string representing a path that RubyGems would use to look for gems.  But it actually doesn't return a string, it returns an array of (up to) 3 string paths.  These paths are referred to in [the RubyGems source code](https://github.com/rubygems/rubygems/blob/master/lib/rubygems/defaults.rb#L175){:target="_blank" rel="noopener" } as:
 
- - [`user_dir`](https://github.com/rubygems/rubygems/blob/master/lib/rubygems/defaults.rb#L103){:target="_blank" rel="noopener"}
+ - [`user_dir`](https://github.com/rubygems/rubygems/blob/master/lib/rubygems/defaults.rb#L103){:target="_blank" rel="noopener" }
     - the directory on the user's machine where gems are stored, assuming no Ruby version manager (such as RBENV) is being used.
     - On my machine, this resolves to `/Users/myusername/.gem/ruby/3.1.0`.
- - [`default_dir`](https://github.com/rubygems/rubygems/blob/master/lib/rubygems/defaults.rb#L37){:target="_blank" rel="noopener"}
+ - [`default_dir`](https://github.com/rubygems/rubygems/blob/master/lib/rubygems/defaults.rb#L37){:target="_blank" rel="noopener" }
     - the default directory where gems are installed for the current Ruby version, *whether or not* a Ruby version manager is being used.
     - On my machine, this resolves to `/Users/myusername/.rbenv/versions/3.1.4/lib/ruby/gems/3.1.0`.
- - [`vendor_dir`](https://github.com/rubygems/rubygems/blob/master/lib/rubygems/defaults.rb#L248){:target="_blank" rel="noopener"}
+ - [`vendor_dir`](https://github.com/rubygems/rubygems/blob/master/lib/rubygems/defaults.rb#L248){:target="_blank" rel="noopener" }
     - the directory where vendor gems are installed.
     - Vendor gems are gems which have been installed directly into a sub-directory of your project, as opposed to in a central location on your machine which is managed by RubyGems.
     - On my machine, this resolves to `/Users/myusername/.rbenv/versions/3.1.4/lib/ruby/vendor_ruby/gems/3.1.0`.
 
-Next: what is `Bundler.bundle_path.to_s`?  According to [the source code](https://github.com/rubygems/bundler/blob/master/lib/bundler.rb#L93){:target="_blank" rel="noopener"}, the `bundle_path` method:
+Next: what is `Bundler.bundle_path.to_s`?  According to [the source code](https://github.com/rubygems/bundler/blob/master/lib/bundler.rb#L93){:target="_blank" rel="noopener" }, the `bundle_path` method:
 
 > Returns absolute path of where gems are installed on the filesystem.
 
 On my machine, `Bundler.bundle_path.to_s` resolves to `/Users/myusername/.rbenv/versions/3.1.4/lib/ruby/gems/3.1.0`.
 
-There aren't any comments in [the original PR](https://github.com/rbenv/rbenv/pull/806){:target="_blank" rel="noopener"} about why this `if` conditional is necessary.  The conditional seems to be checking whether the directory that Bundler will use to install gems is one of the above 3 directories (`user_dir`, `default_dir`, or `vendor_dir`).  But it's hard to tell why we care about that, or under what circumstances the `if` check would return `true` vs. `false`.
+There aren't any comments in [the original PR](https://github.com/rbenv/rbenv/pull/806){:target="_blank" rel="noopener" } about why this `if` conditional is necessary.  The conditional seems to be checking whether the directory that Bundler will use to install gems is one of the above 3 directories (`user_dir`, `default_dir`, or `vendor_dir`).  But it's hard to tell why we care about that, or under what circumstances the `if` check would return `true` vs. `false`.
 
 One clue we have is in what happens inside the `if` block.  Let's look at that.
 
@@ -421,7 +421,7 @@ bin_dir = Gem.bindir(Bundler.bundle_path.to_s)
 bins_before = File.exist?(bin_dir) ? Dir.entries(bin_dir).size : 2
 ```
 
-[The source code](https://github.com/rubygems/rubygems/blob/master/lib/rubygems.rb#L301){:target="_blank" rel="noopener"} tells us that `Gem.bindir contains:
+[The source code](https://github.com/rubygems/rubygems/blob/master/lib/rubygems.rb#L301){:target="_blank" rel="noopener" } tells us that `Gem.bindir contains:
 
 > The path where gem executables are to be installed.
 
@@ -489,7 +489,7 @@ rescue
 end
 ```
 
-This just catches any errors that happen while trying to count the current number of gems, and [alerts the user with a warning message](https://web.archive.org/web/20211021081737/https://apidock.com/ruby/v2_5_5/Kernel/warn){:target="_blank" rel="noopener"}.
+This just catches any errors that happen while trying to count the current number of gems, and [alerts the user with a warning message](https://web.archive.org/web/20211021081737/https://apidock.com/ruby/v2_5_5/Kernel/warn){:target="_blank" rel="noopener" }.
 
 ### Installing the gems
 
@@ -568,11 +568,11 @@ else
 end
 ```
 
-If the `if` condition from earlier returns `false`, then we reach this `else` block.  We register our `hook` lambda with RubyGems via the `post_install` and `post_uninstall` class methods.  According to [the docs](https://www.rubydoc.info/github/rubygems/rubygems/Gem.post_install){:target="_blank" rel="noopener"}, `post_install`:
+If the `if` condition from earlier returns `false`, then we reach this `else` block.  We register our `hook` lambda with RubyGems via the `post_install` and `post_uninstall` class methods.  According to [the docs](https://www.rubydoc.info/github/rubygems/rubygems/Gem.post_install){:target="_blank" rel="noopener" }, `post_install`:
 
 > Adds a post-install hook that will be passed an Gem::Installer instance when Gem::Installer#install is called
 
-And [`post_uninstall`](https://www.rubydoc.info/github/rubygems/rubygems/Gem.post_uninstall){:target="_blank" rel="noopener"}:
+And [`post_uninstall`](https://www.rubydoc.info/github/rubygems/rubygems/Gem.post_uninstall){:target="_blank" rel="noopener" }:
 
 > Adds a post-uninstall hook that will be passed a Gem::Uninstaller instance and the spec that was uninstalled when Gem::Uninstaller#uninstall is called
 

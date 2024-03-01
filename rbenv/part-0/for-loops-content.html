@@ -2,15 +2,15 @@
   <h1 class="post-title"><code>for</code>-loops</h1>
 </header>
 
-<p>Moving onto the <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L7" target="_blank">next line of code</a>:</p>
+<p>Moving onto the <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L7" target="_blank" rel="noopener">next line of code</a>:</p>
 
 <pre><code>for arg; do
   ...
 done</code></pre>
 
-<p>We saw a regular Bash <code>for</code>-loop earlier, in <a href="/blog/path-variable#experiment-printing-IFS" target="_blank">our experiment with delimiters and the <code>IFS</code> variable</a>. This loop is a bit weird, though, because we don't see an <code>arg</code> variable explicitly defined by the code. Yet it's there, all the same.</p>
+<p>We saw a regular Bash <code>for</code>-loop earlier, in <a href="/blog/path-variable#experiment-printing-IFS" target="_blank" rel="noopener">our experiment with delimiters and the <code>IFS</code> variable</a>. This loop is a bit weird, though, because we don't see an <code>arg</code> variable explicitly defined by the code. Yet it's there, all the same.</p>
 
-<p>If we haven't seen this variable defined yet, does that mean it's defined or built-in by the language? As usual, Googling turns up <a href="https://web.archive.org/web/20230406161948/https://stackoverflow.com/questions/73134672/linux-shell-for-arg-do" target="_blank">a StackOverflow post</a>:</p>
+<p>If we haven't seen this variable defined yet, does that mean it's defined or built-in by the language? As usual, Googling turns up <a href="https://web.archive.org/web/20230406161948/https://stackoverflow.com/questions/73134672/linux-shell-for-arg-do" target="_blank" rel="noopener">a StackOverflow post</a>:</p>
 
 <blockquote>
   <p>It's a special way of handling command-line options using for loop.</p>

@@ -13,7 +13,7 @@ createdAt: 16 Jan, 2024
   </figure>
 </div>
 
-<p>In my <a href="/shell" target="_blank">deep-dive write-up of how RBENV works</a>, my first step was to find out where (i.e. in which file) the command's logic lived.  It turned out that it lived in a shim file, which in turn lived inside the <code>~/.rbenv</code> directory.  But I didn't explain what the <code>~/.rbenv</code> directory is, and more specifically, why it starts with a <code>.</code> character.</p>
+<p>In my <a href="/shell" target="_blank" rel="noopener">deep-dive write-up of how RBENV works</a>, my first step was to find out where (i.e. in which file) the command's logic lived.  It turned out that it lived in a shim file, which in turn lived inside the <code>~/.rbenv</code> directory.  But I didn't explain what the <code>~/.rbenv</code> directory is, and more specifically, why it starts with a <code>.</code> character.</p>
 
 <p>This post will try to answer that question, i.e. why do some files and directories start with a dot?</p>
 
@@ -21,7 +21,7 @@ createdAt: 16 Jan, 2024
 
 <h2>Dotfiles and dot folders</h2>
 
-In UNIX, there's a convention whereby the names of files and folders which are meant to be hidden from view by default are prefixed with a dot.  Unsurprisingly, these are called <a href='https://web.archive.org/web/20230623095245/https://www.freecodecamp.org/news/dotfiles-what-is-a-dot-file-and-how-to-create-it-in-mac-and-linux/' target="_blank">"dotfiles" or "dot folders"</a>.</p>
+In UNIX, there's a convention whereby the names of files and folders which are meant to be hidden from view by default are prefixed with a dot.  Unsurprisingly, these are called <a href='https://web.archive.org/web/20230623095245/https://www.freecodecamp.org/news/dotfiles-what-is-a-dot-file-and-how-to-create-it-in-mac-and-linux/' target="_blank" rel="noopener">"dotfiles" or "dot folders"</a>.</p>
 
 <p>When I say "hidden", I mean hidden from the <code>ls</code> command.  For example, the following is the contents of my laptop's home directory, according to the regular <code>ls</code> command (passing the <code>-l</code> flag to list one item per line):</p>
 
@@ -84,15 +84,15 @@ $</code></pre>
 
 <h2>What is an <code>rc</code> dotfile?</h2>
 
-<p>When you install RBENV from source, one of the steps you have to take is <a href="https://github.com/rbenv/rbenv?tab=readme-ov-file#basic-git-checkout" target="_blank">"(c)onfigure your shell to load RBENV"</a>.  You do this by updating a certain file in your home directory to include a certain command.  For the Bash shell, this file is <code>~/.bashrc</code>.  For the Zsh shell, this is the <code>~/.zshrc</code> file.</p>
+<p>When you install RBENV from source, one of the steps you have to take is <a href="https://github.com/rbenv/rbenv?tab=readme-ov-file#basic-git-checkout" target="_blank" rel="noopener">"(c)onfigure your shell to load RBENV"</a>.  You do this by updating a certain file in your home directory to include a certain command.  For the Bash shell, this file is <code>~/.bashrc</code>.  For the Zsh shell, this is the <code>~/.zshrc</code> file.</p>
 
 <p>We see from the filenames that both of these files are dotfiles.  But what is the significance of the <code>rc</code> at the end of these filenams?</p>
 
 <p>When you open a new terminal tab or window in Zsh (the now-default shell for Macs), one of the first things that happens is that Zsh runs a few setup scripts. One of these scripts is that <code>~/.zshrc</code> file. This file is where you'd put configuration options that you'd want to run on every new terminal tab or window.  The same is true for Bash's <code>~/.bashrc</code> file.</p>
 
-<p>There are other setup scripts which get loaded as well, such as <code>~/.zshenv</code>.  But <code>~/.zshrc</code> is the one I interact with most.  Zsh will run these scripts in a specific order, and there are <a href="https://web.archive.org/web/20230724164024/https://unix.stackexchange.com/questions/71253/what-should-shouldnt-go-in-zshenv-zshrc-zlogin-zprofile-zlogout" target="_blank">conventions around what you should put in each file</a>.</p>
+<p>There are other setup scripts which get loaded as well, such as <code>~/.zshenv</code>.  But <code>~/.zshrc</code> is the one I interact with most.  Zsh will run these scripts in a specific order, and there are <a href="https://web.archive.org/web/20230724164024/https://unix.stackexchange.com/questions/71253/what-should-shouldnt-go-in-zshenv-zshrc-zlogin-zprofile-zlogout" target="_blank" rel="noopener">conventions around what you should put in each file</a>.</p>
 
-<p>Other shells have similar <code>rc</code> files (ex.- Bash has <code>~/.bashrc</code>). The <code>rc</code> in <code>.zshrc</code> stands for "run commands" or "run control", depending on <a href="https://web.archive.org/web/20230320050723/https://unix.stackexchange.com/questions/3467/what-does-rc-in-bashrc-stand-for" target="_blank">who you ask</a>.</p>
+<p>Other shells have similar <code>rc</code> files (ex.- Bash has <code>~/.bashrc</code>). The <code>rc</code> in <code>.zshrc</code> stands for "run commands" or "run control", depending on <a href="https://web.archive.org/web/20230320050723/https://unix.stackexchange.com/questions/3467/what-does-rc-in-bashrc-stand-for" target="_blank" rel="noopener">who you ask</a>.</p>
 
 <h2>Experiment- preventing files from being deleted</h2>
 
@@ -134,13 +134,13 @@ $</code></pre>
 
 <h2>Wrapping Up</h2>
 
-<p>That's a very basic introduction to dotfiles.  For a much deeper dive into how dotfiles are used in a professional environment, check out <a href="https://thoughtbot.com/upcase/videos/intro-to-dotfiles" target="_blank">this guide from thoughtbot</a>.</p>
+<p>That's a very basic introduction to dotfiles.  For a much deeper dive into how dotfiles are used in a professional environment, check out <a href="https://thoughtbot.com/upcase/videos/intro-to-dotfiles" target="_blank" rel="noopener">this guide from thoughtbot</a>.</p>
 
 <div id="photo-attribution">
   <h4>Photo Attribution</h4>
   <p>Title of Photo: Unknown</p>
   <p>Description: n/a</p>
   <p>Author: Unknown</p>
-  <p>Source: <a href="https://www.pickpik.com/food-sauce-leaf-salad-plate-drios-113527" target="_blank">PickPik</a></p>
-  <p>License: <a href="https://creativecommons.org/publicdomain/" target="_blank">CC0 1.0 Public Domain</a></p>
+  <p>Source: <a href="https://www.pickpik.com/food-sauce-leaf-salad-plate-drios-113527" target="_blank" rel="noopener">PickPik</a></p>
+  <p>License: <a href="https://creativecommons.org/publicdomain/" target="_blank" rel="noopener">CC0 1.0 Public Domain</a></p>
 </div>

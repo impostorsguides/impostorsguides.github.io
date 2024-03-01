@@ -10,7 +10,7 @@ Here we make two sub-directories inside "$RBENV_ROOT"- one named "shims" and one
 
 ## Brace Expansion
 
-The curly-brace syntax around `{shims,versions}` deserves special mention.  This is called ["brace expansion"](https://web.archive.org/web/20230312015457/https://www.gnu.org/software/bash/manual/html_node/Brace-Expansion.html){:target="_blank" rel="noopener"}.  It's useful when the strings that you want to create share similarities, and differ only in one or a few respects.
+The curly-brace syntax around `{shims,versions}` deserves special mention.  This is called ["brace expansion"](https://web.archive.org/web/20230312015457/https://www.gnu.org/software/bash/manual/html_node/Brace-Expansion.html){:target="_blank" rel="noopener" }.  It's useful when the strings that you want to create share similarities, and differ only in one or a few respects.
 
 Here, we're using it to create the two directories in a single line of code, rather than two separate lines, like so:
 
@@ -101,7 +101,7 @@ $ cat ~/Workspace/OpenSource/{foo,quox}/{bar,baz,buzz}/.ruby-version
 3.0.0
 ```
 
-[That's pretty neat!](https://www.youtube.com/watch?v=OXZt4-LTtHw){:target="_blank" rel="noopener"}
+[That's pretty neat!](https://www.youtube.com/watch?v=OXZt4-LTtHw){:target="_blank" rel="noopener" }
 
 Note that the comma-separated values must not include any spaces:
 
@@ -132,10 +132,10 @@ Here we have a simple case statement, which branches based on the value of our "
 
 If the value of `"$shell"` is `fish`, we `echo` a few commands to `stdout`.  These commands are then run inside the command substitution that we add to our shell configuration file.  We learned when we set the value of the `profile` variable that, if our shell is `fish`, this config file lives in `~/.config/fish/config.fish`.  If our shell was `fish`, the code we added to that file is `status --is-interactive; and rbenv init - fish | source`.
 
-Both these commands use the `fish` shell's `set` command to set shell variables.  The "-g" flag makes the variable global, and the `-x` flag makes the variable available to child processes.  We're creating one environment variable (`RBENV_SHELL`), and modifying another (`PATH`) to pre-pend it with `${RBENV_ROOT}/shims'` so that the shims which RBENV creates will be findable by our terminal.  More info [here](https://fishshell.com/docs/current/cmds/set.html){:target="_blank" rel="noopener"}.
+Both these commands use the `fish` shell's `set` command to set shell variables.  The "-g" flag makes the variable global, and the `-x` flag makes the variable available to child processes.  We're creating one environment variable (`RBENV_SHELL`), and modifying another (`PATH`) to pre-pend it with `${RBENV_ROOT}/shims'` so that the shims which RBENV creates will be findable by our terminal.  More info [here](https://fishshell.com/docs/current/cmds/set.html){:target="_blank" rel="noopener" }.
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-13mar2023-806am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-13mar2023-806am.png">
     <img src="/assets/images/screenshot-13mar2023-806am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
@@ -176,9 +176,9 @@ The `${root}/completions` folder only includes two such files for now- `rbenv.ba
 
 ### Why do we add completions for Bash and `zsh`, but not `fish`?
 
-I was wondering why we include completion scripts for Bash and `zsh`, but not `fish`, so I did some digging in the Github history.  I found [this issue](https://github.com/rbenv/rbenv/issues/1212){:target="_blank" rel="noopener"} which indicates that [`fish` supports RBENV completions natively](https://github.com/fish-shell/fish-shell/blob/1aa0dfe91bc5382220ba2f170bff525501d13908/share/completions/rbenv.fish){:target="_blank" rel="noopener"}.
+I was wondering why we include completion scripts for Bash and `zsh`, but not `fish`, so I did some digging in the Github history.  I found [this issue](https://github.com/rbenv/rbenv/issues/1212){:target="_blank" rel="noopener" } which indicates that [`fish` supports RBENV completions natively](https://github.com/fish-shell/fish-shell/blob/1aa0dfe91bc5382220ba2f170bff525501d13908/share/completions/rbenv.fish){:target="_blank" rel="noopener" }.
 
-Because of that, the `rbenv.fish` shell was redundant and was removed as part of [this PR](https://github.com/rbenv/rbenv/commit/143b2c9c02dbacbbb40592ef4fee5bb5f7f106a5){:target="_blank" rel="noopener"}.  The code to `source` the completion file was then moved into the default branch of the `case` statement [here](https://github.com/gioele/rbenv/commit/9fbbfd268dcbedf0d99f8d14946023e3242feff3){:target="_blank" rel="noopener"}.
+Because of that, the `rbenv.fish` shell was redundant and was removed as part of [this PR](https://github.com/rbenv/rbenv/commit/143b2c9c02dbacbbb40592ef4fee5bb5f7f106a5){:target="_blank" rel="noopener" }.  The code to `source` the completion file was then moved into the default branch of the `case` statement [here](https://github.com/gioele/rbenv/commit/9fbbfd268dcbedf0d99f8d14946023e3242feff3){:target="_blank" rel="noopener" }.
 
 ## The `source` command
 
@@ -256,7 +256,7 @@ $ echo "$FOO"
 $
 ```
 
-Nothing was `echo`ed, even though my script contained an `export` statement.  That's because `export` only makes an environment variable to a script and its children, **not** to any parent script(s).  And when we run `./foo` by itself, we create a [subshell](https://web.archive.org/web/20230320235827/https://tldp.org/LDP/abs/html/subshells.html){:target="_blank" rel="noopener"}, which uses a child process.
+Nothing was `echo`ed, even though my script contained an `export` statement.  That's because `export` only makes an environment variable to a script and its children, **not** to any parent script(s).  And when we run `./foo` by itself, we create a [subshell](https://web.archive.org/web/20230320235827/https://tldp.org/LDP/abs/html/subshells.html){:target="_blank" rel="noopener" }, which uses a child process.
 
 Sometimes we want to isolate those environment variables from our parent, in which case running `./foo` in a subshell is the right call.  But what if that's not what we want?  What if we really do want `FOO` to be set in our parent script?  Well, we have to use `source` instead:
 
@@ -286,7 +286,7 @@ fi
 
 If `$no_rehash` was not set (i.e. if the user did NOT pass `--no-rehash` as an argument), then we run `rbenv command rehash` and send any errors to `/dev/null`.  We'll examine the `rbenv rehash` command more fully when we get to the `libexec/rbenv-rehash` file.  But in brief, this command generates the shim files for any Ruby dependencies we've installed.
 
-Why would someone pass the `--no-rehash` flag?  According to [the `How RBENV Hooks Into Your Shell` section of the `README` file](https://github.com/rbenv/rbenv#how-rbenv-hooks-into-your-shell){:target="_blank" rel="noopener"}, rehashing gems can add latency to your shell startup.  If you want to avoid this latency and think rehashing every time you open a new terminal tab is overkill, pass the `--no-rehash` flag.
+Why would someone pass the `--no-rehash` flag?  According to [the `How RBENV Hooks Into Your Shell` section of the `README` file](https://github.com/rbenv/rbenv#how-rbenv-hooks-into-your-shell){:target="_blank" rel="noopener" }, rehashing gems can add latency to your shell startup.  If you want to avoid this latency and think rehashing every time you open a new terminal tab is overkill, pass the `--no-rehash` flag.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 

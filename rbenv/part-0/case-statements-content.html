@@ -2,7 +2,7 @@
   <h1 class="post-title"><code>case</code>-statements</h1>
 </header>
 
-<p>Moving on to <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L8" target="_blank">the next line</a>:</p>
+<p>Moving on to <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L8" target="_blank" rel="noopener">the next line</a>:</p>
 
 <pre><code>case "$arg" in
   ...
@@ -24,7 +24,7 @@ esac</code></pre>
 
 <h2>Example of Bash's <code>case</code></h2>
 
-<p>However, <a href="https://web.archive.org/web/20220820011836/https://linuxize.com/post/bash-case-statement/" target="_blank">this link</a> has a good explanation of Bash's case statement syntax. It's much too long to copy/paste in its entirety, but there's a lot of good stuff in it.</p>
+<p>However, <a href="https://web.archive.org/web/20220820011836/https://linuxize.com/post/bash-case-statement/" target="_blank" rel="noopener">this link</a> has a good explanation of Bash's case statement syntax. It's much too long to copy/paste in its entirety, but there's a lot of good stuff in it.</p>
 
 <p>Here is a specific example of a <code>case</code> statement that the above article provides, which we can use to deconstruct how they work in Bash:</p>
 
@@ -56,13 +56,13 @@ esac</code></pre>
 
 <p>We open, of course, with the <code>case</code> keyword, followed by the case expression and the <code>in</code> keyword. The statement ends with the <code>esac</code> keyword.</p>
 
-<p>Each case is defined by one or more patterns included on the same line, separated by the <code>|</code> operator.  The <code>)</code> operator terminates a pattern list.  A pattern can include <a href="https://web.archive.org/web/20220820011901/https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html" target="_blank">special characters</a> to take advantage of pattern matching.</p>
+<p>Each case is defined by one or more patterns included on the same line, separated by the <code>|</code> operator.  The <code>)</code> operator terminates a pattern list.  A pattern can include <a href="https://web.archive.org/web/20220820011901/https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html" target="_blank" rel="noopener">special characters</a> to take advantage of pattern matching.</p>
 
 <p>A pattern and its associated commands are known as a clause.  Each clause must be terminated with <code>;;</code>.  It is a common practice to use the wildcard asterisk symbol <code>*</code> as a final pattern to define the default case. This pattern will always match.</p>
 
 <p>The commands corresponding to the first pattern that matches the expression are executed.  If no pattern is matched, the return status is zero.  Otherwise, the return status is the exit status of the executed commands (aka the clause).</p>
 
-<p>For the most part, compared to (for example) a Javascript or Ruby case statement, the only thing that's likely to be new here is the syntax.  There are a few differences, such as <a href="https://unix.stackexchange.com/questions/577603/possible-to-match-multiple-conditions-in-one-case-statement" target="_blank">when you want to purposely fall through from one case statement to the next</a>, but we won't need to know about that for the purposes of grokking RBENV.</p>
+<p>For the most part, compared to (for example) a Javascript or Ruby case statement, the only thing that's likely to be new here is the syntax.  There are a few differences, such as <a href="https://unix.stackexchange.com/questions/577603/possible-to-match-multiple-conditions-in-one-case-statement" target="_blank" rel="noopener">when you want to purposely fall through from one case statement to the next</a>, but we won't need to know about that for the purposes of grokking RBENV.</p>
 
 <h2>Experiment- building a simple <code>case</code> statement</h2>
 

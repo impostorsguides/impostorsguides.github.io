@@ -29,7 +29,7 @@ List all available rbenv commands
 
 I see `--sh` and `--no-sh` listed as valid flags in the `Usage` section, but no explanation as to what these flags do.
 
-Looking at [the `rbenv-commands` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L30){:target="_blank" rel="noopener"} itself, I see that the `--sh` flag narrows down the output to just the commands whose files contain `sh-` in their names (i.e. `shell` and `rehash`).
+Looking at [the `rbenv-commands` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L30){:target="_blank" rel="noopener" } itself, I see that the `--sh` flag narrows down the output to just the commands whose files contain `sh-` in their names (i.e. `shell` and `rehash`).
 
 I'm not yet sure what makes these commands special or requires them to be treated differently, so I write down that question and decide to revisit it later.
 
@@ -47,15 +47,15 @@ esac
 ```
 Here we use a case statement to execute one of several branches of code, based on the different values of our `$shell` var.  Each branch handles a different shell program.  We'll look at what happens when the user's shell is `fish`.
 
-If that's the case, we call the `cat` function, which takes as its input a [heredoc](https://web.archive.org/web/20230501025456/https://tldp.org/LDP/abs/html/here-docs.html){:target="_blank" rel="noopener"} string (a pattern that we previously saw in [the `init.bats` test file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/init.bats#L36){:target="_blank" rel="noopener"}).
+If that's the case, we call the `cat` function, which takes as its input a [heredoc](https://web.archive.org/web/20230501025456/https://tldp.org/LDP/abs/html/here-docs.html){:target="_blank" rel="noopener" } string (a pattern that we previously saw in [the `init.bats` test file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/init.bats#L36){:target="_blank" rel="noopener" }).
 
-Inside the heredoc is where we begin creating a function named `rbenv`.  According to [the docs](https://web.archive.org/web/20230320234416/https://fishshell.com/docs/current/cmds/function.html){:target="_blank" rel="noopener"}, in `fish` we begin a function declaration with the `function` keyword.
+Inside the heredoc is where we begin creating a function named `rbenv`.  According to [the docs](https://web.archive.org/web/20230320234416/https://fishshell.com/docs/current/cmds/function.html){:target="_blank" rel="noopener" }, in `fish` we begin a function declaration with the `function` keyword.
 
 We're creating a function inside a string because that string will be sent to `stdout`, and later used as input for a call to `eval` in our shell configuration file.  We do this because `eval` can execute the code we give it (in this case, our `rbenv` function definition).  Furthermore, it execute that code in such a way that the `rbenv` shell function will actually be available for us to use.
 
 ## Installing `fish`
 
-The `fish` shell uses much different syntax than other shells use.  We can refer back to the [Fish shell docs](https://web.archive.org/web/20220720181625/https://fishshell.com/docs/current/cmds/set.html){:target="_blank" rel="noopener"}, however I can already tell that I'll need to install `fish` on my laptop in order to experiment with its syntax.  For example, in the two lines above, why do we use a "$" sign on line 1, but not on line 2?
+The `fish` shell uses much different syntax than other shells use.  We can refer back to the [Fish shell docs](https://web.archive.org/web/20220720181625/https://fishshell.com/docs/current/cmds/set.html){:target="_blank" rel="noopener" }, however I can already tell that I'll need to install `fish` on my laptop in order to experiment with its syntax.  For example, in the two lines above, why do we use a "$" sign on line 1, but not on line 2?
 
 To install `fish`, I'll use the Homebrew package manager:
 
@@ -64,7 +64,7 @@ brew install fish
 ```
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-13mar2023-808am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-13mar2023-808am.png">
     <img src="/assets/images/screenshot-13mar2023-808am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
@@ -82,7 +82,7 @@ Next few lines:
 
 ### The Escape Character
 
-The `\` before the dollar sign is called the [escape character](https://web.archive.org/web/20230317171428/https://www.gnu.org/software/bash/manual/html_node/Escape-Character.html){:target="_blank" rel="noopener"}.  It's necessary because, without it, the interpreter will try to resolve `$argv[1]` into a Bash variable (since `rbenv-init` is being evaluated as a Bash script).
+The `\` before the dollar sign is called the [escape character](https://web.archive.org/web/20230317171428/https://www.gnu.org/software/bash/manual/html_node/Escape-Character.html){:target="_blank" rel="noopener" }.  It's necessary because, without it, the interpreter will try to resolve `$argv[1]` into a Bash variable (since `rbenv-init` is being evaluated as a Bash script).
 
 We don't want that, at least not here.  Instead, we want `set command $argv[1]` to be part of what gets `echo`'ed to `eval`, so that it gets included in the definition of the `rbenv` shell function.  So whenever you see `\` in this part of `rbenv-init`, it's because we want the character which comes after it to be treated as a string, not as code to be evaluated.
 
@@ -132,7 +132,7 @@ In the case of our `rbenv` shell function, instead of creating a variable named 
 
 ### `argv` in `fish`
 
-According to [the docs](https://web.archive.org/web/20230320234417/https://fishshell.com/docs/current/language.html#envvar-argv){:target="_blank" rel="noopener"}, `argv` is:
+According to [the docs](https://web.archive.org/web/20230320234417/https://fishshell.com/docs/current/language.html#envvar-argv){:target="_blank" rel="noopener" }, `argv` is:
 
 ```
 argv
@@ -182,7 +182,7 @@ argv[3]: buzz
 
 A few things to call out here:
 
- - We got an error, but the code continued executing.  Presumably that's because we didn't include the `fish` equivalent of [the Bash `set -e` command](https://web.archive.org/web/20230209180114/https://linuxhint.com/bash-set-e/){:target="_blank" rel="noopener"}, so the code just continues executing when it hits an error.
+ - We got an error, but the code continued executing.  Presumably that's because we didn't include the `fish` equivalent of [the Bash `set -e` command](https://web.archive.org/web/20230209180114/https://linuxhint.com/bash-set-e/){:target="_blank" rel="noopener" }, so the code just continues executing when it hits an error.
  - As the error states, `fish` array indices start at 1, not 0.
  - We were correct in our hypothesis that we can access the individual args in `argv` using array indexing syntax.
 
@@ -265,7 +265,7 @@ So what would it resolve to?  The easiest way to determine this is to simply pri
 
 ## Installing shell integrations in `fish`
 
-In my `fish` shell, I type `rbenv init` to get the installation instructions that are printed out due to [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L73){:target="_blank" rel="noopener"}:
+In my `fish` shell, I type `rbenv init` to get the installation instructions that are printed out due to [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L73){:target="_blank" rel="noopener" }:
 
 ```
 > rbenv init
@@ -278,10 +278,10 @@ status --is-interactive; and rbenv init - fish | source
 
 It tells me to copy the code `status --is-interactive; and rbenv init - fish | source` into the file `~/.config/fish/config.fish`.  So that's what I do.  I then open a new terminal tab and enter the `fish` shell again.
 
-If I were in Bash, I could print out the shell function by typing `which rbenv`.  I don't know what the equivalent of that is in `fish`, so I Google "print a shell function definition fish".  The first link I find is [this one](https://web.archive.org/web/20230320234416/https://fishshell.com/docs/current/cmds/functions.html){:target="_blank" rel="noopener"}:
+If I were in Bash, I could print out the shell function by typing `which rbenv`.  I don't know what the equivalent of that is in `fish`, so I Google "print a shell function definition fish".  The first link I find is [this one](https://web.archive.org/web/20230320234416/https://fishshell.com/docs/current/cmds/functions.html){:target="_blank" rel="noopener" }:
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-10may2023-938am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-10may2023-938am.png">
     <img src="/assets/images/screenshot-10may2023-938am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
@@ -374,23 +374,23 @@ The fact that we're using `command rbenv` in the `'*'` case tells us that we're 
 
 In other words, in the first case, we want to call the `rbenv` shell function, **not** the version of `rbenv` which is in our `$PATH` (i.e. the `libexec/rbenv` file that we previously examined).  In the 2nd case, we want to call the `rbenv` file directly, bypassing the shell function.
 
-I was wondering why this is the case, so I looked up the `git` history for this block of code.  I discovered [this PR from 2011](https://github.com/rbenv/rbenv/pull/57){:target="_blank" rel="noopener"}:
+I was wondering why this is the case, so I looked up the `git` history for this block of code.  I discovered [this PR from 2011](https://github.com/rbenv/rbenv/pull/57){:target="_blank" rel="noopener" }:
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-11may2023-918am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-11may2023-918am.png">
     <img src="/assets/images/screenshot-11may2023-918am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
 
 The goal seems to be to allow shell-specific commands to set and/or modify environment variables in the current environment.  In the context of the `fish` shell, this is done by:
 
- - calling `rbenv "sh-$command" $argv` (which is just the code from [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L118){:target="_blank" rel="noopener"}, minus the escape characters), and then
+ - calling `rbenv "sh-$command" $argv` (which is just the code from [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L118){:target="_blank" rel="noopener" }, minus the escape characters), and then
  - piping the output from that command to the `source` command.
 
-If we look at [the `fish` docs for the `source` command](https://web.archive.org/web/20230303210037/https://fishshell.com/docs/current/cmds/source.html){:target="_blank" rel="noopener"}, we can see:
+If we look at [the `fish` docs for the `source` command](https://web.archive.org/web/20230303210037/https://fishshell.com/docs/current/cmds/source.html){:target="_blank" rel="noopener" }, we can see:
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-11may2023-926am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-11may2023-926am.png">
     <img src="/assets/images/screenshot-11may2023-926am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>

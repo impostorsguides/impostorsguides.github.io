@@ -1,6 +1,6 @@
 As usual, we'll cover the tests first, and the code afterward.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/commands.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/commands.bats){:target="_blank" rel="noopener" }
 
 ### Happy-path test
 
@@ -18,7 +18,7 @@ After the `bats` shebang and the loading of `test_helper`, the first test is:
 }
 ```
 
-This is the happy-path test, covering [this `for` loop](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L27){:target="_blank" rel="noopener"}.  The test runs the regular `rbenv-commands` command, asserts that it was successful, and asserts that certain commands are listed among the output printed to STDOUT.
+This is the happy-path test, covering [this `for` loop](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L27){:target="_blank" rel="noopener" }.  The test runs the regular `rbenv-commands` command, asserts that it was successful, and asserts that certain commands are listed among the output printed to STDOUT.
 
 We also explicitly assert that the line "sh-shell" does *not* appear in the output.  That's because:
 
@@ -39,7 +39,7 @@ Next test:
 }
 ```
 
-This test covers [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L15){:target="_blank" rel="noopener"}, as well as the 4-line block of code from lines 30-33 (starting [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L30){:target="_blank" rel="noopener"}).
+This test covers [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L15){:target="_blank" rel="noopener" }, as well as the 4-line block of code from lines 30-33 (starting [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L30){:target="_blank" rel="noopener" }).
 
 In this test, we do the following:
 
@@ -86,14 +86,14 @@ Last test for this command:
 }
 ```
 
-This test covers [this 4-line block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L18-L21), as well as [this 4-line block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L34-L37){:target="_blank" rel="noopener"}.  It's the inverse of the "commands --sh" test:
+This test covers [this 4-line block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L18-L21), as well as [this 4-line block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L34-L37){:target="_blank" rel="noopener" }.  It's the inverse of the "commands --sh" test:
 
  - We expect commands whose files do *not* contain the "sh-" prefix in their name to be printed to STDOUT, and
  - We explicitly expect commands which *do* contain that prefix in their filenames to be excluded from the output.
 
 Let's move on to the code for the command itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands){:target="_blank" rel="noopener" }
 
 ### First few lines
 
@@ -235,7 +235,7 @@ Next line of code:
 shopt -s nullglob
 ```
 
-When we first learned about [importing plugin files](/rbenv/rbenv/setting-environment-variables){:target="_blank" rel="noopener"}, we saw that this line sets the `nullglob` shell option.  The `nullglob` option, if we recall, "...allows patterns which match no files to expand to a null string, rather than themselves."
+When we first learned about [importing plugin files](/rbenv/rbenv/setting-environment-variables){:target="_blank" rel="noopener" }, we saw that this line sets the `nullglob` shell option.  The `nullglob` option, if we recall, "...allows patterns which match no files to expand to a null string, rather than themselves."
 
 This tells us that we'll be iterating over a list of paths (probably the paths we just stored in the `paths` variable).
 
@@ -296,7 +296,7 @@ echo "Foo!"
  - I ran `rbenv foo` and saw "Foo!" printed out to my screen:
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-14mar2023-835am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-14mar2023-835am.png">
     <img src="/assets/images/screenshot-14mar2023-835am.png" width="50%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
@@ -316,7 +316,7 @@ Next line of code:
       command="${command##*rbenv-}"
 ```
 
-According to [StackExchange](https://unix.stackexchange.com/questions/669013/difference-between-parameterword-and-parameterword){:target="_blank" rel="noopener"}, the `##` tells the shell to remove the longest-possible match of the subsequent pattern, in this case `*rbenv-`.  The `*` means that the pattern can be expanded to include any text ending in `rbenv-`.  So the shell removes the `rbenv-` text, *plus* everything before it (i.e. `/usr/local/Cellar/rbenv/1.2.0/libexec/`).
+According to [StackExchange](https://unix.stackexchange.com/questions/669013/difference-between-parameterword-and-parameterword){:target="_blank" rel="noopener" }, the `##` tells the shell to remove the longest-possible match of the subsequent pattern, in this case `*rbenv-`.  The `*` means that the pattern can be expanded to include any text ending in `rbenv-`.  So the shell removes the `rbenv-` text, *plus* everything before it (i.e. `/usr/local/Cellar/rbenv/1.2.0/libexec/`).
 
 Therefore, this line takes the value of `command` defined in the inner `for` loop  and changes it to just the value after the last hyphen.  For example, if the previous value of `command` was `/usr/local/Cellar/rbenv/1.2.0/libexec/rbenv-completions`, the new value would be simply `completions`.  And if the value was `/usr/local/Cellar/rbenv/1.2.0/libexec/rbenv-sh-shell`, the new value would be just `sh-shell`.
 

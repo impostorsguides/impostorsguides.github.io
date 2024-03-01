@@ -1,10 +1,10 @@
 TODO- start with the `Usage`, `Summary`, and `Help` comments in the top of each file, before reading the tests.
 
-This is the file that gets called by [this block of the `rbenv` file](https://github.com/rbenv/rbenv/blob/0767d64344d0c52282125e2e25aa03f4d7a80698/libexec/rbenv#L103-L104){:target="_blank" rel="noopener"} when the user types either `rbenv -v` or `rbenv --version` in their terminal.
+This is the file that gets called by [this block of the `rbenv` file](https://github.com/rbenv/rbenv/blob/0767d64344d0c52282125e2e25aa03f4d7a80698/libexec/rbenv#L103-L104){:target="_blank" rel="noopener" } when the user types either `rbenv -v` or `rbenv --version` in their terminal.
 
 As we've done before, we'll start with the tests first:
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/--version.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/--version.bats){:target="_blank" rel="noopener" }
 
 The first two lines are:
 
@@ -24,7 +24,7 @@ After these two lines, the first line of code is:
 export GIT_DIR="${RBENV_TEST_DIR}/.git"
 ```
 
-Here we set an environment variable named `GIT_DIR` to equal a ".git" hidden directory inside our test dir.  I don't see any other references to `GIT_DIR` in the RBENV codebase, so I Google it and find that it's mentioned [here](https://git-scm.com/book/en/v2/Git-Internals-Environment-Variables){:target="_blank" rel="noopener"} in the Git docs:
+Here we set an environment variable named `GIT_DIR` to equal a ".git" hidden directory inside our test dir.  I don't see any other references to `GIT_DIR` in the RBENV codebase, so I Google it and find that it's mentioned [here](https://git-scm.com/book/en/v2/Git-Internals-Environment-Variables){:target="_blank" rel="noopener" } in the Git docs:
 
 > ### Repository Locations
 >
@@ -47,9 +47,9 @@ setup() {
 }
 ```
 
-This is our `setup` hook function which gets called [here](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test#L87){:target="_blank" rel="noopener"}, before the tests are run.
+This is our `setup` hook function which gets called [here](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test#L87){:target="_blank" rel="noopener" }, before the tests are run.
 
-Inside the test, we first create the `$HOME` directory.  [According to test_helper.bash](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L19){:target="_blank" rel="noopener"}, this env var resolves to `"${RBENV_TEST_DIR}/home"`.
+Inside the test, we first create the `$HOME` directory.  [According to test_helper.bash](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L19){:target="_blank" rel="noopener" }, this env var resolves to `"${RBENV_TEST_DIR}/home"`.
 
 Next, we set two of git's config values- the git user's name and email address.  Lastly, we navigate into our `RBENV_TEST_DIR`.
 
@@ -80,7 +80,7 @@ First test:
 }
 ```
 
-We start by asserting that `$RBENV_ROOT` does not exist on our machine.  Since `RBENV_ROOT` does not appear [in the command file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version){:target="_blank" rel="noopener"}, it's not immediately apparent why we do this.  There's no explanation in [the PR which introduced this test](https://github.com/rbenv/rbenv/commit/ab9ebb9d0ddb440e5546e2eb1d1bf3e483f8b017){:target="_blank" rel="noopener"}, either.
+We start by asserting that `$RBENV_ROOT` does not exist on our machine.  Since `RBENV_ROOT` does not appear [in the command file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version){:target="_blank" rel="noopener" }, it's not immediately apparent why we do this.  There's no explanation in [the PR which introduced this test](https://github.com/rbenv/rbenv/commit/ab9ebb9d0ddb440e5546e2eb1d1bf3e483f8b017){:target="_blank" rel="noopener" }, either.
 
 I suspect this is happening because part of running `rbenv --version` is running the `rbenv` file, which includes [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L54-L59) here.  We likely assert that `RBENV_ROOT` is empty because, if it weren't, the non-default version of RBENV that `RBENV_ROOT` pointed to could be using an unexpected version number, and therefore our test would have unexpected output.  We want `RBENV_ROOT` to be set to the default value by the `rbenv` command, thereby making our version number easy to predict.
 
@@ -108,7 +108,7 @@ Next test:
 }
 ```
 
-This test appears to cover [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version#L18){:target="_blank" rel="noopener"}.  The code does the following:
+This test appears to cover [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version#L18){:target="_blank" rel="noopener" }.  The code does the following:
 
  - We `cd` into `${BASH_SOURCE%/*}`, which on my machine resolves to `/Users/myusername/.rbenv/test/../libexec` or simply `/Users/myusername/.rbenv/libexec`.
  - We run `git remote -v`, which (in the above directory on my machine) returns:
@@ -129,7 +129,7 @@ In our test, we do the following:
 
 When we run the `--version` command, we expect it to finish successfully and for the output to match the same pattern as the last test, i.e. the format `?.?.?` (NOT the `v1.0` that we tagged our git repo with).
 
-If we look up [the git history of this test](https://github.com/rbenv/rbenv/commit/dcca61c0bc9747a8886bf7a1d790d902c2426ed0){:target="_blank" rel="noopener"}, we see it was introduced to avoid pulling the viersion number directly from the git repo if the RBENV installation came from an installation source such as Homebrew (i.e., if it wasn't installed by pulling down the Github repo).
+If we look up [the git history of this test](https://github.com/rbenv/rbenv/commit/dcca61c0bc9747a8886bf7a1d790d902c2426ed0){:target="_blank" rel="noopener" }, we see it was introduced to avoid pulling the viersion number directly from the git repo if the RBENV installation came from an installation source such as Homebrew (i.e., if it wasn't installed by pulling down the Github repo).
 
 ### Reading the version number from the git repo
 
@@ -162,7 +162,7 @@ We then run the `--version` command and assert that:
     - the # of commits since the version number (aka `2`), and
     - the shortened version of the most recent commit SHA (aka the output of `git rev-parse --short HEAD`)
 
-Together, these 4 pieces of information constitute the output of the `git describe --tags HEAD` command that we see in [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version#L19){:target="_blank" rel="noopener"}.  Note that the "v" from "v0.4.1" is removed by the `#v` syntax from [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version#L20){:target="_blank" rel="noopener"}.
+Together, these 4 pieces of information constitute the output of the `git describe --tags HEAD` command that we see in [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version#L19){:target="_blank" rel="noopener" }.  Note that the "v" from "v0.4.1" is removed by the `#v` syntax from [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version#L20){:target="_blank" rel="noopener" }.
 
 ### Printing the default version if no git tags are found
 
@@ -181,13 +181,13 @@ Last test:
 
 This test is similar to the previous test, except this time we don't tag the repo with a version number.
 
-We'll still reach the inside of [this `if` statement](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version#L18){:target="_blank" rel="noopener"}, because the output of `git remote -v` contains the string `rbenv`.  But because there are no tags, the command `git describe --tags HEAD` will be empty, so the `git_revision` variable will be empty as well.
+We'll still reach the inside of [this `if` statement](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version#L18){:target="_blank" rel="noopener" }, because the output of `git remote -v` contains the string `rbenv`.  But because there are no tags, the command `git describe --tags HEAD` will be empty, so the `git_revision` variable will be empty as well.
 
-Because of this, the `:-$version` syntax on [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version#L23){:target="_blank" rel="noopener"} causes the parameter expansion to default to the value of the `version` variable, meaning `version`'s value is what gets printed by the `echo` command.  This is why the value of `$output` is expected to match the "?.?.?" pattern.
+Because of this, the `:-$version` syntax on [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version#L23){:target="_blank" rel="noopener" } causes the parameter expansion to default to the value of the `version` variable, meaning `version`'s value is what gets printed by the `echo` command.  This is why the value of `$output` is expected to match the "?.?.?" pattern.
 
 With the tests wrapped up, let's look at the code next.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv---version){:target="_blank" rel="noopener" }
 
 The first block of "code" is just the shebang (which we've already seen by now) followed by some comments:
 
@@ -244,7 +244,7 @@ Here we do the following:
  - We try to run `git remote -v` inside that directory (again, piping any errors to `/dev/null`).
  - We pipe the results of the previous `git remote` command to the `grep` command and `grep`ping for the string "rbenv" in quiet mode (i.e. passing the `-q` flag).
 
- After Googling "grep quiet mode", [the first result I see](https://web.archive.org/web/20230221153703/https://www.oreilly.com/library/view/linux-shell-scripting/9781785881985/3340428d-7fb5-40cb-a044-9fa404916aa5.xhtml){:target="_blank" rel="noopener"} says that the purpose of quiet mode is:
+ After Googling "grep quiet mode", [the first result I see](https://web.archive.org/web/20230221153703/https://www.oreilly.com/library/view/linux-shell-scripting/9781785881985/3340428d-7fb5-40cb-a044-9fa404916aa5.xhtml){:target="_blank" rel="noopener" } says that the purpose of quiet mode is:
 
 > Sometimes, instead of examining at the matched strings, we are only interested in whether there was a match or not. The quiet option (-q), causes grep to run silently and not generate any output. Instead, it runs the command and returns an exit status based on success or failure. The return status is 0 for success and nonzero for failure.
 

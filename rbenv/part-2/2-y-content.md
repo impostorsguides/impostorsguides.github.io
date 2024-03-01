@@ -20,7 +20,7 @@ $ rbenv version-name
 
 Pretty unsurprising.  Let's move on to the tests.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-name.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-name.bats){:target="_blank" rel="noopener" }
 
 ### "Installing" a mocked Ruby version
 
@@ -45,7 +45,7 @@ setup() {
 }
 ```
 
-Here we just make and navigate into our test directory.  This `setup` function is called by the BATS test runner, in [this file](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test){:target="_blank" rel="noopener"}.
+Here we just make and navigate into our test directory.  This `setup` function is called by the BATS test runner, in [this file](https://github.com/sstephenson/bats/blob/03608115df2071fff4eaaff1605768c275e5f81f/libexec/bats-exec-test){:target="_blank" rel="noopener" }.
 
 ### When the user hasn't yet picked a Ruby version
 
@@ -74,7 +74,7 @@ Next test:
 
 Here we check that if the user specifically sets their `RBENV_VERSION` env var to "system", the command will use that as the version name, **regardless** of whether or not Ruby is installed on the machine.
 
-This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L18){:target="_blank" rel="noopener"}.  We see that when the user's `RBENV_VERSION` env var is either empty or set to "system", the program just prints `system` and exits.
+This test covers [this line of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L18){:target="_blank" rel="noopener" }.  We see that when the user's `RBENV_VERSION` env var is either empty or set to "system", the program just prints `system` and exits.
 
 ### When the user specifies `RBENV_VERSION`, but `version-name` has a hook
 
@@ -99,7 +99,7 @@ This test does the following:
 - We then run the `version-name` command, specifying the *first* version number that we created.
 - We assert that the `version-name` command prints the version name from the hook we created.
 
-This implies that the logic to `source` the hook files (which lives [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L14){:target="_blank" rel="noopener"}) overwrites any env vars passed to the command.
+This implies that the logic to `source` the hook files (which lives [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name#L14){:target="_blank" rel="noopener" }) overwrites any env vars passed to the command.
 
 ### Uses the user-specified `IFS` value in hooks
 
@@ -221,7 +221,7 @@ This is the primary happy-path test for this command.
 
 Now on to the code itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-name){:target="_blank" rel="noopener" }
 
 As per usual:
 

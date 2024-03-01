@@ -1,6 +1,6 @@
 We're getting close to the end here, only 3 more commands.  Let's start by reading the "Summary" and "Usage" docs for this command.
 
-## ["Summary" and "Usage" docs](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-versions#L2-L5){:target="_blank" rel="noopener"}
+## ["Summary" and "Usage" docs](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-versions#L2-L5){:target="_blank" rel="noopener" }
 
 ```
 # Summary: List installed Ruby versions
@@ -97,7 +97,7 @@ If a developer decides to do that, they will want the ability to print out both 
 
 Let's move on to the tests.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/versions.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/versions.bats){:target="_blank" rel="noopener" }
 
 After the `bats` shebang and the loading of `test_helper`, the first block of code is:
 
@@ -174,7 +174,7 @@ Next test:
 }
 ```
 
-- This test removes the `ruby` executable from `$PATH`, via [the `path_without ruby` command](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L113){:target="_blank" rel="noopener"} from BATS.
+- This test removes the `ruby` executable from `$PATH`, via [the `path_without ruby` command](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L113){:target="_blank" rel="noopener" } from BATS.
 - It then runs the `versions` command.
 - It asserts that:
     - the command fails because there's no Ruby version installed (not even "system" Ruby), and that
@@ -398,7 +398,7 @@ Next test:
 - It then runs `versions` with the `--bare` flag.
 - Lastly, it asserts that only v1.9 is printed to STDOUT.
 
-This test was added as part of [this PR](https://github.com/rbenv/rbenv/commit/9bcef4b8759b54edee5413500f24f60be28499b0){:target="_blank" rel="noopener"}, as part of covering some edge cases for the `--bare` flag.
+This test was added as part of [this PR](https://github.com/rbenv/rbenv/commit/9bcef4b8759b54edee5413500f24f60be28499b0){:target="_blank" rel="noopener" }, as part of covering some edge cases for the `--bare` flag.
 
 ### When aliases exist and the `--bare` flag is passed
 
@@ -459,7 +459,7 @@ OUT
 
 That's all the tests.  Now on to the code:
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-versions){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-versions){:target="_blank" rel="noopener" }
 
 First block:
 
@@ -558,7 +558,7 @@ if ! enable -f "${BASH_SOURCE%/*}"/rbenv-realpath.dylib realpath 2>/dev/null; th
 fi
 ```
 
-This is a really long block of code, but we've seen this exact same logic before, [in `rbenv-hooks`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-hooks#L24-L53){:target="_blank" rel="noopener"}:
+This is a really long block of code, but we've seen this exact same logic before, [in `rbenv-hooks`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-hooks#L24-L53){:target="_blank" rel="noopener" }:
 
 - We check whether we're able to replace the `realpath` system command with an identically-named (but faster, more performant) command which comes from the file `rbenv-realpath.dylib`.
 
@@ -602,7 +602,7 @@ list_versions() {
 
 We declare a helper function called `list_versions`, which prints out a list of our Ruby versions.
 
-1. First, it turns on [the `nullglob` option](https://web.archive.org/web/20230330000444/https://unix.stackexchange.com/questions/204803/why-is-nullglob-not-default){:target="_blank" rel="noopener"}, which we've seen before.  In this case, it helps avoid errors if our `versions/` directory is empty.
+1. First, it turns on [the `nullglob` option](https://web.archive.org/web/20230330000444/https://unix.stackexchange.com/questions/204803/why-is-nullglob-not-default){:target="_blank" rel="noopener" }, which we've seen before.  In this case, it helps avoid errors if our `versions/` directory is empty.
 
 1. Then, for each item inside our `versions/` directory, we ensure the item is a directory.  If it's not, we skip it.
 
@@ -672,7 +672,7 @@ s/\n/ /'
 ```
 
 
-Now all we need to do is look up each command's meaning in the manual, one at a time.  To do this, we'll use [the GNU.org manual on `sed`](https://web.archive.org/web/20221016162544/https://www.gnu.org/software/sed/manual/sed.html){:target="_blank" rel="noopener"}, which has [a section on `sed` scripts](https://web.archive.org/web/20221016162544/https://www.gnu.org/software/sed/manual/sed.html#sed-scripts){:target="_blank" rel="noopener"}.
+Now all we need to do is look up each command's meaning in the manual, one at a time.  To do this, we'll use [the GNU.org manual on `sed`](https://web.archive.org/web/20221016162544/https://www.gnu.org/software/sed/manual/sed.html){:target="_blank" rel="noopener" }, which has [a section on `sed` scripts](https://web.archive.org/web/20221016162544/https://www.gnu.org/software/sed/manual/sed.html#sed-scripts){:target="_blank" rel="noopener" }.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
@@ -685,7 +685,7 @@ The first `sed` command is `h;`.  When I look up this command in the commands su
           Replace the contents of the hold space with the contents of the pattern space.
 ```
 
-Wondering what "hold space" and "pattern space" are? [This StackOverflow answer](https://stackoverflow.com/a/12834372/2143275){:target="_blank" rel="noopener"} tells us:
+Wondering what "hold space" and "pattern space" are? [This StackOverflow answer](https://stackoverflow.com/a/12834372/2143275){:target="_blank" rel="noopener" } tells us:
 
 > When sed reads a file line by line, the line that has been currently read is inserted into the pattern buffer (pattern space). Pattern buffer is like the temporary buffer, the scratchpad where the current information is stored. When you tell sed to print, it prints the pattern buffer.
 >
@@ -703,7 +703,7 @@ Next `sed` command:
 s/[+-]/./g;
 ```
 
-Section 5.5 of the GNU `sed` manual (titled ["Classes and Bracket Expressions"](https://www.gnu.org/software/sed/manual/sed.html#Character-Classes-and-Bracket-Expressions){:target="_blank" rel="noopener"}) says:
+Section 5.5 of the GNU `sed` manual (titled ["Classes and Bracket Expressions"](https://www.gnu.org/software/sed/manual/sed.html#Character-Classes-and-Bracket-Expressions){:target="_blank" rel="noopener" }) says:
 
 > A bracket expression is a list of characters enclosed by `[` and `]`. It matches any single character in that list; if the first character of the list is the caret `^`, then it matches any character not in the list. For example, the following command replaces the words 'gray' or 'grey' with 'blue':
 >
@@ -751,7 +751,7 @@ I make a simple text file named `bar` and paste the following Ruby versions insi
 1.9.3-preview1
 ```
 
-These Ruby versions were taken from [the official Ruby release list](https://web.archive.org/web/20221006111802/https://www.ruby-lang.org/en/downloads/releases/){:target="_blank" rel="noopener"}.  I figured this looked like a fairly exhaustive list of all the various formats that Ruby uses for its version numbers.
+These Ruby versions were taken from [the official Ruby release list](https://web.archive.org/web/20221006111802/https://www.ruby-lang.org/en/downloads/releases/){:target="_blank" rel="noopener" }.  I figured this looked like a fairly exhaustive list of all the various formats that Ruby uses for its version numbers.
 
 I then ran the following command in my Bash terminal:
 
@@ -835,11 +835,11 @@ The pattern `s/.p\([[:digit:]]\)/.z.\1/;` can be thought of as the following 4 t
  - `s` kicks off the "search-and-replace" operation.
  - `.p\([[:digit:]]\)`- everything between this first `/` and the next `/` is the old pattern, which we will be replacing with the new pattern.
     - `.p` means that the pattern we're replacing will start with `.p`
-    - `\( ... \)`- we declare a ["sub-expression"](https://web.archive.org/web/20221016162544/https://www.gnu.org/software/sed/manual/sed.html#Back_002dreferences-and-Subexpressions){:target="_blank" rel="noopener"} to temporarily store the contents inside `( ... )`, so that we can refer back to the contents later.
-    - `[[:digit:]]` means that we match any digit using the `[[:digit:]]` syntax, which is a [named bracket expression](https://web.archive.org/web/20230329110316/https://www.gnu.org/software/sed/manual/html_node/Character-Classes-and-Bracket-Expressions.html){:target="_blank" rel="noopener"}.
+    - `\( ... \)`- we declare a ["sub-expression"](https://web.archive.org/web/20221016162544/https://www.gnu.org/software/sed/manual/sed.html#Back_002dreferences-and-Subexpressions){:target="_blank" rel="noopener" } to temporarily store the contents inside `( ... )`, so that we can refer back to the contents later.
+    - `[[:digit:]]` means that we match any digit using the `[[:digit:]]` syntax, which is a [named bracket expression](https://web.archive.org/web/20230329110316/https://www.gnu.org/software/sed/manual/html_node/Character-Classes-and-Bracket-Expressions.html){:target="_blank" rel="noopener" }.
  - `.z.\1`- this is the new pattern that we'll use to replace the old pattern.
     - `.z.` means our new pattern will begin with the literal characters `.z.`
-    - `\1` means "keep the contents of the sub-expression from our old pattern".  This is called a [back-reference](https://web.archive.org/web/20230603182508/https://www.gnu.org/software/sed/manual/html_node/Back_002dreferences-and-Subexpressions.html){:target="_blank" rel="noopener"}, because we're referring back to our previous sub-expression.
+    - `\1` means "keep the contents of the sub-expression from our old pattern".  This is called a [back-reference](https://web.archive.org/web/20230603182508/https://www.gnu.org/software/sed/manual/html_node/Back_002dreferences-and-Subexpressions.html){:target="_blank" rel="noopener" }, because we're referring back to our previous sub-expression.
  - `;`- the final `;` terminates this `sed` command.
 
 So to summarize the line `s/.p\([[:digit:]]\)/.z.\1/;`:
@@ -851,7 +851,7 @@ So to summarize the line `s/.p\([[:digit:]]\)/.z.\1/;`:
 
 ### 4. Adding `.z` to the end, for sortability
 
-Next `sed` command is `s/$/.z/;`.  Another search-and-replace command.  The `$` sign represents the end of the input, again according to [this link](https://web.archive.org/web/20221021041253/https://users.monash.edu.au/~erict/Resources/sed/){:target="_blank" rel="noopener"}.
+Next `sed` command is `s/$/.z/;`.  Another search-and-replace command.  The `$` sign represents the end of the input, again according to [this link](https://web.archive.org/web/20221021041253/https://users.monash.edu.au/~erict/Resources/sed/){:target="_blank" rel="noopener" }.
 
 So we're searching for the end of the input, and we're replacing it with ".z".  Essentially we're concatenating ".z" to the end of the input line.  We can test that again, by running this command after our previous commands:
 
@@ -954,7 +954,7 @@ Next `sed` command:
 G;
 ```
 
-From the "3.2 sed commands summary" section of [the GNU `sed` docs](https://web.archive.org/web/20221016162544/https://www.gnu.org/software/sed/manual/sed.html#sed-commands-list){:target="_blank" rel="noopener"}, we see this command does the following:
+From the "3.2 sed commands summary" section of [the GNU `sed` docs](https://web.archive.org/web/20221016162544/https://www.gnu.org/software/sed/manual/sed.html#sed-commands-list){:target="_blank" rel="noopener" }, we see this command does the following:
 
 > G
 >
@@ -1114,7 +1114,7 @@ The first bit of syntax that Google is:
 LC_ALL=C
 ```
 
-[This StackOverflow post](https://web.archive.org/web/20221019143235/https://unix.stackexchange.com/questions/87745/what-does-lc-all-c-do){:target="_blank" rel="noopener"} tells us the following about `LC_ALL`:
+[This StackOverflow post](https://web.archive.org/web/20221019143235/https://unix.stackexchange.com/questions/87745/what-does-lc-all-c-do){:target="_blank" rel="noopener" } tells us the following about `LC_ALL`:
 
 > `LC_ALL` is the environment variable that overrides all the other localisation settings (except `$LANGUAGE` under some circumstances).
 >
@@ -1185,10 +1185,10 @@ In the `man` entry for `sort` again, we find the following:
 
 So we are using the `-k` flag multiple times in order to define multiple sort keys.  The syntax `1,1` means "start the sort at the first field of each line, and end at the first field of each line."
 
-If we Google `"bash sort keys"`, we get confirmation via [this link](https://web.archive.org/web/20220410153515/https://riptutorial.com/bash/example/31704/sort-by-keys){:target="_blank" rel="noopener"}, from a site called "RIP Tutorial".  I've highlighted the relevant sentence below:
+If we Google `"bash sort keys"`, we get confirmation via [this link](https://web.archive.org/web/20220410153515/https://riptutorial.com/bash/example/31704/sort-by-keys){:target="_blank" rel="noopener" }, from a site called "RIP Tutorial".  I've highlighted the relevant sentence below:
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-18mar23-1113am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-18mar23-1113am.png">
     <img src="/assets/images/screenshot-18mar23-1113am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>

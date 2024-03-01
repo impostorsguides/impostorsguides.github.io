@@ -2,7 +2,7 @@
   <h1 class="post-title">Shebangs</h1>
 </header>
 
-<p>If you recall, <a href="https://gist.github.com/richiethomas/272b7719f3c75abf6818a8211552004e" target="_blank">our shim file</a> looks like this:</p>
+<p>If you recall, <a href="https://gist.github.com/richiethomas/272b7719f3c75abf6818a8211552004e" target="_blank" rel="noopener">our shim file</a> looks like this:</p>
 
 <pre><code>#!/usr/bin/env bash
 set -e
@@ -31,7 +31,7 @@ exec "/opt/homebrew/bin/rbenv" exec "$program" "$@"
 
 <pre><code>#!/usr/bin/env bash</code></pre>
 
-<p>I run a Google search for the string <code>#!/usr/bin/env bash</code>, and I learn that this line of code is called a <a href="https://web.archive.org/web/20230323182633/https://en.wikipedia.org/wiki/Shebang_(Unix)" target="_blank">"shebang"</a>.</p>
+<p>I run a Google search for the string <code>#!/usr/bin/env bash</code>, and I learn that this line of code is called a <a href="https://web.archive.org/web/20230323182633/https://en.wikipedia.org/wiki/Shebang_(Unix)" target="_blank" rel="noopener">"shebang"</a>.</p>
 
 <p>In UNIX, a shebang is a special line of code at the top of a script file which tells UNIX which program to use when executing the rest of the file's code. In this case, since the shebang ends in Bash, we're telling UNIX to use the bash shell to evaluate the code.</p>
 
@@ -59,13 +59,13 @@ TERM_SESSION_ID=563FA0D2-24E2-4FDE-9DE4-D7E6D9E58123
 USER=richiethomas
 ...</code></pre>
 
-<p>Using the <code>#!/usr/bin/env bash</code> shebang instead of <code>#!/usr/bin/bash</code> <a href="https://web.archive.org/web/20230716084854/https://unix.stackexchange.com/questions/29608/why-is-it-better-to-use-usr-bin-env-name-instead-of-path-to-name-as-my" target="_blank">has both its pros and cons</a>.</p>
+<p>Using the <code>#!/usr/bin/env bash</code> shebang instead of <code>#!/usr/bin/bash</code> <a href="https://web.archive.org/web/20230716084854/https://unix.stackexchange.com/questions/29608/why-is-it-better-to-use-usr-bin-env-name-instead-of-path-to-name-as-my" target="_blank" rel="noopener">has both its pros and cons</a>.</p>
 
 <h3>Pros of <code>#!/usr/bin/env bash</code></h3>
 
 <p>On the one hand, using this shebang means that your script doesn't depend on Bash residing in a specific folder on the user's machine.  This is because <code>#!/usr/bin/env bash</code> tells macOS "Hey, check the directories listed in your <code>$PATH</code> environment variable for the 'bash' executable, and use the first one you find to run code which follows."</p>
 
-<p>We'll talk about environment variables in a future chapter.  But if you're unfamiliar with the <code>$PATH</code> environment variable, I've got a write-up about it <a href="/blog/path-variable/" target="_blank">here</a>.</p>
+<p>We'll talk about environment variables in a future chapter.  But if you're unfamiliar with the <code>$PATH</code> environment variable, I've got a write-up about it <a href="/blog/path-variable/" target="_blank" rel="noopener">here</a>.</p>
 
 <p>If we use the <code>/usr/bin/bash</code> shebang, then whoever runs our script must have Bash installed in their <code>/usr/bin/</code> directory.  Since people run RBENV on all kinds of machines with all sorts of software installed, this is not a safe assumption. For example, my <code>bash</code> executable is installed at <code>/bin/bash</code>, with no <code>/usr/</code> prefix.  You may face a similar situation on your machine.</p>
 
@@ -75,7 +75,7 @@ USER=richiethomas
 
 <p>Since using <code>#!/usr/bin/env bash</code> means that macOS will find the first version of Bash that it finds, this means that your users could potentially be using different versions of Bash.  This could cause your program to behave in unexpected ways, depending on how different those versions are.</p>
 
-<p>The links <a href="https://web.archive.org/web/20230326212656/https://www.baeldung.com/linux/bash-shebang-lines" target="_blank">here</a> and <a href="https://web.archive.org/web/20230316084258/https://stackoverflow.com/questions/16365130/what-is-the-difference-between-usr-bin-env-bash-and-usr-bin-bash" target="_blank">here</a> contain additional info on the differences between the two types of shebangs, including some cases where you might not want to use <code>/usr/bin/env bash</code>.</p>
+<p>The links <a href="https://web.archive.org/web/20230326212656/https://www.baeldung.com/linux/bash-shebang-lines" target="_blank" rel="noopener">here</a> and <a href="https://web.archive.org/web/20230316084258/https://stackoverflow.com/questions/16365130/what-is-the-difference-between-usr-bin-env-bash-and-usr-bin-bash" target="_blank" rel="noopener">here</a> contain additional info on the differences between the two types of shebangs, including some cases where you might not want to use <code>/usr/bin/env bash</code>.</p>
 
 <h2>Why do we need any shebang at all?</h2>
 
@@ -115,7 +115,7 @@ $</code></pre>
 zsh: permission denied: ./hello.rb
 $</code></pre>
 
-<p>OK, well this is just because we haven't yet updated the file permissions to <a href="https://askubuntu.com/questions/229589/how-to-make-a-file-e-g-a-sh-script-executable-so-it-can-be-run-from-a-termi" target="_blank">make the file executable</a>. That's a step we'll need to do whenever we make a brand-new file.</p>
+<p>OK, well this is just because we haven't yet updated the file permissions to <a href="https://askubuntu.com/questions/229589/how-to-make-a-file-e-g-a-sh-script-executable-so-it-can-be-run-from-a-termi" target="_blank" rel="noopener">make the file executable</a>. That's a step we'll need to do whenever we make a brand-new file.</p>
 
 <p>We do that with the <code>chmod</code> command, passing <code>+x</code> to tell UNIX to set the file's execution permission.  Let's do that, and then try to re-run the file:</p>
 
@@ -140,17 +140,17 @@ $</code></pre>
 
 <p>Success!  We've told bash which interpreter we want to use, meaning that we no longer need to use the <code>ruby</code> command at the terminal prompt.</p>
 
-<p>A Github gist of the above <code>hello.rb</code> file can be found <a href="https://gist.github.com/richiethomas/36a4b5bb683219fb76f139a9c542891e" target="_blank">here</a>.</p>
+<p>A Github gist of the above <code>hello.rb</code> file can be found <a href="https://gist.github.com/richiethomas/36a4b5bb683219fb76f139a9c542891e" target="_blank" rel="noopener">here</a>.</p>
 
 <h2>File extensions vs. shebangs</h2>
 
-<p>Our file includes a <code>.rb</code> file extension at the end, but the terminal doesn't use that extension when deciding how to interpret the file. I came across <a href="https://web.archive.org/web/20211027134850/https://superuser.com/questions/267632/file-extension-for-file-to-be-run-by-terminal" target="_blank">this StackOverflow post</a> while looking for documentation on this question.  <a href="https://web.archive.org/web/20211027134850/https://superuser.com/questions/267632/file-extension-for-file-to-be-run-by-terminal#answer-885285" target="_blank">One of the answers</a> states:</p>
+<p>Our file includes a <code>.rb</code> file extension at the end, but the terminal doesn't use that extension when deciding how to interpret the file. I came across <a href="https://web.archive.org/web/20211027134850/https://superuser.com/questions/267632/file-extension-for-file-to-be-run-by-terminal" target="_blank" rel="noopener">this StackOverflow post</a> while looking for documentation on this question.  <a href="https://web.archive.org/web/20211027134850/https://superuser.com/questions/267632/file-extension-for-file-to-be-run-by-terminal#answer-885285" target="_blank" rel="noopener">One of the answers</a> states:</p>
 
 <blockquote>
 On OS X (and U*x generally), the name of the file doesn't matter at all. What matters is that it needs to have executable permission (chmod +x file) and a correct shebang line.
 </blockquote>
 
-<p>This is one big difference between Windows and UNIX. The former takes the approach of <a href="https://superuser.com/questions/266268/where-in-the-registry-does-windows-store-with-which-program-to-open-certain-file" target="_blank">using the file extension</a> to determine which program to use when executing a given file. This means Windows application developers have to tell the OS which file extensions their application can open. The benefit of the Windows approach is that no shebang is required in the file itself.</p>
+<p>This is one big difference between Windows and UNIX. The former takes the approach of <a href="https://superuser.com/questions/266268/where-in-the-registry-does-windows-store-with-which-program-to-open-certain-file" target="_blank" rel="noopener">using the file extension</a> to determine which program to use when executing a given file. This means Windows application developers have to tell the OS which file extensions their application can open. The benefit of the Windows approach is that no shebang is required in the file itself.</p>
 
 <p>UNIX, on the other hand, doesn't use such a registry, at least not when directly running scripts from the terminal. This means that the author of a file (rather than the author of an application) gets to decide how to open their file. Different philosophies, different trade-offs.</p>
 

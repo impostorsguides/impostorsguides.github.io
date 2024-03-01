@@ -1,7 +1,7 @@
 
 ## Code
 
-The first line in [this file](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv){:target="_blank" rel="noopener"} is:
+The first line in [this file](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv){:target="_blank" rel="noopener" } is:
 
 ```
 #!/usr/bin/env bash
@@ -29,11 +29,11 @@ if [ "$1" = "--debug" ]; then
 fi
 ```
 
-We recognize the `if` statement and the `[` syntax from earlier.  Here, we're testing whether `"$1"` evaluates to the string `--debug`.  I suspect that `$1` represents the first argument that gets passed to the command, but I'm not sure if the indexing is 0-based or 1-based.  A quick Google search leads me [here](https://web.archive.org/web/20211006091051/https://stackoverflow.com/questions/29258603/what-do-0-1-2-mean-in-shell-script){:target="_blank" rel="noopener"}:
+We recognize the `if` statement and the `[` syntax from earlier.  Here, we're testing whether `"$1"` evaluates to the string `--debug`.  I suspect that `$1` represents the first argument that gets passed to the command, but I'm not sure if the indexing is 0-based or 1-based.  A quick Google search leads me [here](https://web.archive.org/web/20211006091051/https://stackoverflow.com/questions/29258603/what-do-0-1-2-mean-in-shell-script){:target="_blank" rel="noopener" }:
 
 
 <center>
-  <a target="_blank" href="/assets/images/stackoverflow-answer-positional-arguments.png">
+  <a target="_blank" rel="noopener" href="/assets/images/stackoverflow-answer-positional-arguments.png">
     <img src="/assets/images/stackoverflow-answer-positional-arguments.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
@@ -50,7 +50,7 @@ Next line of code:
 
 We recognize the `export` statement from Part 1.  We set `RBENV_DEBUG` equal to 1, and then export it.
 
-We know from [here](https://unix.stackexchange.com/a/28349/142469){:target="_blank" rel="noopener"} that an `export`ed variable is available in the same script, in a child script, and in a function which is called inside that same script, but not in the parent process or other sibling scripts called by that parent process.  So we can assume that `RBENV_DEBUG` will be used in one of those places in the near future.
+We know from [here](https://unix.stackexchange.com/a/28349/142469){:target="_blank" rel="noopener" } that an `export`ed variable is available in the same script, in a child script, and in a function which is called inside that same script, but not in the parent process or other sibling scripts called by that parent process.  So we can assume that `RBENV_DEBUG` will be used in one of those places in the near future.
 
 ## The `shift` keyword
 
@@ -60,7 +60,7 @@ Next line of code.
 shift
 ```
 
-What does `shift` do?  According to [the docs](https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_09_07.html){:target="_blank" rel="noopener"}:
+What does `shift` do?  According to [the docs](https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_09_07.html){:target="_blank" rel="noopener" }:
 
 > This command takes one argument, a number. The positional parameters are shifted to the left by this number, N. The positional parameters from `N+1` to `$#` are renamed to variable names from `$1` to `$#` - `N+1`.
 >
@@ -146,7 +146,7 @@ export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 set -x
 ```
 
-The first line of code is just a comment, containing [a link to an article](https://wiki-dev.bash-hackers.org/scripting/debuggingtips#making_xtrace_more_useful){:target="_blank" rel="noopener"} about a program named `xtrace`.  Inside the article, we see the following:
+The first line of code is just a comment, containing [a link to an article](https://wiki-dev.bash-hackers.org/scripting/debuggingtips#making_xtrace_more_useful){:target="_blank" rel="noopener" } about a program named `xtrace`.  Inside the article, we see the following:
 
 > #### Making xtrace more useful
 > (by AnMaster)
@@ -172,7 +172,7 @@ The article mentions that, by setting an environment variable called `PS4` equal
 
 So what is PS4, and what does it do?
 
-I try `man PS4` but get no answer.  I Google "PS4 bash", and I open up [the first result I see](https://web.archive.org/web/20230304080135/https://www.thegeekstuff.com/2008/09/bash-shell-take-control-of-ps1-ps2-ps3-ps4-and-prompt_command/){:target="_blank" rel="noopener"}.  It mentions not only PS4, but also PS1, PS2, and PS3.  I scroll down to the section on PS4 and I see:
+I try `man PS4` but get no answer.  I Google "PS4 bash", and I open up [the first result I see](https://web.archive.org/web/20230304080135/https://www.thegeekstuff.com/2008/09/bash-shell-take-control-of-ps1-ps2-ps3-ps4-and-prompt_command/){:target="_blank" rel="noopener" }.  It mentions not only PS4, but also PS1, PS2, and PS3.  I scroll down to the section on PS4 and I see:
 
 > PS4 – Used by "set -x" to prefix tracing output
 >
@@ -212,7 +212,7 @@ What about the 2nd half of `PS4`?
 ${FUNCNAME[0]:+${FUNCNAME[0]}(): }
 ```
 
-After Googling `FUNCNAME`, I find the online version of [its `man` page entry](https://web.archive.org/web/20230322221925/https://www.man7.org/linux/man-pages/man1/bash.1.html){:target="_blank" rel="noopener"}:
+After Googling `FUNCNAME`, I find the online version of [its `man` page entry](https://web.archive.org/web/20230322221925/https://www.man7.org/linux/man-pages/man1/bash.1.html){:target="_blank" rel="noopener" }:
 
 ```
 FUNCNAME
@@ -281,7 +281,7 @@ ${FUNCNAME[0]:+${FUNCNAME[0]}(): }
 
 We see `${ ... }`, so we know we're dealing with parameter expansion again.  And if we take out the two references to `FUNCNAME[0]` (which we know will equal the current function **if we're currently inside a function**), then we're left with `${__:+__():}`.
 
-I'm curious what `:+` means, so I look for these two characters in [the parameter expansion docs](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"}.  I see:
+I'm curious what `:+` means, so I look for these two characters in [the parameter expansion docs](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener" }.  I see:
 
 > ${parameter:+word}
 >
@@ -319,13 +319,13 @@ Does all that pan out when we actually run `rbenv` with the `--debug` flag?  Let
 $ rbenv --debug version
 ```
 
-There's a ton of output.  Below is one line from that output [which comes from *outside* of a function](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L73){:target="_blank" rel="noopener"}...
+There's a ton of output.  Below is one line from that output [which comes from *outside* of a function](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L73){:target="_blank" rel="noopener" }...
 
 ```
 +(/Users/myusername/.rbenv/bin/rbenv:73): shopt -s nullglob
 ```
 
-...and another [which comes from *inside* a function](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L41){:target="_blank" rel="noopener"}:
+...and another [which comes from *inside* a function](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L41){:target="_blank" rel="noopener" }:
 
 ```
 ++(/Users/myusername/.rbenv/bin/rbenv:41): abs_dirname(): local path=/Users/myusername/.rbenv/bin/rbenv
@@ -335,10 +335,10 @@ Although we haven't yet reached these lines of code and don't yet know what they
 
 ### Aside- what is `xtrace`?
 
-I kept noticing the phrase `xtrace` being thrown around on some of the links I encountered while trying to solve the above.  I Googled "what is xtrace bash", and found [this link](https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_02_03.html){:target="_blank" rel="noopener"}, which says:
+I kept noticing the phrase `xtrace` being thrown around on some of the links I encountered while trying to solve the above.  I Googled "what is xtrace bash", and found [this link](https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_02_03.html){:target="_blank" rel="noopener" }, which says:
 
 <center>
-  <a target="_blank" href="/assets/images/stackoverflow-answer-12mar2023-138pm.png">
+  <a target="_blank" rel="noopener" href="/assets/images/stackoverflow-answer-12mar2023-138pm.png">
     <img src="/assets/images/stackoverflow-answer-12mar2023-138pm.png" width="100%" style="border: 1px solid black; padding: 0.5em" alt="StackOverflow answer about `xtrace`">
   </a>
 </center>
@@ -364,7 +364,7 @@ If we look for `RBENV_DEBUG` throughout the codebase, we can see it used in mult
 
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-24mar2023-623pm.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-24mar2023-623pm.png">
     <img src="/assets/images/screenshot-24mar2023-623pm.png" width="70%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>

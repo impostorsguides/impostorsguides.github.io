@@ -2,7 +2,7 @@
   <h1 class="post-title">Case 1: When we don't care about the args</h1>
 </header>
 
-<p>Now that we've learned how <code>case</code> statements work in Bash, we're better able to interpret the <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L9" target="_blank">next line of code</a>:</p>
+<p>Now that we've learned how <code>case</code> statements work in Bash, we're better able to interpret the <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L9" target="_blank" rel="noopener">next line of code</a>:</p>
 
 <pre><code>    -e* | -- ) break ;;</code></pre>
 
@@ -10,7 +10,7 @@
 
 <h2>Breaking out of the <code>for</code>-loop early</h2>
 
-<p>In the earlier list of bullet points, I mentioned that "A pattern can have <a href="https://web.archive.org/web/20220820011901/https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html" target="_blank">special characters</a>."  This clause is an example of the use of such special characters.</p>
+<p>In the earlier list of bullet points, I mentioned that "A pattern can have <a href="https://web.archive.org/web/20220820011901/https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html" target="_blank" rel="noopener">special characters</a>."  This clause is an example of the use of such special characters.</p>
 
 <p>We see two patterns (<code>-e*</code> and <code>--</code>), separated by the <code>|</code> character, then terminated by the <code>)</code> character.  If the current argument in the iteration matches either pattern, we exit the <code>for</code>-loop (i.e. we <code>break</code>). Otherwise, we check the next clause in the case statement.</p>
 
@@ -98,7 +98,7 @@ $ </code></pre>
 
 <h2>The <code>--</code> flag</h2>
 
-<p>The 2nd pattern which could cause this same behavior is <code>--</code>.  To tell us why, StackOverflow <a href="https://web.archive.org/web/20220623104640/https://unix.stackexchange.com/questions/11376/what-does-double-dash-mean" target="_blank">saves the day again</a>:</p>
+<p>The 2nd pattern which could cause this same behavior is <code>--</code>.  To tell us why, StackOverflow <a href="https://web.archive.org/web/20220623104640/https://unix.stackexchange.com/questions/11376/what-does-double-dash-mean" target="_blank" rel="noopener">saves the day again</a>:</p>
 
 <blockquote>
   <p>...a double dash (<code>--</code>) is used in most Bash built-in commands and many other commands to signify the end of command options, after which only positional arguments are accepted.</p>
@@ -114,7 +114,7 @@ $ </code></pre>
 
 <h2>Wrapping Up</h2>
 
-<p>In the discussion above, I restricted my sources of information to those which are publicly-available via Google.  However, in full disclosure, back in 2019 I actually <a href="https://github.com/rbenv/rbenv/issues/1173" target="_blank">posted a question on the RBENV Github page</a> asking why this <code>if</code>-block was necessary, and why it was only activated if the program being run was Ruby.  A frequent contributor named to the codebase Jason Karns was kind enough to reply in detail, and taught me a lot about the shim file with his response.</p>
+<p>In the discussion above, I restricted my sources of information to those which are publicly-available via Google.  However, in full disclosure, back in 2019 I actually <a href="https://github.com/rbenv/rbenv/issues/1173" target="_blank" rel="noopener">posted a question on the RBENV Github page</a> asking why this <code>if</code>-block was necessary, and why it was only activated if the program being run was Ruby.  A frequent contributor named to the codebase Jason Karns was kind enough to reply in detail, and taught me a lot about the shim file with his response.</p>
 
 <p>I hesitated to include the above link in this chapter because I want to encourage my fellow aspiring 10x'ers to answer their own questions first if possible, and only post questions to a repo in this manner if all other options have been exhausted.  However, I decided to err on the side of transparency and share this issue, in the event that Jason's answer will fill in any blanks that the above explanation left.</p>
 

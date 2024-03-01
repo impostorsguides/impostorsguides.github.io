@@ -1,6 +1,6 @@
 Now we move onto the `rbenv/src/` directory.
 
-First file: [`Makefile.in`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/Makefile.in){:target="_blank" rel="noopener"}.
+First file: [`Makefile.in`](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/Makefile.in){:target="_blank" rel="noopener" }.
 
 This file is short, just 25 lines of code:
 
@@ -51,19 +51,19 @@ But before we get into what this syntax is, let's look at what Makefiles are.
 
 ## What is a Makefile?
 
-The most comprehensive resource I found on Makefiles is a website called [MakefileTutorial.com](https://web.archive.org/web/20230723010515/https://makefiletutorial.com/){:target="_blank" rel="noopener"}.  It tells us that:
+The most comprehensive resource I found on Makefiles is a website called [MakefileTutorial.com](https://web.archive.org/web/20230723010515/https://makefiletutorial.com/){:target="_blank" rel="noopener" }.  It tells us that:
 
 > Makefiles are used to help decide which parts of a large program need to be recompiled. In the vast majority of cases, C or C++ files are compiled. Other languages typically have their own tools that serve a similar purpose as Make. Make can also be used beyond compilation too, when you need a series of instructions to run depending on what files have changed.
 
 It goes on to talk about dependency graphs, and how a Makefile can be used to construct a dependency graph which tells your computer to recompile the dependencies (and the things which depend on them) if any of them change.
 
-Additionally, according to [OpenSource.com](https://web.archive.org/web/20230701183057/https://opensource.com/article/18/8/what-how-makefile){:target="_blank" rel="noopener"}:
+Additionally, according to [OpenSource.com](https://web.archive.org/web/20230701183057/https://opensource.com/article/18/8/what-how-makefile){:target="_blank" rel="noopener" }:
 
 > If you want to run or update a task when certain files are updated, the `make` utility can come in handy. The `make` utility requires a file, `Makefile` (or `makefile`), which defines set of tasks to be executed.
 
 So the program which reads your `Makefile` and re-compiles your dependencies is called `make`.
 
-Let's create a simple Makefile as an experiment, following along with the first example from the above [MakefileTutorial.com link](https://web.archive.org/web/20230723010515/https://makefiletutorial.com/){:target="_blank" rel="noopener"}.
+Let's create a simple Makefile as an experiment, following along with the first example from the above [MakefileTutorial.com link](https://web.archive.org/web/20230723010515/https://makefiletutorial.com/){:target="_blank" rel="noopener" }.
 
 ### Experiment- building a trivial Makefile example
 
@@ -158,13 +158,13 @@ Let's start with the first rule, since everything before it is just variable dec
 .c.o:
 ```
 
-What is the `.c.o` syntax?  If we Google ".c.o Makefile", we see [this StackOverflow post](https://web.archive.org/web/20230427182329/https://stackoverflow.com/questions/9233447/what-is-the-makefile-target-c-o-for){:target="_blank" rel="noopener"}, which tells us that:
+What is the `.c.o` syntax?  If we Google ".c.o Makefile", we see [this StackOverflow post](https://web.archive.org/web/20230427182329/https://stackoverflow.com/questions/9233447/what-is-the-makefile-target-c-o-for){:target="_blank" rel="noopener" }, which tells us that:
 
 > It's an old-fashioned suffix rule. The more up-to-date way to do it is to use a pattern rule:
 >
 > `%.o : %.c`
 
-This looks more familiar, i.e. we have two sides of a rule, separated by a colon.  According to [MakefileTutorial.com](https://web.archive.org/web/20230723010515/https://makefiletutorial.com/#-wildcard-1){:target="_blank" rel="noopener"}, the `%` symbol is called a "wildcard".  Here we're using it to state that, for each file with a `.c` extension, we want to make an identical target with a `.o` extension.
+This looks more familiar, i.e. we have two sides of a rule, separated by a colon.  According to [MakefileTutorial.com](https://web.archive.org/web/20230723010515/https://makefiletutorial.com/#-wildcard-1){:target="_blank" rel="noopener" }, the `%` symbol is called a "wildcard".  Here we're using it to state that, for each file with a `.c` extension, we want to make an identical target with a `.o` extension.
 
 What is the commend that this rule executes?
 
@@ -214,11 +214,11 @@ Let's break this down:
 
 ### The `-fno-common` flag
 
-According to [the `gcc` docs](https://web.archive.org/web/20230620054155/https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html){:target="_blank" rel="noopener"}, the `-fno-common` flag tells `gcc` what to do if it finds multiple definitions for the same global variable.  This is the default behavior for `gcc`, but here we're being explicit about the behavior.  By passing this flag, we're telling `gcc` that, if the same global variable is defined more than once, to raise a multiple-definition error so we can investigate and fix the error.
+According to [the `gcc` docs](https://web.archive.org/web/20230620054155/https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html){:target="_blank" rel="noopener" }, the `-fno-common` flag tells `gcc` what to do if it finds multiple definitions for the same global variable.  This is the default behavior for `gcc`, but here we're being explicit about the behavior.  By passing this flag, we're telling `gcc` that, if the same global variable is defined more than once, to raise a multiple-definition error so we can investigate and fix the error.
 
 ### The `-c` flag
 
-According to `gcc --help`, the `-c` flag tells `gcc` to "Only run preprocess, compile, and assemble steps".  In other words, we're telling `gcc` to only create [object files](https://web.archive.org/web/20230620034536/https://stackoverflow.com/questions/7718299/whats-an-object-file-in-c){:target="_blank" rel="noopener"}, or the individual compiled files that the `gcc` linker later combines into an executable file.  It's unclear to me why we want to do this.  I know the next step in the Makefile is to take the object file and turn it into the `../libexec/rbenv-realpath.dylib` file, but I'm not sure why a regular, non-`dylib` file is insufficient for RBENV's purposes.
+According to `gcc --help`, the `-c` flag tells `gcc` to "Only run preprocess, compile, and assemble steps".  In other words, we're telling `gcc` to only create [object files](https://web.archive.org/web/20230620034536/https://stackoverflow.com/questions/7718299/whats-an-object-file-in-c){:target="_blank" rel="noopener" }, or the individual compiled files that the `gcc` linker later combines into an executable file.  It's unclear to me why we want to do this.  I know the next step in the Makefile is to take the object file and turn it into the `../libexec/rbenv-realpath.dylib` file, but I'm not sure why a regular, non-`dylib` file is insufficient for RBENV's purposes.
 
 ### The `-o` flag
 
@@ -247,7 +247,7 @@ Let's break this up into pieces.
 
 This rule's job is to build a file named `rbenv-realpath.dylib`, which lives in `../libexec/` (aka the directory containing all our RBENV commands).
 
-This is the file which the `rbenv` command uses [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L23){:target="_blank" rel="noopener"} (and other commands use in a similar way) to speed up the `realpath` command.
+This is the file which the `rbenv` command uses [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L23){:target="_blank" rel="noopener" } (and other commands use in a similar way) to speed up the `realpath` command.
 
 ### The rule's dependency: `realpath.o`
 
@@ -288,9 +288,9 @@ gcc -dynamiclib -dynamic -undefined dynamic_lookup  -o ../libexec/rbenv-realpath
 
 ### The `-dynamiclib` and `-dynamic` flags
 
-There are certain flags and options that we can pass to `gcc` which are specific to [Darwin](https://en.wikipedia.org/wiki/Darwin_(operating_system)){:target="_blank" rel="noopener"}, the core UNIX operating system of macOS.  Since I'm running `make` on a Macbook, the env var `SHOBJ_LDFLAGS` resolves to these Darwin-specific options, thanks to the `shobj-conf` file which the `configure` script ran.
+There are certain flags and options that we can pass to `gcc` which are specific to [Darwin](https://en.wikipedia.org/wiki/Darwin_(operating_system)){:target="_blank" rel="noopener" }, the core UNIX operating system of macOS.  Since I'm running `make` on a Macbook, the env var `SHOBJ_LDFLAGS` resolves to these Darwin-specific options, thanks to the `shobj-conf` file which the `configure` script ran.
 
-The first flag is `-dynamiclib`.  If we Google around for this flag, we find the docs for those Darwin-specific flags [here](https://web.archive.org/web/20230329044039/https://gcc.gnu.org/onlinedocs/gcc/Darwin-Options.html){:target="_blank" rel="noopener"}.  The entry for `-dynamiclib` looks like so:
+The first flag is `-dynamiclib`.  If we Google around for this flag, we find the docs for those Darwin-specific flags [here](https://web.archive.org/web/20230329044039/https://gcc.gnu.org/onlinedocs/gcc/Darwin-Options.html){:target="_blank" rel="noopener" }.  The entry for `-dynamiclib` looks like so:
 
 ```
 -dynamiclib

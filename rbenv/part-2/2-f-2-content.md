@@ -1,5 +1,5 @@
 
-Link to the code [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init){:target="_blank" rel="noopener"}.
+Link to the code [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init){:target="_blank" rel="noopener" }.
 
 ## Setup
 
@@ -110,7 +110,7 @@ We grab the 1st argument, and we store it in a variable named `shell`.  The valu
 
 If that argument was empty, we assume that the user didn't manually specify which shell they're using.  In that case, we set it for them.  We run the command `ps -p "$PPID" -o 'args='`, and then progressively whittle down the value of this output, until we get to just the name of the user's shell.
 
-To see in detail what happens here, I add a bunch of `echo` statements to [this `if`-block](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L35-L42){:target="_blank" rel="noopener"}, so that it looks like this:
+To see in detail what happens here, I add a bunch of `echo` statements to [this `if`-block](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L35-L42){:target="_blank" rel="noopener" }, so that it looks like this:
 
 ```
 shell="$1"
@@ -189,7 +189,7 @@ root: /Users/myusername/.rbenv/libexec/..
 
 We see the `rbenv-init` file, its parent directory, and the final value of `$root`.  The name "root" makes sense, because it's the root directory of RBENV.
 
-This variable isn't used until later, when we look for a file whose job is to enable [tab completion](https://web.archive.org/web/20230330150603/https://en.wikipedia.org/wiki/Command-line_completion){:target="_blank" rel="noopener"} in the terminal.  We can ignore `root` for now.
+This variable isn't used until later, when we look for a file whose job is to enable [tab completion](https://web.archive.org/web/20230330150603/https://en.wikipedia.org/wiki/Command-line_completion){:target="_blank" rel="noopener" } in the terminal.  We can ignore `root` for now.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 

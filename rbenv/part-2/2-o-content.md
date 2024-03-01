@@ -61,7 +61,7 @@ As mentioned in the usage comments, when I call `rbenv prefix` without any argum
 
 Simple enough.  Let's look at the specs now.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/prefix.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/prefix.bats){:target="_blank" rel="noopener" }
 
 ### Running the command with no argument
 
@@ -149,7 +149,7 @@ Here, the setup includes:
 
 Once we have our fake `rbenv-which` command ready, we run the command with the `RBENV_VERSION` env var set to `system`, and we verify that the `prefix` command successfully exited with `/` (i.e. the home directory) as its output.
 
-From looking at [the Github history](https://github.com/rbenv/rbenv/pull/919){:target="_blank" rel="noopener"}, it looks like this test was added as part of a bugfix where `rbenv prefix` didn't work when pulling the Ruby version from the machine's system version.
+From looking at [the Github history](https://github.com/rbenv/rbenv/pull/919){:target="_blank" rel="noopener" }, it looks like this test was added as part of a bugfix where `rbenv prefix` didn't work when pulling the Ruby version from the machine's system version.
 
 ### When no `system` version is installed
 
@@ -357,8 +357,8 @@ alt="${RBENV_TEST_DIR}/$(echo "${found#/}" | tr '/' '-')"
 
 We set the `alt` local variable equal to `"${RBENV_TEST_DIR}/$(echo "${found#/}" | tr '/' '-')"`.  This consists of two strings, concatenated together with a `/`:
 
- - I added [a logging statement](/assets/images/screenshot-16mar2023-838am.png){:target="_blank" rel="noopener"} to the `path_without` function.  From this logging statement, I determine that `${RBENV_TEST_DIR}` resolves to `/var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/rbenv.eke` on my machine.
- - Similarly, `$(echo "${found#/}" | tr '/' '-')`, resolves to `usr-bin` on my machine.  Again, I learned this because by adding [a logging statement](/assets/images/screenshot-16mar2023-844am.png){:target="_blank" rel="noopener"} which stored the contents of this command in a variable, and then `echo`ed the variable.
+ - I added [a logging statement](/assets/images/screenshot-16mar2023-838am.png){:target="_blank" rel="noopener" } to the `path_without` function.  From this logging statement, I determine that `${RBENV_TEST_DIR}` resolves to `/var/folders/tn/wks_g5zj6sv_6hh0lk6_6gl80000gp/T/rbenv.eke` on my machine.
+ - Similarly, `$(echo "${found#/}" | tr '/' '-')`, resolves to `usr-bin` on my machine.  Again, I learned this because by adding [a logging statement](/assets/images/screenshot-16mar2023-844am.png){:target="_blank" rel="noopener" } which stored the contents of this command in a variable, and then `echo`ed the variable.
 
 We can further tell what's going on here by looking up the `man` page for `tr`:
 
@@ -441,7 +441,7 @@ Lastly, we trim the trailing `:` character off the beginning and end of `path`, 
 
 Having read through the spec file for the `prefix` command, let's turn to the command file itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-prefix){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-prefix){:target="_blank" rel="noopener" }
 
 First up is the 4 things that we always see at the beginning:
 

@@ -19,7 +19,7 @@ $ </code></pre>
 
 <p>Here we see that there are two executable filepaths in total, and that the one located at <code>/Users/richiethomas/.rbenv/shims/</code> is found before the one located at <code>/usr/bin/bundle</code>.  The filepath that is found first is the one that my computer will use to run this command, so this is the filepath I need to inspect if I want to know what my machine is doing.</p>
 
-<p>Note- if you're wondering why <code>~/.rbenv/</code> begins with a dot, I go into more detail about that <a href="/blog/what-are-dotfiles/" target="_blank">here</a>.</p>
+<p>Note- if you're wondering why <code>~/.rbenv/</code> begins with a dot, I go into more detail about that <a href="/blog/what-are-dotfiles/" target="_blank" rel="noopener">here</a>.</p>
 
 <h2>Inspecting the filepath I found</h2>
 
@@ -53,7 +53,7 @@ exec "/Users/richiethomas/.rbenv/bin/rbenv" exec "$program" "$@"</code></pre>
 
 <p>Yikes, that's a spicy meatball!</p>
 
-<p>It'll take me quite a few posts to explain this code in its entirety.  For now, the important take-away is that this code comes from <a href="https://github.com/rbenv/rbenv" target="_blank">RBENV</a>, the version manager I use for Ruby.  It does <i>not</i> come from the <code>bundle</code> command.  There are a few clues which let me know this is true:</p>
+<p>It'll take me quite a few posts to explain this code in its entirety.  For now, the important take-away is that this code comes from <a href="https://github.com/rbenv/rbenv" target="_blank" rel="noopener">RBENV</a>, the version manager I use for Ruby.  It does <i>not</i> come from the <code>bundle</code> command.  There are a few clues which let me know this is true:</p>
 
 <ul>
   <li>The file's path is <code>/Users/richiethomas/.rbenv/shims/bundle</code>, which includes <code>.rbenv</code>.</li>
@@ -67,13 +67,13 @@ exec "/Users/richiethomas/.rbenv/bin/rbenv" exec "$program" "$@"</code></pre>
     </li>
 </ul>
 
-<p>If you're unfamiliar with the concept of version managers, I wrote a blog post about it <a href="/blog/version-managers/" target="_blank">here</a>.  If you know what version managers are but are unfamiliar with why someone might choose RBENV over other options, I wrote a blog post about that <a href="/blog/comparing-rbenv-with-similar-tools/" target="_blank">here</a>.</p>
+<p>If you're unfamiliar with the concept of version managers, I wrote a blog post about it <a href="/blog/version-managers/" target="_blank" rel="noopener">here</a>.  If you know what version managers are but are unfamiliar with why someone might choose RBENV over other options, I wrote a blog post about that <a href="/blog/comparing-rbenv-with-similar-tools/" target="_blank" rel="noopener">here</a>.</p>
 
 <h2>Moving On</h2>
 
 <p>In the following chapters, I'll break down the code line-by-line.  By the end, we'll see why all these files can have the same exact code, yet execute different programs.  We'll also see that RBENV (and some other Ruby version managers) work by intercepting your call to the <code>ruby</code> command (or any other Ruby-specific command), doing some work to figure out which Ruby version you want to use, and then making sure that this Ruby version is used by the command you've typed.</p>
 
-<p>In order to keep the focus of this guide on the RBENV codebase, I didn't want to dive too deeply into the concept of a "shim".  If you're unfamiliar with the concept of a shim, I wrote a blog post about it, which you can read <a href="/blog/what-is-a-shim/" target="_blank">here</a>.</p>
+<p>In order to keep the focus of this guide on the RBENV codebase, I didn't want to dive too deeply into the concept of a "shim".  If you're unfamiliar with the concept of a shim, I wrote a blog post about it, which you can read <a href="/blog/what-is-a-shim/" target="_blank" rel="noopener">here</a>.</p>
 
 <p>The first line of code in the above shim is:</p>
 

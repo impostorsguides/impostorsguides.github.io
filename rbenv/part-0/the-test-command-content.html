@@ -2,7 +2,7 @@
   <h1 class="post-title">The <code>test</code> Command</h1>
 </header>
 
-<p>Moving on to <a href="https://gist.github.com/richiethomas/489d8678a582e8a7193ad9122c9eaa4d#file-bundle-shim-line-3-L3" target="_blank">line 3 of the code</a>:</p>
+<p>Moving on to <a href="https://gist.github.com/richiethomas/489d8678a582e8a7193ad9122c9eaa4d#file-bundle-shim-line-3-L3" target="_blank" rel="noopener">line 3 of the code</a>:</p>
 
 <pre><code>[ -n "$RBENV_DEBUG" ] && set -x</code></pre>
 
@@ -126,12 +126,12 @@ $ </code></pre>
 
 <p>Why are the last two cases not returning the results I expect?</p>
 
-<p>In this case, StackOverflow comes through with an answer <a href="https://web.archive.org/web/20230406161647/https://unix.stackexchange.com/questions/400889/why-isnt-n-false-like-n/400895" target="_blank">here</a>:</p>
+<p>In this case, StackOverflow comes through with an answer <a href="https://web.archive.org/web/20230406161647/https://unix.stackexchange.com/questions/400889/why-isnt-n-false-like-n/400895" target="_blank" rel="noopener">here</a>:</p>
 
 <blockquote><p><strong><code>[ -n ]</code> does not use the -n test.</strong></p>
 <p>The <code>-n</code> in <code>[ -n ]</code> is not a test at all. When there is only one argument between <code>[</code> and <code>]</code>, that argument is a string that is tested to see if it is empty. Even when that string has a leading <code>-</code>, it is still interpreted as an operand, not a test. Since the string <code>-n</code> is not empty (it contains two characters, <code>-</code> and <code>n</code>, not zero characters), <code>[ -n ]</code> evaluates to true.</p></blockquote>
 
-<p>...and again <a href="https://archive.ph/Hk4g2#selection-1397.13-1455.75" target="_blank">here</a>:</p>
+<p>...and again <a href="https://archive.ph/Hk4g2#selection-1397.13-1455.75" target="_blank" rel="noopener">here</a>:</p>
 
 <blockquote><p>You need to quote your variables. Without quotes you are writing <code>test -n</code> instead of <code>test -n "expression"</code>. The test command has no idea that you provided a variable that expanded to nothing.</p></blockquote>
 

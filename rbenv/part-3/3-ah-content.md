@@ -1,6 +1,6 @@
 Before we start diving into the code for this file, let's look at its Github history.
 
-## [Github History](https://github.com/rbenv/rbenv/pull/528){:target="_blank" rel="noopener"}
+## [Github History](https://github.com/rbenv/rbenv/pull/528){:target="_blank" rel="noopener" }
 
 According to the PR which introduced this file (link above):
 
@@ -18,7 +18,7 @@ So the goal here is to replace the pre-installed `realpath` command on our machi
 
 Let's now move on to the code.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/configure){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/src/configure){:target="_blank" rel="noopener" }
 
 We've seen the Bash shebang and the setting of "exit-on-first-error" mode before, so we won't dwell on those two lines of code.
 
@@ -65,7 +65,7 @@ Since `gcc` is installed on my machine, we can expect the `CC` variable to equal
 
 #### What is GCC?
 
-According to [GNU's homepage](https://web.archive.org/web/20221119003936/https://gcc.gnu.org/){:target="_blank" rel="noopener"}, GCC stands for "GNU Compiler Collection":
+According to [GNU's homepage](https://web.archive.org/web/20221119003936/https://gcc.gnu.org/){:target="_blank" rel="noopener" }, GCC stands for "GNU Compiler Collection":
 
 > GCC was originally written as the compiler for the GNU operating system.
 
@@ -188,7 +188,7 @@ What is `shobj-conf`?  If we open it up, at the top we see:
 #		into bash with `enable -f'
 ```
 
-So it prints out a bunch of variable assignments, which are then plugged into our `Makefile.in` file to produce a file named `Makefile`.  Then later (specifically [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L23){:target="_blank" rel="noopener"}), we'll use the `enable -f` command to load the result of the `Makefile` (i.e. a file named `libexec/rbenv-realpath.dylib`) into our code.
+So it prints out a bunch of variable assignments, which are then plugged into our `Makefile.in` file to produce a file named `Makefile`.  Then later (specifically [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L23){:target="_blank" rel="noopener" }), we'll use the `enable -f` command to load the result of the `Makefile` (i.e. a file named `libexec/rbenv-realpath.dylib`) into our code.
 
 Reading the above description at the top of `shobj-conf` is enough for now.  We see just below the above description that the author of this file is Chet Ramey, so I'm reasonably sure that RBENV's copy of this file was borrowed wholesale from another source.  Reading it line-by-line would require a lot of time and effort, so let's skip that script for now.
 
@@ -215,7 +215,7 @@ SHLIB_STATUS='supported'
 
 So the above output is what we pass to `eval`.  It sets a bunch of variables, which (if we skip ahead a bit) we see are referenced in the subsequent `sed` command (see below), as well as in `Makefile.in`.  We'll find out later that the purpose of the `sed` command is to insert the above variable values into `Makefile.in`, and then use that updated `Makefile.in` to generate a file named `Makefile`.  From there, we can run the `make` command and build our faster `realpath` function.
 
-We're also going to skip the discussion of what each variable is responsible for in the Makefile.  If you're curious about that, check out [this link](https://web.archive.org/web/20220716090040/https://tiswww.case.edu/php/chet/readline/README){:target="_blank" rel="noopener"}, which defines what most of the variables do.
+We're also going to skip the discussion of what each variable is responsible for in the Makefile.  If you're curious about that, check out [this link](https://web.archive.org/web/20220716090040/https://tiswww.case.edu/php/chet/readline/README){:target="_blank" rel="noopener" }, which defines what most of the variables do.
 
 ### Generating the Makefile
 
@@ -241,7 +241,7 @@ sed "
 It looks intimidating, but it's actually pretty straightforward:
 
  - The `sed` command, which we talked about before.  It's a command to read in a certain file, perform actions on each line of that file, and output the results to a new file.
- - A single (although rather long) string with a bunch of nearly-identical commands in it.  These commands are called ["scripts"](https://web.archive.org/web/20220611195519/https://www.gnu.org/software/sed/manual/html_node/sed-script-overview.html){:target="_blank" rel="noopener"}.
+ - A single (although rather long) string with a bunch of nearly-identical commands in it.  These commands are called ["scripts"](https://web.archive.org/web/20220611195519/https://www.gnu.org/software/sed/manual/html_node/sed-script-overview.html){:target="_blank" rel="noopener" }.
  - A filename representing the input to run these commands against.  In this case, the filename is `Makefile.in`.
  - The `>` symbol to redirect the output from `STDOUT` to another destination
  - A 2nd filename to act as the destination which the output gets redirected to.  In this case, that's a file named `Makefile`.
@@ -254,7 +254,7 @@ What does each of those `sed` scripts do?  One clue is that they all share nearl
  - a parameter expansion operation (ex.- `${CC}` or `${CFLAGS}`)
  - a final `#`.
 
-Each command is a search-and-replace operation, except instead of using `/` syntax (ex.- `s/@CC@/${CC}/`), we use `#` as a delimiter (ex.- `s#@CC@#${CC}#`).  Using a non-slash character as a delimiter is permitted, according to [the docs for `sed`](https://web.archive.org/web/20230714142751/http://www.gnu.org/software/sed/manual/sed.html){:target="_blank" rel="noopener"}:
+Each command is a search-and-replace operation, except instead of using `/` syntax (ex.- `s/@CC@/${CC}/`), we use `#` as a delimiter (ex.- `s#@CC@#${CC}#`).  Using a non-slash character as a delimiter is permitted, according to [the docs for `sed`](https://web.archive.org/web/20230714142751/http://www.gnu.org/software/sed/manual/sed.html){:target="_blank" rel="noopener" }:
 
 > `\%regexp%`
 >

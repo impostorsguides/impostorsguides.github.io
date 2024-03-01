@@ -1,6 +1,6 @@
 How is this command used?  Let's check the comments at the top of the file.
 
-### ["Usage" comments](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-file-read#L2){:target="_blank" rel="noopener"}
+### ["Usage" comments](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-file-read#L2){:target="_blank" rel="noopener" }
 
 ```
 # Usage: rbenv version-file-read <file>
@@ -36,7 +36,7 @@ $ echo $?     # prints the exit code of the last command you ran
 
 Let's move on to the test file.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-file-read.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-file-read.bats){:target="_blank" rel="noopener" }
 
 After the `bats` shebang and the loading of `test_helper`, the first block of code is:
 
@@ -47,7 +47,7 @@ setup() {
 }
 ```
 
-This function makes a Ruby project directory and navigates into it.  We've seen this `setup` function before in other test files.  [This is a special `bats` function](https://github.com/sstephenson/bats#setup-and-teardown-pre--and-post-test-hooks){:target="_blank" rel="noopener"}, which gets called before each test case.  You can also define a `teardown` hook method, which gets called after each test case, though that isn't done in this specific test file.
+This function makes a Ruby project directory and navigates into it.  We've seen this `setup` function before in other test files.  [This is a special `bats` function](https://github.com/sstephenson/bats#setup-and-teardown-pre--and-post-test-hooks){:target="_blank" rel="noopener" }, which gets called before each test case.  You can also define a `teardown` hook method, which gets called after each test case, though that isn't done in this specific test file.
 
 ### Passing no argument
 
@@ -221,7 +221,7 @@ Next test:
 
 Here we assert that strings which would normally cause directory traversal to happen (i.e. `..` and `../foo`) will trigger a failure in the `version-file-read` command.
 
-This test is related to [this issue](https://github.com/rbenv/rbenv/issues/977){:target="_blank" rel="noopener"} in the Github history, which describes a security vulnerability reported by another contributor.  It looks like an earlier version of RBENV included the possibility of using a version of Ruby other than that intended by the user, if a malicious person was somehow able to modify the victim's RBENV version file.
+This test is related to [this issue](https://github.com/rbenv/rbenv/issues/977){:target="_blank" rel="noopener" } in the Github history, which describes a security vulnerability reported by another contributor.  It looks like an earlier version of RBENV included the possibility of using a version of Ruby other than that intended by the user, if a malicious person was somehow able to modify the victim's RBENV version file.
 
 ### When a version file includes path segments
 
@@ -239,7 +239,7 @@ This test was introduced in the same PR that introduced the previous test.  It a
 
 Onto the file itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-file-read){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-file-read){:target="_blank" rel="noopener" }
 
 The usual first block of code:
 
@@ -280,7 +280,7 @@ First we test if the value stored in `VERSION_FILE` actually represents an exist
 IFS="${IFS}"$'\r'
 ```
 
-We modify the value of the internal field separator to be its original value, plus the carriage return.  The `"${IFS}"$'\r'` syntax can be thought of as `"${IFS}"` plus `$'\r'`.  The 2nd half of this syntax is the Bash way of expanding escape sequences, as illustrated by [this StackOverflow answer](https://web.archive.org/web/20220929180039/https://stackoverflow.com/questions/11966312/how-does-the-leading-dollar-sign-affect-single-quotes-in-bash){:target="_blank" rel="noopener"}.  [For example](https://stackoverflow.com/a/11966402){:target="_blank" rel="noopener"}:
+We modify the value of the internal field separator to be its original value, plus the carriage return.  The `"${IFS}"$'\r'` syntax can be thought of as `"${IFS}"` plus `$'\r'`.  The 2nd half of this syntax is the Bash way of expanding escape sequences, as illustrated by [this StackOverflow answer](https://web.archive.org/web/20220929180039/https://stackoverflow.com/questions/11966312/how-does-the-leading-dollar-sign-affect-single-quotes-in-bash){:target="_blank" rel="noopener" }.  [For example](https://stackoverflow.com/a/11966402){:target="_blank" rel="noopener" }:
 
 ```
 $ echo $'Name\tAge\nBob\t24\nMary\t36'
@@ -318,7 +318,7 @@ Next:
 -d ""
 ```
 
-According to [this link](https://stackoverflow.com/a/24902454/2143275){:target="_blank" rel="noopener"}:
+According to [this link](https://stackoverflow.com/a/24902454/2143275){:target="_blank" rel="noopener" }:
 
 > With `-d ''` it sets the delimiter to `'\0'` and makes `read` read the whole input in one instance, and not just a single line. `IFS=$'\n'` sets newline (`\n`) as the separator for each value. `__` is optional and gathers any extra input besides the first 3 lines.
 
@@ -358,7 +358,7 @@ We use the `<` character to redirect the contents of `$VERSION_FILE` to the inpu
 || :
 ```
 
-Lastly, [this StackOverflow article](https://web.archive.org/web/20220804070349/https://superuser.com/questions/1022374/what-does-mean-in-the-context-of-a-shell-script){:target="_blank" rel="noopener"} mentions that the intention of `|| :` is to prevent the `read` command from erroring out, or returning a non-successful exit code.
+Lastly, [this StackOverflow article](https://web.archive.org/web/20220804070349/https://superuser.com/questions/1022374/what-does-mean-in-the-context-of-a-shell-script){:target="_blank" rel="noopener" } mentions that the intention of `|| :` is to prevent the `read` command from erroring out, or returning a non-successful exit code.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 

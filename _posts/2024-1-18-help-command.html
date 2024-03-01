@@ -15,7 +15,7 @@ createdAt: 16 Jan, 2024
 
 <p>The purpose of this post is to set up the <code>help</code> command for folks who are using the Zsh shell (like I am).  If you're using Bash or another shell, feel free to skip this one.</p>
 
-<p>Up until 2019, the default shell for Mac was Bash.  <a href="https://web.archive.org/web/20230925065323/https://macpaw.com/how-to/default-interactive-shell-now-zsh" target="_blank">When Apple released macOS Catalina</a>, Apple started shipping Zsh as the default shell instead.  This was possibly done because <a href="https://web.archive.org/web/20230923201322/https://discussions.apple.com/thread/250722978" target="_blank">Bash changed its software license from GPL2 to GPL3</a>.  The difference between the two is that GPL3 requires that <a href="https://web.archive.org/web/20230922222429/https://blog.inedo.com/devops/license-detection/" target="_blank">"code built with GPL3-licensed packages must open-source that code"</a>. This is likely not something that was compatible with Apple's business model.</p>
+<p>Up until 2019, the default shell for Mac was Bash.  <a href="https://web.archive.org/web/20230925065323/https://macpaw.com/how-to/default-interactive-shell-now-zsh" target="_blank" rel="noopener">When Apple released macOS Catalina</a>, Apple started shipping Zsh as the default shell instead.  This was possibly done because <a href="https://web.archive.org/web/20230923201322/https://discussions.apple.com/thread/250722978" target="_blank" rel="noopener">Bash changed its software license from GPL2 to GPL3</a>.  The difference between the two is that GPL3 requires that <a href="https://web.archive.org/web/20230922222429/https://blog.inedo.com/devops/license-detection/" target="_blank" rel="noopener">"code built with GPL3-licensed packages must open-source that code"</a>. This is likely not something that was compatible with Apple's business model.</p>
 
 <p>As a result, we as Mac-using shell students now have to spend a few mental cycles on the subtle but sometimes important differences between Bash and Zsh.  One of those differences is with the <code>help</code> command, which is usable out-of-the-box in Bash but which has a few hurdles in Zsh.</p>
 
@@ -75,7 +75,7 @@ $ </code></pre>
 <p>To continue making progress and run <code>help set</code> successfully, we have 3 options:</p>
 
 <ul>
-  <li>Change our default shell from Zsh to Bash, so that every time we open a new terminal tab, we see a Bash prompt.  This is a completely valid option- <a href="https://web.archive.org/web/20240110123203/https://en.wikipedia.org/wiki/Bash_(Unix_shell)#Program_name" target="_blank">Bash is one of the most popular shells in-use today</a>.</li>
+  <li>Change our default shell from Zsh to Bash, so that every time we open a new terminal tab, we see a Bash prompt.  This is a completely valid option- <a href="https://web.archive.org/web/20240110123203/https://en.wikipedia.org/wiki/Bash_(Unix_shell)#Program_name" target="_blank" rel="noopener">Bash is one of the most popular shells in-use today</a>.</li>
   <li>Activate the <code>run-help</code> command on our machine, and then create an alias which executes that command every time we type <code>help</code> in our terminal. This is the option that I chose for my machine, since I've already customized my Zsh prompt and I don't want to have to do so again with a Bash prompt.</li>
   <li>Make no permanent changes, and instead simply remember to log into Bash each time we want to run <code>help</code>. If you're a novice and want to minimize any config changes to your machine, then this is the way to go.  But it's also the option which results in the most legwork in the long run.</li>
 </ul>
@@ -114,9 +114,9 @@ richies-mbp:part-0 richiethomas$ </code></pre>
 
 <h2>Option 2: Aliasing <code>run-help</code> to <code>help</code></h2>
 
-<p>As mentioned before, we could just remember to log into Bash whenever we need to run <code>help</code>. But speaking for myself, I don't want to have to do this every single time I open a terminal tab (which is every day).  <a href="https://www.goodreads.com/quotes/568877-i-choose-a-lazy-person-to-do-a-hard-job" target="_blank">I'm lazy</a>, and I'd rather make a one-and-done configuration change, and continue to use ZSH as I have done so far.</p>
+<p>As mentioned before, we could just remember to log into Bash whenever we need to run <code>help</code>. But speaking for myself, I don't want to have to do this every single time I open a terminal tab (which is every day).  <a href="https://www.goodreads.com/quotes/568877-i-choose-a-lazy-person-to-do-a-hard-job" target="_blank" rel="noopener">I'm lazy</a>, and I'd rather make a one-and-done configuration change, and continue to use ZSH as I have done so far.</p>
 
-<p>After some Googling around, I found <a href="https://web.archive.org/web/20230805163147/https://superuser.com/questions/1563825/is-there-a-zsh-equivalent-to-the-bash-help-builtin/1563859" target="_blank">this StackOverflow question</a>, with <a href="https://web.archive.org/web/20230805163147/https://superuser.com/questions/1563825/is-there-a-zsh-equivalent-to-the-bash-help-builtin/1563859#1563859" target="_blank">this answer</a> describing how to make the help output more helpful (pun intended):</p>
+<p>After some Googling around, I found <a href="https://web.archive.org/web/20230805163147/https://superuser.com/questions/1563825/is-there-a-zsh-equivalent-to-the-bash-help-builtin/1563859" target="_blank" rel="noopener">this StackOverflow question</a>, with <a href="https://web.archive.org/web/20230805163147/https://superuser.com/questions/1563825/is-there-a-zsh-equivalent-to-the-bash-help-builtin/1563859#1563859" target="_blank" rel="noopener">this answer</a> describing how to make the help output more helpful (pun intended):</p>
 
 <blockquote>
   <p>...put this into ~/.zshrc:</p>
@@ -134,8 +134,8 @@ alias help=run-help</code></pre>
 <p>It's telling me to:</p>
 
 <ul>
-  <li><a href="https://web.archive.org/web/20230405124404/https://ss64.com/osx/alias-zsh.html" target="_blank">unalias</a> the current definition of the <code>run-help</code> command (<a href="https://web.archive.org/web/20230403130053/https://wiki.archlinux.org/title/zsh" target="_blank">which is aliased to "man" by default</a> in Zsh)</li>
-  <li><a href="https://stackoverflow.com/a/63661686/2143275" target="_blank">autoload</a> a new implementation of the <code>run-help</code> command (this is what I meant by "manually turn on the <code>run-help</code> command" from earlier)</li>
+  <li><a href="https://web.archive.org/web/20230405124404/https://ss64.com/osx/alias-zsh.html" target="_blank" rel="noopener">unalias</a> the current definition of the <code>run-help</code> command (<a href="https://web.archive.org/web/20230403130053/https://wiki.archlinux.org/title/zsh" target="_blank" rel="noopener">which is aliased to "man" by default</a> in Zsh)</li>
+  <li><a href="https://stackoverflow.com/a/63661686/2143275" target="_blank" rel="noopener">autoload</a> a new implementation of the <code>run-help</code> command (this is what I meant by "manually turn on the <code>run-help</code> command" from earlier)</li>
   <li>set a new value for <code>$HELPDIR</code> (This environment variable tells <code>run-help</code> where to look for its help files.)</li>
   <li>create an alias for our new <code>run-help</code> command, called <code>help</code>, which is just shorter and easier to type.</li>
 </ul>
@@ -186,7 +186,7 @@ alias help=run-help</code></pre>
   <p>Title: Unknown</p>
   <p>Description: n/a</p>
   <p>Author: No author specified.</p>
-  <p>Source: <a href="https://www.centerforrespect.com/product/help-my-teen-is-dating-dvd-over-2-hours-long/" target="_blank">The Center For Respect</a></p>
-  <p>License: <a href="https://creativecommons.org/licenses/by-nc-nd/3.0/" target="_blank">CC BY-NC-ND 3.0 DEED Attribution-NonCommercial-NoDerivs 3.0 Unported</a></p>
-  <p>License information comes from Google Images (screenshot <a href="/assets/images/help-dvd-license.jpg" target="_blank">here</a>).</p>
+  <p>Source: <a href="https://www.centerforrespect.com/product/help-my-teen-is-dating-dvd-over-2-hours-long/" target="_blank" rel="noopener">The Center For Respect</a></p>
+  <p>License: <a href="https://creativecommons.org/licenses/by-nc-nd/3.0/" target="_blank" rel="noopener">CC BY-NC-ND 3.0 DEED Attribution-NonCommercial-NoDerivs 3.0 Unported</a></p>
+  <p>License information comes from Google Images (screenshot <a href="/assets/images/help-dvd-license.jpg" target="_blank" rel="noopener">here</a>).</p>
 </div>

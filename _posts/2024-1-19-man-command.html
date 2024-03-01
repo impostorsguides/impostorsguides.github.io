@@ -13,11 +13,11 @@ createdAt: 19 Jan, 2024
   </figure>
 </div>
 
-<p>In our <a href="/shell/set-command/" target="_blank">examination of the RBENV shim</a>, we encountered the <code>set</code> command.  At that point, we hadn't yet encountered that command, and so we had to look it up in the docs.</p>
+<p>In our <a href="/shell/set-command/" target="_blank" rel="noopener">examination of the RBENV shim</a>, we encountered the <code>set</code> command.  At that point, we hadn't yet encountered that command, and so we had to look it up in the docs.</p>
 
 <p>In many cases, we can find the manual for various terminal commands using the <code>man</code> command (short for "manual"). If we fail to find what we're looking for using <code>man</code>, we can try checking StackOverflow or another source. But the quality of those sources can vary widely, so a useful habit is to stick to official docs when we can.</p>
 
-<p>Also note that <code>set</code> is a builtin command and therefore <a href="https://web.archive.org/web/20220516205120/https://unix.stackexchange.com/questions/167004/why-dont-shell-builtins-have-proper-man-pages" target="_blank">we have to access its docs via the <code>help</code> command</a>.  Typically, we'd start our docs search with the <code>man</code> command and switch to <code>help</code> if we discover that the command in question is a builtin.  A bit later in this post, we'll look at how to tell whether a command is a builtin command or not.</p>
+<p>Also note that <code>set</code> is a builtin command and therefore <a href="https://web.archive.org/web/20220516205120/https://unix.stackexchange.com/questions/167004/why-dont-shell-builtins-have-proper-man-pages" target="_blank" rel="noopener">we have to access its docs via the <code>help</code> command</a>.  Typically, we'd start our docs search with the <code>man</code> command and switch to <code>help</code> if we discover that the command in question is a builtin.  A bit later in this post, we'll look at how to tell whether a command is a builtin command or not.</p>
 
 <p><code>man</code> entries can be hard-to-parse if you've never encountered one before.  Let's learn how to read them.</p>
 
@@ -64,7 +64,7 @@ createdAt: 19 Jan, 2024
 
 <ul>
   <li>a list of environment variables which affect how <code>ls</code> works</li>
-  <li>a description of the <a href="https://web.archive.org/web/20230604005103/https://www.techopedia.com/definition/33430/exit-code" target="_blank">exit code(s)</a> that <code>ls</code> might return, and under what conditions they might be returned</li>
+  <li>a description of the <a href="https://web.archive.org/web/20230604005103/https://www.techopedia.com/definition/33430/exit-code" target="_blank" rel="noopener">exit code(s)</a> that <code>ls</code> might return, and under what conditions they might be returned</li>
   <li>examples of how to use the command</li>
   <li>various other bits of information which aren't immediately relevant to us</li>
 </ul>
@@ -94,7 +94,7 @@ createdAt: 19 Jan, 2024
 
 <h2>Builtin vs. External Commands</h2>
 
-<p>Depending on the command you give it, sometimes <code>man</code> will give you documentation on that command (like it did with <code>ls</code>).  Other times, it returns an explanation of what a <a href="https://web.archive.org/web/20230226091101/https://www.gnu.org/software/bash/manual/html_node/Shell-Builtin-Commands.html" target="_blank">builtin command</a> is in UNIX.</p>
+<p>Depending on the command you give it, sometimes <code>man</code> will give you documentation on that command (like it did with <code>ls</code>).  Other times, it returns an explanation of what a <a href="https://web.archive.org/web/20230226091101/https://www.gnu.org/software/bash/manual/html_node/Shell-Builtin-Commands.html" target="_blank" rel="noopener">builtin command</a> is in UNIX.</p>
 
 <p>For example, let's try looking up the <code>set</code> command in its <code>man</code> page. I type <code>man set</code> into my terminal and I see the following:</p>
 
@@ -126,9 +126,9 @@ createdAt: 19 Jan, 2024
 
 <p>So when does it give you one result, vs. the other?</p>
 
-<p>As it turns out, <a href="https://unix.stackexchange.com/questions/167004/why-dont-shell-builtins-have-proper-man-pages" target="_blank"><code>man</code> pages are provided only for "external commands"</a>, i.e. commands which come from UNIX.  But the shell is not UNIX. UNIX is the operating system, and the shell is the application we're using to interact with the operating system.  In fact, <a href="https://web.archive.org/web/20220601094544/https://www.pcmag.com/encyclopedia/term/shell" target="_blank">the reason why it's called the "shell"</a> is that it surrounds the operating system, like an eggshell.</p>
+<p>As it turns out, <a href="https://unix.stackexchange.com/questions/167004/why-dont-shell-builtins-have-proper-man-pages" target="_blank" rel="noopener"><code>man</code> pages are provided only for "external commands"</a>, i.e. commands which come from UNIX.  But the shell is not UNIX. UNIX is the operating system, and the shell is the application we're using to interact with the operating system.  In fact, <a href="https://web.archive.org/web/20220601094544/https://www.pcmag.com/encyclopedia/term/shell" target="_blank" rel="noopener">the reason why it's called the "shell"</a> is that it surrounds the operating system, like an eggshell.</p>
 
-<p>The <code>set</code> command is a builtin program provided by the shell, not an external command provided by UNIX. It's for this reason that shell authors keep the docs for their commands separate from the docs for external commands.  The filesystem can be a messy place, and it's important to maintain strict compartmentalization for the sake of keeping things organized.  As the British say, <a href="https://www.youtube.com/watch?v=onRk0sjSgFU" target="_blank">"everything in its right place"</a>.</p>
+<p>The <code>set</code> command is a builtin program provided by the shell, not an external command provided by UNIX. It's for this reason that shell authors keep the docs for their commands separate from the docs for external commands.  The filesystem can be a messy place, and it's important to maintain strict compartmentalization for the sake of keeping things organized.  As the British say, <a href="https://www.youtube.com/watch?v=onRk0sjSgFU" target="_blank" rel="noopener">"everything in its right place"</a>.</p>
 
 <h2>How to tell if a command is a builtin</h2>
 
@@ -162,6 +162,6 @@ $ type foo
   <p>Title: Unknown</p>
   <p>Description: n/a</p>
   <p>Author: No author specified.</p>
-  <p>Source: <a href="https://pxhere.com/en/photo/452472" target="_blank">PxHere</a></p>
-  <p>License: <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank">Public Domain (CC0 1.0 DEED CC0 1.0 Universal)</a></p>
+  <p>Source: <a href="https://pxhere.com/en/photo/452472" target="_blank" rel="noopener">PxHere</a></p>
+  <p>License: <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener">Public Domain (CC0 1.0 DEED CC0 1.0 Universal)</a></p>
 </div>

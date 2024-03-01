@@ -1,6 +1,6 @@
 First let's look at the "Summary" and "Usage" comments.
 
-## ["Summary" and "Usage" comments](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-whence#L2-L3){:target="_blank" rel="noopener"}
+## ["Summary" and "Usage" comments](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-whence#L2-L3){:target="_blank" rel="noopener" }
 
 ```
 # Summary: List all Ruby versions that contain the given executable
@@ -30,7 +30,7 @@ The result is the full path to the executable, rather than just its name.
 
 Next, the tests.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/whence.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/whence.bats){:target="_blank" rel="noopener" }
 
 ### Creating a mocked executable
 
@@ -88,7 +88,7 @@ I notice that we don't have a spec to cover the `--path` flag.  That seems like 
 
 Now on to the code itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-whence){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-whence){:target="_blank" rel="noopener" }
 
 ### Printing Completions
 

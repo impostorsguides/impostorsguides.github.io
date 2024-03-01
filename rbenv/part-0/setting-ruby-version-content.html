@@ -2,7 +2,7 @@
   <h1 class="post-title">Setting the Correct Ruby Version</h1>
 </header>
 
-<p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L12-L13" target="_blank">Next 2 lines of code</a> are:</p>
+<p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L12-L13" target="_blank" rel="noopener">Next 2 lines of code</a> are:</p>
 
 <pre><code>export RBENV_DIR="${arg%/*}"
 break</code></pre>
@@ -11,9 +11,9 @@ break</code></pre>
 
 <h2>Searching for usages of <code>RBENV_DIR</code></h2>
 
-<p>To answer this question, I search for it in the RBENV codebase, which (on my machine) is located at <code>~/.rbenv/</code>, because <a href="http://localhost:4000/blog/installing-rbenv-from-source/" target="_blank">I installed RBENV from source, not via Homebrew</a>.</p>
+<p>To answer this question, I search for it in the RBENV codebase, which (on my machine) is located at <code>~/.rbenv/</code>, because <a href="http://localhost:4000/blog/installing-rbenv-from-source/" target="_blank" rel="noopener">I installed RBENV from source, not via Homebrew</a>.</p>
 
-<p>Note that I performed the search below using the <code>ag</code> command, which you can learn how to install <a href="https://github.com/ggreer/the_silver_searcher" target="_blank">here</a>. Your computer will likely ship with the <code>grep</code> command, but <a href="https://stackoverflow.com/questions/39689604/why-is-ag-slower-than-grep#:~:text=Ag%20is%20designed%20for%20searching,tools%20meant%20for%20different%20purposes." target="_blank"><code>ag</code> is <i>much</i> faster for searching codebases</a>.</p>
+<p>Note that I performed the search below using the <code>ag</code> command, which you can learn how to install <a href="https://github.com/ggreer/the_silver_searcher" target="_blank" rel="noopener">here</a>. Your computer will likely ship with the <code>grep</code> command, but <a href="https://stackoverflow.com/questions/39689604/why-is-ag-slower-than-grep#:~:text=Ag%20is%20designed%20for%20searching,tools%20meant%20for%20different%20purposes." target="_blank" rel="noopener"><code>ag</code> is <i>much</i> faster for searching codebases</a>.</p>
 
 <p>When I run this search, I see multiple references to it in various files:</p>
 
@@ -60,7 +60,7 @@ $ </code></pre>
 
 <p>The reference that catches my eye is the one at the bottom, in the <code>README.md</code> file. This file will likely tell us in plain English what we want to know.</p>
 
-<p>Sure enough, we find that it contains <a href="https://web.archive.org/web/20230413141208/https://github.com/rbenv/rbenv#environment-variables" target="_blank">the following table</a>:</p>
+<p>Sure enough, we find that it contains <a href="https://web.archive.org/web/20230413141208/https://github.com/rbenv/rbenv#environment-variables" target="_blank" rel="noopener">the following table</a>:</p>
 
 <table>
   <tr>
@@ -80,7 +80,7 @@ $ </code></pre>
   </tr>
 </table>
 
-<p>Again from reading <a href="https://web.archive.org/web/20230413141208/https://github.com/rbenv/rbenv" target="_blank">the README file</a>, we see that the <code>.ruby-version</code> file is one way that RBENV uses to detect which Ruby version you want to use:</p>
+<p>Again from reading <a href="https://web.archive.org/web/20230413141208/https://github.com/rbenv/rbenv" target="_blank" rel="noopener">the README file</a>, we see that the <code>.ruby-version</code> file is one way that RBENV uses to detect which Ruby version you want to use:</p>
 
 <blockquote><p>"...rbenv scans the current project directory for a file named .ruby-version. If found, that file determines the version of Ruby that should be used within that directory."</p></blockquote>
 
@@ -105,7 +105,7 @@ $ </code></pre>
 
 <p>The difference between the two is that shell variables are only accessible from within the shell they're created in.  Environment variables, on the other hand, are also accessible from within child shells created by the parent shell.</p>
 
-<p><a href="https://web.archive.org/web/20220713174024/https://www.baeldung.com/linux/bash-variables-export" target="_blank">This blog post</a> gives two examples, one demonstrating access of an environment variable from a child shell, and the other of (attempting to) access a shell variable from a child shell. To see this for ourselves, we can do an experiment mimicking these examples in our terminal.</p>
+<p><a href="https://web.archive.org/web/20220713174024/https://www.baeldung.com/linux/bash-variables-export" target="_blank" rel="noopener">This blog post</a> gives two examples, one demonstrating access of an environment variable from a child shell, and the other of (attempting to) access a shell variable from a child shell. To see this for ourselves, we can do an experiment mimicking these examples in our terminal.</p>
 
 <h2>Experiment- environment vs shell variables</h2>
 
@@ -145,7 +145,7 @@ bash-3.2$ </code></pre>
 
 <h2>Setting the <code>RBENV_DIR</code> variable</h2>
 
-<p>In the meantime, what do the contents of the <code>RBENV_DIR</code> variable look like? To answer that, we have to know what <code>"${arg%/*}"</code> resolves to, in <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L12" target="_blank">this line of code</a>.  It looks like more parameter expansion, similar to the kind we used <a href="https://gist.github.com/richiethomas/272b7719f3c75abf6818a8211552004e#file-bundle-L5" target="_blank">here</a> to store the program name in the <code>program</code> shell variable.  But the <code>%/*</code> syntax looks new, so let's run an experiment to find out what it does.</p>
+<p>In the meantime, what do the contents of the <code>RBENV_DIR</code> variable look like? To answer that, we have to know what <code>"${arg%/*}"</code> resolves to, in <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L12" target="_blank" rel="noopener">this line of code</a>.  It looks like more parameter expansion, similar to the kind we used <a href="https://gist.github.com/richiethomas/272b7719f3c75abf6818a8211552004e#file-bundle-L5" target="_blank" rel="noopener">here</a> to store the program name in the <code>program</code> shell variable.  But the <code>%/*</code> syntax looks new, so let's run an experiment to find out what it does.</p>
 
 <h3>Experiment- a simpler version of RBENV's parameter expansion</h3>
 
@@ -169,7 +169,7 @@ $</code></pre>
 
 <blockquote><p><strong>${parameter##word}</strong></p>
 
-<p>The word is expanded to produce a pattern and matched according to the rules described below (see <a href="https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html" target="_blank">Pattern Matching</a>). <u>If the pattern matches the beginning of the expanded value of parameter, then the result of the expansion is the expanded value of parameter with the shortest matching pattern (the <code>#</code> case) or the longest matching pattern (the <code>##</code> case) deleted.</u></p></blockquote>
+<p>The word is expanded to produce a pattern and matched according to the rules described below (see <a href="https://web.archive.org/web/20220816200045/https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html" target="_blank" rel="noopener">Pattern Matching</a>). <u>If the pattern matches the beginning of the expanded value of parameter, then the result of the expansion is the expanded value of parameter with the shortest matching pattern (the <code>#</code> case) or the longest matching pattern (the <code>##</code> case) deleted.</u></p></blockquote>
 
 <p>We now know enough to piece together what this line of code is doing.  We create a new environment variable named <code>RBENV_DIR</code> which will be available in any child shells.  Then, we take the parent directory of the filepath which was passed to the <code>ruby</code> command, and set <code>RBENV_DIR</code> equal to that parent directory.</p>
 
@@ -179,7 +179,7 @@ $</code></pre>
 
 <p>If no quotation marks are used, the shell may treat the multiple words inside the variable's value as multiple arguments, instead of a single argument.  And if single-quotes are used, the shell will treat <code>$FOO</code> as the string "$FOO" instead of as a variable containing a value.</p>
 
-<p>More info at <a href="https://web.archive.org/web/20231128200800/https://unix.stackexchange.com/questions/16303/what-is-the-significance-of-single-and-double-quotes-in-environment-variables" target="_blank">this StackOverflow post</a>.</p>
+<p>More info at <a href="https://web.archive.org/web/20231128200800/https://unix.stackexchange.com/questions/16303/what-is-the-significance-of-single-and-double-quotes-in-environment-variables" target="_blank" rel="noopener">this StackOverflow post</a>.</p>
 
 <h2>Summarizing the <code>if</code>-block</h2>
 
@@ -211,7 +211,7 @@ fi</code></pre>
 
 <h2>Setting <code>RBENV_ROOT</code></h2>
 
-<p>The <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L20" target="_blank">next line of code</a> is pretty straight-forward, so we'll quickly knock it out before moving to the final line of code in the shim:</p>
+<p>The <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L20" target="_blank" rel="noopener">next line of code</a> is pretty straight-forward, so we'll quickly knock it out before moving to the final line of code in the shim:</p>
 
 <pre><code>export RBENV_ROOT="/Users/richiethomas/.rbenv"</code></pre>
 

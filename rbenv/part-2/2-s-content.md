@@ -1,6 +1,6 @@
 First the test file.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-file-write.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-file-write.bats){:target="_blank" rel="noopener" }
 
 ### Setting up our working directory
 
@@ -78,7 +78,7 @@ This 2nd assertion implicitly tests that the new version file also, in fact, exi
 
 That's all for the tests, now on to the code itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-file-write){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-file-write){:target="_blank" rel="noopener" }
 
 First up:
 
@@ -132,7 +132,7 @@ rbenv-prefix "$RBENV_VERSION" >/dev/null
 
 Here we validate that the Ruby version number that the user passed as argument #2 corresponds to a valid Ruby version that exists on the user's machine.
 
-If not, an error will be raised, and we'll exit.  We can see this error being raised in the `rbenv-prefix` command, at [this block of code](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-prefix#L37){:target="_blank" rel="noopener"}.
+If not, an error will be raised, and we'll exit.  We can see this error being raised in the `rbenv-prefix` command, at [this block of code](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-prefix#L37){:target="_blank" rel="noopener" }.
 
 ### Writing the version number to the version file
 

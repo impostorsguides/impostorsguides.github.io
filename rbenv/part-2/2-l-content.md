@@ -6,7 +6,7 @@ You're still free to set different versions inside a local Ruby project director
 
 As usual, we'll read the tests first, then the code.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/global.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/global.bats){:target="_blank" rel="noopener" }
 
 ### Default Behavior
 
@@ -98,7 +98,7 @@ The purpose of that setup was to mock out the installation of Ruby v1.2.3 on our
 
 Having read through the command's test file, let's move on to the file for the command itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-global){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-global){:target="_blank" rel="noopener" }
 
 First few lines of code are familiar to us by this point:
 

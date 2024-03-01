@@ -105,12 +105,12 @@ rbenv 1.2.0-16-gc4395e5
 
 ### Version Numbers
 
-In the output `1.2.0-16-gc4395e5`, the `1.2.0` represent the major, minor, and patch versions, in accordance with [semantic versioning](https://semver.org/){:target="_blank" rel="noopener"} (or SemVer, for short).
+In the output `1.2.0-16-gc4395e5`, the `1.2.0` represent the major, minor, and patch versions, in accordance with [semantic versioning](https://semver.org/){:target="_blank" rel="noopener" } (or SemVer, for short).
 
 You might also be asking what `16-gc4395e5` represents.  I wasn't sure either, and I didn't know what to Google, so I asked ChatGPT:
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-2may2023-957am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-2may2023-957am.png">
     <img src="/assets/images/screenshot-2may2023-957am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
@@ -215,7 +215,7 @@ $ rbenv -v
 rbenv 1.2.0
 ```
 
-This time, there's no `-16` or `g...`.  Just a version number.  That's because RBENV SHA # `38e1fbb08e9d75d708a1ffb75fb9bbe179832ac8` has a [git tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging){:target="_blank" rel="noopener"} attached to it.
+This time, there's no `-16` or `g...`.  Just a version number.  That's because RBENV SHA # `38e1fbb08e9d75d708a1ffb75fb9bbe179832ac8` has a [git tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging){:target="_blank" rel="noopener" } attached to it.
 
 We'll get into why this is later, when we look at the actual code for the `rbenv---version` file.  For now, the goal was just to learn how to read the output of the `--version` flag.
 
@@ -280,7 +280,7 @@ Here we're declaring a variable called `command_path`, and setting its value equ
  - the result of `command -v "rbenv-$command"`, or (if there is no result)
  - the simple boolean value `true`.
 
-We saw the same `|| true` syntax [earlier in this file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L46){:target="_blank" rel="noopener"}.  It means that we don't want a failure of `command -v "rbenv-$command"` to trigger an exit of this script.
+We saw the same `|| true` syntax [earlier in this file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L46){:target="_blank" rel="noopener" }.  It means that we don't want a failure of `command -v "rbenv-$command"` to trigger an exit of this script.
 
 The value of the command substitution depends on what `command -v "rbenv-$command"` evaluates to.  This might be a bit confusing to read, because `command` is the name of a shell builtin, but `$command` is the name of a shell variable that we declared earlier.
 
@@ -300,7 +300,7 @@ command: command [-pVv] command [arg ...]
 
 So according to the above, calling `command ls` is **not** the same as calling `ls`.
 
-Let's say you have a shell function named `ls`, in addition to the regular `ls` command, and you call `ls` in your shell.  In this case, Bash will try to execute the shell function first, before executing the `ls` command.  The way to bypass this behavior, and go straight to the shell command, is with the `command` command.  [This applies to aliases as well as shell functions.](https://web.archive.org/web/20230502134246/https://askubuntu.com/questions/512770/what-is-the-bash-command-command){:target="_blank" rel="noopener"}
+Let's say you have a shell function named `ls`, in addition to the regular `ls` command, and you call `ls` in your shell.  In this case, Bash will try to execute the shell function first, before executing the `ls` command.  The way to bypass this behavior, and go straight to the shell command, is with the `command` command.  [This applies to aliases as well as shell functions.](https://web.archive.org/web/20230502134246/https://askubuntu.com/questions/512770/what-is-the-bash-command-command){:target="_blank" rel="noopener" }
 
 As the `help` output mentions, adding the `-v` flag results in a printed description of the command you're running.  When I pass `-v` to `command ls`, my terminal displays the path to the executable (`/bin/ls`) *instead of* actually executing the command.
 
@@ -310,7 +310,7 @@ So in our case, if we type `rbenv version` in our terminal, then this line of co
 command_path="$(command -v "rbenv-version" || true)"
 ```
 
-Since [we loaded `libexec` into `$PATH` earlier](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L79){:target="_blank" rel="noopener"}, `rbenv-version` is considered a valid executable, which means `command -v rbenv-version` will return `/Users/myusername/.rbenv/libexec/rbenv-version` on my machine.
+Since [we loaded `libexec` into `$PATH` earlier](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L79){:target="_blank" rel="noopener" }, `rbenv-version` is considered a valid executable, which means `command -v rbenv-version` will return `/Users/myusername/.rbenv/libexec/rbenv-version` on my machine.
 
 It is this value that gets stored in the `command_path` variable.  We can prove that in our terminal by adding `libexec/` to our `$PATH` and running `command -v rbenv-version`:
 
@@ -430,7 +430,7 @@ rbenv help "sh-shell"
 
 So the output matches what we'd expect from reading the code, but I'm still confused on why the code is written this way in the first place.  At this point we know enough to tell the user which command they *should have* run, because that's what was just printed.  Why don't we just run that same command, and save the user the work of doing so themselves?
 
-I find [the PR which added this block of code](https://github.com/rbenv/rbenv/pull/914){:target="_blank" rel="noopener"} and read through it.  Turns out the code used to look like this:
+I find [the PR which added this block of code](https://github.com/rbenv/rbenv/pull/914){:target="_blank" rel="noopener" } and read through it.  Turns out the code used to look like this:
 
 ```
 if [ "$1" = --help ]; then
@@ -521,7 +521,7 @@ When you run `rbenv` commands from inside your terminal with shell integration e
 
 This shell function gets defined by the `eval "$(rbenv init -)"` call in your shell config, each time you open a new terminal tab.  When responding to a command, UNIX checks for shell functions before it checks your `PATH` for any commands.  Because of this, the shell function is what gets run when you type `rbenv` into your terminal.
 
-One of the things the shell function does is execute [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L147-L152){:target="_blank" rel="noopener"}, which checks if the command that the user is running begins with `sh-`.  If it does, it runs `eval` plus the name of the command with its `sh-` prefix.  Otherwise, it runs the command via the `command` command (which we discussed earlier).  [This was also the case](https://github.com/rbenv/rbenv/blob/9fdce5d069946417d481fd878c5c005db5b4539c/libexec/rbenv-init#L151){:target="_blank" rel="noopener"} at the the time [the error was reported](https://github.com/rbenv/rbenv/pull/914){:target="_blank" rel="noopener"}.
+One of the things the shell function does is execute [this block of code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-init#L147-L152){:target="_blank" rel="noopener" }, which checks if the command that the user is running begins with `sh-`.  If it does, it runs `eval` plus the name of the command with its `sh-` prefix.  Otherwise, it runs the command via the `command` command (which we discussed earlier).  [This was also the case](https://github.com/rbenv/rbenv/blob/9fdce5d069946417d481fd878c5c005db5b4539c/libexec/rbenv-init#L151){:target="_blank" rel="noopener" } at the the time [the error was reported](https://github.com/rbenv/rbenv/pull/914){:target="_blank" rel="noopener" }.
 
 It's **this** call to `eval` that is erroring out.  We can prove that to ourselves by changing that block of code in `rbenv-init` to look like the following:
 
@@ -589,7 +589,7 @@ This is a human-readable set of usage instructions.  But `eval` is meant to take
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
-But I'm still wondering why commands prefixed with `sh-` use `eval`, while those without the prefix use `command`.  I decide to look up the command which introduced this `if/else` block.  After some digging, I find it [here](https://github.com/rbenv/rbenv/pull/57){:target="_blank" rel="noopener"}.  It says:
+But I'm still wondering why commands prefixed with `sh-` use `eval`, while those without the prefix use `command`.  I decide to look up the command which introduced this `if/else` block.  After some digging, I find it [here](https://github.com/rbenv/rbenv/pull/57){:target="_blank" rel="noopener" }.  It says:
 
 > Regular commands pass though as you'd expect. But special shell commands prefixed with sh- are called, but its result is evaled in the current shell allowing them to modify environment variables.
 
@@ -662,7 +662,7 @@ More generally, this is also a useful design pattern if you need to run a child 
 
 ### Aside- backticks vs. command substitution
 
-FYI, [according to StackOverflow](https://web.archive.org/web/20230411191359/https://stackoverflow.com/questions/9405478/command-substitution-backticks-or-dollar-sign-paren-enclosed){:target="_blank" rel="noopener"}, the following syntax...
+FYI, [according to StackOverflow](https://web.archive.org/web/20230411191359/https://stackoverflow.com/questions/9405478/command-substitution-backticks-or-dollar-sign-paren-enclosed){:target="_blank" rel="noopener" }, the following syntax...
 
 ```
 `sh-foo`
@@ -685,7 +685,7 @@ Next (and final!) line of code in this file:
     exec "$command_path" "$@"
 ```
 
-This is the line of code which actually executes the command that the user typed.  The `$@` syntax expands into [the flags or arguments](https://web.archive.org/web/20230319115333/https://stackoverflow.com/questions/3898665/what-is-in-bash){:target="_blank" rel="noopener"} we pass to that command.
+This is the line of code which actually executes the command that the user typed.  The `$@` syntax expands into [the flags or arguments](https://web.archive.org/web/20230319115333/https://stackoverflow.com/questions/3898665/what-is-in-bash){:target="_blank" rel="noopener" } we pass to that command.
 
 To prove this, let's update the code of this `else` block to the following:
 

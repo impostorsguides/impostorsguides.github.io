@@ -13,7 +13,7 @@ createdAt: 21 Jan, 2024
   </figure>
 </div>
 
-<p>I recently wrote <a href="/shell" target="_blank">a line-by-line walk-through of the RBENV shim</a> for <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4" target="_blank">the <code>bundle</code> command</a> (actually, the RBENV shim for every gem, since they're all the same code).  The goal was to be able to explain what the syntax of each line of code does.</p>
+<p>I recently wrote <a href="/shell" target="_blank" rel="noopener">a line-by-line walk-through of the RBENV shim</a> for <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4" target="_blank" rel="noopener">the <code>bundle</code> command</a> (actually, the RBENV shim for every gem, since they're all the same code).  The goal was to be able to explain what the syntax of each line of code does.</p>
 
 <p>But there's an order-of-magnitude difference between knowing what a piece of code does, vs. knowing how and why it got to that point. Reading the repo's git history is one way to reach that 2nd level of understanding.</p>
 
@@ -23,7 +23,7 @@ createdAt: 21 Jan, 2024
 
 <h2>Prelude: Chesterton's Fence</h2>
 
-<p>There's <a href="https://fs.blog/chestertons-fence/" target="_blank">a principle called "Chesterton's Fence"</a> which I've found to be quite helpful in programming (and in life in general).  It states the following:</p>
+<p>There's <a href="https://fs.blog/chestertons-fence/" target="_blank" rel="noopener">a principle called "Chesterton's Fence"</a> which I've found to be quite helpful in programming (and in life in general).  It states the following:</p>
 
 <blockquote><p>There exists in such a case a certain institution or law; let us say, for the sake of simplicity, a fence or gate erected across a road. The more modern type of reformer goes gaily up to it and says, “I don’t see the use of this; let us clear it away.” To which the more intelligent type of reformer will do well to answer: “If you don’t see the use of it, I certainly won’t let you clear it away. Go away and think. Then, when you can come back and tell me that you do see the use of it, I may allow you to destroy it.”</p></blockquote>
 
@@ -55,19 +55,19 @@ fi</code></pre>
   
 <p>And here's our working knowledge of what this code does.</p>
 
-<p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L6" target="_blank">The <code>if</code> clause itself</a> checks whether the command that the user entered (i.e. the command that RBENV is intercepting via this shim) is the <code>ruby</code> command.  If it is, we proceed with the logic inside the <code>if</code>-clause.  If it's not, we skip that logic entirely.</p>
+<p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L6" target="_blank" rel="noopener">The <code>if</code> clause itself</a> checks whether the command that the user entered (i.e. the command that RBENV is intercepting via this shim) is the <code>ruby</code> command.  If it is, we proceed with the logic inside the <code>if</code>-clause.  If it's not, we skip that logic entirely.</p>
 
-<p>Inside the <code>if</code> clause is <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L7">a <code>for</code>-loop</a>, which iterates over each argument passed to the <code>ruby</code> shim.  For each argument, we check its value via <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L8" target="_blank">a <code>case</code> statement</a>.</p>
+<p>Inside the <code>if</code> clause is <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L7">a <code>for</code>-loop</a>, which iterates over each argument passed to the <code>ruby</code> shim.  For each argument, we check its value via <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L8" target="_blank" rel="noopener">a <code>case</code> statement</a>.</p>
 
 <p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L9">If the argument is either <code>-e</code> or <code>--</code></a>, we break out of the <code>for</code>-loop, since these two arguments indicate that any subsequent arguments are parameters and are unrelated to the shim's business.</p>
 
-<p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L10" target="_blank">If the argument is a string containing a <code>/</code> character</a>, however, we next check if that <code>*/*</code> string <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L11" target="_blank">represents a path to a file in our filesystem</a>. If it does not, we do nothing.  If it does, however, <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L12" target="_blank">we set an environment variable</a> called <code>RBENV_DIR</code> which is equal to that filepath, minus the file name itself (in other words, the parent directory of that file).  We then <code>break</code> out of the <code>for</code>-loop, indicating that we don't care about any subsequent arguments.</p>
+<p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L10" target="_blank" rel="noopener">If the argument is a string containing a <code>/</code> character</a>, however, we next check if that <code>*/*</code> string <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L11" target="_blank" rel="noopener">represents a path to a file in our filesystem</a>. If it does not, we do nothing.  If it does, however, <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L12" target="_blank" rel="noopener">we set an environment variable</a> called <code>RBENV_DIR</code> which is equal to that filepath, minus the file name itself (in other words, the parent directory of that file).  We then <code>break</code> out of the <code>for</code>-loop, indicating that we don't care about any subsequent arguments.</p>
 
 <p>But why do we need to do all the above?</p>
 
 <h2>Purpose of the <code>RBENV_DIR</code> environment variable</h2>
 
-<p>In <a href="https://web.archive.org/web/20230408051543/https://github.com/rbenv/rbenv#how-it-works" target="_blank">the "How It Works" section of the README file</a>, we see that if you pass the <code>ruby</code> command a filename to run, RBENV will look for a file named <code>.ruby-version</code> in the same directory as that of the filename you pass:</p>
+<p>In <a href="https://web.archive.org/web/20230408051543/https://github.com/rbenv/rbenv#how-it-works" target="_blank" rel="noopener">the "How It Works" section of the README file</a>, we see that if you pass the <code>ruby</code> command a filename to run, RBENV will look for a file named <code>.ruby-version</code> in the same directory as that of the filename you pass:</p>
 
 <blockquote><p>After rbenv injects itself into your PATH at installation time, any invocation of <code>ruby</code>, <code>gem</code>, <code>bundler</code>, or other Ruby-related executable will first activate rbenv. Then, rbenv scans the current project directory for a file named <code>.ruby-version</code>. If found, that file determines the version of Ruby that should be used within that directory. Finally, rbenv looks up that Ruby version among those installed under <code>~/.rbenv/versions/</code>.</p></blockquote>
   
@@ -79,7 +79,7 @@ fi</code></pre>
 
 <h3>Quick note- <code>.ruby-version</code> vs. <code>.rbenv-version</code></h3>
 
-<p>As mentioned, RBENV sometimes uses on a file called <code>.ruby-version</code> to do its job. However, when we dig into the history of the <code>if</code>-block, we'll be looking at an earlier version of RBENV in which it instead used a file called <code>.rbenv-version</code>. This file performed the same function, but <a href="https://github.com/rbenv/rbenv/pull/302#issuecomment-11785236" target="_blank">per this comment thread</a>, the filename made it harder for folks who used RBENV to collaborate with folks who used other Ruby version managers.</p>
+<p>As mentioned, RBENV sometimes uses on a file called <code>.ruby-version</code> to do its job. However, when we dig into the history of the <code>if</code>-block, we'll be looking at an earlier version of RBENV in which it instead used a file called <code>.rbenv-version</code>. This file performed the same function, but <a href="https://github.com/rbenv/rbenv/pull/302#issuecomment-11785236" target="_blank" rel="noopener">per this comment thread</a>, the filename made it harder for folks who used RBENV to collaborate with folks who used other Ruby version managers.</p>
 
 <p>Because of this, the core team subsequently switched from using <code>.rbenv-version</code> to <code>.ruby-version</code>. So if you see me referring to both filenames and get confused, just know that they had the same purpose.</p>
 
@@ -87,7 +87,7 @@ fi</code></pre>
 
 <p>In order to find this PR, we need to know its SHA number ("SHA" stands for "Simple Hashing Algorithm").  The SHA is a unique identifier that git uses to refer to a specific commit. Once we have this, we can plug it into Github's search bar, pull up the corresponding PR and any associated Github Issues, and review any relevant discussions (which might give us more context).</p>
 
-<p>Note that this is not a git tutorial, and that git knowledge is a prerequisite for moving forward.  If you're not yet familiar with git, the official git docs contain <a href="https://git-scm.com/docs/gittutorial" target="_blank">a great tutorial here</a>.</p>
+<p>Note that this is not a git tutorial, and that git knowledge is a prerequisite for moving forward.  If you're not yet familiar with git, the official git docs contain <a href="https://git-scm.com/docs/gittutorial" target="_blank" rel="noopener">a great tutorial here</a>.</p>
 
 <h3>Attempting to run <code>git blame</code> on the shim file</h3>
 
@@ -97,7 +97,7 @@ fi</code></pre>
 fatal: no such path 'shims/bundle' in HEAD
 ~/.rbenv (master)  $</code></pre>
 
-<p>The error <code>no such path 'shims/bundle'</code> in HEAD appears because the shim directory <code>~/.rbenv/shims</code> is included in <a href="https://git-scm.com/docs/gitignore" target="_blank">RBENV's .gitignore file</a>, meaning the shims are not stored in a git repo (and hence don't have their own SHA). We can confirm this by looking at RBENV's <code>.gitignore</code> file.  If we run the following in our terminal...</p>
+<p>The error <code>no such path 'shims/bundle'</code> in HEAD appears because the shim directory <code>~/.rbenv/shims</code> is included in <a href="https://git-scm.com/docs/gitignore" target="_blank" rel="noopener">RBENV's .gitignore file</a>, meaning the shims are not stored in a git repo (and hence don't have their own SHA). We can confirm this by looking at RBENV's <code>.gitignore</code> file.  If we run the following in our terminal...</p>
 
 <pre><code>$ vim ~/.rbenv/.gitignore</code></pre>
 
@@ -120,7 +120,7 @@ fatal: no such path 'shims/bundle' in HEAD
 
 <p>However, we know that the shims all have the same exact code, and also that new shim files are generated every time we install a new gem.  Given this knowledge, I'd bet that there's a "shim factory" somewhere in the RBENV codebase, which auto-generates a new file whenever a new gem is installed.</p>
 
-<p>One strategy to find this shim factory is to search the RBENV codebase for an arbitrary piece of code from the shim file.  But first we need to pick which line of code to search for. I pick a line which I suspect will not be too common in the codebase, giving us a high signal-to-noise ratio in our search results. Then I use <a href="https://github.com/ggreer/the_silver_searcher" target="_blank">the <code>ag</code> tool</a> to find its location:</p>
+<p>One strategy to find this shim factory is to search the RBENV codebase for an arbitrary piece of code from the shim file.  But first we need to pick which line of code to search for. I pick a line which I suspect will not be too common in the codebase, giving us a high signal-to-noise ratio in our search results. Then I use <a href="https://github.com/ggreer/the_silver_searcher" target="_blank" rel="noopener">the <code>ag</code> tool</a> to find its location:</p>
 
 <pre><code>$ cd ~/.rbenv/
 
@@ -170,11 +170,11 @@ $</code></pre>
 
 <h2>Running <code>git blame</code> on the correct file</h2>
 
-<p>I copy the filepath for <code>rbenv-rehash</code> and run <code>git blame</code> on it (docs on this command <a href="https://web.archive.org/web/20230327142152/https://git-scm.com/docs/git-blame" target="_blank">here</a>):</p>
+<p>I copy the filepath for <code>rbenv-rehash</code> and run <code>git blame</code> on it (docs on this command <a href="https://web.archive.org/web/20230327142152/https://git-scm.com/docs/git-blame" target="_blank" rel="noopener">here</a>):</p>
 
 <pre><code>$ git blame libexec/rbenv-rehash</code></pre>
 
-<p>You should see <a href="https://github.com/rbenv/rbenv/blame/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-rehash" target="_blank">something like this</a>:</p>
+<p>You should see <a href="https://github.com/rbenv/rbenv/blame/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-rehash" target="_blank" rel="noopener">something like this</a>:</p>
   
 <pre><code>$ git blame libexec/rbenv-rehash                  
 6938692c libexec/rbenv-rehash (Andreas Johansson 2011-08-12 11:33:45 +0200   1) #!/usr/bin/env bash
@@ -222,7 +222,7 @@ dd8a005c libexec/rbenv-rehash (Sam Stephenson    2011-08-15 01:16:13 -0500  59) 
 <p>Now that we have our SHA, I open my web browser and go to Github, where I paste the SHA value I copied from <code>git blame</code> into the search bar on the top-left and select "In this repository" (click the images to enlarge in a new window):</p>
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-2024-01-21-11.26am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-2024-01-21-11.26am.png">
     <img src="/assets/images/screenshot-2024-01-21-11.26am.png" width="90%" alt="Searching for SHA # 283e67b5 on Github's homepage.">
   </a>
 </center>
@@ -230,7 +230,7 @@ dd8a005c libexec/rbenv-rehash (Sam Stephenson    2011-08-15 01:16:13 -0500  59) 
 <p>Hitting <code>Enter</code> and moving to the search results page, we see Github says "we couldn't find any code"...</p>
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-2024-01-21-11.35am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-2024-01-21-11.35am.png">
     <img src="/assets/images/screenshot-2024-01-21-11.35am.png" width="90%" alt="No code results found for SHA # 283e67b5 on Github's search page.">
   </a>
 </center>
@@ -238,7 +238,7 @@ dd8a005c libexec/rbenv-rehash (Sam Stephenson    2011-08-15 01:16:13 -0500  59) 
 <p>...but that message is irrelevant for us. We're not looking for code; we're looking for a PR. And on the left-hand side, we can see that Github did find one issue and one commit containing this SHA:</p>
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot02024-01-21-11.39am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot02024-01-21-11.39am.png">
     <img src="/assets/images/screenshot02024-01-21-11.39am.png" width="70%" alt="Close-up of Github search results, showing one commit and one pull request which match the SHA we searched for.">
   </a>
 </center>
@@ -247,10 +247,10 @@ dd8a005c libexec/rbenv-rehash (Sam Stephenson    2011-08-15 01:16:13 -0500  59) 
 
 <h3>Reading the Github commit</h3>
 
-<p>First, <a href="https://github.com/rbenv/rbenv/commit/283e67b57e8ab0bbbe504aab6866729b0035186a" target="_blank">the commit results</a>:</p>
+<p>First, <a href="https://github.com/rbenv/rbenv/commit/283e67b57e8ab0bbbe504aab6866729b0035186a" target="_blank" rel="noopener">the commit results</a>:</p>
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-2024-01-21-11.42am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-2024-01-21-11.42am.png">
     <img src="/assets/images/screenshot-2024-01-21-11.42am.png" width="100%" alt="The git commit which matches the SHA we searched for.">
   </a>
 </center>
@@ -263,10 +263,10 @@ dd8a005c libexec/rbenv-rehash (Sam Stephenson    2011-08-15 01:16:13 -0500  59) 
 
 <h2>Reading the Github Issue</h2>
 
-<p>Let's also check <a href="https://github.com/rbenv/rbenv/pull/299" target="_blank">the issue link</a>:</p>
+<p>Let's also check <a href="https://github.com/rbenv/rbenv/pull/299" target="_blank" rel="noopener">the issue link</a>:</p>
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-2024-01-21-11.46am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-2024-01-21-11.46am.png">
     <img src="/assets/images/screenshot-2024-01-21-11.46am.png" width="100%" alt="The Github issue which matches the SHA we searched for.">
   </a>
 </center>
@@ -281,12 +281,12 @@ dd8a005c libexec/rbenv-rehash (Sam Stephenson    2011-08-15 01:16:13 -0500  59) 
 
 <p>Before closing the browser tab, I notice the following at the end of the PR:</p>
 
-<blockquote><p>See previous discussion at <a href="https://github.com/rbenv/rbenv/pull/298" target="_blank">#298</a></p></blockquote>
+<blockquote><p>See previous discussion at <a href="https://github.com/rbenv/rbenv/pull/298" target="_blank" rel="noopener">#298</a></p></blockquote>
 
-<p>Out of curiosity I read through that PR. Among other things, it contains <a href="https://github.com/rbenv/rbenv/pull/298#issuecomment-11698517" target="_blank">a conversation which stands out to me</a>:</p>
+<p>Out of curiosity I read through that PR. Among other things, it contains <a href="https://github.com/rbenv/rbenv/pull/298#issuecomment-11698517" target="_blank" rel="noopener">a conversation which stands out to me</a>:</p>
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-2024-01-21-11.57am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-2024-01-21-11.57am.png">
     <img src="/assets/images/screenshot-2024-01-21-11.57am.png" width="100%" alt="A comment from Mislav Marohnić explaining why he would consider it surprising behavior if RBENV used the Ruby version of a local directory instead of the current directory, if those two directories were different.">
   </a>
 </center>
@@ -299,18 +299,18 @@ dd8a005c libexec/rbenv-rehash (Sam Stephenson    2011-08-15 01:16:13 -0500  59) 
   <li>the Ruby script used the Ruby version of the 2nd directory.</li>
 </ul>
 
-<p>Replying to Mislav, another contributor (Jeremy) <a href="https://github.com/rbenv/rbenv/pull/298#issuecomment-11699902" target="_blank">disagrees that this would be surprising behavior</a>, saying that adding a <code>.rbenv-version</code> file to a project is like declaring a Ruby dependency.</p>
+<p>Replying to Mislav, another contributor (Jeremy) <a href="https://github.com/rbenv/rbenv/pull/298#issuecomment-11699902" target="_blank" rel="noopener">disagrees that this would be surprising behavior</a>, saying that adding a <code>.rbenv-version</code> file to a project is like declaring a Ruby dependency.</p>
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-2024-01-21-12.00pm.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-2024-01-21-12.00pm.png">
     <img src="/assets/images/screenshot-2024-01-21-12.00pm.png" width="100%" alt="A reply to Mislav's comment from Jeremy, saying that adding a .rbenv-version file to a project is like declaring a dependency for that project, therefore making it unsurprising behavior for RBENV to use that project's declared Ruby version.">
   </a>
 </center>
 
-<p>Finally, Sam Stephenson (the lead developer of the RBENV project) chimes in to specify <a href="https://github.com/rbenv/rbenv/pull/298#issuecomment-11710825" target="_blank">what the order of precedence needs to be</a> when checking for a Ruby version:</p>
+<p>Finally, Sam Stephenson (the lead developer of the RBENV project) chimes in to specify <a href="https://github.com/rbenv/rbenv/pull/298#issuecomment-11710825" target="_blank" rel="noopener">what the order of precedence needs to be</a> when checking for a Ruby version:</p>
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-2024-01-21-12.04pm.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-2024-01-21-12.04pm.png">
     <img src="/assets/images/screenshot-2024-01-21-12.04pm.png" width="100%" alt="Sam Stephenson's comment on the order of operations that RBENV should use for deriving a project's Ruby version.">
   </a>
 </center>
@@ -333,7 +333,7 @@ dd8a005c libexec/rbenv-rehash (Sam Stephenson    2011-08-15 01:16:13 -0500  59) 
 <p>First, I make sure that the version of RBENV that I'm running (i.e. the SHA that I'm pointing to in my <code>~/.rbenv</code> directory) matches the last of the commits in the PR which added the <code>if</code>-block:</p>
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-2024-01-21-12.25pm.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-2024-01-21-12.25pm.png">
     <img src="/assets/images/screenshot-2024-01-21-12.25pm.png" width="100%" alt="The list of commits for the PR which introduced the 'if'-block in the shim code.  The specific commit that we want to roll back to is highlighted.">
   </a>
 </center>
@@ -467,7 +467,7 @@ rbenv: no local version configured for this directory
 <p>Next, I find the SHA of the version of the RBENV code just before the if-block was introduced:</p>
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-2024-01-21-12.41pm.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-2024-01-21-12.41pm.png">
     <img src="/assets/images/screenshot-2024-01-21-12.41pm.png" width="100%" alt="The list of commits for the PR which introduced the 'if'-block in the shim code.  The specific commit that we want to roll back to is highlighted.">
   </a>
 </center>
@@ -594,7 +594,7 @@ exec "/Users/richiethomas/.rbenv/bin/rbenv" exec "$program" "$@"
   <h4>Photo Attribution</h4>
   <p>Title of Photo: Useless gate on a path by the railway.</p>
   <p>Description: "The field boundary has been removed but the gate has been left standing on its own."</p>
-  <p>Author: <a href="https://www.geograph.org.uk/profile/13873" target="_blank">Ian Calderwood</a></p>
-  <p>Source: <a href="https://www.geograph.org.uk/photo/5209806" target="_blank">Geograph</a></p>
-  <p>License: <a href="https://creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC BY-SA 2.0 DEED Attribution-ShareAlike 2.0 Generic</a></p>
+  <p>Author: <a href="https://www.geograph.org.uk/profile/13873" target="_blank" rel="noopener">Ian Calderwood</a></p>
+  <p>Source: <a href="https://www.geograph.org.uk/photo/5209806" target="_blank" rel="noopener">Geograph</a></p>
+  <p>License: <a href="https://creativecommons.org/licenses/by-sa/2.0/" target="_blank" rel="noopener">CC BY-SA 2.0 DEED Attribution-ShareAlike 2.0 Generic</a></p>
 </div>

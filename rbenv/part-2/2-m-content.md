@@ -1,6 +1,6 @@
 Again, let's start with the test file, `help.bats`.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/help.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/help.bats){:target="_blank" rel="noopener" }
 
 ### Showing common commands
 
@@ -283,7 +283,7 @@ This spec does the same as the previous spec, but with a multi-line extended des
 
 Now onto the command file itself.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help){:target="_blank" rel="noopener" }
 
 First few lines of code are almost too obvious to repeat at this point:
 
@@ -411,7 +411,7 @@ quox bar baz
 
 I continue Googling to get a bit more context.  The command's usage inside `rbenv-help` looks complicated, so I think it'll pay to become a bit more familiar with it.
 
-The site HowToGeek [says the following](https://www.howtogeek.com/666395/how-to-use-the-sed-command-on-linux/){:target="_blank" rel="noopener"}:
+The site HowToGeek [says the following](https://www.howtogeek.com/666395/how-to-use-the-sed-command-on-linux/){:target="_blank" rel="noopener" }:
 
 > The `sed` command is a bit like chess: it takes an hour to learn the basics and a lifetime to master them (or, at least a lot of practice)...
 >
@@ -435,11 +435,11 @@ HowToGeek clarifies what the `-n` flag does:
 
 > By default, sed prints all lines. We'd see all the text in the file with the matching lines printed twice. To prevent this, we'll use the -n (quiet) option to suppress the unmatched text.
 
-ComputerHope, which I've often found to be another good resource during this project, adds [the following](https://www.computerhope.com/unix/used.htm){:target="_blank" rel="noopener"}:
+ComputerHope, which I've often found to be another good resource during this project, adds [the following](https://www.computerhope.com/unix/used.htm){:target="_blank" rel="noopener" }:
 
 > The sed stream editor performs basic text transformations on an input stream (a file, or input from a pipeline). While in some ways similar to an editor which permits scripted edits (such as ed), sed works by making only one pass over the input(s), and is consequently more efficient. But it is sed's ability to filter text in a pipeline which particularly distinguishes it from other types of editors.
 
-I'm still a bit unclear on the `-e` flag, however.  When I Google 'what does the "-e" flag do sed', the first result I see is [a StackExchange post](https://unix.stackexchange.com/questions/33157/what-is-the-purpose-of-e-in-sed-command){:target="_blank" rel="noopener"} which proves helpful:
+I'm still a bit unclear on the `-e` flag, however.  When I Google 'what does the "-e" flag do sed', the first result I see is [a StackExchange post](https://unix.stackexchange.com/questions/33157/what-is-the-purpose-of-e-in-sed-command){:target="_blank" rel="noopener" } which proves helpful:
 
 <p style="text-align: center">
   <img src="/assets/images/screenshot-15mar2023-123pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
@@ -447,7 +447,7 @@ I'm still a bit unclear on the `-e` flag, however.  When I Google 'what does the
 
 From this and other answers in the post, I can see that `-e` tells `sed` to use the subsequent argument (i.e. the strange-looking syntax starting with `/^#/ !{`) as a script to run against the input that it receives.
 
-To figure out what input we'll pass to `sed`, I search the file to see where the `extract_initial_comment_block` function is called.  I see [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L100){:target="_blank" rel="noopener"} that we send `sed` the content of a file (whose name we do not yet know), and then pipe the output of `sed` to another function named `collect_documentation` (also TBD).
+To figure out what input we'll pass to `sed`, I search the file to see where the `extract_initial_comment_block` function is called.  I see [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-help#L100){:target="_blank" rel="noopener" } that we send `sed` the content of a file (whose name we do not yet know), and then pipe the output of `sed` to another function named `collect_documentation` (also TBD).
 
 ### What does the `sed` script do?
 
@@ -466,7 +466,7 @@ s/^#$/# /
 }
 ```
 
-It appears to be 3 scripts in one, separated by newlines.  [I ask StackExchange for help](https://unix.stackexchange.com/questions/717738/what-is-the-function-of-this-script-passed-to-sed-e){:target="_blank" rel="noopener"} and the next day, I have [my answer](https://unix.stackexchange.com/a/717747/142469){:target="_blank" rel="noopener"}.
+It appears to be 3 scripts in one, separated by newlines.  [I ask StackExchange for help](https://unix.stackexchange.com/questions/717738/what-is-the-function-of-this-script-passed-to-sed-e){:target="_blank" rel="noopener" } and the next day, I have [my answer](https://unix.stackexchange.com/a/717747/142469){:target="_blank" rel="noopener" }.
 
 The TL;DR is that I was right in thinking that the code inside the quotes represents 3 commands passed to `sed`, executed one-after-another:
 
@@ -480,7 +480,7 @@ So to summarize what the `extract_initial_comment_block` function does: it simpl
 
 This is pretty much what we might expect from a function named `extract_initial_comment_block`, given what we know about RBENV's command files so far.
 
-For more on how to use `sed`, check out [LinuxHint.com's "50 `sed` command examples" post](https://linuxhint.com/50_sed_command_examples/){:target="_blank" rel="noopener"}.
+For more on how to use `sed`, check out [LinuxHint.com's "50 `sed` command examples" post](https://linuxhint.com/50_sed_command_examples/){:target="_blank" rel="noopener" }.
 
 ### The `collect_documentation` function
 
@@ -509,7 +509,7 @@ We've seen `type -p` before, when deciding whether to use `greadlink` or `readli
 
 In the case of setting our local `awk` variable, `type -p gawk awk` searches the disk for the files associated with 2 commands, `gawk` and `awk`.  It pipes the results to `head -n1`, which means it takes the first filepath it finds from those 2 commands, and it pipes any errors to `/dev/null`.  So the value of the `awk` local variable is either the filepath for the `gawk` command or that of the `awk` command (if no filepath was found for `gawk`).
 
-[According to the Github history](https://github.com/rbenv/rbenv/pull/581){:target="_blank" rel="noopener"}, the reason we check for `gawk` first and then fall back to `awk` is because the Solaris version of UNIX implements `awk` in a way which broke `rbenv-help`.
+[According to the Github history](https://github.com/rbenv/rbenv/pull/581){:target="_blank" rel="noopener" }, the reason we check for `gawk` first and then fall back to `awk` is because the Solaris version of UNIX implements `awk` in a way which broke `rbenv-help`.
 
 #### Erroring out if no `awk` command
 
@@ -522,7 +522,7 @@ if [ -z "$awk" ]; then
 fi
 ```
 
-If neither `gawk` nor `awk` is installed on the user's system, we echo an error message to STDERR and return a non-zero exit code.  This might happen if (for example) a user is running RBENV on a version of Windows with which Bash does not natively ship.  Note that Bash is now available for Windows, but [that hasn't always been the case](https://web.archive.org/web/20230329195218/https://venturebeat.com/business/microsoft-is-bringing-the-bash-shell-to-windows/){:target="_blank" rel="noopener"}.
+If neither `gawk` nor `awk` is installed on the user's system, we echo an error message to STDERR and return a non-zero exit code.  This might happen if (for example) a user is running RBENV on a version of Windows with which Bash does not natively ship.  Note that Bash is now available for Windows, but [that hasn't always been the case](https://web.archive.org/web/20230329195218/https://venturebeat.com/business/microsoft-is-bringing-the-bash-shell-to-windows/){:target="_blank" rel="noopener" }.
 
 #### Disabling a `shellcheck` rule
 
@@ -532,7 +532,7 @@ Next line of code:
 # shellcheck disable=SC2016
 ```
 
- I Google "what is ShellCheck", and [the first result](https://web.archive.org/web/20220915000849/https://www.shellcheck.net/){:target="_blank" rel="noopener"} of *this* search describes it as "ShellCheck is an open source static analysis tool that automatically finds bugs in your shell scripts."  Back to the line of code, it appears that `shellcheck disable=SC2016` disables [rule number 2016](https://www.shellcheck.net/wiki/SC2016){:target="_blank" rel="noopener"}:
+ I Google "what is ShellCheck", and [the first result](https://web.archive.org/web/20220915000849/https://www.shellcheck.net/){:target="_blank" rel="noopener" } of *this* search describes it as "ShellCheck is an open source static analysis tool that automatically finds bugs in your shell scripts."  Back to the line of code, it appears that `shellcheck disable=SC2016` disables [rule number 2016](https://www.shellcheck.net/wiki/SC2016){:target="_blank" rel="noopener" }:
 
 > Expressions don't expand in single quotes, use double quotes for that.
 >
@@ -567,7 +567,7 @@ We first see `"$awk" ` followed by the opening single-quote.  `"$awk"` is the ex
 
 ### The `awk` command
 
-GNU has [a user's guide](https://web.archive.org/web/20220915174506/https://www.gnu.org/software/gawk/manual/gawk.html){:target="_blank" rel="noopener"} on the `awk` utility, which says that it's "a program that you can use to select particular records in a file and perform operations upon them."  [The Linux man page](https://web.archive.org/web/20220707035408/https://man7.org/linux/man-pages/man1/awk.1p.html){:target="_blank" rel="noopener"} for `awk` has more details:
+GNU has [a user's guide](https://web.archive.org/web/20220915174506/https://www.gnu.org/software/gawk/manual/gawk.html){:target="_blank" rel="noopener" } on the `awk` utility, which says that it's "a program that you can use to select particular records in a file and perform operations upon them."  [The Linux man page](https://web.archive.org/web/20220707035408/https://man7.org/linux/man-pages/man1/awk.1p.html){:target="_blank" rel="noopener" } for `awk` has more details:
 
 > The awk utility shall execute programs written in the awk programming language, which is specialized for textual data manipulation. An awk program is a sequence of patterns and corresponding actions. When input is read that matches a pattern, the action associated with that pattern is carried out.
 
@@ -590,7 +590,7 @@ TODO: come up with a guide on how to do some common operations using `sed`, and 
 I've decided that the easiest way to understand the subsequent sequence of `awk` commands is to ask ChatGPT what the script does, and then do a series of experiments to test whether ChatGPT led me astray or not.  Here's the initial question I asked, followed by the initial answer.  I'll be diving deeper into each part of the answer in follow-up questions.
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-5jun2023-107pm.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-5jun2023-107pm.png">
     <img src="/assets/images/screenshot-5jun2023-107pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
@@ -678,7 +678,7 @@ We'll see later on that the Bash code which is output by `collect_documentation`
 
 So that's a high level of what this function does.
 
-I find [this link](https://web.archive.org/web/20230402124238/https://tldp.org/LDP/abs/html/awk.html){:target="_blank" rel="noopener"} from The Linux Documentation Project, which walks through how to use `awk`:
+I find [this link](https://web.archive.org/web/20230402124238/https://tldp.org/LDP/abs/html/awk.html){:target="_blank" rel="noopener" } from The Linux Documentation Project, which walks through how to use `awk`:
 
 > Awk breaks each line of input passed to it into fields. By default, a field is a string of consecutive characters delimited by whitespace, though there are options for changing this. Awk parses and operates on each separate field. This makes it ideal for handling structured text files -- especially tables -- data organized into consistent chunks, such as rows and columns.
 >
@@ -1042,7 +1042,7 @@ Notice that the 2nd argument passed to `sum` was `"&2"`, with `&2` wrapped in do
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
-The above examples should give us enough knowlege about `awk` to be able to understand how it's used in RBENV, but its capabilities go far beyond what we've demonstrated here.  `awk` is one of those tools which takes a minute to learn and a lifetime to master.  If you want to learn more, GNU maintains an entire manual just on `awk` [here](https://web.archive.org/web/20230000000000*/https://www.gnu.org/software/gawk/manual/gawk.html){:target="_blank" rel="noopener"}.
+The above examples should give us enough knowlege about `awk` to be able to understand how it's used in RBENV, but its capabilities go far beyond what we've demonstrated here.  `awk` is one of those tools which takes a minute to learn and a lifetime to master.  If you want to learn more, GNU maintains an entire manual just on `awk` [here](https://web.archive.org/web/20230000000000*/https://www.gnu.org/software/gawk/manual/gawk.html){:target="_blank" rel="noopener" }.
 
 Let's now turn to the `collect_documentation` function.  We start with this pattern-action pair:
 
@@ -1068,7 +1068,7 @@ And our action is:
 }
 ```
 
-This means we initialize the `summary` variable and store the `substr($0, 10)` value inside of it when the given line of input starts with `Summary:`.  According to [the GNU guide to `awk`](https://web.archive.org/web/20230509013018/https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html){:target="_blank" rel="noopener"}, the `substr` built-in function takes an input string and a character position number (1-based, not 0-based), and returns all the characters from the specified position number until the end of the string.
+This means we initialize the `summary` variable and store the `substr($0, 10)` value inside of it when the given line of input starts with `Summary:`.  According to [the GNU guide to `awk`](https://web.archive.org/web/20230509013018/https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html){:target="_blank" rel="noopener" }, the `substr` built-in function takes an input string and a character position number (1-based, not 0-based), and returns all the characters from the specified position number until the end of the string.
 
 You can optionally provide a 3rd argument, the length N of characters you want to check, and `substr` will return a string starting at your position number and spanning the N subsequent characters (inclusive of the starting character).
 

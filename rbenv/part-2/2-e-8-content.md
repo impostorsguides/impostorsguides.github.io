@@ -17,7 +17,7 @@ We've seen the `-z` flag in conditional logic before- it checks whether a value 
 
 So if the `RBENV_ROOT` variable has not yet been set, then we give it a default value of `${HOME}/.rbenv`, i.e. the `.rbenv` hidden directory located as a subdir of our UNIX home directory.  If it *has* been set, then we just trim off any trailing "/" character.  Either way, we export it as a environment variable.
 
-What does `$RBENV_ROOT` do?  According to [the "Environment Variables" section](https://github.com/rbenv/rbenv#environment-variables){:target="_blank" rel="noopener"} of the README, it:
+What does `$RBENV_ROOT` do?  According to [the "Environment Variables" section](https://github.com/rbenv/rbenv#environment-variables){:target="_blank" rel="noopener" } of the README, it:
 
 > Defines the directory under which Ruby versions and shims reside.
 
@@ -48,7 +48,7 @@ Now the code inside the `else` block:
   [[ $RBENV_DIR == /* ]] || RBENV_DIR="$PWD/$RBENV_DIR"
 ```
 
-The code`[[ $RBENV_DIR == /* ]]` is an attempt to [pattern-match](https://web.archive.org/web/20220628171954/https://unix.stackexchange.com/questions/72039/whats-the-difference-between-single-and-double-equal-signs-in-shell-compari){:target="_blank" rel="noopener"}, **not** an equality check.  The particular pattern that we're matching against returns true if `$RBENV_DIR` starts with the `/` character.  If the pattern does **not** match, we set `RBENV_DIR` equal to `"$PWD/$RBENV_DIR"`.
+The code`[[ $RBENV_DIR == /* ]]` is an attempt to [pattern-match](https://web.archive.org/web/20220628171954/https://unix.stackexchange.com/questions/72039/whats-the-difference-between-single-and-double-equal-signs-in-shell-compari){:target="_blank" rel="noopener" }, **not** an equality check.  The particular pattern that we're matching against returns true if `$RBENV_DIR` starts with the `/` character.  If the pattern does **not** match, we set `RBENV_DIR` equal to `"$PWD/$RBENV_DIR"`.
 
 Since a leading `/` in a filepath means we're dealing with an absolute path, this means we're checking to see if `$RBENV_DIR` is a string that represents an absolute path.  And since `"$PWD"` is always an absolute path pointing to our current directory, this line of code means that:
 
@@ -65,12 +65,12 @@ RBENV_DIR="$PWD"
 cd "$OLDPWD"
 ```
 
-Here we're attempting to `cd` into our latest version of `$RBENV_DIR`, sending any error message to `/dev/null`, and aborting with a helpful error message if that `cd` attempt fails.  We then set the value of `RBENV_DIR` to the value of `$PWD` (the directory we're currently in), before `cd`ing into `OLDPWD`, an environment variable [that Bash maintains ](https://web.archive.org/web/20220127091111/https://riptutorial.com/bash/example/16875/-oldpwd){:target="_blank" rel="noopener"} and which stores the directory we were in prior to our current one.
+Here we're attempting to `cd` into our latest version of `$RBENV_DIR`, sending any error message to `/dev/null`, and aborting with a helpful error message if that `cd` attempt fails.  We then set the value of `RBENV_DIR` to the value of `$PWD` (the directory we're currently in), before `cd`ing into `OLDPWD`, an environment variable [that Bash maintains ](https://web.archive.org/web/20220127091111/https://riptutorial.com/bash/example/16875/-oldpwd){:target="_blank" rel="noopener" } and which stores the directory we were in prior to our current one.
 
 This sequence of code is doing two things:
 
  - It ensures that the value we store in `RBENV_DIR` is a valid directory, by attempting to `cd` into it and aborting if this fails.
- - It [normalizes](https://web.archive.org/web/20220619163902/https://www.linux.com/training-tutorials/normalizing-path-names-bash/){:target="_blank" rel="noopener"} the value of `RBENV_DIR`, "...remov(ing) unneeded /./ and ../dir sequences."
+ - It [normalizes](https://web.archive.org/web/20220619163902/https://www.linux.com/training-tutorials/normalizing-path-names-bash/){:target="_blank" rel="noopener" } the value of `RBENV_DIR`, "...remov(ing) unneeded /./ and ../dir sequences."
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 

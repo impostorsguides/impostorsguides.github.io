@@ -20,7 +20,7 @@ While we don't seem to be relying on any of these facts in the case of RBENV, ea
 
 ### Aside- using ChatGPT as a last resort
 
-Sometimes I find that the questions I want to ask aren't a good fit for StackOverflow, which [has a very specific format](https://stackoverflow.com/help/how-to-ask){:target="_blank" rel="noopener"} that they want you to use when asking your questions.  This might be because my question takes the form of "What are the pros and cons of X?", which can be interpreted as being opinion-based.  Or they might take the form of "Why was X originally done in Y way?", which is how my question above was interpreted.  StackOverflow wants questions that are likely to have objective, clear-cut answers.  With other types of questions, there didn't use to be a great alternative.  Quora would have been the closest thing that *I* could think of, but I'd never ask a question on their because their interface has way too many ads, and also the quality of answers is just too low.
+Sometimes I find that the questions I want to ask aren't a good fit for StackOverflow, which [has a very specific format](https://stackoverflow.com/help/how-to-ask){:target="_blank" rel="noopener" } that they want you to use when asking your questions.  This might be because my question takes the form of "What are the pros and cons of X?", which can be interpreted as being opinion-based.  Or they might take the form of "Why was X originally done in Y way?", which is how my question above was interpreted.  StackOverflow wants questions that are likely to have objective, clear-cut answers.  With other types of questions, there didn't use to be a great alternative.  Quora would have been the closest thing that *I* could think of, but I'd never ask a question on their because their interface has way too many ads, and also the quality of answers is just too low.
 
 I'm starting to think that ChatGPT might be a decent alternative.  *It's not perfect* by any means, but the answers I've pulled from it so far have been detailed and appear to be directionally accurate.  It's still important to verify whether the specific claims it makes are actually correct (as I'll illustrate in the next aside), but I feel like that's something we should be doing anyway, even with answers from humans.  I plan on using ChatGPT as a backstop if I get stuck on subsequent questions while writing this post, if only to give me ideas for what directions to look in when I get stuck.
 
@@ -39,13 +39,13 @@ And the answer it gave was:
   <img src="/assets/images/chat-gpt-why-arent-files-executable-by-default.png" width="70%" alt="Asking ChatGPT why files aren't executable by their creator until `chmod` is run.">
 </p>
 
-I wanted to verify the statement `When a new file is created, it inherits the default permissions of the directory it was created in...`, so I did an experiment.  I made a directory, verified that its permissions were such that the user who created it could "execute" it, and then created a file inside that directory.  But that file was not, by default, executable by its creator.  That implies the ChatGPT statement was incorrect.  So I Googled `do unix files inherit the permissions of a directory`, and got [this link](https://archive.ph/uQX9j#selection-1631.0-1645.117){:target="_blank" rel="noopener"} as the first result:
+I wanted to verify the statement `When a new file is created, it inherits the default permissions of the directory it was created in...`, so I did an experiment.  I made a directory, verified that its permissions were such that the user who created it could "execute" it, and then created a file inside that directory.  But that file was not, by default, executable by its creator.  That implies the ChatGPT statement was incorrect.  So I Googled `do unix files inherit the permissions of a directory`, and got [this link](https://archive.ph/uQX9j#selection-1631.0-1645.117){:target="_blank" rel="noopener" } as the first result:
 
 <p style="text-align: center">
   <img src="/assets/images/file-permissions-inheritance-in-unix-1.png" width="70%" alt="Confirming that ChatGPT was not, in fact, correct about UNIX file permissions inheritance.">
 </p>
 
-This is confirmed by [this StackOverflow post](https://web.archive.org/web/20230129173431/https://superuser.com/questions/264383/how-to-set-file-permissions-so-that-new-files-inherit-same-permissions){:target="_blank" rel="noopener"}:
+This is confirmed by [this StackOverflow post](https://web.archive.org/web/20230129173431/https://superuser.com/questions/264383/how-to-set-file-permissions-so-that-new-files-inherit-same-permissions){:target="_blank" rel="noopener" }:
 
 <p style="text-align: center">
   <img src="/assets/images/file-permissions-inheritance-in-unix-2.png" width="50%" alt="More confirmation that ChatGPT was not, in fact, correct about UNIX file permissions inheritance.">
@@ -62,7 +62,7 @@ As an experiment, I try asking ChatGPT for confirmation of this theory:
 <!-- ChatGPT link- https://chat.openai.com/chat/1a2694aa-d446-46b0-a1dd-f40d24377efb -->
 
 <center>
-  <a target="_blank" href="/assets/images/chat-gpt-why-change-shebang.png">
+  <a target="_blank" rel="noopener" href="/assets/images/chat-gpt-why-change-shebang.png">
     <img src="/assets/images/chat-gpt-why-change-shebang.png" width="90%" style="border: 1px solid black; padding: 0.5em" alt="Asking ChatGPT why RBENV changed their shebang from `ruby-local-exec` to `ruby`.">
   </a>
 </center>
@@ -115,13 +115,13 @@ total 0
 
 This implies that the `foo/bar` file did not inherit its permissions from its parent directory, and that the ChatGPT statement was incorrect.
 
-For added confirmation, I Googled `do unix files inherit the permissions of a directory`, and got [this link](https://web.archive.org/web/20230219234547/https://info.nrao.edu/computing/guide/file-access-and-archiving/unix-file-permissions){:target="_blank" rel="noopener"} as the first result:
+For added confirmation, I Googled `do unix files inherit the permissions of a directory`, and got [this link](https://web.archive.org/web/20230219234547/https://info.nrao.edu/computing/guide/file-access-and-archiving/unix-file-permissions){:target="_blank" rel="noopener" } as the first result:
 
 <p style="text-align: center">
   <img src="/assets/images/file-permissions-inheritance-in-unix-1.png" width="90%" alt="Confirming that ChatGPT was not, in fact, correct about UNIX file permissions inheritance.">
 </p>
 
-This is confirmed by [this StackOverflow post](https://web.archive.org/web/20230129173431/https://superuser.com/questions/264383/how-to-set-file-permissions-so-that-new-files-inherit-same-permissions){:target="_blank" rel="noopener"}:
+This is confirmed by [this StackOverflow post](https://web.archive.org/web/20230129173431/https://superuser.com/questions/264383/how-to-set-file-permissions-so-that-new-files-inherit-same-permissions){:target="_blank" rel="noopener" }:
 
 <p style="text-align: center">
   <img src="/assets/images/file-permissions-inheritance-in-unix-2.png" width="80%" alt="More confirmation that ChatGPT was not, in fact, correct about UNIX file permissions inheritance.">
@@ -135,7 +135,7 @@ So lesson learned- we can't trust ChatGPT implicitly.
 
 Prior to this change, did RBENV use the Ruby version in the directory from which it was run, *regardless* of what the Ruby version was in the target directory?  To find out, roll back my RBENV and do an experiment.
 
-I `cd` into my RBENV **installation directory** (i.e. `~/.rbenv`), and verify that it is a git repository by running `ls -la` and searching for the `.git` hidden directory.  Then I get the commit SHA from [this link](https://github.com/rbenv/rbenv/pull/299){:target="_blank" rel="noopener"}, which I see is SHA `e0b8938fef05dd6d08322e113015c51e79c70291`.  I then run `git checkout e0b8938fef05dd6d08322e113015c51e79c70291` to roll back my installed version to the commit which introduced this change.
+I `cd` into my RBENV **installation directory** (i.e. `~/.rbenv`), and verify that it is a git repository by running `ls -la` and searching for the `.git` hidden directory.  Then I get the commit SHA from [this link](https://github.com/rbenv/rbenv/pull/299){:target="_blank" rel="noopener" }, which I see is SHA `e0b8938fef05dd6d08322e113015c51e79c70291`.  I then run `git checkout e0b8938fef05dd6d08322e113015c51e79c70291` to roll back my installed version to the commit which introduced this change.
 
 Next, in my scratch directory (`~/Workspace/OpenSource`), **I open a new terminal tab**.  This way I'm still in my same directory, but opening the new tab caused my `~/.zshrc` (where I invoke `rbenv init`) to be re-run.  This ensures I'm now using the version of RBENV that I just checked out (i.e. the version corresponding to SHA `e0b8938fef05dd6d08322e113015c51e79c70291`).
 
@@ -148,7 +148,7 @@ ruby_version = `rbenv version`
 puts "Ruby version: #{ruby_version}"
 ```
 
-The `\`` backtick symbols surrounding `rbenv version` mean that we will run the `rbenv version` terminal command, and store the results in the variable named `ruby_version`.  This process is sometimes called [shelling out](https://stackoverflow.com/a/28655406/2143275){:target="_blank" rel="noopener"} to a sub-process.
+The `\`` backtick symbols surrounding `rbenv version` mean that we will run the `rbenv version` terminal command, and store the results in the variable named `ruby_version`.  This process is sometimes called [shelling out](https://stackoverflow.com/a/28655406/2143275){:target="_blank" rel="noopener" } to a sub-process.
 
 I then copy the above `script` file from `foo/` into `bar/`, so an identical file exists in each new directory.  When I run `./script` from within `foo/`, followed by `../bar/script` (also from within `foo/`), I see:
 
@@ -192,7 +192,7 @@ This time, the version numbers are the same- `2.7.5`!  Also, the source of the v
 
 ## Extra credit: the `ruby-local-exec` shebang
 
-There's something here I still don't understand, specifically that 2nd sentence in the description of [PR # 299](https://github.com/rbenv/rbenv/pull/299){:target="_blank" rel="noopener"}:
+There's something here I still don't understand, specifically that 2nd sentence in the description of [PR # 299](https://github.com/rbenv/rbenv/pull/299){:target="_blank" rel="noopener" }:
 
 ```
 It should, in effect, remove the need for the ruby-local-exec shebang line.
@@ -220,7 +220,7 @@ I type "ruby-local-exec" in Github's search field while inside the Github reposi
 
 
 <center>
-  <a target="_blank" href="/assets/images/ruby-local-exec-search.png">
+  <a target="_blank" rel="noopener" href="/assets/images/ruby-local-exec-search.png">
     <img src="/assets/images/ruby-local-exec-search.png" width="100%" alt="Searching Github for the string 'ruby-local-exec'." style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
@@ -228,7 +228,7 @@ I type "ruby-local-exec" in Github's search field while inside the Github reposi
 I'm taken to a search results page, which (among other things) indicates that Github found 6 commits with this string present:
 
 <center>
-  <a target="_blank" href="/assets/images/search-results-for-ruby-local-exec.png">
+  <a target="_blank" rel="noopener" href="/assets/images/search-results-for-ruby-local-exec.png">
     <img src="/assets/images/search-results-for-ruby-local-exec.png" width="100%" alt="Github Search results for the string 'ruby-local-exec'." style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
@@ -237,18 +237,18 @@ I click on "Commits" to see which commits those were.  From there, I see a list 
 
 
 <center>
-  <a target="_blank" href="/assets/images/search-results-for-ruby-local-exec-2.png">
+  <a target="_blank" rel="noopener" href="/assets/images/search-results-for-ruby-local-exec-2.png">
   <img src="/assets/images/search-results-for-ruby-local-exec-2.png" width="100%" alt="Github Search results for the string 'ruby-local-exec'." style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
 
-[The commit](https://github.com/rbenv/rbenv/commit/1411fa5a1624ca5eeb5582897373c58a715fe2d2){:target="_blank" rel="noopener"} labeled "Add experimental `ruby-local-exec`" looks promising, so I click on that.
+[The commit](https://github.com/rbenv/rbenv/commit/1411fa5a1624ca5eeb5582897373c58a715fe2d2){:target="_blank" rel="noopener" } labeled "Add experimental `ruby-local-exec`" looks promising, so I click on that.
 
 From there, I'm taken to a list of files, which (in the case of this PR) is just one file- the one we're looking for (`bin/ruby-local-exec`):
 
 
 <center>
-  <a target="_blank" href="/assets/images/ruby-local-exec-commit.png">
+  <a target="_blank" rel="noopener" href="/assets/images/ruby-local-exec-commit.png">
     <img src="/assets/images/ruby-local-exec-commit.png" width="100%" alt="The original commit for the 'ruby-local-exec' file." style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
@@ -259,7 +259,7 @@ Great, so we finally have confirmation that `ruby-local-exec` was indeed a file 
 
 Now that we know the file existed, we can read its code to answer this question.
 
-**However**, we have to pick which version of the file to read, because it appears that the code underwent some changes over its lifetime.  When [the file was first committed](https://github.com/rbenv/rbenv/commit/1411fa5a1624ca5eeb5582897373c58a715fe2d2){:target="_blank" rel="noopener"}, it looked like this:
+**However**, we have to pick which version of the file to read, because it appears that the code underwent some changes over its lifetime.  When [the file was first committed](https://github.com/rbenv/rbenv/commit/1411fa5a1624ca5eeb5582897373c58a715fe2d2){:target="_blank" rel="noopener" }, it looked like this:
 
 ```
 #!/usr/bin/env bash
@@ -287,7 +287,7 @@ cd "$cwd"
 exec ruby "$@"
 ```
 
-And [by the time the `if`-block which replaced it was introduced](https://github.com/rbenv/rbenv/pull/299/commits){:target="_blank" rel="noopener"}, it looked like this:
+And [by the time the `if`-block which replaced it was introduced](https://github.com/rbenv/rbenv/pull/299/commits){:target="_blank" rel="noopener" }, it looked like this:
 
 ```
 #!/usr/bin/env bash
@@ -365,12 +365,12 @@ While trying to answer this question,
 
 ## Why the switch from `.rbenv-version` to `.ruby-version`?
 
-[The discussion in PR 298](https://github.com/rbenv/rbenv/pull/298){:target="_blank" rel="noopener"} references a file named `.rbenv-version`, which is of course different from the `.ruby-version` file we've previously discussed.  My guess is that, at some point, the RBENV core team switched from a naming convention of `.rbenv-version` to `.ruby-version`, in order to be more inter-operable with other Ruby version managers.
+[The discussion in PR 298](https://github.com/rbenv/rbenv/pull/298){:target="_blank" rel="noopener" } references a file named `.rbenv-version`, which is of course different from the `.ruby-version` file we've previously discussed.  My guess is that, at some point, the RBENV core team switched from a naming convention of `.rbenv-version` to `.ruby-version`, in order to be more inter-operable with other Ruby version managers.
 
-A quick Github search in the RBENV repo for `".rbenv-version" ".ruby-version"` (so that I can find PRs which contain both terms) yields 8 results, of which [this PR](https://github.com/rbenv/rbenv/pull/302){:target="_blank" rel="noopener"} is one.  This quote in particular stands out among the comments:
+A quick Github search in the RBENV repo for `".rbenv-version" ".ruby-version"` (so that I can find PRs which contain both terms) yields 8 results, of which [this PR](https://github.com/rbenv/rbenv/pull/302){:target="_blank" rel="noopener" } is one.  This quote in particular stands out among the comments:
 
 <center>
-  <a target="_blank" href="/assets/images/switch-rbenv-version-to-ruby-version.png">
+  <a target="_blank" rel="noopener" href="/assets/images/switch-rbenv-version-to-ruby-version.png">
     <img src="/assets/images/switch-rbenv-version-to-ruby-version.png" width="90%" style="border: 1px solid black; padding: 0.5em" alt="Comments discussing the support of the '.ruby-version' filename over '.rbenv-version'." >
   </a>
 </center>
@@ -389,7 +389,7 @@ However, when I search my local version of the codebase for `.rbenv-version`, no
 
 ## Please don't do what I did here
 
-While searching Github for answers to the above, I actually came across [a post of mine](https://github.com/rbenv/rbenv/issues/1173){:target="_blank" rel="noopener"} on this same repository from 2019, where I asked this exact same question!
+While searching Github for answers to the above, I actually came across [a post of mine](https://github.com/rbenv/rbenv/issues/1173){:target="_blank" rel="noopener" } on this same repository from 2019, where I asked this exact same question!
 
 I only vaguely remember posting this, but I remember the person who answered me was much nicer and more detailed in his answer than he needed to be.  In retrospect, I'm a bit embarrassed that I posted this question instead of searching through the git history.  If everyone did what I did, open-source maintainers would be overwhelmed and would never get anything done.  I definitely don't recommend that you do what I did- instead, learn from my mistakes.  Github is not a 2nd StackOverflow.
 
@@ -501,7 +501,7 @@ exec ruby "$@"
 
 -------------------
 
-[RBENV's README on Github](https://github.com/rbenv/rbenv/tree/c4395e58201966d9f90c12bd6b7342e389e7a4cb/){:target="_blank" rel="noopener"} could help inform that decision.
+[RBENV's README on Github](https://github.com/rbenv/rbenv/tree/c4395e58201966d9f90c12bd6b7342e389e7a4cb/){:target="_blank" rel="noopener" } could help inform that decision.
 
 A couple of possibilities stand out:
 

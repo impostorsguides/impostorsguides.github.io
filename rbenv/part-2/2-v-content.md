@@ -24,7 +24,7 @@ bash-3.2$ rbenv version
 
 Now let's move on to the test file.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version.bats){:target="_blank" rel="noopener" }
 
 ### "Installing" a test Ruby version
 
@@ -108,7 +108,7 @@ The line:
 cat > ".ruby-version" <<<"1.9.3"
 ```
 
-...says: "Read from STDIN and print what you receive to the file `.ruby-version`.  At the same time, send the string "1.9.3" to STDIN."  The line `<<<"1.9.3"` is called a herestring, and is [a way of sending text to `stdin`](https://web.archive.org/web/20220605071257/https://askubuntu.com/questions/678915/whats-the-difference-between-and-in-bash){:target="_blank" rel="noopener"}.
+...says: "Read from STDIN and print what you receive to the file `.ruby-version`.  At the same time, send the string "1.9.3" to STDIN."  The line `<<<"1.9.3"` is called a herestring, and is [a way of sending text to `stdin`](https://web.archive.org/web/20220605071257/https://askubuntu.com/questions/678915/whats-the-difference-between-and-in-bash){:target="_blank" rel="noopener" }.
 
 ### When the origin is RBENV's global Ruby file
 
@@ -144,9 +144,9 @@ I create this test and run it to see if it passes:
 }
 ```
 
-It does indeed pass, so I create [a PR to add this test](https://github.com/rbenv/rbenv/pull/1456){:target="_blank" rel="noopener"}, and a few days later the core team merges it.
+It does indeed pass, so I create [a PR to add this test](https://github.com/rbenv/rbenv/pull/1456){:target="_blank" rel="noopener" }, and a few days later the core team merges it.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version){:target="_blank" rel="noopener" }
 
 Now on to the code itself.
 

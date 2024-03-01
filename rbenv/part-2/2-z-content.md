@@ -1,6 +1,6 @@
 First, we'll look at the summary comments.
 
-## ["Summary" comments](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-origin#L2){:target="_blank" rel="noopener"}
+## ["Summary" comments](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-origin#L2){:target="_blank" rel="noopener" }
 
 ```
 # Summary: Explain how the current Ruby version is set
@@ -36,7 +36,7 @@ So `rbenv version-origin` returns the source file where the current Ruby version
 
 Next, the tests.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-origin.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/version-origin.bats){:target="_blank" rel="noopener" }
 
 ### Setup
 
@@ -69,7 +69,7 @@ Our first test is:
 - It then runs the `version-origin` command.
 - Lastly, it asserts that this non-existent global "version" file's path is returned anyway.
 
-[As we discovered](https://github.com/rbenv/rbenv/discussions/1510){:target="_blank" rel="noopener"} when reading the command for `rbenv version-file`, the goal of returning the origin is to tell the user where the Ruby version is **expected to be set**, not where it **is being set**.  That's why this command returns the global filepath "even if it doesn't exist".
+[As we discovered](https://github.com/rbenv/rbenv/discussions/1510){:target="_blank" rel="noopener" } when reading the command for `rbenv version-file`, the goal of returning the origin is to tell the user where the Ruby version is **expected to be set**, not where it **is being set**.  That's why this command returns the global filepath "even if it doesn't exist".
 
 ### When the global version file exists
 
@@ -161,7 +161,7 @@ This test is similar to one we saw in the previous file's test suite.
 
 It looks like we're passing an argument (i.e. the string "env") to `version-origin` in this test.  I'm not sure what that is.  The argument doesn't appear to be used anywhere, nor does "$1" appear anywhere in the command itself.
 
-I took a look at [the PR](https://github.com/rbenv/rbenv/pull/852/files){:target="_blank" rel="noopener"} which introduced this line of code, and it looks like it might have been a copy-paste error, since the previous implementation of the test did not include an argument to the invocation of the command.
+I took a look at [the PR](https://github.com/rbenv/rbenv/pull/852/files){:target="_blank" rel="noopener" } which introduced this line of code, and it looks like it might have been a copy-paste error, since the previous implementation of the test did not include an argument to the invocation of the command.
 
 ### When the user attempts to pass the `RBENV_VERSION_ORIGIN` var
 
@@ -178,7 +178,7 @@ This test just asserts that the `version-origin` command ignores any value of `R
 
 That's it for specs, now onto the code:
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-origin){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-version-origin){:target="_blank" rel="noopener" }
 
 Let's get the usual suspects out of the way first:
 
@@ -200,7 +200,7 @@ unset RBENV_VERSION_ORIGIN
 
 Here we explicitly unset any previously-set values for `RBENV_VERSION_ORIGIN`, such as those passed into the command by the caller.
 
-This line of code was added [in this PR](https://github.com/rbenv/rbenv/commit/4fde4ecbaf1e1f3082c9275a6f244c70527ad497){:target="_blank" rel="noopener"}, and there's no mention of an issue or anything which may have prompted its addition.
+This line of code was added [in this PR](https://github.com/rbenv/rbenv/commit/4fde4ecbaf1e1f3082c9275a6f244c70527ad497){:target="_blank" rel="noopener" }, and there's no mention of an issue or anything which may have prompted its addition.
 
 ### Running hooks
 

@@ -12,7 +12,7 @@ According to the README, `RBENV_HOOK_PATH` is a:
 Colon-separated list of paths searched for rbenv hooks.
 ```
 
-This code adds `${RBENV_ROOT}/rbenv.d` to the end of the current value of `RBENV_HOOK_PATH`, if any.  According to [the README file](https://github.com/rbenv/rbenv#environment-variables){:target="_blank" rel="noopener"}, `RBENV_HOOK_PATH` is the environment variable which controls where RBENV searches for [hooks](https://github.com/rbenv/rbenv/wiki/Authoring-plugins#rbenv-hooks){:target="_blank" rel="noopener"}.  Hooks are similar to plugins, in that they both update functionality within RBENV.  But they differ in that:
+This code adds `${RBENV_ROOT}/rbenv.d` to the end of the current value of `RBENV_HOOK_PATH`, if any.  According to [the README file](https://github.com/rbenv/rbenv#environment-variables){:target="_blank" rel="noopener" }, `RBENV_HOOK_PATH` is the environment variable which controls where RBENV searches for [hooks](https://github.com/rbenv/rbenv/wiki/Authoring-plugins#rbenv-hooks){:target="_blank" rel="noopener" }.  Hooks are similar to plugins, in that they both update functionality within RBENV.  But they differ in that:
 
 - Plugins expose entirely new RBENV commands (i.e. `rbenv foo`).
 - Hooks modify existing commands.
@@ -59,7 +59,7 @@ drwxr-xr-x  4 myusername  staff   128 Sep  4 10:13 ..
 -rw-r--r--  1 myusername  staff  1427 Sep  4 10:13 rubygems_plugin.rb
 ```
 
-I Google "gem-rehash", and the first thing I find is [this deprecated Github repo](https://github.com/rbenv/rbenv-gem-rehash){:target="_blank" rel="noopener"}.  The description says:
+I Google "gem-rehash", and the first thing I find is [this deprecated Github repo](https://github.com/rbenv/rbenv-gem-rehash){:target="_blank" rel="noopener" }.  The description says:
 
 > Never run rbenv rehash again. This rbenv plugin automatically runs rbenv rehash every time you install or uninstall a gem.
 >
@@ -92,7 +92,7 @@ RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${RBENV_ROOT}/rbenv.d"
 
 ### The `.d` extension in `rbenv.d`
 
-The `.d` in `rbenv.d` appears to be a file extension, but it's being used on a directory.  I Google `what does ".d" stand for bash`, and the first result I see is [this StackOverflow post](https://web.archive.org/web/20220619172419/https://unix.stackexchange.com/questions/4029/what-does-the-d-stand-for-in-directory-names){:target="_blank" rel="noopener"}:
+The `.d` in `rbenv.d` appears to be a file extension, but it's being used on a directory.  I Google `what does ".d" stand for bash`, and the first result I see is [this StackOverflow post](https://web.archive.org/web/20220619172419/https://unix.stackexchange.com/questions/4029/what-does-the-d-stand-for-in-directory-names){:target="_blank" rel="noopener" }:
 
 > The .d suffix here means directory. Of course, this would be unnecessary as Unix doesn't require a suffix to denote a file type but in that specific case, something was necessary to disambiguate the commands (/etc/init, /etc/rc0, /etc/rc1 and so on) and the directories they use (/etc/init.d, /etc/rc0.d, /etc/rc1.d, ...)
 >
@@ -166,7 +166,7 @@ Hello world
 10
 ```
 
-So far, so good.  Our hook is getting registered by [this block of code](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-exec#L36){:target="_blank" rel="noopener"}, and the call to `source "$script"` is what causes our `foobar.bash` script to execute. This happens one time, because the parent directory of `foobar.bash` is only added to `RBENV_HOOK_PATH` once.
+So far, so good.  Our hook is getting registered by [this block of code](https://github.com/rbenv/rbenv/blob/master/libexec/rbenv-exec#L36){:target="_blank" rel="noopener" }, and the call to `source "$script"` is what causes our `foobar.bash` script to execute. This happens one time, because the parent directory of `foobar.bash` is only added to `RBENV_HOOK_PATH` once.
 
 Now, I comment out the `if` check:
 
@@ -201,7 +201,7 @@ RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib
 ```
 This just means we're further updating RBENV_HOOK_PATH to include more `rbenv.d` directories, including those inside `/usr/local/etc`, `/etc`, as well as `/usr/lib/rbenv/hooks`.  These directories may or may not even exist on the user's machine (for example, I don't currently have a `/usr/local/etc/rbenv.d` directory on mine).  They're just directories where the user *might* have installed additional hooks.
 
-Why these specific directories?  They appear to be a part of a convention known as the [Filesystem Hierarchy Standard](https://web.archive.org/web/20230326013203/https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard){:target="_blank" rel="noopener"}, or the conventional layout of directories on a UNIX system.  Using this convention means that developers on UNIX machines can trust that the files they're looking for are likely to live in certain places.
+Why these specific directories?  They appear to be a part of a convention known as the [Filesystem Hierarchy Standard](https://web.archive.org/web/20230326013203/https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard){:target="_blank" rel="noopener" }, or the conventional layout of directories on a UNIX system.  Using this convention means that developers on UNIX machines can trust that the files they're looking for are likely to live in certain places.
 
 For example, the two main directories we're using in this line of code are `/usr/` and `/etc/`.  The FHS describes these directories as follows:
 
@@ -210,7 +210,7 @@ For example, the two main directories we're using in this line of code are `/usr
     - `/usr/local/`- "Tertiary hierarchy for local data, specific to this host. Typically has further subdirectories (e.g., bin, lib, share)."
     - `/usr/lib/`- "Libraries for the binaries in /usr/bin and /usr/sbin."
 
-[This link here](https://archive.is/hXKpL){:target="_blank" rel="noopener"} contains more concrete examples.  It mentions that it refers to the FHS for Linux, not for UNIX, but [this StackOverflow post](https://web.archive.org/web/20150928165243/http://unix.stackexchange.com/questions/98751/is-the-filesystem-hierarchy-standard-a-unix-standard-or-a-gnu-linux-standard/){:target="_blank" rel="noopener"} says that both Linux and UNIX follow the same FHS, so I think we're OK.  The site says these directories might contain the following types of files:
+[This link here](https://archive.is/hXKpL){:target="_blank" rel="noopener" } contains more concrete examples.  It mentions that it refers to the FHS for Linux, not for UNIX, but [this StackOverflow post](https://web.archive.org/web/20150928165243/http://unix.stackexchange.com/questions/98751/is-the-filesystem-hierarchy-standard-a-unix-standard-or-a-gnu-linux-standard/){:target="_blank" rel="noopener" } says that both Linux and UNIX follow the same FHS, so I think we're OK.  The site says these directories might contain the following types of files:
 
 #### /etc
 
@@ -236,7 +236,7 @@ It also notes that `/etc` should only contain static files; no executable / bina
 > This is used for all packages which are compiled manually from the source by the system administrator.
 This directory has its own hierarchy with all the bin, sbin and lib folders which contain the binaries and applications of the compiled software.
 
-In summary, though I can't yet quote chapter-and-verse of what each folder's purpose is on a UNIX machine, for now it's enough to know that there's a concept called the Filesystem Hierarchy Standard, and that it specifies the purposes of the different folders in your UNIX system.  I can always refer to the official docs if I need to look up this information.  The homepage of the standard is [here](https://www.pathname.com/fhs/){:target="_blank" rel="noopener"}, and the document containing the standard is [here](https://www.pathname.com/fhs/pub/fhs-2.3.pdf){:target="_blank" rel="noopener"}.
+In summary, though I can't yet quote chapter-and-verse of what each folder's purpose is on a UNIX machine, for now it's enough to know that there's a concept called the Filesystem Hierarchy Standard, and that it specifies the purposes of the different folders in your UNIX system.  I can always refer to the official docs if I need to look up this information.  The homepage of the standard is [here](https://www.pathname.com/fhs/){:target="_blank" rel="noopener" }, and the document containing the standard is [here](https://www.pathname.com/fhs/pub/fhs-2.3.pdf){:target="_blank" rel="noopener" }.
 
 <div style="margin: 2em; border-bottom: 1px solid grey"></div>
 
@@ -261,7 +261,7 @@ export RBENV_HOOK_PATH
 
 This syntax is definitely parameter expansion, but I haven't seen the `#:` syntax before.
 
-I search [the GNU docs](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener"} for `#:`, since it looks like a specific kind of expansion pattern, but I don't see those two characters used together anywhere in the docs.  This is definitely parameter expansion, though.
+I search [the GNU docs](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html){:target="_blank" rel="noopener" } for `#:`, since it looks like a specific kind of expansion pattern, but I don't see those two characters used together anywhere in the docs.  This is definitely parameter expansion, though.
 
 Maybe this is just another example of the `#` pattern that we've already seen before, for instance when we saw `parameter#/*`?  In that case, we were removing any leading `/` character from the start of the parameter.  Maybe here we're doing the same, but with the `:` character instead?
 

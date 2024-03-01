@@ -2,7 +2,7 @@
   <h1 class="post-title"><code>if</code>-blocks</h1>
 </header>
 
-<p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L6" target="_blank">Next line of code</a>:</p>
+<p><a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L6" target="_blank" rel="noopener">Next line of code</a>:</p>
 
 <pre><code>if [ "$program" = "ruby" ]; then
   ...
@@ -148,9 +148,9 @@ $ </code></pre>
 
 <H2>Equals signs- single vs. double</H2>
 
-<p>One thing I notice in <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L6" target="_blank">this line of code</a> is the use of single-equals as a comparison check. In Ruby, single-equals are used for assignments, and double-equals are used for comparisons. This doesn't appear to be the case in Bash, at least not inside the <code>[ ... ]</code> brackets.</p>
+<p>One thing I notice in <a href="https://gist.github.com/impostorsguides/bec6a1c0f520f703c6db259a472596c4#file-bundle-shim-L6" target="_blank" rel="noopener">this line of code</a> is the use of single-equals as a comparison check. In Ruby, single-equals are used for assignments, and double-equals are used for comparisons. This doesn't appear to be the case in Bash, at least not inside the <code>[ ... ]</code> brackets.</p>
 
-<p>I Google "double vs single equals bash", and the first result that appears is <a href="https://unix.stackexchange.com/questions/72039/whats-the-difference-between-single-and-double-equal-signs-in-shell-compari" target="_blank">this StackOverflow post</a>. I learn that the following are all equivalent in Bash:</p>
+<p>I Google "double vs single equals bash", and the first result that appears is <a href="https://unix.stackexchange.com/questions/72039/whats-the-difference-between-single-and-double-equal-signs-in-shell-compari" target="_blank" rel="noopener">this StackOverflow post</a>. I learn that the following are all equivalent in Bash:</p>
 
 <pre><code>[[ $x == "$y" ]]
 [[ $x = "$y" ]]
@@ -166,7 +166,7 @@ test "$a" == "$b"</code></pre>
 
 <p>In the above examples from StackOverflow, I notice that some of the code uses single-brackets (<code>[ ... ]</code>), and some use double-brackets (<code>[[ ... ]]</code>). I'm curious if there's any meaningful difference between these two, so I Google "single vs double-brackets bash".</p>
 
-<p>The first result I find is <a href="https://unix.stackexchange.com/questions/49007/when-should-i-use-vs-in-bash-single-vs-double-brackets" target="_blank">a StackOverflow post</a> titled "When should I use <code>[</code> vs <code>[[</code> in Bash (single vs double brackets)?".  The answers say that the single-bracket <code>[ ... ]</code> syntax is part of the POSIX standard, and is therefore more portable to other shells.</p>
+<p>The first result I find is <a href="https://unix.stackexchange.com/questions/49007/when-should-i-use-vs-in-bash-single-vs-double-brackets" target="_blank" rel="noopener">a StackOverflow post</a> titled "When should I use <code>[</code> vs <code>[[</code> in Bash (single vs double brackets)?".  The answers say that the single-bracket <code>[ ... ]</code> syntax is part of the POSIX standard, and is therefore more portable to other shells.</p>
 
 <blockquote><p>Only <code>[</code> (<code>test</code>) is in POSIX. You won't find <code>[[</code> specified in POSIX except as a reserved word that implementations may use. Bash does indeed use <code>[[</code> as an enhanced <code>test</code> operator, and if you are writing scripts targeted specifically for bash, always use <code>[[</code> because it is much more powerful than <code>[</code> and safer to use as well. If, however, you are targeting POSIX sh, you need to use [, and make sure to quote arguments and not use more than 4 arguments to <code>[</code>.</p></blockquote>
 
@@ -180,7 +180,7 @@ test "$a" == "$b"</code></pre>
 
 <p>The above answer made a big deal about the POSIX-compatitibility of <code>[</code> vs. <code>[[</code>.  But what even is POSIX?</p>
 
-<p>If we Google "What is POSIX", one of the results is <a href="https://web.archive.org/web/20240113054352/https://stackoverflow.com/questions/1780599/what-is-the-meaning-of-posix" target="_blank">another StackOverflow post</a>.  The top-rated answer from that post says:</p>
+<p>If we Google "What is POSIX", one of the results is <a href="https://web.archive.org/web/20240113054352/https://stackoverflow.com/questions/1780599/what-is-the-meaning-of-posix" target="_blank" rel="noopener">another StackOverflow post</a>.  The top-rated answer from that post says:</p>
 
 <blockquote>
   <p>POSIX is a family of standards, specified by the IEEE, to clarify and make uniform the application programming interfaces (and ancillary issues, such as command line shell utilities) provided by Unix-y operating systems.</p>

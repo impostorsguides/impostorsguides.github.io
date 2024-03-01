@@ -4,7 +4,7 @@ I see the following directories in the Github repo:
 
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-19mar2023-237pm.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-19mar2023-237pm.png">
     <img src="/assets/images/screenshot-19mar2023-237pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
@@ -17,7 +17,7 @@ Additionally, the last line in the shim file we just examined was the following:
 exec "/usr/local/bin/rbenv" exec "$program" "$@"
 ```
 
-This essentially boils down to `exec`'ing the `/usr/local/bin/rbenv` command.  The file `/usr/local/bin/rbenv` is a [symlink](https://web.archive.org/web/20221126123116/https://devdojo.com/devdojo/what-is-a-symlink){:target="_blank" rel="noopener"} to `/usr/local/Cellar/rbenv/1.2.0/bin`, which in turn is just a symlink to `/usr/local/Cellar/rbenv/1.2.0/libexec/rbenv`:
+This essentially boils down to `exec`'ing the `/usr/local/bin/rbenv` command.  The file `/usr/local/bin/rbenv` is a [symlink](https://web.archive.org/web/20221126123116/https://devdojo.com/devdojo/what-is-a-symlink){:target="_blank" rel="noopener" } to `/usr/local/Cellar/rbenv/1.2.0/bin`, which in turn is just a symlink to `/usr/local/Cellar/rbenv/1.2.0/libexec/rbenv`:
 
 ```
 $ ls -la /usr/local/bin/rbenv

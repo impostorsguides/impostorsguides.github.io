@@ -1,6 +1,6 @@
 Once again, let's start with the command's test file.
 
-## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/hooks.bats){:target="_blank" rel="noopener"}
+## [Tests](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/hooks.bats){:target="_blank" rel="noopener" }
 
 ### Sad path- running `hooks` without arguments
 
@@ -61,7 +61,7 @@ Lastly, we assert that:
 
 ## The `create_hook()` helper function
 
-This helper function comes from [the `test_helper` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash){:target="_blank" rel="noopener"} that we loaded at the start of this test file, and it looks like this:
+This helper function comes from [the `test_helper` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash){:target="_blank" rel="noopener" } that we loaded at the start of this test file, and it looks like this:
 
 ```
 create_hook() {
@@ -73,7 +73,7 @@ create_hook() {
 }
 ```
 
-We can see that the function has a dependency on the `RBENV_HOOK_PATH` env var.  Although the value of this env var is set [at the start of the `test_helper` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L20){:target="_blank" rel="noopener"}, we override it in our test.
+We can see that the function has a dependency on the `RBENV_HOOK_PATH` env var.  Although the value of this env var is set [at the start of the `test_helper` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L20){:target="_blank" rel="noopener" }, we override it in our test.
 
 The first two lines of this helper method do the following:
 
@@ -103,7 +103,7 @@ create_hook() {
 When I run this spec file with `bats test/hooks.bats`, I see `testlog` has been created and contains the following:
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-14mar2023-845am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-14mar2023-845am.png">
     <img src="/assets/images/screenshot-14mar2023-845am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
@@ -132,7 +132,7 @@ So the `0` in `! -t 0` represents a file descriptor.  And this condition says "e
 I was still a bit confused by this, so I plugged this block of code into ChatGPT:
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-23may2023-128pm.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-23may2023-128pm.png">
     <img src="/assets/images/screenshot-23may2023-128pm.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
@@ -201,12 +201,12 @@ So we've verified the following:
 As a final check, I look for how the `create_hook` function receives its input.  I search for other uses via the Github search field:
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-14mar2023-904am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-14mar2023-904am.png">
     <img src="/assets/images/screenshot-14mar2023-904am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
 
-The 3rd result in the above screenshot is for the test file `test/version-name.bats`.  On [this line of code](https://github.com/rbenv/rbenv/blob/d604acb78aeba583be95f08d45eeae430372beb9/test/version-name.bats#L34){:target="_blank" rel="noopener"}, I see:
+The 3rd result in the above screenshot is for the test file `test/version-name.bats`.  On [this line of code](https://github.com/rbenv/rbenv/blob/d604acb78aeba583be95f08d45eeae430372beb9/test/version-name.bats#L34){:target="_blank" rel="noopener" }, I see:
 
 ```
 create_hook version-name hello.bash <<SH
@@ -268,7 +268,7 @@ Here we do the following:
 
 - We create a hook for `rbenv exec` in the `rbenv.d` subdirectory of `RBENV_TEST_DIR`.
 - We also create a directory whose name is the value of the `$HOME` environment variable.
-- That value is set [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L19){:target="_blank" rel="noopener"}:
+- That value is set [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/test/test_helper.bash#L19){:target="_blank" rel="noopener" }:
 
 ```
 export HOME="${RBENV_TEST_DIR}/home"
@@ -321,7 +321,7 @@ The answer is that `bright.sh` had a symlink pointing to it called `world.bash`.
 
 With that question answered, let's move on to the command file itself, `libexec/rbenv-hooks`.
 
-## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-hooks){:target="_blank" rel="noopener"}
+## [Code](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-hooks){:target="_blank" rel="noopener" }
 
 By now, this first block of code is standard boilerplate for us:
 
@@ -399,10 +399,10 @@ Next block of code:
   fi
 ```
 
-This block of code `echo`s an error message to `STDERR` and returns a non-zero result if the `RBENV_NATIVE_EXT` contains a value.  We did a similar thing in [this line of the `rbenv` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L30){:target="_blank" rel="noopener"}.  For a refresher on why this was added, we can check out [the PR which introduced the change](https://web.archive.org/web/20220722202956/https://github.com/rbenv/rbenv/pull/528){:target="_blank" rel="noopener"}:
+This block of code `echo`s an error message to `STDERR` and returns a non-zero result if the `RBENV_NATIVE_EXT` contains a value.  We did a similar thing in [this line of the `rbenv` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L30){:target="_blank" rel="noopener" }.  For a refresher on why this was added, we can check out [the PR which introduced the change](https://web.archive.org/web/20220722202956/https://github.com/rbenv/rbenv/pull/528){:target="_blank" rel="noopener" }:
 
 <center>
-  <a target="_blank" href="/assets/images/screenshot-14mar2023-919am.png">
+  <a target="_blank" rel="noopener" href="/assets/images/screenshot-14mar2023-919am.png">
     <img src="/assets/images/screenshot-14mar2023-919am.png" width="90%" style="border: 1px solid black; padding: 0.5em">
   </a>
 </center>
@@ -421,7 +421,7 @@ if [ -z "$READLINK" ]; then
 fi
 ```
 
-This is another pattern we've seen before, again [in the `rbenv` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L32){:target="_blank" rel="noopener"}:
+This is another pattern we've seen before, again [in the `rbenv` file](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L32){:target="_blank" rel="noopener" }:
 
  - We check for a path to a command named `greadlink`, and also for a path to a command named `readlink`.
  - We take the first result we find (`| head -n1`), and we set the `READLINK` variable equal to that result.
@@ -486,9 +486,9 @@ Next line of code:
 IFS=: hook_paths=($RBENV_HOOK_PATH)
 ```
 
-We've seen something similar before, [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L23){:target="_blank" rel="noopener"} inside the `rbenv-commands` file:
+We've seen something similar before, [here](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv-commands#L23){:target="_blank" rel="noopener" } inside the `rbenv-commands` file:
 
-We set a new variable called `hook_paths` equal to an array created from splitting the string stored in `$RBENV_HOOK_PATH`, using `:` as the delimiter.  This is called "word splitting" in bash; more info [here](https://web.archive.org/web/20220713204204/https://www.gnu.org/software/bash/manual/html_node/Word-Splitting.html){:target="_blank" rel="noopener"}.  We'll end up with an array of individual directories, which we'll iterate over in the next block.
+We set a new variable called `hook_paths` equal to an array created from splitting the string stored in `$RBENV_HOOK_PATH`, using `:` as the delimiter.  This is called "word splitting" in bash; more info [here](https://web.archive.org/web/20220713204204/https://www.gnu.org/software/bash/manual/html_node/Word-Splitting.html){:target="_blank" rel="noopener" }.  We'll end up with an array of individual directories, which we'll iterate over in the next block.
 
 ### Iterating over the hook paths
 
@@ -504,7 +504,7 @@ done
 shopt -u nullglob
 ```
 
-We've seen `shopt -s nullglob` before, but as a reminder, [this StackExchange link](https://archive.ph/pAHiZ){:target="_blank" rel="noopener"} says this command sets a shell option so that "...filename globbing patterns that don't match any filenames are simply expanded to nothing rather than remaining unexpanded."
+We've seen `shopt -s nullglob` before, but as a reminder, [this StackExchange link](https://archive.ph/pAHiZ){:target="_blank" rel="noopener" } says this command sets a shell option so that "...filename globbing patterns that don't match any filenames are simply expanded to nothing rather than remaining unexpanded."
 
 So if `${hook_paths[@]}` doesn't match any actual directories, or `$path/$RBENV_COMMAND"/*.bash` doesn't match any filenames, we don't perform the code inside the `for` block.
 
@@ -518,7 +518,7 @@ And that's it for the `rbenv hooks` command!
 
 Hooks are 3rd-party libraries that you can install within RBENV, to add functionality to its existing commands.
 
-If we look back to our read-through of the `rbenv` file, we saw that part of that file's job was to [populate the `RBENV_HOOK_PATH` environment variable](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81-L91){:target="_blank" rel="noopener"} with various directories.  One of those directories is `~/.rbenv/rbenv.d/`.  This directory contains zero or more subdirectories whose names correspond to RBENV's commands (for example, `exec/`).  If we create a `.bash` script inside one of these directories, RBENV will treat it as a hook, and will execute that Bash script when running the command corresponding to that directory.
+If we look back to our read-through of the `rbenv` file, we saw that part of that file's job was to [populate the `RBENV_HOOK_PATH` environment variable](https://github.com/rbenv/rbenv/blob/c4395e58201966d9f90c12bd6b7342e389e7a4cb/libexec/rbenv#L81-L91){:target="_blank" rel="noopener" } with various directories.  One of those directories is `~/.rbenv/rbenv.d/`.  This directory contains zero or more subdirectories whose names correspond to RBENV's commands (for example, `exec/`).  If we create a `.bash` script inside one of these directories, RBENV will treat it as a hook, and will execute that Bash script when running the command corresponding to that directory.
 
 To learn more, let's make our own as an experiment.
 
