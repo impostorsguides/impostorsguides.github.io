@@ -22,45 +22,43 @@
 <p>The file is only 38 lines of code long:</p>
 
 <pre>
-<code>
-  #!/usr/bin/env ruby
+<code>#!/usr/bin/env ruby
 
-  # Quiet some warnings we see when running in warning mode:
-  # RUBYOPT=-w bundle exec sidekiq
-  $TESTING = false
-  
-  require_relative "../lib/sidekiq/cli"
-  
-  def integrate_with_systemd
-    return unless ENV["NOTIFY_SOCKET"]
-  
-    Sidekiq.configure_server do |config|
-      config.logger.info "Enabling systemd notification integration"
-      require "sidekiq/sd_notify"
-      config.on(:startup) do
-        Sidekiq::SdNotify.ready
-      end
-      config.on(:shutdown) do
-        Sidekiq::SdNotify.stopping
-      end
-      Sidekiq.start_watchdog if Sidekiq::SdNotify.watchdog?
+# Quiet some warnings we see when running in warning mode:
+# RUBYOPT=-w bundle exec sidekiq
+$TESTING = false
+
+require_relative "../lib/sidekiq/cli"
+
+def integrate_with_systemd
+  return unless ENV["NOTIFY_SOCKET"]
+
+  Sidekiq.configure_server do |config|
+    config.logger.info "Enabling systemd notification integration"
+    require "sidekiq/sd_notify"
+    config.on(:startup) do
+      Sidekiq::SdNotify.ready
     end
+    config.on(:shutdown) do
+      Sidekiq::SdNotify.stopping
+    end
+    Sidekiq.start_watchdog if Sidekiq::SdNotify.watchdog?
   end
-  
-  begin
-    cli = Sidekiq::CLI.instance
-    cli.parse
-  
-    integrate_with_systemd
-  
-    cli.run
-  rescue => e
-    raise e if $DEBUG
-    warn e.message
-    warn e.backtrace.join("\n")
-    exit 1
-  end
-</code>
+end
+
+begin
+  cli = Sidekiq::CLI.instance
+  cli.parse
+
+  integrate_with_systemd
+
+  cli.run
+rescue => e
+  raise e if $DEBUG
+  warn e.message
+  warn e.backtrace.join("\n")
+  exit 1
+end</code>
 </pre>
 
 <p>We'll probably need more than one post to cover all of this, so let's get started.</p>
