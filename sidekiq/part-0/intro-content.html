@@ -1,0 +1,75 @@
+<header class="post-header">
+  <h1 class="post-title">Introduction</h1>
+</header>
+
+<div>
+  <figure style="width: 100%; margin: 0 0 10px 25px">
+    <img src="/assets/images/sidekick.jpg" style="margin: auto" width="100%" alt="Image of two people kicking the air.">
+    <figcaption style="text-align: center;">Photo attribution <a href="/sidekiq/intro/#photo-attribution">here</a>.</figcaption>
+  </figure>
+</div>
+
+<p>I've become interested in learning how the <a href="https://en.wikipedia.org/wiki/Open-core_model" target="_blank" rel="nofollow">open-core business model</a> works.  In particular, I'm interested in how software engineer Mike Perham <a href="https://www.indiehackers.com/podcast/016-mike-perham-of-sidekiq" target="_blank" rel="nofollow">runs Sidekiq as a million-dollar business with no employees</a>.</p>
+
+<p>With that in mind, my next deep-dive into open-source codebases will be the free version of the Sidekiq gem.  My goal is to not only learn some Ruby coding best practices, but to learn how open-core libraries achieve the dual goal of making the core functionality free, while getting premium customers to pay a monthly fee for extra features.</p>
+
+<p>I've pulled down the latest code from <a href="https://github.com/sidekiq/sidekiq/" target="_blank" rel="nofollow">Sidekiq's Github repo</a>, and am currently pointing to commit # <code>7c41779ad6ea196d75c84a46a1df04405bb6202f</code>.  The entry point for this code base (aka the file which gets executed first) is <a href="https://github.com/sidekiq/sidekiq/blob/7c41779ad6ea196d75c84a46a1df04405bb6202f/bin/sidekiq" target="_blank" rel="nofollow">a script named <code>bin/sidekiq</code></a>, so that's the file I'll inspect first.</p>
+
+<h2>The file's code</h2>
+
+<p>Relative to the root project directory, the file we'll be reviewing first is <a href="https://github.com/sidekiq/sidekiq/blob/7c41779ad6ea196d75c84a46a1df04405bb6202f/bin/sidekiq" target="_blank" rel="nofollow"><code>bin/sidekiq</code></a>.</p>
+
+<p>The file is only 38 lines of code long:</p>
+
+<pre>
+<code>
+  #!/usr/bin/env ruby
+
+  # Quiet some warnings we see when running in warning mode:
+  # RUBYOPT=-w bundle exec sidekiq
+  $TESTING = false
+  
+  require_relative "../lib/sidekiq/cli"
+  
+  def integrate_with_systemd
+    return unless ENV["NOTIFY_SOCKET"]
+  
+    Sidekiq.configure_server do |config|
+      config.logger.info "Enabling systemd notification integration"
+      require "sidekiq/sd_notify"
+      config.on(:startup) do
+        Sidekiq::SdNotify.ready
+      end
+      config.on(:shutdown) do
+        Sidekiq::SdNotify.stopping
+      end
+      Sidekiq.start_watchdog if Sidekiq::SdNotify.watchdog?
+    end
+  end
+  
+  begin
+    cli = Sidekiq::CLI.instance
+    cli.parse
+  
+    integrate_with_systemd
+  
+    cli.run
+  rescue => e
+    raise e if $DEBUG
+    warn e.message
+    warn e.backtrace.join("\n")
+    exit 1
+  end
+</code>
+</pre>
+
+<p>We'll probably need more than one post to cover all of this, so let's get started.</p>
+
+<div id="photo-attribution">
+  <h4>Photo Attribution</h4>
+  <p>Title: "Men doing Sidekick"</p>
+  <p>Description: n/a</p>
+  <p>Author: photomania</p>
+  <p>Source: <a href="https://pixahive.com/photo/men-doing-sidekick/" target="_blank" rel="noopener">Pixahive</a></p>
+  <p>License: <a href="https://pixahive.com/photo/men-doing-sidekick/" target="_blank" rel="noopener">CC0 - Free to Use, Attribution Optional</a></p>
+</div>

@@ -1,0 +1,113 @@
+<header class="post-header">
+  <h1 class="post-title">The "sidekiq" executable file</h1>
+</header>
+
+
+<p>The first line of code in this file is:</p>
+
+<pre><code>#!/usr/bin/env ruby</code></pre>
+
+<h2>Shebang</h2>
+
+<p>This file is loaded into our <code>$PATH</code> environment variable by our Ruby version manager, which is how we're able to execute it simply by typing <code>sidekiq</code> in our terminal.  But the reason we don't have to preface the <code>sidekiq</code> command with the <code>ruby</code> command is because of this shebang at the top of the file, which tells the computer what kind of code this file contains, and therefore how to execute it.</p>
+
+<h2>Reducing Nose When Running In Warning Mode</h2>
+
+<p>Next block of code:</p>
+
+<pre><code># Quiet some warnings we see when running in warning mode:
+# RUBYOPT=-w bundle exec sidekiq
+$TESTING = false
+</code></pre>
+
+<p>The comment says that the purpose of the code <code>$TESTING = false</code> is to "(q)uiet some warnings we see when running in warning mode".  But what is "warning mode", and how do we enable it?</p>
+
+<p>In this case, warning mode is enabled by running <code>bundle exec sidekiq</code> with the <code>RUBYOPT</code> variable set to include <code>=-w</code>.  The <code>man ruby</code> page documents the <code>RUBYOPT</code> variable:</p>
+
+<pre><code>RUBYOPT    Additional Ruby options.
+
+e.g.
+      RUBYOPT="-w -Ke"
+
+Note that RUBYOPT can contain only -d, -E, -I, -K, -r, -T, -U, -v, -w, -W, --debug, --disable-FEATURE and --enable-FEATURE.
+</code></pre>
+
+<p>IMHO, this documentation isn't super-thorough: it just says "Additional Ruby options", which... great.</p>
+
+<p>After Googling around a bit, I found <a href="https://archive.ph/Wk7I6">this discussion forum</a>, wherein a user named Justin Baker says:</p>
+
+<blockquote>RUBYOPT is an environment variable that you can set to cause every invocation of `ruby` to be started with those options.</blockquote>
+
+<p>This would be handy if you wanted to make sure some of Ruby's options were always passed by default, without having to pass them manually every time.</p>
+
+<p>Here we're concerned with the <code>-w</code> option, since that's what's mentioned in the commented-out line of code.  If we re-run <code>man ruby</code> and search for <code>-w</code>, we see this flag does the following:</p>
+
+<pre><code>-w   Enables verbose mode without printing version message at the beginning.  
+It sets the $VERBOSE variable to true.
+</code></pre>
+
+<h2>Experiment- running Ruby with and without verbose mode</h2>
+
+<p>What is verbose mode, and what kinds of information should we expect to see when running in verbose mode, which we would not see when running in non-verbose mode?</p>
+
+<p>One type of info is warnings.  For example, if we try to reference an instance variable which hasn't yet been defined, we'll get a warning, but only when we're in <code>-w</code> mode.  For example, let's say we have a script named "foo.rb" which looks like so:</p>
+
+<pre><code># foo.rb
+
+@undefined_variable
+puts "Hello world"</code></pre>
+
+<p>If we then run <code>ruby foo.rb</code> from our terminal, we see the following:</p>
+
+<pre><code>$ ruby foo.rb   
+Hello world
+</code></pre>
+
+<p>If, however, we pass the <code>-w</code> flag, we see:</p>
+
+<pre><code>$ ruby -w foo.rb
+foo.rb:2: warning: possibly useless use of a variable in void context
+Hello world
+</code></pre>
+
+<p>So these are the kinds of "warnings" that the comments <a href="">here</a> told us we can prevent from showing up by setting <code>$TESTING</code> equal to <code>true</code>.  But how does doing the former cause the latter to happen?  Is this done automatically by Ruby, or is it in the code somewhere?</p>
+
+<p>As it turns out, the answer is the latter.  <a href="https://github.com/sidekiq/sidekiq/blob/7c41779ad6ea196d75c84a46a1df04405bb6202f/lib/sidekiq/testing.rb#L332-L334">This block of code</a> calls the <code>warn</code> method, but only under certain conditions.  One of those conditions is that <code>$TESTING</code> should be <code>false</code>:</p>
+
+<pre><code>if defined?(::Rails) && Rails.respond_to?(:env) && !Rails.env.test? && !$TESTING
+  warn("⛔️ WARNING: Sidekiq testing API enabled, but this is not the test environment.  Your jobs will not go to Redis.", uplevel: 1)
+end</code></pre>
+
+<p>If <code>!$TESTING</code> (i.e. <code>$TESTING</code> with a bang in front of it) is <code>true</code>, then <code>$TESTING</code> must be <code>false</code>.</p>
+
+<h2>Why Disable Warnings?</h2>
+
+<p>For further context on why the above code was added, we can run <code>git blame</code> on this file, look up the commit SHA, and search for that SHA in Github:</p>
+
+<pre><code>$ git blame bin/sidekiq
+
+726b6cad7 (Mike Perham 2012-01-16 16:14:47 -0800  1) #!/usr/bin/env ruby
+726b6cad7 (Mike Perham 2012-01-16 16:14:47 -0800  2) 
+bcbe9b258 (Mike Perham 2015-06-22 09:14:55 -0700  3) # Quiet some warnings we see when running in warning mode:
+bcbe9b258 (Mike Perham 2015-06-22 09:14:55 -0700  4) # RUBYOPT=-w bundle exec sidekiq
+bcbe9b258 (Mike Perham 2015-06-22 09:14:55 -0700  5) $TESTING = false
+bcbe9b258 (Mike Perham 2015-06-22 09:14:55 -0700  6) 
+...  
+</code></pre>
+
+<p>If we search <a href="https://github.com/sidekiq/sidekiq">Sidekiq's Github repo</a> for the SHA <code>bcbe9b258</code>, we find <a href="https://github.com/sidekiq/sidekiq/commit/bcbe9b258aec081d56ba1ae0188b677014f6abf8">this link</a>, with a description that says the PR was added to resolve <a href="https://github.com/sidekiq/sidekiq/issues/2402">this reported issue</a>:</p>
+
+<blockquote><p>When I enable ruby warnings (aka verbose mode) I get the following warning:</p>
+
+<code>/Users/iain/.gem/ruby/2.2.2/gems/sidekiq-3.0.0/lib/sidekiq/fetch.rb:85: warning: instance variable @done not initialized</code>
+
+
+<p><br>It happens every second or so (looks like sidekiq is polling for new jobs). It looks like the code has a class variable called @done which is read but never initialized here.</p>
+
+<p>I'm happy to fix it, but I don't have any good suggestions about how to initialize it cleanly, and wanted to ask in case you have any ideas (before I do the work).</p></blockquote>
+
+<p>So the user who reported the issue was running Ruby in verbose mode, and seeing warnings because an instance variable named <code>@done</code> was being referenced in one of Sidekiq's files (<code>~/.gem/ruby/2.2.2/gems/sidekiq-3.0.0/lib/sidekiq/fetch.rb</code>) but hadn't been defined yet.  This was unnoticeable in regular Ruby mode, but triggered a warning in verbose mode.  The PR which introduced our current block of code prevents the warning from being triggered, by replacing the simple reference to <code>@done</code> with the more syntactically-correct <code>defined? @done</code> inside the <code>self.done?</code> method body.</p>
+
+<h2>Wrapping Up</h2>
+
+<p>Let's now move on to the <code>integrate_with_systemd</code> method, which is implemented in the next block of code and then invoked a bit later inside our current file.</p>
