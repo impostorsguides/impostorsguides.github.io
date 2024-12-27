@@ -1,0 +1,35 @@
+<header class="post-header">
+  <h1 class="post-title">Integrating With <code>systemd</code></h1>
+</header>
+
+<p>Next line of code:</p>
+
+<pre><code>require_relative "../lib/sidekiq/cli"</code></pre>
+
+<p>This code simply requires the <code>Sidekiq::CLI</code> class, which we'll discuss in a future post.  In brief, this class is responsible for parsing command-line arguments, configuring Sidekiq, handling signals, and starting the Sidekiq process.</p>
+
+<h2>The <code>integrate_with_systemd</code> method</h2>
+
+<p>Next block of code:</p>
+
+<pre><code>def integrate_with_systemd
+  return unless ENV["NOTIFY_SOCKET"]
+
+  Sidekiq.configure_server do |config|
+    config.logger.info "Enabling systemd notification integration"
+    require "sidekiq/sd_notify"
+    config.on(:startup) do
+      Sidekiq::SdNotify.ready
+    end
+    config.on(:shutdown) do
+      Sidekiq::SdNotify.stopping
+    end
+    Sidekiq.start_watchdog if Sidekiq::SdNotify.watchdog?
+  end
+end
+</code></pre>
+
+<p>We'll need the rest of this post to talk about what this method does.  But first: what is the "systemd" that is referenced in this method name?</p>
+
+<p>I wanted to be able to experiment with <code>systemd</code> and its command line interface, <code>systemctl</code>, but I use a Macbook (which runs on Unix) and apparently Unix doesn't support <code>systemd</code>.  I </p>
+

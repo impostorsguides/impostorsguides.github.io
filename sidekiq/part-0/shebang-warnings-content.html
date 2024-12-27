@@ -67,7 +67,20 @@ Hello world
 
 <pre><code>$ ruby -w foo.rb
 foo.rb:2: warning: possibly useless use of a variable in void context
-Hello world
+Hello world</code></pre>
+
+<p>Similarly, if we first <code>export</code> the <code>RUBYOPT</code> environment variable before running our "foo.rb" script, we see the same warning:</p>
+
+<pre><code>$ export RUBYOPT=-w
+$ ruby foo.rb
+foo.rb:1: warning: possibly useless use of a variable in void context
+Hello world</code></pre>
+
+<p>But if we unset <code>RUBYOPT</code> and re-run the script, the warning goes away:</p>
+
+<pre><code>$ export RUBYOPT=  
+$ ruby foo.rb
+Hi
 </code></pre>
 
 <p>So these are the kinds of "warnings" that the comments <a href="">here</a> told us we can prevent from showing up by setting <code>$TESTING</code> equal to <code>true</code>.  But how does doing the former cause the latter to happen?  Is this done automatically by Ruby, or is it in the code somewhere?</p>
