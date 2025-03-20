@@ -1,0 +1,31 @@
+---
+layout: post
+permalink: /blog/python-vs-ruby-dependency-management/
+title: WIP- Why do we need to create a virtual environment for Django projects, but not for Rails projects?
+excerpt_separator: <!--more-->
+createdAt: 20 Mar, 2025
+---
+
+<div>
+  <figure style="width: 100%; margin: 0 0 10px 25px">
+    <img src="/assets/images/chefs_knife.jpg" style="margin: auto" width="100%" alt="Image of a chef chopping ingredients.">
+    <figcaption style="text-align: center;">Photo attribution <a href="/blog/what-is-systemd/#photo-attribution">here</a>.</figcaption>
+  </figure>
+</div>
+
+<p>While reading through the code for Ruby's Sidekiq library, I came across <a href="https://github.com/sidekiq/sidekiq/blob/7c41779ad6ea196d75c84a46a1df04405bb6202f/bin/sidekiq#L9-L23" target="_blank" rel="nofollow">the "integrate_with_systemd" method</a>.  I was curious what "systemd" referred to, and this post is the result of what I learned while Googling around.</p>
+
+<!--more-->
+
+<h2><code>systemd</code> vs. <code>launchd</code></h2>
+
+<p>The first thing I realized when I was researching systemd is that it doesn't exist on Unix systems, only on Linux systems.  In my terminal, I tried calling "systemctl" (the executable command for systemd), but I got a "command not found" error.  Macs have a similar program called "launchctl", but </p>
+
+<div id="photo-attribution">
+  <h4>Photo Attribution</h4>
+  <p>Title: Chef's knife used against knuckle</p>
+  <p>Description: n/a</p>
+  <p>Author: Olaf Simons</p>
+  <p>Source: <a href="https://commons.wikimedia.org/wiki/File:Chef%27s_knife_used_against_knuckle.jpg" target="_blank" rel="noopener">Wikimedia</a></p>
+  <p>License: <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.en" target="_blank" rel="noopener">Creative Commons Attribution-Share Alike 3.0 Unported</a></p>
+</div>
