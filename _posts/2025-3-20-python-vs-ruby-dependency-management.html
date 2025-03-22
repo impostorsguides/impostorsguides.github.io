@@ -25,7 +25,9 @@ createdAt: 20 Mar, 2025
   source venv/bin/activate # for Mac/Linux
 </pre>
 
-<p>The comment says the first line "create(s) and activate(s) a virtual environment".  This is not something I've had to do (at least, not consciously) when building Rails apps.  So <a src="https://claude.ai/share/2400b059-aa8e-4e58-898a-230c9cb66771" target="_blank" rel="nofollow">in a separate Claude chat</a>, I ask why this is necessary with Django, but not with Rails.  It's response:</p>
+<p>The comment says the first line "create(s) and activate(s) a virtual environment".  This is not something I've had to do (at least, not consciously) when building Rails apps.  Side note- In Python, virtual environments aren't strictly required, but they're strongly recommended to avoid dependency conflicts.</p>
+
+<p><a src="https://claude.ai/share/2400b059-aa8e-4e58-898a-230c9cb66771" target="_blank" rel="nofollow">in a separate Claude chat</a>, I ask why this is necessary with Django, but not with Rails.  It's response:</p>
 
 <blockquote>
 <p>Django and Rails handle their dependencies and project isolation differently:</p>
@@ -47,12 +49,28 @@ createdAt: 20 Mar, 2025
 <p>The key difference is that Rails has integrated dependency management through Bundler as part of its standard setup, while Django relies on Python's external virtual environment tools to achieve similar isolation.</p>
 </blockquote>
 
-<p>What stood out to me first is the point about Python lacking built-in project-specific dependency management.  After some digging, I discovered that the packages and dependencies of a Django project are stored in a sub-directory inside the project's virtual environment directory (i.e. <code>venv</code>).  That directory is called <code>site-packages/</code>, and in my newly-created Django project, that directory lives at <code>lib/python3.13/site-packages</code>.</p>
+<p>What stood out to me first is the point about Python lacking built-in project-specific dependency management, so I did some digging.  I discovered that, when you install dependencies inside a virtual environment, they are stored in a <code>site-packages/</code> directory inside the virtual environment (e.g., <code>venv/lib/python3.13/site-packages/</code>). This ensures that dependencies for one project don't interfere with system-wide Python packages or packages from other projects.</p>
 
-<p>Conversely, Ruby stores dependencies at a global level, and uses the concept of a Gemfile as a dependency manifest file for a given project, and a program called Bundler reads that Gemfile (or more specifically, the <code>Gemfile.lock</code> file which specifies the versions of a project's gems) at runtime and modifies the Ruby load path to only include the specified gem versions for that project.</p>
+<p>The virtual environment created for a Django project contains a directory called <code>bin/</code>.  This directory contains, among other things, several symlinks to the Python executable itself:</p>
 
-<p>This brings up a question: why did Django choose to store a given project's dependencies directly in the project folder, while Ruby chose to store them at the global level?</p>
+<pre><code>~/Desktop/Workspace/Django/django_todo/venv ()  $ ls -la bin/
+...
+-rw-r--r--   1 richiethomas  staff  2135 Mar 20 14:03 activate
+...
+lrwxr-xr-x   1 richiethomas  staff    10 Mar 20 14:03 python -> python3.13
+lrwxr-xr-x   1 richiethomas  staff    10 Mar 20 14:03 python3 -> python3.13
+lrwxr-xr-x   1 richiethomas  staff    98 Mar 20 14:03 python3.13 -> /opt/homebrew/Cellar/python@3.13/3.13.0_1/Frameworks/Python.framework/Versions/3.13/bin/python3.13
+...</code></pre>
 
+<p>Above, we can also see a file in the same <code>bin/</code> directory called <code>activate</code>.  This is the file we're executing when we run <code>source venv/bin/activate</code> as per Claude's instructions.  This file updates our <code>$PATH</code> variable inside the virtual environment to include the <code>python</code> executables inside <code>bin/</code> before any other executables, ensuring this is the executable which gets used when we run Python programs inside the virtual environment.</p>
+
+<p>Conversely, in Ruby, dependency management is a bit different.  If you're using a Ruby version manager, each version manager takes a different approach.  For example, I use <code>rbenv</code> to manage my Ruby versions.  You can explicitly install gems inside your project's directory structure (most commonly inside a folder named <code>vendor/</code>), but by default RBENV stores each version of Ruby in a different folder, and stores gems for each Ruby version inside a sub-folder of that Ruby version's main folder.</p>
+
+<p>With RBENV, gems are installed separately for each Ruby version. If you install a gem while using Ruby 3.0, switching to Ruby 3.1 (rbenv use 3.1) means that gem won't be available until you install it again for that version.</p>
+
+<p>Separately, Ruby uses the concept of a Gemfile as a dependency manifest file for a given project, and a program called Bundler reads that Gemfile (or more specifically, the <code>Gemfile.lock</code> file which specifies the versions of a project's gems) at runtime and modifies the Ruby load path to only include the specified gem versions for that project.</p>
+
+<p>In summary, Ruby version managers like RBENV are in charge of managing both Ruby versions and the locations of each version's gems.  Additionally, Bundler is in charge of including just the Ruby gem versions required for a given project.  It's this one-two punch which allows Ruby projects to avoid storing their own dependencies inside the project folder.</p>
 
 <div id="photo-attribution">
   <h4>Photo Attribution</h4>
