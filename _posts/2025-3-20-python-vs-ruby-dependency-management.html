@@ -13,8 +13,46 @@ createdAt: 20 Mar, 2025
   </figure>
 </div>
 
+<p>I'm starting to learn Django development now, as a side project while I do my job search.  I've seen just as many Python/Django job postings (if not more) as I've seen Rails postings.  And with AI becoming more and more common of a requirement in the engineering field, it feels prudent to have some exposure to Python in general.</p>
+
+<p>One of the first things I did was <a src="https://claude.ai/share/aa7c0771-5712-4ae6-887d-f8b282d9262e" target="_blank" rel="nofollow">ask Claude</a> to help me set up a simple Django to-do app.  After setting up the directory I'll be working in, the first few instructions are as follows:</p>
 
 <!--more-->
+
+<pre>
+  # Create and activate a virtual environment
+  python -m venv venv
+  source venv/bin/activate # for Mac/Linux
+</pre>
+
+<p>The comment says the first line "create(s) and activate(s) a virtual environment".  This is not something I've had to do (at least, not consciously) when building Rails apps.  So <a src="https://claude.ai/share/2400b059-aa8e-4e58-898a-230c9cb66771" target="_blank" rel="nofollow">in a separate Claude chat</a>, I ask why this is necessary with Django, but not with Rails.  It's response:</p>
+
+<blockquote>
+<p>Django and Rails handle their dependencies and project isolation differently:</p>
+<h4>For Django (Python):</h4>
+<ul>
+  <li>Python lacks built-in project-specific dependency management</li>
+  <li>Virtual environments (venv, virtualenv, conda) create isolated spaces where packages are installed only for that project</li>
+  <li>Without them, all packages would be installed system-wide, risking version conflicts between projects</li>
+  <li>Python's package manager (pip) doesn't have built-in project isolation</li>
+</ul>
+
+<h4>For Rails (Ruby):</h4>
+
+<li>Ruby has Bundler, which manages gems (Ruby packages) at the project level</li>
+<li>Bundler reads the Gemfile to install the correct versions of dependencies for each project</li>
+<li>Ruby's gemsets (especially with RVM or rbenv) provide isolation between projects</li>
+<li>Rails comes with this infrastructure built-in as part of its workflow</li>
+<br>
+<p>The key difference is that Rails has integrated dependency management through Bundler as part of its standard setup, while Django relies on Python's external virtual environment tools to achieve similar isolation.</p>
+</blockquote>
+
+<p>What stood out to me first is the point about Python lacking built-in project-specific dependency management.  After some digging, I discovered that the packages and dependencies of a Django project are stored in a sub-directory inside the project's virtual environment directory (i.e. <code>venv</code>).  That directory is called <code>site-packages/</code>, and in my newly-created Django project, that directory lives at <code>lib/python3.13/site-packages</code>.</p>
+
+<p>Conversely, Ruby stores dependencies at a global level, and uses the concept of a Gemfile as a dependency manifest file for a given project, and a program called Bundler reads that Gemfile (or more specifically, the <code>Gemfile.lock</code> file which specifies the versions of a project's gems) at runtime and modifies the Ruby load path to only include the specified gem versions for that project.</p>
+
+<p>This brings up a question: why did Django choose to store a given project's dependencies directly in the project folder, while Ruby chose to store them at the global level?</p>
+
 
 <div id="photo-attribution">
   <h4>Photo Attribution</h4>
