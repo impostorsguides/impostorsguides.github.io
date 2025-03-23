@@ -1,0 +1,166 @@
+---
+layout: post
+permalink: /blog/why-both-apps-and-projects-in-django/
+title: (WIP Post) Why do we need both apps and projects in Django?
+excerpt_separator: <!--more-->
+createdAt: 22 Mar, 2025
+---
+
+<div>
+  <figure style="width: 100%; margin: 0 0 10px 25px">
+    <img src="/assets/images/recipe-app.jpg" style="margin: auto" width="100%" alt="Image of packages being delivered.">
+    <figcaption style="text-align: center;">Photo attribution <a href="/blog/why-both-apps-and-projects-in-django/#photo-attribution">here</a>.</figcaption>
+  </figure>
+</div>
+
+<p>While continuing to follow the instructions <a src="https://claude.ai/chat/80046cad-ed7b-4567-b8a6-b200f8e906fa" target="_blank" rel="nofollow">here</a> on setting up a new Django to-do list app, I got to this point in the instructions:</p>
+
+<!--more-->
+
+<pre><code>## Step 2: Creating a Django Project
+
+  Now, let's create a new Django project:
+  
+  ```bash
+  # Create a new Django project
+  django-admin startproject todo_project .
+  
+  # Create a new app within the project
+  python manage.py startapp todo_app
+  ```</code></pre>
+
+<p>I was confused about the distinction made in the comments about projects vs. apps in Django.  After some digging, I discovered that the distinction between "apps" and "projects" is fundamental to Django's architecture.</p>
+
+<p>According to Claude:</p>
+
+<blockquote>
+  The distinction (between a project and an app) is that a Django "project" is the entire web application, while an "app" is a modular component within the project that handles specific functionality. A single project can contain multiple apps, and apps can be reused across different projects.
+</blockquote>
+
+<p>I asked Claude to further explain the concept of apps by giving me an example of a real-world project which contains multiple different apps.  Its response:</p>
+
+
+<blockquote>
+  <p>Here's an example of a real-world e-commerce project with multiple Django apps:</p>
+  <h5>E-commerce Platform Project</h5>
+  
+  <h6>User Management App</h6>
+  
+  <ul>
+    <li>Handles user registration, authentication, profiles</li>
+    <li>Manages user permissions and roles</li>
+    <li>Implements password reset functionality and account settings</li>
+  </ul>
+  
+  <h6>Product Catalog App</h6>
+  
+  <ul>
+    <li>Manages product listings, categories, and tags</li>
+    <li>Handles inventory tracking</li>
+    <li>Implements product search and filtering</li>
+    <li>Manages product reviews and ratings</li>
+  </ul>
+  
+  <h6>Shopping Cart App</h6>
+  
+  <ul>
+    <li>Handles shopping cart functionality</li>
+    <li>Manages add/remove/update items</li>
+    <li>Calculates totals, taxes, and discounts</li>
+    <li>Saves carts between sessions</li>
+  </ul>
+  
+  <h6>Checkout App</h6>
+  
+  <ul>
+    <li>Handles checkout process</li>
+    <li>Processes payment information</li>
+    <li>Handles shipping address collection</li>
+    <li>Manages order creation and confirmation</li>
+    <li>Integrates with payment gateways</li>
+  </ul>
+  
+  <h6>Order Management App</h6>
+  
+  <ul>
+    <li>Tracks order status and history</li>
+    <li>Handles order fulfillment workflows</li>
+    <li>Manages shipment tracking</li>
+    <li>Processes returns and refunds</li>
+  </ul>
+  <p>...</p>
+  <p>This modular approach allows different teams to work on separate apps simultaneously, makes the codebase more maintainable, and allows for reusability across other projects if needed.  </p>
+</blockquote>
+
+<p>This is super-helpful, and makes clear the distinction between apps and projects in Django.  Out of curiosity, I then ask Claude if there is a similar concept in Rails to Django's "apps vs. projects" distinction.  Its response:</p>
+
+<blockquote>
+  <p>In Rails, there isn't an exact one-to-one equivalent to Django's "apps vs projects" distinction, but there are comparable concepts:</p>
+
+<p>In Django:</p>
+
+<ul>
+  <li>A project is the entire web application</li>
+  <li>Apps are modular, reusable components within the project</li>
+  <li>Each app handles a specific piece of functionality</li>
+</ul>
+
+<p>In Rails:</p>
+
+<ul>
+  <li>The closest equivalent to a Django "project" is simply a Rails application itself</li>
+  <li>Instead of "apps," Rails uses several modular concepts:
+    <ul>
+      <li>Engines: Self-contained mini-applications that can be mounted within a main Rails app (closest to Django apps)</li>
+      <li>Concerns: Modules that encapsulate shared functionality across controllers or models</li>
+      <li>Gems: Packaged Ruby libraries that can add functionality to Rails apps</li>
+    </ul>
+  </li>
+</ul>
+
+<p>The key differences:</p>
+
+<ul>
+  <li>Rails applications are typically more monolithic, with a standard directory structure for models, views, and controllers</li>
+  <li>Django encourages modularity from the start, with apps being self-contained</li>
+  <li>Rails Engines are more complex to set up than Django apps and aren't used as frequently for internal organization</li>
+  <li>Rails leans more heavily on namespacing within the application, while Django uses separate app directories</li>
+</ul>
+<p>If you wanted to achieve the Django-style modularity in Rails, you'd typically use Engines for truly separable components or use namespaces/modules to organize related code within a single Rails application.</p>
+</blockquote>
+
+<p>So to summarize the above, the closest concept in Rails to Django's concept of apps vs. projects is that a Rails app is like a Django project, while a Rails engine is like a Django app.</p>
+
+<p>After running the commands <code>django-admin startproject todo_project .</code> and <code>python manage.py startapp todo_app
+</code>, my virtual environment's main directory (<code>~/Desktop/Workspace/Django/django_todo/venv</code>) looks like this:</p>
+
+<pre><code>$ ls -la
+total 24
+drwxr-xr-x  10 richiethomas  staff  320 Mar 22 18:45 .
+drwxr-xr-x   3 richiethomas  staff   96 Mar 20 14:03 ..
+-rw-r--r--   1 richiethomas  staff   69 Mar 20 14:03 .gitignore
+drwxr-xr-x  14 richiethomas  staff  448 Mar 20 20:47 bin
+drwxr-xr-x   3 richiethomas  staff   96 Mar 20 14:03 include
+drwxr-xr-x   3 richiethomas  staff   96 Mar 20 14:03 lib
+-rwxr-xr-x   1 richiethomas  staff  668 Mar 22 18:44 manage.py
+-rw-r--r--   1 richiethomas  staff  403 Mar 20 14:03 pyvenv.cfg
+drwxr-xr-x   9 richiethomas  staff  288 Mar 22 18:45 todo_app
+drwxr-xr-x   8 richiethomas  staff  256 Mar 22 18:45 todo_project</code></pre>
+
+<p>Notice the two directories at the end: "todo_app/" and "todo_project/".  The 1st directory (along with the file <code>manage.py</code>) was created by the command <code>python manage.py startapp todo_app</code>, and represents our first app.  Conversely, the 2nd one was created by the command <code>django-admin startproject todo_project .</code>, and represents the Django project as a whole.</p>
+
+<h2>Summary</h2>
+
+<p>An app is a self-contained module that provides a specific functionality, while a project is a collection of apps that work together to form a complete web application. This separation allows for better organization, reusability, and maintainability of code.</p>
+
+
+
+
+<div id="photo-attribution">
+  <h4>Photo Attribution</h4>
+  <p>Title: Fried Egg on a Pan</p>
+  <p>Description: n/a</p>
+  <p>Author: Pranjall Kumar</p>
+  <p>Source: <a href="https://www.pexels.com/photo/fried-egg-on-a-pan-12390158/" target="_blank" rel="noopener">Pexels</a></p>
+  <p>License: <a href="https://www.pexels.com/license/" target="_blank" rel="noopener">Free To Use</a></p>
+</div>
