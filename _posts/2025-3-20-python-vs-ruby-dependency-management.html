@@ -1,7 +1,7 @@
 ---
 layout: post
 permalink: /blog/python-vs-ruby-dependency-management/
-title: WIP- Why do we need to create a virtual environment for Django projects, but not for Rails projects?
+title: Why do we need to create a virtual environment for Django projects, but not for Rails projects?
 excerpt_separator: <!--more-->
 createdAt: 20 Mar, 2025
 ---
@@ -25,9 +25,9 @@ createdAt: 20 Mar, 2025
   source venv/bin/activate # for Mac/Linux
 </pre>
 
-<p>The comment says the first line "create(s) and activate(s) a virtual environment".  This is not something I've had to do (at least, not consciously) when building Rails apps.  Side note- In Python, virtual environments aren't strictly required, but they're strongly recommended to avoid dependency conflicts.</p>
+<p>The comment says the first line "create(s) and activate(s) a virtual environment".  This is not something I've had to do (at least, not consciously) when building Rails apps.  Side note- In Python, virtual environments aren't strictly required, but <a src="https://chatgpt.com/share/67df238f-9ca8-800f-bd34-50b212a537da" target="_blank" rel="nofollow">they're strongly recommended</a> to avoid dependency conflicts.</p>
 
-<p><a src="https://claude.ai/share/2400b059-aa8e-4e58-898a-230c9cb66771" target="_blank" rel="nofollow">in a separate Claude chat</a>, I ask why this is necessary with Django, but not with Rails.  It's response:</p>
+<p><a src="https://claude.ai/share/2400b059-aa8e-4e58-898a-230c9cb66771" target="_blank" rel="nofollow">In a separate Claude chat</a>, I ask why this is necessary with Django, but not with Rails.  The response I get is:</p>
 
 <blockquote>
 <p>Django and Rails handle their dependencies and project isolation differently:</p>
@@ -64,7 +64,7 @@ lrwxr-xr-x   1 richiethomas  staff    98 Mar 20 14:03 python3.13 -> /opt/homebre
 
 <p>Above, we can also see a file in the same <code>bin/</code> directory called <code>activate</code>.  This is the file we're executing when we run <code>source venv/bin/activate</code> as per Claude's instructions.  This file updates our <code>$PATH</code> variable inside the virtual environment to include the <code>python</code> executables inside <code>bin/</code> before any other executables, ensuring this is the executable which gets used when we run Python programs inside the virtual environment.</p>
 
-<p>Conversely, in Ruby, dependency management is a bit different.  If you're using a Ruby version manager, each version manager takes a different approach.  For example, I use <code>rbenv</code> to manage my Ruby versions.  You can explicitly install gems inside your project's directory structure (most commonly inside a folder named <code>vendor/</code>), but by default RBENV stores each version of Ruby in a different folder, and stores gems for each Ruby version inside a sub-folder of that Ruby version's main folder.</p>
+<p>Conversely, in Ruby, dependency management is a bit different.  If you're using a Ruby version manager, each version manager takes a different approach.  For example, I use <code>rbenv</code> to manage my Ruby versions.  By default, RBENV stores each version of Ruby in a different folder, and stores gems for each Ruby version inside a sub-folder of that Ruby version's main folder.  However, you can also explicitly install gems inside your project's directory structure (most commonly inside a folder named <code>vendor/</code>).</p>
 
 <p>With RBENV, gems are installed separately for each Ruby version. If you install a gem while using Ruby 3.0, switching to Ruby 3.1 (rbenv use 3.1) means that gem won't be available until you install it again for that version.</p>
 
