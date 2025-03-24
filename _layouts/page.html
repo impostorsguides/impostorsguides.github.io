@@ -18,4 +18,15 @@ layout: base
     </div>
   {% endif %}
 
+  {% if page.photo-title %}
+  <div id="photo-attribution">
+    <h4>Photo Attribution</h4>
+    <p>Title: {{ page.photo-title || 'n/a' }}</p>
+    <p>Description: {{ page.photo-description || 'n/a' }} </p>
+    <p>Author: {{ page.photo-author || 'n/a' }} </p>
+    <p>Source: <a href={{ page.photo-source-link }} target="_blank" rel="noopener">{{ page.photo-source-name }}</a></p>
+    <p>License: <a href={{ page.photo-source-license-link }} target="_blank" rel="noopener">{{ page.photo-source-license-name }}</a></p>
+  </div>
+  {% endif %}
+
 </article>
