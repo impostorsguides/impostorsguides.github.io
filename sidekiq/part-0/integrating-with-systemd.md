@@ -7,7 +7,7 @@ permalink: /sidekiq/integrating-with-systemd/
 next-title: 
 next-permalink: 
 previous-title: Shebangs and Disabling Certain Warnings
-previous-permalink: /sidekiq/shebang-and-warnings/
+previous-permalink: /sidekiq/shebang-and-warnings
 ---
 
 {% include_relative integrating-with-systemd-content.html %}

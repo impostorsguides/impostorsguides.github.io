@@ -4,7 +4,7 @@ If we look at the `git` history for this symlink file, we can see that it was ad
 
 So, why the change of directories?
 
-When we previously read through the `rbenv` command, specifically the part about [making hooks available](/rbenv/rbenv/making-hooks-available){:target="_blank" rel="noopener" }, we learned about the [Filesystem Hierarchy Standard](https://es.wikipedia.org/wiki/Filesystem_Hierarchy_Standard){:target="_blank" rel="noopener" }.  Part of that standard addresses the `bin/` and `libexec/` directories, and why you might use one vs. the other.
+When we previously read through the `rbenv` command, specifically the part about [making hooks available](/shell/rbenv/making-hooks-available){:target="_blank" rel="noopener" }, we learned about the [Filesystem Hierarchy Standard](https://es.wikipedia.org/wiki/Filesystem_Hierarchy_Standard){:target="_blank" rel="noopener" }.  Part of that standard addresses the `bin/` and `libexec/` directories, and why you might use one vs. the other.
 
 ## Uses of the `bin/` directory
 
