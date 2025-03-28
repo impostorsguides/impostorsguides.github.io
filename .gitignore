@@ -1,6 +1,5 @@
 .DS_Store
 _site/**
-!_site/sitemap.xml
 .byebug_history
 .sass-cache
 .jekyll-metadata
