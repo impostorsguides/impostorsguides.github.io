@@ -12,3 +12,18 @@ createdAt: 25 Mar, 2025
     <figcaption style="text-align: center;">Photo attribution <a href="/blog/class-attributes-in-django/#photo-attribution">here</a>.</figcaption>
   </figure>
 </div>
+
+<p>While making a simple to-do app in Django as part of <a href="https://claude.ai/share/aa7c0771-5712-4ae6-887d-f8b282d9262e" target="_blank" rel="nofollow">a guide that ClaudeAI wrote for me</a>, I came across the following code:</p>
+
+<pre><code>...
+
+class TodoListView(ListView):
+  model = Todo
+  template_name = 'todo_app/todo_list.html'
+  context_object_name = 'todos'
+
+...</code></pre>
+
+<p>Coming from Ruby, this code was strange-looking to me.  It looked as if we're declaring a class, and then declaring several local variables inside the class.  That's not something you'd typically do in Ruby.  Instead, you could declare class variables.</p>
+
+<p>I assumed that's what was happening here, but I wanted to be sure.</p>
