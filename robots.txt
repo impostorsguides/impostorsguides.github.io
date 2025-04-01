@@ -4,6 +4,7 @@ layout: null
 
 User-agent: *
 Disallow: /*.html$
+Disallow: /-content/
 Disallow: /404.html
 
 Sitemap: {{ "/sitemap.xml" | prepend: site.baseurl | prepend: site.url }}
