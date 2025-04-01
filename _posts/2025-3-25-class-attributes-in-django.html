@@ -24,6 +24,77 @@ class TodoListView(ListView):
 
 ...</code></pre>
 
-<p>Coming from Ruby, this code was strange-looking to me.  It looked as if we're declaring a class, and then declaring several local variables inside the class.  That's not something you'd typically do in Ruby.  Instead, you could declare class variables.</p>
+<p>I assumed (and ChatGPT confirmed) that this code creates a class named "TodoListView", which inherits from a more generic "ListView" parent class.  So far, so good.  However, the variable declarations in the body of the class look strange to me, especially since I come from a Ruby background.</p>
 
-<p>I assumed that's what was happening here, but I wanted to be sure.</p>
+<p>It's as if we're declaring a class, and then declaring several local variables inside the class.  That's a bit non-sensical, so I'm assuming that's not what this does, but I'm not sure what it *does* do.  So I asked ChatGPT to explain.  Its response:</p>
+
+<blockquote>
+<p>...in Python (and Django), those look like regular variable assignments, but they are actually <strong>class attributes</strong> rather than instance attributes.</p>
+
+<h4>Key Difference from Rails:</h4>
+
+<p>In Ruby on Rails, you would typically define instance variables inside methods (e.g., <code>@todos = Todo.all</code> in a controller action). However, in Django class-based views, attributes like <code>model</code>, <code>template_name</code>, and <code>context_object_name</code> are class attributes, which Django's <code>ListView</code> uses to configure the view.</p>
+
+<h4>How This Works in Django:</h4>
+<p><code>ListView</code> is a Django <strong>generic class-based view</strong> (CBV).</p>
+
+<p>Django internally reads these class attributes and uses them to configure the view when handling a request.</p>
+
+<p>Behind the scenes, <code>ListView</code> provides a method called <code>get_queryset()</code>, which retrieves the model data. You can override it if needed.</p>
+
+<h4>Equivalent in Rails:</h4>
+<p>In a Rails controller, the equivalent would be:</p>
+
+<pre>
+<code>class TodosController < ApplicationController
+  def index
+    @todos = Todo.all
+    render "todos/index"
+  end
+end</code>
+</pre>
+<p>But in Django, <code>ListView</code> abstracts this logic, so you don't have to manually define a method to fetch records.</p>
+</blockquote>
+
+<p>OK, so "class attributes" are just the Django equivalent of "class variables" in Ruby.  Same with "instance attributes" vs. "instance variables".  And instead of the Rails method of defining a `TodosController` class which would contain all of our controller actions (<code>index</code>, <code>show</code>, etc.), we define separate classes for each "action" for our business object, i.e. ToDo instances.</p>
+
+<p>So does Django have a <code>ShowView</code> parent class, which would be the equivalent of the Rails <code>show</code> action?  Or an <code>EditView</code> class, which would equate to Rails' <code>edit</code> action?  Not quite, but close!  According to ChatGPT, these are the Django parent classes, with their Rails equivalents:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Django View</th>
+      <th>Rails Equivalent</th>
+    </tr>
+  </thead>
+  <tr>
+    <td>ListView</td>
+    <td><code>index</code> (e.g., <code>Todo.all</code>)</td>
+  </tr>
+  <tr>
+    <td>DetailView</td>
+    <td><code>show</code> (e.g., <code>Todo.find(params[:id])</code>)</td>
+  </tr>
+  <tr>
+    <td>CreateView</td>
+    <td><code>new</code> + <code>create</code> (e.g., <code>Todo.new</code>, <code>Todo.create</code>)</td>
+  </tr>
+  <tr>
+    <td>UpdateView</td>
+    <td><code>edit</code> + <code>update</code> (e.g., <code>Todo.find(params[:id]).update</code>)</td>
+  </tr>
+  <tr>
+    <td>DeleteView</td>
+    <td><code>destroy</code> (e.g., <code>Todo.find(params[:id]).destroy</code>)</td>
+  </tr>
+</table>
+
+<p>Last question- what are some other class attributes that can be set in Django?  According to ChatGPT (and confirmed by <a src="https://docs.djangoproject.com/en/5.1/topics/pagination/" target="_blank" rel="nofollow">the Django docs</a>), here are some of the more useful class attributes used with ListView:</p>
+
+<ul>
+  <li>You can define an alternative to the default result set (aka the default queryset) by using the <code>queryset</code> class attribute, i.e. <code>queryset = Todo.objects.filter(completed=false)</code>.</li>
+  <li>You can set how many results per paginated page by defining the <code>paginate_by</code> attribute, i.e. <code>paginate_by = 10</code>.</li>
+  <li>You can set which attribute of the queryset object will dictate the result order by using the <code>ordering</code> attribute, i.e. <code>ordering = ["-created_at"]</code>.</li>
+</ul>
+
+<p>Great, I answered my original question about class attributes, and several follow-up questions as well.</p>
