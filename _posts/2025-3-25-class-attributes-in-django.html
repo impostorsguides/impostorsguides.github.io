@@ -97,4 +97,40 @@ end</code>
   <li>You can set which attribute of the queryset object will dictate the result order by using the <code>ordering</code> attribute, i.e. <code>ordering = ["-created_at"]</code>.</li>
 </ul>
 
+<p>As a last step, I ask ChatGPT to come up with a simple, "Hello World" example of using parent classes with class attributes, and inheriting from that parent class in subsequent child classes.  Here's the code it gave me:</p>
+
+<pre><code># in a file named greeter.py
+  
+class Greeter:
+	greeting = "Hello"
+	name = "World"
+
+	def say_hello(self):
+		print(f"{self.greeting}, {self.name}!")
+
+class FriendlyGreeter(Greeter):
+	greeting = "Hi"
+	name = "Alice"
+
+class FormalGreeter(Greeter):
+	greeting = "Good day"
+	name = "Mr. Smith"
+
+greeter = Greeter()
+friendlyGreeter = FriendlyGreeter()
+formalGreeter = FormalGreeter()
+
+greeter.say_hello()
+friendlyGreeter.say_hello()
+formalGreeter.say_hello()</code></pre>
+
+<p>When I run this code in my terminal, I get:</p>
+
+<pre><code>$ python3 greeter.py 
+  Hello, World!
+  Hi, Alice!
+  Good day, Mr. Smith!</code></pre>
+
+<p>This result makes sense- the parent class is able to be instantiated, and when we do so we see the default values of "Hello" and "World" in-use.  But when we override those values in child classes, we see the <code>say_hello</code> method uses those child class attribute values instead.</p>
+
 <p>Great, I answered my original question about class attributes, and several follow-up questions as well.</p>
